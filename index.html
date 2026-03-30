@@ -5143,19 +5143,17 @@ function injectAttendingInline(card, sel){
     </div>
     <div class="att-inline-response" id="att-inline-response"></div>`;
 
-  // Insere após o key-point-wrap (dentro do card, antes dos contadores)
-  const kpWrapEl = document.getElementById('key-point-wrap');
-  const reportBtn = document.querySelector('[id="report-issue-btn"]') || 
-                    document.querySelector('.card-footer-counter');
-  if(kpWrapEl && kpWrapEl.parentNode){
-    // Insere depois do key-point-wrap
-    kpWrapEl.parentNode.insertBefore(wrap, kpWrapEl.nextSibling);
-  } else {
-    // Fallback: antes dos botões FSRS
-    const studyInner = document.getElementById('study-inner');
-    const fsrsNav = studyInner ? studyInner.querySelector('.fsrs-nav') : null;
-    if(fsrsNav && fsrsNav.parentNode){
-      fsrsNav.parentNode.insertBefore(wrap, fsrsNav);
+  // Insere no study-inner, entre o card e os botões FSRS
+  const studyInner = document.getElementById('study-inner');
+  if(studyInner){
+    // Procura o plain-nav ou fsrs-nav como referência
+    const plainNav = studyInner.querySelector('#plain-nav');
+    const fsrsNav  = studyInner.querySelector('#fsrs-nav');
+    const ref = plainNav || fsrsNav;
+    if(ref){
+      studyInner.insertBefore(wrap, ref);
+    } else {
+      studyInner.appendChild(wrap);
     }
   }
 
