@@ -2798,36 +2798,22 @@ function revealAnswer(sel,card){
   const dd=document.getElementById('exp-dist');
   if(dw&&dd){
     if(distHtml){
-      // Extrair Key point do distHtml e colocar separado
-      let cleanDist = distHtml;
-      let keyPointText = '';
-      const kpMatch = distHtml.match(/<b>Key point:<\/b>\s*(.+?)(?:<div|<\/div>|$)/is);
-      if(!kpMatch){
-        // Tentar sem tags
-        const kpMatch2 = distHtml.match(/Key point[:\s]+(.+?)(?:<div|$)/is);
-        if(kpMatch2) keyPointText = kpMatch2[1].trim();
-      } else {
-        keyPointText = kpMatch[1].trim();
-      }
-      // Remover Key point do distHtml
-      cleanDist = distHtml
-        .replace(/<b>Key point:<\/b>\s*.+?(?=<div class="dist-item"|$)/is, '')
-        .replace(/Key point[:\s]+.+?(?=<div class="dist-item"|$)/is, '')
-        .trim();
-      dd.innerHTML = cleanDist || distHtml;
+      dd.innerHTML = distHtml;
       dw.style.display = '';
-      // Renderizar Key point separado abaixo
-      const kpWrap = document.getElementById('key-point-wrap');
-      if(kpWrap){
-        if(keyPointText){
-          kpWrap.innerHTML = '<div class="key-point-line"><span class="key-point-label">Key point</span> ' + keyPointText + '</div>';
-          kpWrap.style.display = '';
-        } else {
-          kpWrap.style.display = 'none';
-        }
-      }
     } else {
       dw.style.display='none';
+    }
+  }
+
+  // KEY POINT — usa campo kp do Supabase
+  const kpWrap = document.getElementById('key-point-wrap');
+  if(kpWrap){
+    const kpText = (card.kp || '').trim();
+    if(kpText && kpText.toLowerCase() !== 'null'){
+      kpWrap.innerHTML = '<div class="key-point-line"><span class="key-point-label">Key Point</span> ' + kpText + '</div>';
+      kpWrap.style.display = '';
+    } else {
+      kpWrap.style.display = 'none';
     }
   }
 
@@ -2884,6 +2870,9 @@ function revealAnswer(sel,card){
   // Show FSRS buttons
   const rb=document.getElementById('fsrs-nav');
   if(rb) rb.classList.add('visible');
+
+  // ── BoardMD Attending — inject inline after answer revealed ──
+  injectAttendingInline(card, sel);
 
   // Update FSRS intervals display
   const ivs=getIntervals(getState(card.id));
@@ -5060,73 +5049,43 @@ function showAppAuthMenu(){
   }, 50);
 }
 </script>
-<!-- BOARDMD ATTENDING PANEL -->
-<div id="attending-overlay" onclick="if(event.target===this)closeAttending()">
-  <div id="attending-panel">
-    <div class="att-header">
-      <div class="att-header-left">
-        <div class="att-badge">
-          <svg viewBox="0 0 24 24"><path d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 1 1 7.072 0l-.548.547A3.374 3.374 0 0 0 14 18.469V19a2 2 0 1 1-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
-        </div>
-        <div>
-          <div class="att-title">BoardMD Attending</div>
-          <div class="att-subtitle">AI-powered clinical reasoning tutor</div>
-        </div>
-      </div>
-      <button class="att-close" onclick="closeAttending()">✕</button>
-    </div>
-    <div class="att-usage" id="att-usage-line">
-      <span id="att-free-indicator">Free tier: <span id="att-uses-left">3</span>/3 questions today</span>
-    </div>
-    <div class="att-buttons">
-      <button class="att-btn" id="att-btn-why" onclick="askAttending('why')">
-        <div class="att-btn-icon" style="background:rgba(244,63,94,.12);">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#f43f5e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-        </div>
-        <div>
-          <div class="att-btn-label">Why my answer?</div>
-          <div class="att-btn-desc">Explain why your choice was right or wrong</div>
-        </div>
-      </button>
-      <button class="att-btn" id="att-btn-explain" onclick="askAttending('explain')">
-        <div class="att-btn-icon" style="background:rgba(59,127,255,.12);">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#3b7fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
-        </div>
-        <div>
-          <div class="att-btn-label">Explain better</div>
-          <div class="att-btn-desc">Deeper concept breakdown with analogies</div>
-        </div>
-      </button>
-      <button class="att-btn" id="att-btn-mcq" onclick="askAttending('mcq')">
-        <div class="att-btn-icon" style="background:rgba(34,197,94,.12);">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
-        </div>
-        <div>
-          <div class="att-btn-label">More MCQs</div>
-          <div class="att-btn-desc">Generate 2 similar board-style questions</div>
-        </div>
-      </button>
-      <button class="att-btn" id="att-btn-surprise" onclick="askAttending('surprise')">
-        <div class="att-btn-icon" style="background:rgba(232,168,54,.12);">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#e8a836" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-        </div>
-        <div>
-          <div class="att-btn-label">Surprise me</div>
-          <div class="att-btn-desc">HY clinical pearl related to this topic</div>
-        </div>
-      </button>
-    </div>
-    <div class="att-response-wrap" id="att-response-wrap">
-      <div class="att-response-empty" id="att-empty-state">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 1 1 7.072 0l-.548.547A3.374 3.374 0 0 0 14 18.469V19a2 2 0 1 1-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
-        Ask your Attending anything about this card
-      </div>
-    </div>
-  </div>
-</div>
+<!-- BOARDMD ATTENDING — inline inside each card -->
+<style>
+/* ── BOARDMD ATTENDING inline ── */
+.att-inline{margin:0 18px 20px;border:1px solid rgba(139,92,246,.2);border-radius:12px;overflow:hidden;background:rgba(99,102,241,.03);}
+html.light .att-inline{background:rgba(99,102,241,.04);border-color:rgba(139,92,246,.18);}
+.att-inline-header{display:flex;align-items:center;justify-content:space-between;padding:10px 14px 8px;border-bottom:1px solid rgba(139,92,246,.12);}
+.att-inline-left{display:flex;align-items:center;gap:7px;}
+.att-inline-badge{width:24px;height:24px;border-radius:6px;background:linear-gradient(135deg,#6366f1,#8b5cf6);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.att-inline-badge svg{width:12px;height:12px;stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+.att-inline-title{font-size:11px;font-weight:700;color:#8b5cf6;font-family:'Inter',sans-serif;letter-spacing:.03em;}
+.att-inline-btns{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;padding:8px 10px;}
+.att-ibtn{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:8px 4px;cursor:pointer;text-align:center;transition:all .15s;display:flex;flex-direction:column;align-items:center;gap:3px;font-family:'Inter',sans-serif;}
+.att-ibtn:hover{border-color:rgba(139,92,246,.5);background:rgba(99,102,241,.07);transform:translateY(-1px);}
+.att-ibtn:disabled{opacity:.38;cursor:not-allowed;transform:none;}
+.att-ibtn-emoji{display:none;}
+.att-ibtn-label{font-size:9px;font-weight:700;color:var(--text-dim);line-height:1.2;}
+html.light .att-ibtn{background:var(--surface2);}
+.att-inline-response{padding:0 12px 12px;display:none;}
+.att-inline-response.visible{display:block;}
+.att-thinking{display:flex;align-items:center;gap:8px;padding:10px 2px;color:var(--text-faint);font-size:13px;font-family:'Inter',sans-serif;}
+.att-thinking-dots{display:flex;gap:3px;}
+.att-thinking-dot{width:5px;height:5px;border-radius:50%;background:rgba(139,92,246,.6);animation:attDot 1.2s ease infinite;}
+.att-thinking-dot:nth-child(2){animation-delay:.2s;}
+.att-thinking-dot:nth-child(3){animation-delay:.4s;}
+@keyframes attDot{0%,80%,100%{transform:scale(.8);opacity:.5}40%{transform:scale(1.2);opacity:1}}
+.att-response-msg{background:rgba(99,102,241,.06);border:1px solid rgba(99,102,241,.15);border-radius:10px;padding:14px 16px;}
+.att-response-label{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#8b5cf6;margin-bottom:8px;font-family:'Inter',sans-serif;display:flex;align-items:center;gap:5px;}
+.att-response-text{font-size:14px;color:var(--text);line-height:1.78;font-family:'Inter',sans-serif;}
+.att-response-text strong{font-weight:600;color:var(--text);}
+.att-response-text em{font-style:italic;color:var(--text-dim);}
+.att-response-text p{margin:0 0 10px;}
+.att-response-text p:last-child{margin:0;}
+@media(max-width:600px){.att-inline-btns{grid-template-columns:repeat(2,1fr);}}
+</style>
 
 <script>
-// ── BOARDMD ATTENDING — Gemini 2.0 Flash via Puter.js ──────────────────
+// ── BOARDMD ATTENDING — inline no card ────────────────────────────────
 const ATT_FREE_LIMIT = 3;
 const ATT_USES_KEY   = 'bmd_att_uses_v1';
 
@@ -5138,72 +5097,85 @@ function getAttUses(){
     return d;
   }catch(e){ return { date: new Date().toISOString().slice(0,10), count: 0 }; }
 }
+function saveAttUses(u){ try{ localStorage.setItem(ATT_USES_KEY, JSON.stringify(u)); }catch(e){} }
 
-function saveAttUses(uses){
-  try{ localStorage.setItem(ATT_USES_KEY, JSON.stringify(uses)); }catch(e){}
-}
+function injectAttendingInline(card, sel){
+  // Remove bloco anterior se existir
+  const old = document.getElementById('att-inline-wrap');
+  if(old) old.remove();
 
-function updateAttUsageUI(){
-  const uses = getAttUses();
-  const isPro = !!window._supaUser; // Pro = logged in (placeholder for Stripe later)
-  const left = Math.max(0, ATT_FREE_LIMIT - uses.count);
-  const el = document.getElementById('att-uses-left');
-  const line = document.getElementById('att-usage-line');
-  const freeInd = document.getElementById('att-free-indicator');
-  if(isPro){
-    if(line) line.innerHTML = '<span style="color:var(--emerald)">✓ Pro — unlimited questions</span>';
-  } else {
-    if(el) el.textContent = left;
-    if(el) el.style.color = left > 0 ? 'var(--accent)' : 'var(--rose)';
-    // Disable buttons if exhausted
-    ['att-btn-why','att-btn-explain','att-btn-mcq','att-btn-surprise'].forEach(id=>{
-      const btn = document.getElementById(id);
-      if(btn) btn.disabled = left <= 0;
-    });
-  }
-}
-
-function openAttending(){
-  const overlay = document.getElementById('attending-overlay');
-  overlay.classList.add('active');
-  // Reset response area to empty state
-  document.getElementById('att-empty-state')&&(document.getElementById('att-empty-state').style.display='');
-  updateAttUsageUI();
-}
-
-function closeAttending(){
-  document.getElementById('attending-overlay')?.classList.remove('active');
-  document.getElementById('attending-btn')?.classList.remove('active');
-}
-
-async function askAttending(type){
-  // Check usage
-  const uses = getAttUses();
   const isPro = !!window._supaUser;
-  if(!isPro && uses.count >= ATT_FREE_LIMIT){
-    showToast('Daily limit reached. Sign in for Pro access.');
-    return;
-  }
+  const uses   = getAttUses();
+  const left   = Math.max(0, ATT_FREE_LIMIT - uses.count);
+  const blocked = !isPro && left <= 0;
+  const dis = blocked ? 'disabled' : '';
 
-  // Get current card context
-  const allCards = [...(window.deck||[]), ...(window.againQueue||[])];
-  const card = allCards[window.idx] || null;
-  if(!card){
-    showToast('No card loaded. Start studying first.');
-    return;
-  }
+  const usageLine = isPro
+    ? '<span style="font-size:10px;font-family:'JetBrains Mono',monospace;color:var(--emerald);">✓ Pro — unlimited</span>'
+    : `<span style="font-size:10px;font-family:'JetBrains Mono',monospace;color:${left>0?'var(--text-faint)':'var(--rose)'};">${left}/${ATT_FREE_LIMIT} free today</span>`;
 
-  // Disable buttons while loading
-  ['att-btn-why','att-btn-explain','att-btn-mcq','att-btn-surprise'].forEach(id=>{
-    const btn = document.getElementById(id);
-    if(btn) btn.disabled = true;
-  });
-
-  // Show thinking state
-  const wrap = document.getElementById('att-response-wrap');
-  const emptyState = document.getElementById('att-empty-state');
-  if(emptyState) emptyState.style.display = 'none';
+  const wrap = document.createElement('div');
+  wrap.id = 'att-inline-wrap';
+  wrap.className = 'att-inline';
   wrap.innerHTML = `
+    <div class="att-inline-header">
+      <div class="att-inline-left">
+        <div class="att-inline-badge">
+          <svg viewBox="0 0 24 24"><path d="M9.663 17h4.673M12 3v1m6.364 1.636-.707.707M21 12h-1M4 12H3m3.343-5.657-.707-.707m2.828 9.9a5 5 0 1 1 7.072 0l-.548.547A3.374 3.374 0 0 0 14 18.469V19a2 2 0 1 1-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+        </div>
+        <span class="att-inline-title">BoardMD Attending</span>
+      </div>
+      ${usageLine}
+    </div>
+    <div class="att-inline-btns">
+      <button class="att-ibtn" ${dis} onclick="askAttendingInline('why',this)">
+        <span class="att-ibtn-label">Why my answer?</span>
+      </button>
+      <button class="att-ibtn" ${dis} onclick="askAttendingInline('explain',this)">
+        <span class="att-ibtn-label">Explain better</span>
+      </button>
+      <button class="att-ibtn" ${dis} onclick="askAttendingInline('mcq',this)">
+        <span class="att-ibtn-label">More MCQs</span>
+      </button>
+      <button class="att-ibtn" ${dis} onclick="askAttendingInline('surprise',this)">
+        <span class="att-ibtn-label">Surprise me</span>
+      </button>
+    </div>
+    <div class="att-inline-response" id="att-inline-response"></div>`;
+
+  // Insere antes dos botões FSRS
+  const fsrsNav = document.getElementById('fsrs-nav');
+  if(fsrsNav && fsrsNav.parentNode){
+    fsrsNav.parentNode.insertBefore(wrap, fsrsNav);
+  }
+
+  // Guarda contexto do card
+  wrap._attCard = card;
+  wrap._attSel  = sel;
+}
+
+async function askAttendingInline(type, btnEl){
+  const wrap = document.getElementById('att-inline-wrap');
+  if(!wrap) return;
+
+  const card = wrap._attCard;
+  const sel  = wrap._attSel;
+  if(!card){ showToast('No card loaded.'); return; }
+
+  const isPro = !!window._supaUser;
+  const uses   = getAttUses();
+  if(!isPro && uses.count >= ATT_FREE_LIMIT){
+    showToast('Daily limit reached — sign in for Pro access.');
+    return;
+  }
+
+  // Desabilita botões
+  wrap.querySelectorAll('.att-ibtn').forEach(b => b.disabled = true);
+
+  // Mostra thinking
+  const respWrap = document.getElementById('att-inline-response');
+  respWrap.classList.add('visible');
+  respWrap.innerHTML = `
     <div class="att-thinking">
       <div class="att-thinking-dots">
         <div class="att-thinking-dot"></div>
@@ -5213,120 +5185,80 @@ async function askAttending(type){
       <span>Your Attending is thinking…</span>
     </div>`;
 
-  // Build prompt based on type
-  const opts = (card.w||[]).map((o,i)=>String.fromCharCode(65+i)+'. '+o).join('\n');
-  const userChoice = window.lastChosenIdx !== undefined
-    ? String.fromCharCode(65 + window.lastChosenIdx) + '. ' + (card.w||[])[window.lastChosenIdx]
-    : 'Not answered yet';
-  const correctAnswer = card.c || '';
-  const wasCorrect = window.lastChosenIdx !== undefined && (card.w||[])[window.lastChosenIdx] === correctAnswer;
+  setTimeout(()=>{ respWrap.scrollIntoView({ behavior:'smooth', block:'nearest' }); }, 100);
 
-  const cardContext = `
-QUESTION: ${card.q}
+  // Contexto do card
+  const opts = (card.w||[]).map((o,i) => String.fromCharCode(65+i) + '. ' + o).join('\n');
+  const chosenIdx = window.lastChosenIdx;
+  const userChoice = chosenIdx !== undefined
+    ? String.fromCharCode(65+chosenIdx) + '. ' + (card.w||[])[chosenIdx]
+    : 'Not recorded';
+  const wasCorrect = chosenIdx !== undefined && (card.w||[])[chosenIdx] === card.c;
 
+  const ctx = `QUESTION: ${card.q}
 OPTIONS:
 ${opts}
-
-CORRECT ANSWER: ${correctAnswer}
-STUDENT SELECTED: ${userChoice} (${wasCorrect ? 'CORRECT' : 'INCORRECT'})
-TOPIC: ${card.topic || ''} | SYSTEM: ${card.system || ''}
-`;
+CORRECT ANSWER: ${card.c}
+STUDENT SELECTED: ${userChoice} (${wasCorrect ? 'CORRECT ✓' : 'INCORRECT ✗'})
+TOPIC: ${card.topic||''} | SYSTEM: ${card.system||''}
+EXPLANATION: ${(card.e||'').replace(/<[^>]+>/g,' ').slice(0,300)}`;
 
   const prompts = {
-    why: `You are a brilliant, warm attending physician teaching a medical student. The student just answered this USMLE-style question:
+    why: `You are a brilliant, warm attending physician. The student just answered this USMLE board question:\n\n${ctx}\n\nIn 2-3 paragraphs: acknowledge right/wrong (one sentence). Explain WHY using core pathophysiology. Be direct, clinical — like a great attending, not a textbook. End with one punchy clinical pearl.`,
+    explain: `You are a brilliant attending. The student wants deeper understanding:\n\n${ctx}\n\nTeach this concept at the whiteboard. One vivid analogy. Cover: pathophysiology, clinical clues, board trap. 3 paragraphs max.`,
+    mcq: `You are a brilliant attending and board question writer:\n\n${ctx}\n\nWrite 2 new USMLE-style MCQs on the SAME concept. Format:\n**Q1:** [vignette]\nA. B. C. D.\n**Answer: X — [explanation]**\n\n**Q2:** [vignette]\nA. B. C. D.\n**Answer: X — [explanation]**`,
+    surprise: `You are a brilliant attending. Give ONE unforgettable clinical pearl about:\n\n${ctx}\n\nSomething NOT in the explanation — a real-world connection, classic trick, or board trap. 2 paragraphs max. Be vivid.`,
+  };
 
-${cardContext}
-
-In 3-4 paragraphs: First acknowledge whether they got it right or wrong (briefly). Then explain WHY their selected answer was right/wrong from a pathophysiology standpoint. Be direct, use clinical reasoning, and speak like an attending on rounds — not a textbook. End with one memorable clinical pearl.`,
-
-    explain: `You are a brilliant attending physician. The student wants a deeper understanding of this topic:
-
-${cardContext}
-
-Teach this concept as if on rounds with a motivated student. Use a clear analogy or mechanism they can visualize. Cover: core pathophysiology, key clinical presentation clues, and one common exam pitfall. 4-5 paragraphs, conversational but precise.`,
-
-    mcq: `You are a brilliant attending and board examiner. Based on this concept:
-
-${cardContext}
-
-Generate exactly 2 new USMLE Step 1/2 style MCQs testing the SAME concept from different angles. Format each as:
-
-**Question N:** [full vignette stem]
-A. [option]
-B. [option]
-C. [option]
-D. [option]
-**Correct: X — [brief explanation]**
-
-Make them board-realistic, not trivial.`,
-
-    surprise: `You are a brilliant attending physician. The student is studying:
-
-${cardContext}
-
-Give them ONE high-yield clinical pearl or "attending wisdom" about this topic that they will NOT find in the card explanation — something that connects the concept to real clinical practice, a classic presentation, or a board exam trap. Be memorable, engaging, 2-3 paragraphs max. Think: what would make a student say "I'll never forget that."`,
+  const typeLabels = {
+    why:'Why Your Answer', explain:'Deeper Explanation',
+    mcq:'Practice Questions', surprise:'Clinical Pearl'
   };
 
   try {
-    // Use puter.ai for Gemini (free tier)
     let responseText = '';
-
     if(typeof puter !== 'undefined' && puter.ai){
       const response = await puter.ai.chat(prompts[type], { model: 'gemini-2.0-flash' });
-      responseText = typeof response === 'string' ? response : (response?.message?.content || response?.text || JSON.stringify(response));
+      responseText = typeof response === 'string' ? response
+        : (response?.message?.content || response?.text || JSON.stringify(response));
     } else {
-      // Fallback: simulate a response if puter not loaded
-      responseText = '⚠️ Attending not available — please check your internet connection and try again.';
+      responseText = '⚠️ AI Attending not available — check your connection and try again.';
     }
 
-    // Format response
     const formatted = responseText
       .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
       .replace(/\*(.*?)\*/g, '<em>$1</em>')
       .replace(/\n\n/g, '</p><p>')
       .replace(/\n/g, '<br>');
 
-    const typeLabels = {
-      why: '💡 Why Your Answer',
-      explain: '📖 Deeper Explanation',
-      mcq: '📝 Practice Questions',
-      surprise: '⭐ Clinical Pearl'
-    };
-
-    wrap.innerHTML = `
+    respWrap.innerHTML = `
       <div class="att-response-msg">
-        <div class="att-response-label">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 1 1 7.072 0l-.548.547A3.374 3.374 0 0 0 14 18.469V19a2 2 0 1 1-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
-          ${typeLabels[type]}
-        </div>
+        <div class="att-response-label">${typeLabels[type]}</div>
         <div class="att-response-text"><p>${formatted}</p></div>
       </div>`;
 
-    // Increment usage counter
-    if(!isPro){
-      uses.count++;
-      saveAttUses(uses);
-      updateAttUsageUI();
-    }
+    if(!isPro){ uses.count++; saveAttUses(uses); }
 
   } catch(err) {
-    wrap.innerHTML = `<div class="att-response-msg" style="border-color:rgba(244,63,94,.2)"><div class="att-response-text" style="color:var(--rose)">Error reaching Attending. Please try again.<br><small>${err.message||''}</small></div></div>`;
+    respWrap.innerHTML = `<div class="att-response-msg" style="border-color:rgba(244,63,94,.2)">
+      <div class="att-response-text" style="color:var(--rose)">
+        Error reaching Attending. Please try again.<br>
+        <small style="opacity:.6">${err.message||''}</small>
+      </div></div>`;
   }
 
-  // Re-enable buttons
-  updateAttUsageUI();
+  // Re-habilita botões
+  const newUses = getAttUses();
+  const newLeft = Math.max(0, ATT_FREE_LIMIT - newUses.count);
+  wrap.querySelectorAll('.att-ibtn').forEach(b => {
+    b.disabled = !isPro && newLeft <= 0;
+  });
+
+  setTimeout(()=>{ respWrap.scrollIntoView({ behavior:'smooth', block:'nearest' }); }, 80);
 }
 
-// Track which answer the student chose (hook into existing answer logic)
+// Rastreia qual opção o aluno escolheu
 window.lastChosenIdx = undefined;
-const _origHandleAnswer = window.handleAnswer;
-if(typeof window.handleAnswer === 'function'){
-  window.handleAnswer = function(idx){
-    window.lastChosenIdx = idx;
-    return _origHandleAnswer.apply(this, arguments);
-  };
-}
-// Also hook opt-btn clicks after DOM
 document.addEventListener('click', function(e){
   const btn = e.target.closest('.opt-btn');
   if(btn && !btn.disabled){
