@@ -5143,10 +5143,20 @@ function injectAttendingInline(card, sel){
     </div>
     <div class="att-inline-response" id="att-inline-response"></div>`;
 
-  // Insere antes dos botões FSRS
-  const fsrsNav = document.getElementById('fsrs-nav');
-  if(fsrsNav && fsrsNav.parentNode){
-    fsrsNav.parentNode.insertBefore(wrap, fsrsNav);
+  // Insere após o key-point-wrap (dentro do card, antes dos contadores)
+  const kpWrapEl = document.getElementById('key-point-wrap');
+  const reportBtn = document.querySelector('[id="report-issue-btn"]') || 
+                    document.querySelector('.card-footer-counter');
+  if(kpWrapEl && kpWrapEl.parentNode){
+    // Insere depois do key-point-wrap
+    kpWrapEl.parentNode.insertBefore(wrap, kpWrapEl.nextSibling);
+  } else {
+    // Fallback: antes dos botões FSRS
+    const studyInner = document.getElementById('study-inner');
+    const fsrsNav = studyInner ? studyInner.querySelector('.fsrs-nav') : null;
+    if(fsrsNav && fsrsNav.parentNode){
+      fsrsNav.parentNode.insertBefore(wrap, fsrsNav);
+    }
   }
 
   // Guarda contexto do card
