@@ -1727,6 +1727,23 @@ function applyFont(){
   document.documentElement.style.setProperty('--font-size',fontSize+'px');
   const el=document.getElementById('fval');if(el) el.textContent=fontSize;
   try{localStorage.setItem('bmd_font',fontSize);}catch(e){}
+  // Force font size on all card text elements
+  const px = fontSize+'px';
+  const targets = [
+    '#c-q',           // question
+    '.opt-btn',       // options
+    '.exp-text',      // explanation
+    '.exp-dist',      // distractors
+    '.exp-correct-inner', // correct answer
+    '.key-point-line',    // key point
+    '.att-response-text', // attending response
+    '.dist-item',         // distractor items
+  ];
+  targets.forEach(sel=>{
+    document.querySelectorAll(sel).forEach(el=>{
+      el.style.fontSize = px;
+    });
+  });
 }
 
 // ── SESSION STATE ────────────────────────────────────────────────────
@@ -2214,6 +2231,9 @@ function shuffleOpts(card){
 // ── RENDER CARD ───────────────────────────────────────────────────────
 function renderCard(){
   revealed=false;
+  // Remove Attending block from previous card
+  const oldAtt = document.getElementById('att-inline-wrap');
+  if(oldAtt) oldAtt.remove();
   // Hide FSRS buttons until answer revealed
   const _fsrs=document.getElementById('fsrs-nav');
   if(_fsrs) _fsrs.classList.remove('visible');
@@ -5127,7 +5147,7 @@ function injectAttendingInline(card, sel){
       </div>
       ${usageLine}
     </div>
-    <div class="att-inline-btns">
+    <div class="att-inline-btns" style="grid-template-columns:repeat(5,1fr)">
       <button class="att-ibtn" ${dis} onclick="askAttendingInline('why',this)">
         <span class="att-ibtn-label">Why my answer?</span>
       </button>
@@ -5139,6 +5159,9 @@ function injectAttendingInline(card, sel){
       </button>
       <button class="att-ibtn" ${dis} onclick="askAttendingInline('surprise',this)">
         <span class="att-ibtn-label">Surprise me</span>
+      </button>
+      <button class="att-ibtn" onclick="translateCard(this)">
+        <span class="att-ibtn-label">Translate PT</span>
       </button>
     </div>
     <div class="att-inline-response" id="att-inline-response"></div>`;
@@ -5172,7 +5195,8 @@ async function askAttendingInline(type, btnEl){
 
   const isPro = !!window._supaUser;
   const uses   = getAttUses();
-  if(!isPro && uses.count >= ATT_FREE_LIMIT){
+  // Translate is always free
+  if(type !== 'translate' && !isPro && uses.count >= ATT_FREE_LIMIT){
     showToast('Daily limit reached — sign in for Pro access.');
     return;
   }
@@ -5216,11 +5240,27 @@ EXPLANATION: ${(card.e||'').replace(/<[^>]+>/g,' ').slice(0,300)}`;
     explain: `You are a brilliant attending. The student wants deeper understanding:\n\n${ctx}\n\nTeach this concept at the whiteboard. One vivid analogy. Cover: pathophysiology, clinical clues, board trap. 3 paragraphs max.`,
     mcq: `You are a brilliant attending and board question writer:\n\n${ctx}\n\nWrite 2 new USMLE-style MCQs on the SAME concept. Format:\n**Q1:** [vignette]\nA. B. C. D.\n**Answer: X — [explanation]**\n\n**Q2:** [vignette]\nA. B. C. D.\n**Answer: X — [explanation]**`,
     surprise: `You are a brilliant attending. Give ONE unforgettable clinical pearl about:\n\n${ctx}\n\nSomething NOT in the explanation — a real-world connection, classic trick, or board trap. 2 paragraphs max. Be vivid.`,
+
+    translate: `Translate the following medical flashcard content to Brazilian Portuguese. Keep medical terms accurate. Return ONLY the translation in this exact format:
+
+QUESTÃO: [translated question]
+A. [option] B. [option] C. [option] D. [option]
+RESPOSTA CORRETA: [translated answer]
+EXPLICAÇÃO: [translated explanation]
+PONTO-CHAVE: [translated key point]
+
+Content to translate:
+QUESTION: \${card.q}
+OPTIONS: \${(card.w||[]).map((o,i)=>String.fromCharCode(65+i)+'. '+o).join(' ')}
+CORRECT ANSWER: \${card.c}
+EXPLANATION: \${(card.e||'').replace(/<[^>]+>/g,' ').slice(0,500)}
+KEY POINT: \${(card.kp||'')}`,
   };
 
   const typeLabels = {
     why:'Why Your Answer', explain:'Deeper Explanation',
-    mcq:'Practice Questions', surprise:'Clinical Pearl'
+    mcq:'Practice Questions', surprise:'Clinical Pearl',
+    translate:'Tradução PT-BR'
   };
 
   try {
@@ -5245,7 +5285,7 @@ EXPLANATION: ${(card.e||'').replace(/<[^>]+>/g,' ').slice(0,300)}`;
         <div class="att-response-text"><p>${formatted}</p></div>
       </div>`;
 
-    if(!isPro){ uses.count++; saveAttUses(uses); }
+    if(!isPro && type !== 'translate'){ uses.count++; saveAttUses(uses); }
 
   } catch(err) {
     respWrap.innerHTML = `<div class="att-response-msg" style="border-color:rgba(244,63,94,.2)">
