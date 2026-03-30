@@ -4714,8 +4714,54 @@ function hideLoadingOverlay(){
   if(el){ el.style.opacity='0'; el.style.transition='opacity .4s'; setTimeout(()=>el.remove(),400); }
 }
 
+// ── CACHE CONFIG ─────────────────────────────────────────────────────
+const CACHE_KEY     = 'bmd_cards_cache_v1';
+const CACHE_TS_KEY  = 'bmd_cards_cache_ts_v1';
+const CACHE_TTL_MS  = 24 * 60 * 60 * 1000; // 24 horas
+
+function getCachedCards(){
+  try {
+    const ts = parseInt(localStorage.getItem(CACHE_TS_KEY) || '0');
+    if(Date.now() - ts > CACHE_TTL_MS) return null;
+    const raw = localStorage.getItem(CACHE_KEY);
+    if(!raw) return null;
+    return JSON.parse(raw);
+  } catch(e){ return null; }
+}
+
+function setCachedCards(cards){
+  try {
+    localStorage.setItem(CACHE_KEY, JSON.stringify(cards));
+    localStorage.setItem(CACHE_TS_KEY, String(Date.now()));
+  } catch(e){
+    // localStorage cheio — limpa cache antigo e tenta de novo
+    try {
+      localStorage.removeItem(CACHE_KEY);
+      localStorage.removeItem(CACHE_TS_KEY);
+    } catch(e2){}
+  }
+}
+
+function buildDecks(allCards){
+  window.DECKS = {};
+  for(const card of allCards){
+    const dk = card.deck;
+    if(!window.DECKS[dk]) window.DECKS[dk] = [];
+    window.DECKS[dk].push(card);
+  }
+}
+
 // ── LOAD ALL CARDS FROM SUPABASE ─────────────────────────────────────
 async function loadCardsFromSupabase(){
+  // Tenta cache primeiro
+  const cached = getCachedCards();
+  if(cached && cached.length > 0){
+    console.log(`BoardMD: ${cached.length} cards from cache`);
+    buildDecks(cached);
+    return cached.length;
+  }
+
+  // Cache miss — carrega do Supabase
   showLoadingOverlay('Loading cards...');
 
   const PAGE = 1000;
@@ -4742,13 +4788,8 @@ async function loadCardsFromSupabase(){
     if(data.length < PAGE) break;
   }
 
-  // Organiza em DECKS
-  window.DECKS = {};
-  for(const card of allCards){
-    const dk = card.deck;
-    if(!window.DECKS[dk]) window.DECKS[dk] = [];
-    window.DECKS[dk].push(card);
-  }
+  buildDecks(allCards);
+  setCachedCards(allCards);
 
   console.log(`BoardMD: ${allCards.length} cards loaded from Supabase`);
   hideLoadingOverlay();
