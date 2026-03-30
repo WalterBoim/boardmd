@@ -964,7 +964,14 @@ html.light { --uw-hover:#f0f7ff; --uw-correct:#e8f5e9; --uw-wrong:#fdecea; --uw-
       <button class="theme-toggle" id="theme-toggle-landing" onclick="toggleTheme()" title="Toggle theme">
         <svg id="theme-icon-landing" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
       </button>
-      <button class="nav-btn primary" onclick="openStepSelector()">Study Now →</button>
+      <div id="nav-auth-area" style="display:flex;align-items:center;gap:8px;">
+        <div id="nav-user-pill" style="display:none;align-items:center;gap:6px;padding:5px 10px;border-radius:8px;border:1px solid var(--border);font-size:12px;font-weight:600;color:var(--text-dim);font-family:'JetBrains Mono',monospace;">
+          <span id="nav-user-name">User</span>
+          <button onclick="signOut()" style="background:none;border:none;color:var(--text-faint);cursor:pointer;font-size:11px;padding:0;margin-left:4px;" title="Sign out">x</button>
+        </div>
+        <button id="nav-login-btn" class="nav-btn" onclick="signInWithGoogle()">Sign in with Google</button>
+      </div>
+      <button class="nav-btn primary" onclick="openStepSelector()">Study Now</button>
     </div>
   </nav>
 
@@ -4671,5 +4678,194 @@ document.getElementById('report-modal-overlay').addEventListener('click', functi
 });
 </script>
 
-<script src="https://pub-d33257b8f4d244fc9f9544f228b1ed79.r2.dev/cards.js" onload="window.cardsLoaded=true;if(window.pendingInit)window.pendingInit();"></script></body>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script>
+// ── SUPABASE CONFIG ──────────────────────────────────────────────────
+const SUPA_URL = 'https://hwdcgbcnphkmxaasties.supabase.co';
+const SUPA_KEY = 'sb_publishable_kgmsWjn-0nH9qxCnNCv0kg_QtU4CEdI';
+const _supa = supabase.createClient(SUPA_URL, SUPA_KEY);
+
+// ── LOADING UI ───────────────────────────────────────────────────────
+function showLoadingOverlay(msg){
+  let el = document.getElementById('bmd-loading-overlay');
+  if(!el){
+    el = document.createElement('div');
+    el.id = 'bmd-loading-overlay';
+    el.style.cssText = 'position:fixed;inset:0;background:var(--bg);z-index:99999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;font-family:"Lato",sans-serif;';
+    el.innerHTML = `
+      <div style="font-size:22px;font-weight:700;color:var(--accent);letter-spacing:-.5px;">BoardMD</div>
+      <div id="bmd-loading-msg" style="font-size:13px;color:var(--text-dim);"></div>
+      <div style="width:200px;height:3px;background:var(--border);border-radius:2px;overflow:hidden;">
+        <div id="bmd-loading-bar" style="height:100%;background:var(--accent);border-radius:2px;transition:width .3s;width:0%"></div>
+      </div>
+      <div id="bmd-loading-count" style="font-size:11px;color:var(--text-faint);font-family:'JetBrains Mono',monospace;"></div>`;
+    document.body.appendChild(el);
+  }
+  document.getElementById('bmd-loading-msg').textContent = msg;
+}
+function updateLoadingProgress(pct, count){
+  const bar = document.getElementById('bmd-loading-bar');
+  const cnt = document.getElementById('bmd-loading-count');
+  if(bar) bar.style.width = pct + '%';
+  if(cnt) cnt.textContent = count + ' cards loaded';
+}
+function hideLoadingOverlay(){
+  const el = document.getElementById('bmd-loading-overlay');
+  if(el){ el.style.opacity='0'; el.style.transition='opacity .4s'; setTimeout(()=>el.remove(),400); }
+}
+
+// ── LOAD ALL CARDS FROM SUPABASE ─────────────────────────────────────
+async function loadCardsFromSupabase(){
+  showLoadingOverlay('Loading cards...');
+
+  const PAGE = 1000;
+  const allCards = [];
+  let from = 0;
+  let total = null;
+
+  while(true){
+    const { data, error, count } = await _supa
+      .from('cards')
+      .select('id,deck,system,topic,subject,qid,q,c,w,e,kp,d,img', { count: total === null ? 'exact' : undefined })
+      .range(from, from + PAGE - 1);
+
+    if(error){ console.error('Supabase error:', error); break; }
+    if(!data || data.length === 0) break;
+
+    if(total === null && count !== null) total = count;
+    allCards.push(...data);
+    from += PAGE;
+
+    const pct = total ? Math.round(allCards.length / total * 100) : 0;
+    updateLoadingProgress(pct, allCards.length);
+
+    if(data.length < PAGE) break;
+  }
+
+  // Organiza em DECKS
+  window.DECKS = {};
+  for(const card of allCards){
+    const dk = card.deck;
+    if(!window.DECKS[dk]) window.DECKS[dk] = [];
+    window.DECKS[dk].push(card);
+  }
+
+  console.log(`BoardMD: ${allCards.length} cards loaded from Supabase`);
+  hideLoadingOverlay();
+  return allCards.length;
+}
+
+// ── AUTH ─────────────────────────────────────────────────────────────
+async function getSession(){
+  const { data } = await _supa.auth.getSession();
+  return data?.session;
+}
+
+async function signInWithGoogle(){
+  await _supa.auth.signInWithOAuth({
+    provider: 'google',
+    options: { redirectTo: window.location.origin }
+  });
+}
+
+async function signOut(){
+  await _supa.auth.signOut();
+  location.reload();
+}
+
+// ── FSRS SYNC ────────────────────────────────────────────────────────
+let _supaUser = null;
+
+async function syncFsrsToSupabase(){
+  if(!_supaUser) return;
+  const local = {};
+  try{ Object.assign(local, JSON.parse(localStorage.getItem('bmd_fsrs5')||'{}')); }catch(e){}
+  if(!Object.keys(local).length) return;
+
+  const rows = Object.entries(local).map(([card_id, s]) => ({
+    user_id:    _supaUser.id,
+    card_id,
+    state:      s.state || 0,
+    stability:  s.stability || 0,
+    difficulty: s.difficulty || 0,
+    interval:   s.interval || 0,
+    due:        s.due || 0,
+    reps:       s.reps || 0,
+    lapses:     s.lapses || 0,
+    step_idx:   s.stepIdx || 0,
+    updated_at: new Date().toISOString()
+  }));
+
+  // Upsert em batches de 500
+  for(let i = 0; i < rows.length; i += 500){
+    const batch = rows.slice(i, i + 500);
+    await _supa.from('fsrs_progress').upsert(batch, { onConflict: 'user_id,card_id' });
+  }
+}
+
+async function loadFsrsFromSupabase(){
+  if(!_supaUser) return;
+  const { data, error } = await _supa
+    .from('fsrs_progress')
+    .select('card_id,state,stability,difficulty,interval,due,reps,lapses,step_idx')
+    .eq('user_id', _supaUser.id);
+
+  if(error || !data?.length) return;
+
+  const fsrsData = {};
+  for(const r of data){
+    fsrsData[r.card_id] = {
+      state:      r.state,
+      stability:  r.stability,
+      difficulty: r.difficulty,
+      interval:   r.interval,
+      due:        r.due,
+      reps:       r.reps,
+      lapses:     r.lapses,
+      stepIdx:    r.step_idx
+    };
+  }
+  try{ localStorage.setItem('bmd_fsrs5', JSON.stringify(fsrsData)); }catch(e){}
+  // Reinicia o objeto fsrs em memória
+  try{ Object.assign(window.fsrs || {}, fsrsData); }catch(e){}
+}
+
+// ── INIT ─────────────────────────────────────────────────────────────
+(async function init(){
+  // Carrega cards
+  await loadCardsFromSupabase();
+
+  // Verifica sessão
+  const session = await getSession();
+  if(session){
+    _supaUser = session.user;
+    // Carrega progresso FSRS da nuvem
+    await loadFsrsFromSupabase();
+    // Mostra nome do usuário na nav se existir
+    const nameEl = document.getElementById('lb-my-name');
+    if(nameEl && session.user.email){
+      nameEl.textContent = session.user.email.split('@')[0];
+    }
+    // Sincroniza FSRS para a nuvem a cada 2 minutos
+    setInterval(syncFsrsToSupabase, 120000);
+    // Sincroniza ao fechar a aba
+    window.addEventListener('beforeunload', syncFsrsToSupabase);
+  }
+
+  // Atualiza UI de auth
+  if(session){
+    const pill = document.getElementById('nav-user-pill');
+    const loginBtn = document.getElementById('nav-login-btn');
+    const nameEl = document.getElementById('nav-user-name');
+    if(pill){ pill.style.display='flex'; }
+    if(loginBtn){ loginBtn.style.display='none'; }
+    if(nameEl){ nameEl.textContent = session.user.email.split('@')[0]; }
+  }
+
+  // Dispara o app
+  window.cardsLoaded = true;
+  if(window.pendingInit) window.pendingInit();
+})();
+</script>
+</body>
 </html>
