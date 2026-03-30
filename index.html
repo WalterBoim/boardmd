@@ -5111,8 +5111,8 @@ function injectAttendingInline(card, sel){
   const dis = blocked ? 'disabled' : '';
 
   const usageLine = isPro
-    ? '<span style="font-size:10px;font-family:'JetBrains Mono',monospace;color:var(--emerald);">✓ Pro — unlimited</span>'
-    : `<span style="font-size:10px;font-family:'JetBrains Mono',monospace;color:${left>0?'var(--text-faint)':'var(--rose)'};">${left}/${ATT_FREE_LIMIT} free today</span>`;
+    ? '<span style="font-size:10px;font-family:Inter,sans-serif;color:var(--emerald);">Pro — unlimited</span>'
+    : '<span style="font-size:10px;font-family:Inter,sans-serif;color:'+(left>0?'var(--text-faint)':'var(--rose)')+';">'+left+'/'+ATT_FREE_LIMIT+' free today</span>';
 
   const wrap = document.createElement('div');
   wrap.id = 'att-inline-wrap';
