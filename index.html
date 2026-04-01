@@ -1145,6 +1145,13 @@ html.light .att-btn{background:var(--surface2);}
         <div class="deck-tags"><span class="deck-tag">Adaptive</span><span class="deck-tag">QID Tagged</span><span class="deck-tag">949 cards</span></div>
         <div class="deck-footer"><div class="deck-count"><strong>949</strong> <span>cards</span></div><button class="btn-deck">Study now →</button></div>
       </div>
+      <div class="deck-card s2" onclick="openApp('shelf_surgery')">
+        <div class="deck-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="color:#f57314"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg></div>
+        <div class="deck-name">BoardMD Shelf</div><div class="deck-title">Surgery · and more rotations coming</div>
+        <div class="deck-desc">High-yield Shelf Exam MCQs covering all CMS objectives — one rotation at a time. Surgery is live now.</div>
+        <div class="deck-tags"><span class="deck-tag">Shelf Exams</span><span class="deck-tag">CMS Based</span><span class="deck-tag">100 cards</span></div>
+        <div class="deck-footer"><div class="deck-count"><strong>100</strong> <span>cards</span></div><button class="btn-deck">Study now →</button></div>
+      </div>
     </div>
 
   <hr class="divider">
@@ -1266,6 +1273,8 @@ html.light .att-btn{background:var(--surface2);}
       <button class="deck-tab" id="tab-s2"         onclick="switchDeckTab('s2')">Rapid Review</button>
       <button class="deck-tab" id="tab-core"       onclick="switchDeckTab('core')">Core Review</button>
       <button class="deck-tab" id="tab-hy"         onclick="switchDeckTab('hy')">HY Concepts</button>
+      <span class="tab-group-sep">SHELF</span>
+      <button class="deck-tab" id="tab-shelf_surgery" onclick="switchDeckTab('shelf_surgery')">Surgery</button>
     </div>
   </header>
 
@@ -1558,7 +1567,7 @@ const DEFAULT_SETTINGS={
 let deckSettings={};
 (function(){
   try{deckSettings=JSON.parse(localStorage.getItem(SETTINGS_KEY)||'{}');}catch(e){}
-  const allDecks=['boardmd_s1','boardmd_s2','s1','s2','core','hy','hy1','arrows','fa_s1','ethics','s1_core','fa_step1'];
+  const allDecks=['boardmd_s1','boardmd_s2','s1','s2','core','hy','hy1','arrows','fa_s1','ethics','s1_core','fa_step1','shelf_surgery'];
   allDecks.forEach(dk=>{
     if(!deckSettings[dk]) deckSettings[dk]={...DEFAULT_SETTINGS};
     Object.keys(DEFAULT_SETTINGS).forEach(k=>{
@@ -1584,7 +1593,7 @@ let todayData={};
 (function(){
   try{todayData=JSON.parse(localStorage.getItem(TODAY_KEY)||'{}');}catch(e){}
   const today=dayStamp();
-  const allDecks=['boardmd_s1','boardmd_s2','s1','s2','core','hy','hy1','arrows','fa_s1','ethics','s1_core','fa_step1'];
+  const allDecks=['boardmd_s1','boardmd_s2','s1','s2','core','hy','hy1','arrows','fa_s1','ethics','s1_core','fa_step1','shelf_surgery'];
   allDecks.forEach(dk=>{
     if(!todayData[dk]||todayData[dk].date!==today) todayData[dk]={date:today,newSeen:0};
   });
@@ -2007,7 +2016,7 @@ function goHome(){
 // Track which step the user is studying
 let currentStep = localStorage.getItem('bmd_step') || 's1'; // 's1' or 's2'
 const STEP1_DECKS = ['boardmd_s1','s1_core','s1','hy1','fa_step1','fa_s1','arrows','ethics'];
-const STEP2_DECKS = ['boardmd_s2','core','s2','hy'];
+const STEP2_DECKS = ['boardmd_s2','core','s2','hy','shelf_surgery'];
 
 function openApp(dk){
   document.getElementById('landing').style.display='none';
@@ -2266,6 +2275,7 @@ function renderCard(){
       'hy1':'HY Concepts S1','hy':'HY Concepts S2',
       'fa_step1':'Foundations S1','fa_s1':'Clinical Patterns',
       'arrows':'Trends & Arrows','ethics':'HY Ethics',
+      'shelf_surgery':'BoardMD Shelf',
     };
     deckLabelEl.textContent=(deckNames[card.deck]||card.deck||'').toUpperCase();
     // Popular deck badge no canto direito
@@ -2279,6 +2289,7 @@ function renderCard(){
         'hy1':'HY S1','hy':'HY S2',
         'fa_step1':'FA S1','fa_s1':'Patterns',
         'arrows':'Arrows','ethics':'Ethics',
+        'shelf_surgery':'Surgery',
       };
       const badgeName = badgeNames[card.deck]||card.deck||'';
       deckBadgeEl.textContent = badgeName;
@@ -2289,6 +2300,7 @@ function renderCard(){
         's1':'rgba(245,158,11,.15)','hy1':'rgba(245,158,11,.15)',
         'hy':'rgba(239,68,68,.15)','ethics':'rgba(239,68,68,.15)',
         'arrows':'rgba(168,85,247,.15)','fa_step1':'rgba(168,85,247,.15)',
+        'shelf_surgery':'rgba(245,115,20,.15)',
       };
       const badgeTextColors={
         's1_core':'#6366f1','boardmd_s1':'#3b7fff',
@@ -2296,6 +2308,7 @@ function renderCard(){
         's1':'#f59e0b','hy1':'#f59e0b',
         'hy':'#ef4444','ethics':'#ef4444',
         'arrows':'#a855f7','fa_step1':'#a855f7',
+        'shelf_surgery':'#f57314',
       };
       deckBadgeEl.style.background = badgeColors[card.deck]||'rgba(59,127,255,.1)';
       deckBadgeEl.style.color = badgeTextColors[card.deck]||'#3b7fff';
@@ -2852,6 +2865,7 @@ function revealAnswer(sel,card){
     'hy1':'HY Concepts S1','hy':'HY Concepts S2',
     'fa_step1':'Foundations S1','fa_s1':'Clinical Patterns',
     'arrows':'Trends Arrows','ethics':'HY Ethics',
+    'shelf_surgery':'BoardMD Shelf',
   };
   const _deckLabel=(_deckNames[card.deck]||'').toLowerCase();
   const _isDeckDuplicate=_deckLabel&&_topicText.toLowerCase().includes(_deckLabel.split(' ')[0]);
@@ -3141,7 +3155,7 @@ function searchQids(){
   if(statusEl) statusEl.textContent='Searching…';
 
   // Search all decks — match both numeric and string qid fields
-  const searchDecks=['s1_core','boardmd_s1','boardmd_s2','core','s1','s2','hy','hy1','fa_s1','arrows','ethics','fa_step1'];
+  const searchDecks=['s1_core','boardmd_s1','boardmd_s2','core','s1','s2','hy','hy1','fa_s1','arrows','ethics','fa_step1','shelf_surgery'];
   const found=[],missing=[];
 
   qids.forEach(qid=>{
@@ -4232,8 +4246,8 @@ function _syncFC(nw,lrn,du,st){
   else if(st===2)d.classList.add('cfc-active');
 }
 
-var _sR=[],_sD='all',_s1=['boardmd_s1','s1_core','s1','s1core','fa_s1','arrows','hy1','ethics'],_s2=['boardmd_s2','s2','core','hy'];
-var _dkL={boardmd_s1:'BoardMD Step 1',boardmd_s2:'BoardMD Step 2 CK',s1:'Step 1 · Rapid',s2:'Step 2 CK · Rapid',core:'Step 2 CK · Core',s1core:'Step 1 · Core',hy:'Step 2 CK · HY',hy1:'Step 1 · HY',fa_s1:'Clinical Patterns',ethics:'Ethics',arrows:'Arrows'};
+var _sR=[],_sD='all',_s1=['boardmd_s1','s1_core','s1','s1core','fa_s1','arrows','hy1','ethics'],_s2=['boardmd_s2','s2','core','hy','shelf_surgery'];
+var _dkL={boardmd_s1:'BoardMD Step 1',boardmd_s2:'BoardMD Step 2 CK',s1:'Step 1 · Rapid',s2:'Step 2 CK · Rapid',core:'Step 2 CK · Core',s1core:'Step 1 · Core',hy:'Step 2 CK · HY',hy1:'Step 1 · HY',fa_s1:'Clinical Patterns',ethics:'Ethics',arrows:'Arrows',shelf_surgery:'BoardMD Shelf'};
 function openCardSearch(){document.getElementById('search-overlay').style.display='flex';setTimeout(function(){document.getElementById('search-input').focus();},80);document.getElementById('search-open-btn').classList.add('active');}
 function closeCardSearch(){document.getElementById('search-overlay').style.display='none';document.getElementById('search-open-btn').classList.remove('active');}
 function toggleSChip(b){document.querySelectorAll('.search-chip').forEach(function(x){x.classList.remove('active');});b.classList.add('active');_sD=b.dataset.deck;runCardSearch();}
@@ -4242,7 +4256,7 @@ function runCardSearch(){
   var re=document.getElementById('search-results'),ac=document.getElementById('search-actions');
   if(q.length<2){re.innerHTML='<div style="text-align:center;color:var(--text-faint);font-size:13px;padding:32px 0">Start typing…</div>';ac.style.display='none';_sR=[];return;}
   var terms=q.split(' ').filter(function(t){return t.length>1;});_sR=[];
-  ['boardmd_s1','boardmd_s2','s1','s2','core','s1core','hy','hy1','fa_s1','ethics','arrows'].forEach(function(dk){
+  ['boardmd_s1','boardmd_s2','s1','s2','core','s1core','hy','hy1','fa_s1','ethics','arrows','shelf_surgery'].forEach(function(dk){
     if(_sD==='step1'&&_s1.indexOf(dk)<0)return;if(_sD==='step2'&&_s2.indexOf(dk)<0)return;
     if(_sD!=='all'&&_sD!=='step1'&&_sD!=='step2'&&_sD!==dk)return;
     (DECKS[dk]||[]).forEach(function(card){
@@ -4295,7 +4309,7 @@ function studySearchResults(){
   </div>
 </div>
 
-<div id="search-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:2000;align-items:center;justify-content:center;backdrop-filter:blur(6px)" onclick="if(event.target===this)closeCardSearch()"><div style="background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:28px;width:min(580px,95vw);max-height:88vh;overflow-y:auto;display:flex;flex-direction:column;gap:16px"><div style="display:flex;justify-content:space-between;align-items:flex-start"><div><div style="font-family:'Instrument Serif',serif;font-size:22px;color:var(--text)">Search Cards</div><div style="font-size:12px;color:var(--text-dim);margin-top:4px">Search by topic, keyword or system · Filter by Step 1 or Step 2 CK</div></div><button class="qid-close" onclick="closeCardSearch()">&#x2715;</button></div><input id="search-input" type="text" placeholder="e.g. aortic stenosis, iron deficiency…" oninput="runCardSearch()" autocomplete="off" style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:11px 14px;color:var(--text);font-size:14px;font-family:'Lato',sans-serif;outline:none;width:100%"><div style="display:flex;gap:6px;flex-wrap:wrap"><button class="search-chip active" data-deck="all" onclick="toggleSChip(this)">All Decks</button><button class="search-chip" data-deck="step1" onclick="toggleSChip(this)">Step 1</button><button class="search-chip" data-deck="step2" onclick="toggleSChip(this)">Step 2 CK</button><button class="search-chip" data-deck="boardmd_s1" onclick="toggleSChip(this)">BoardMD S1</button><button class="search-chip" data-deck="boardmd_s2" onclick="toggleSChip(this)">BoardMD S2</button><button class="search-chip" data-deck="s1" onclick="toggleSChip(this)">Rapid S1</button><button class="search-chip" data-deck="fa_s1" onclick="toggleSChip(this)">Clinical Patterns</button><button class="search-chip" data-deck="arrows" onclick="toggleSChip(this)">Arrows</button><button class="search-chip" data-deck="s2" onclick="toggleSChip(this)">Rapid S2</button><button class="search-chip" data-deck="core" onclick="toggleSChip(this)">Core S2</button><button class="search-chip" data-deck="hy" onclick="toggleSChip(this)">HY S2</button><button class="search-chip" data-deck="hy1" onclick="toggleSChip(this)">HY S1</button><button class="search-chip" data-deck="ethics" onclick="toggleSChip(this)">Ethics</button></div><div id="search-results"><div style="text-align:center;color:var(--text-faint);font-size:13px;padding:32px 0">Start typing to search…</div></div><div id="search-actions" style="display:none;gap:10px;align-items:center;padding-top:8px;border-top:1px solid var(--border)"><button id="search-study-btn" onclick="studySearchResults()" style="background:var(--accent);color:#fff;border:none;border-radius:9px;padding:11px 22px;font-family:'Lato',sans-serif;font-size:13px;font-weight:700;cursor:pointer">Study matched cards</button><span id="search-count-label" style="font-size:12px;color:var(--text-dim)"></span></div></div></div>
+<div id="search-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:2000;align-items:center;justify-content:center;backdrop-filter:blur(6px)" onclick="if(event.target===this)closeCardSearch()"><div style="background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:28px;width:min(580px,95vw);max-height:88vh;overflow-y:auto;display:flex;flex-direction:column;gap:16px"><div style="display:flex;justify-content:space-between;align-items:flex-start"><div><div style="font-family:'Instrument Serif',serif;font-size:22px;color:var(--text)">Search Cards</div><div style="font-size:12px;color:var(--text-dim);margin-top:4px">Search by topic, keyword or system · Filter by Step 1 or Step 2 CK</div></div><button class="qid-close" onclick="closeCardSearch()">&#x2715;</button></div><input id="search-input" type="text" placeholder="e.g. aortic stenosis, iron deficiency…" oninput="runCardSearch()" autocomplete="off" style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:11px 14px;color:var(--text);font-size:14px;font-family:'Lato',sans-serif;outline:none;width:100%"><div style="display:flex;gap:6px;flex-wrap:wrap"><button class="search-chip active" data-deck="all" onclick="toggleSChip(this)">All Decks</button><button class="search-chip" data-deck="step1" onclick="toggleSChip(this)">Step 1</button><button class="search-chip" data-deck="step2" onclick="toggleSChip(this)">Step 2 CK</button><button class="search-chip" data-deck="boardmd_s1" onclick="toggleSChip(this)">BoardMD S1</button><button class="search-chip" data-deck="boardmd_s2" onclick="toggleSChip(this)">BoardMD S2</button><button class="search-chip" data-deck="s1" onclick="toggleSChip(this)">Rapid S1</button><button class="search-chip" data-deck="fa_s1" onclick="toggleSChip(this)">Clinical Patterns</button><button class="search-chip" data-deck="arrows" onclick="toggleSChip(this)">Arrows</button><button class="search-chip" data-deck="s2" onclick="toggleSChip(this)">Rapid S2</button><button class="search-chip" data-deck="core" onclick="toggleSChip(this)">Core S2</button><button class="search-chip" data-deck="hy" onclick="toggleSChip(this)">HY S2</button><button class="search-chip" data-deck="hy1" onclick="toggleSChip(this)">HY S1</button><button class="search-chip" data-deck="ethics" onclick="toggleSChip(this)">Ethics</button><button class="search-chip" data-deck="shelf_surgery" onclick="toggleSChip(this)">Surgery Shelf</button></div><div id="search-results"><div style="text-align:center;color:var(--text-faint);font-size:13px;padding:32px 0">Start typing to search…</div></div><div id="search-actions" style="display:none;gap:10px;align-items:center;padding-top:8px;border-top:1px solid var(--border)"><button id="search-study-btn" onclick="studySearchResults()" style="background:var(--accent);color:#fff;border:none;border-radius:9px;padding:11px 22px;font-family:'Lato',sans-serif;font-size:13px;font-weight:700;cursor:pointer">Study matched cards</button><span id="search-count-label" style="font-size:12px;color:var(--text-dim)"></span></div></div></div>
   <footer style="
     text-align:center;
     padding:24px 20px;
