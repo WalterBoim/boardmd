@@ -1276,7 +1276,7 @@ html.light .att-btn{background:var(--surface2);}
     </div>
   </header>
 
-  <!-- LEADERBOARD PANEL --><!-- shelf-v15 -->
+  <!-- LEADERBOARD PANEL --><!-- shelf-v16 -->
   <div class="lb-panel" id="lb-panel">
     <div>
       <div class="lb-header-title">Global Ranking</div>
@@ -2743,7 +2743,17 @@ function revealAnswer(sel,card){
     dClean = dClean.replace(/<strong>\s*Distractor(?:\s+Notes)?(?:\s*\([^)]*\))?:?\s*<\/strong>/gi, '');
     dClean = dClean.replace(/^Distractor(?:\s+Notes)?(?:\s*\([^)]*\))?:?\s*/i, '');
     // Formatar cada linha do d como item separado
-    const dLines = dClean.split(/\n|<br\s*\/?>/i).filter(l=>l.trim());
+    // Tenta quebrar por \n primeiro, depois por padrão "Nome — razão."
+    let dLines = dClean.split(/\n|<br\s*\/?>/i).filter(l=>l.trim());
+    
+    // Se veio tudo numa linha só, tenta quebrar por ". NomeOpcao —" ou ". NomeOpcao -"
+    if(dLines.length === 1){
+      // Quebra quando encontra ponto seguido de letra maiúscula que é início de distractor
+      const parts = dClean.split(/\.\s+(?=[A-Z][a-zA-Z\s]+(?:—|--))/);
+      if(parts.length > 1){
+        dLines = parts.map((p,i) => i < parts.length-1 ? p.trim()+'.' : p.trim()).filter(l=>l.trim());
+      }
+    }
     if(dLines.length > 1){
       distHtml = dLines.map(line=>{
         line = line.trim();
