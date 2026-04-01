@@ -1227,11 +1227,7 @@ html.light .att-btn{background:var(--surface2);}
         <button class="hdr-icon-btn" onclick="openSettings()" title="Settings">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
         </button>
-        <!-- BoardMD Attending -->
-        <button class="hdr-icon-btn" id="attending-btn" onclick="openAttending()" title="BoardMD Attending — AI Tutor" style="border-color:rgba(139,92,246,.35);color:#8b5cf6;gap:4px;">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 1 1 7.072 0l-.548.547A3.374 3.374 0 0 0 14 18.469V19a2 2 0 1 1-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
-          <span style="font-size:10px;font-weight:800;letter-spacing:.02em">ATT</span>
-        </button>
+        <!-- BoardMD Attending — acessível apenas inline no card -->
         <div class="hdr-divider"></div>
         <!-- Font size -->
         <div class="font-ctrl">
@@ -1280,7 +1276,7 @@ html.light .att-btn{background:var(--surface2);}
     </div>
   </header>
 
-  <!-- LEADERBOARD PANEL --><!-- shelf-v9 -->
+  <!-- LEADERBOARD PANEL --><!-- shelf-v10 -->
   <div class="lb-panel" id="lb-panel">
     <div>
       <div class="lb-header-title">Global Ranking</div>
@@ -1307,11 +1303,11 @@ html.light .att-btn{background:var(--surface2);}
       <div style="display:flex;flex-direction:column;align-items:center;gap:8px;min-width:130px;">
         <div style="position:relative;width:120px;height:120px;">
           <svg viewBox="0 0 120 120" width="120" height="120">
-            <circle cx="60" cy="60" r="50" fill="none" stroke="var(--border)" stroke-width="12"/>
-            <circle id="perf-donut-correct" cx="60" cy="60" r="50" fill="none" stroke="#22c55e" stroke-width="12" stroke-linecap="round"
-              stroke-dasharray="314" stroke-dashoffset="314" transform="rotate(-90 60 60)" style="transition:stroke-dashoffset .6s ease"/>
-            <circle id="perf-donut-incorrect" cx="60" cy="60" r="50" fill="none" stroke="#f43f5e" stroke-width="12" stroke-linecap="round"
-              stroke-dasharray="314" stroke-dashoffset="314" transform="rotate(-90 60 60)" style="transition:stroke-dashoffset .6s ease;display:none"/>
+            <circle cx="60" cy="60" r="52" fill="none" stroke="var(--border)" stroke-width="7"/>
+            <circle id="perf-donut-correct" cx="60" cy="60" r="52" fill="none" stroke="#22c55e" stroke-width="7" stroke-linecap="round"
+              stroke-dasharray="327" stroke-dashoffset="327" transform="rotate(-90 60 60)" style="transition:stroke-dashoffset .6s ease"/>
+            <circle id="perf-donut-incorrect" cx="60" cy="60" r="52" fill="none" stroke="#f43f5e" stroke-width="7" stroke-linecap="round"
+              stroke-dasharray="327" stroke-dashoffset="327" transform="rotate(-90 60 60)" style="transition:stroke-dashoffset .6s ease;display:none"/>
           </svg>
           <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;">
             <div id="perf-pct" style="font-size:26px;font-weight:800;color:var(--text);font-family:'JetBrains Mono',monospace;">—</div>
@@ -1325,9 +1321,9 @@ html.light .att-btn{background:var(--surface2);}
       <div style="display:flex;flex-direction:column;align-items:center;gap:8px;min-width:130px;">
         <div style="position:relative;width:120px;height:120px;">
           <svg viewBox="0 0 120 120" width="120" height="120">
-            <circle cx="60" cy="60" r="50" fill="none" stroke="var(--border)" stroke-width="12"/>
-            <circle id="perf-donut-used" cx="60" cy="60" r="50" fill="none" stroke="var(--accent)" stroke-width="12" stroke-linecap="round"
-              stroke-dasharray="314" stroke-dashoffset="314" transform="rotate(-90 60 60)" style="transition:stroke-dashoffset .6s ease"/>
+            <circle cx="60" cy="60" r="52" fill="none" stroke="var(--border)" stroke-width="7"/>
+            <circle id="perf-donut-used" cx="60" cy="60" r="52" fill="none" stroke="var(--accent)" stroke-width="7" stroke-linecap="round"
+              stroke-dasharray="327" stroke-dashoffset="327" transform="rotate(-90 60 60)" style="transition:stroke-dashoffset .6s ease"/>
           </svg>
           <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;">
             <div id="perf-used-pct" style="font-size:26px;font-weight:800;color:var(--text);font-family:'JetBrains Mono',monospace;">—</div>
@@ -3415,9 +3411,9 @@ applyFont();
         <div class="qid-modal-title">QID Filter</div>
         <div class="qid-modal-sub">Paste question IDs from your qbank test results, wrong answers list,<br>or any QID source. One per line or comma-separated.</div>
       </div>
-      <button class="qid-close" onclick="closeQidFilter()"></button>
+      <button class="qid-close" onclick="closeQidFilter()">&#x2715;</button>
     </div>
-    <textarea class="qid-textarea" id="qid-textarea" placeholder="e.g. 19068&#10;19241, 19395&#10;3054&#10;&#10;Paste any mix of QIDs — we'll find matching cards" onkeydown="if((e.ctrlKey||e.metaKey)&&e.key==='Enter'){e.preventDefault();searchQids();}"></textarea>
+    <textarea class="qid-textarea" id="qid-textarea" placeholder="e.g. 19068&#10;19241, 19395&#10;3054&#10;&#10;Paste any mix of QIDs — we'll find matching cards" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();searchQids();}"></textarea>
     <div class="qid-actions">
       <button class="qid-btn-search" onclick="searchQids()">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-1px;margin-right:5px"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>Find Cards
@@ -4377,9 +4373,9 @@ function studySearchResults(){
         <div class="qid-modal-title" style="color:#8b5cf6;">BID Filter</div>
         <div class="qid-modal-sub">Enter BoardMD Card IDs to study specific cards.<br>Find the BID number on any BoardMD S1 or S2 card (top right, purple).</div>
       </div>
-      <button class="qid-close" onclick="closeBidFilter()"></button>
+      <button class="qid-close" onclick="closeBidFilter()">&#x2715;</button>
     </div>
-    <textarea class="qid-textarea" id="bid-textarea" placeholder="e.g. 1234&#10;5678, 9012&#10;&#10;Paste any BID numbers — one per line or comma-separated" onkeydown="if((e.ctrlKey||e.metaKey)&&e.key==='Enter'){e.preventDefault();searchBids();}"></textarea>
+    <textarea class="qid-textarea" id="bid-textarea" placeholder="e.g. 1234&#10;5678, 9012&#10;&#10;Paste any BID numbers — one per line or comma-separated" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();searchBids();}"></textarea>
     <div class="qid-actions">
       <button class="qid-btn-search" onclick="searchBids()" style="background:#8b5cf6;">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-1px;margin-right:5px"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>Find Cards
@@ -4483,7 +4479,7 @@ function openCardEditor(){
 
   document.getElementById('editor-card-id').textContent = 'ID: ' + card.id + (card.qid ? '  ·  QID ' + card.qid : '');
   document.getElementById('editor-q').value = c.q || '';
-  document.getElementById('editor-exp').value = c.d || '';
+  document.getElementById('editor-exp').value = c.e || '';
   document.getElementById('editor-system').value = c.system || '';
   document.getElementById('editor-topic').value = c.topic || '';
 
@@ -5181,11 +5177,11 @@ function injectAttendingInline(card, sel){
         </div>
         <span class="att-inline-title">BoardMD Attending</span>
       </div>
-      ${usageLine}
+      <span style="font-size:10px;font-family:Inter,sans-serif;color:var(--text-faint);">Free</span>
     </div>
     <div class="att-inline-btns">
       <button class="att-ibtn" ${dis} onclick="askAttendingInline('why',this)">
-        <span class="att-ibtn-label">Why my answer?</span>
+        <span class="att-ibtn-label">Why this answer?</span>
       </button>
       <button class="att-ibtn" ${dis} onclick="askAttendingInline('explain',this)">
         <span class="att-ibtn-label">Explain better</span>
@@ -5197,6 +5193,11 @@ function injectAttendingInline(card, sel){
         <span class="att-ibtn-label">Surprise me</span>
       </button>
     </div>
+    <div style="display:flex;gap:8px;padding:0 10px 10px;align-items:center;">
+      <input id="att-ask-input" type="text" placeholder="Ask anything about this topic…" style="flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:'Inter',sans-serif;font-size:12px;padding:8px 12px;outline:none;transition:border-color .15s;" onfocus="this.style.borderColor='rgba(139,92,246,.5)'" onblur="this.style.borderColor='var(--border)'" onkeydown="if(event.key==='Enter')askAttendingInline('custom',null)">
+      <button ${dis} onclick="askAttendingInline('custom',null)" style="background:rgba(99,102,241,.12);border:1px solid rgba(139,92,246,.3);border-radius:8px;color:#8b5cf6;font-family:'Inter',sans-serif;font-size:11px;font-weight:700;padding:8px 14px;cursor:pointer;white-space:nowrap;transition:all .15s;" onmouseover="this.style.background='rgba(99,102,241,.22)'" onmouseout="this.style.background='rgba(99,102,241,.12)'">Ask</button>
+    </div>
+    <div style="padding:0 10px 8px;font-size:9px;color:var(--text-faint);font-family:'Inter',sans-serif;line-height:1.4;">For educational purposes only. Not medical advice.</div>
     <div class="att-inline-response" id="att-inline-response"></div>`;
 
   // Insere no study-inner, entre o card e os botões FSRS
@@ -5269,31 +5270,18 @@ TOPIC: ${card.topic||''} | SYSTEM: ${card.system||''}
 EXPLANATION: ${(card.e||'').replace(/<[^>]+>/g,' ').slice(0,300)}`;
 
   const prompts = {
-    why: `You are a brilliant, warm attending physician. The student just answered this USMLE board question:\n\n${ctx}\n\nIn 2-3 paragraphs: acknowledge right/wrong (one sentence). Explain WHY using core pathophysiology. Be direct, clinical — like a great attending, not a textbook. End with one punchy clinical pearl.`,
+    why: `You are a brilliant, warm attending physician. The student just answered this USMLE board question:\n\n${ctx}\n\nIn 2-3 paragraphs: acknowledge right/wrong (one sentence). Explain WHY this is the correct answer using core pathophysiology. Be direct, clinical — like a great attending, not a textbook. End with one punchy clinical pearl.`,
     explain: `You are a brilliant attending. The student wants deeper understanding:\n\n${ctx}\n\nTeach this concept at the whiteboard. One vivid analogy. Cover: pathophysiology, clinical clues, board trap. 3 paragraphs max.`,
     mcq: `You are a brilliant attending and board question writer:\n\n${ctx}\n\nWrite 2 new USMLE-style MCQs on the SAME concept. Format:\n**Q1:** [vignette]\nA. B. C. D.\n**Answer: X — [explanation]**\n\n**Q2:** [vignette]\nA. B. C. D.\n**Answer: X — [explanation]**`,
     surprise: `You are a brilliant attending. Give ONE unforgettable clinical pearl about:\n\n${ctx}\n\nSomething NOT in the explanation — a real-world connection, classic trick, or board trap. 2 paragraphs max. Be vivid.`,
-
-    translate: `Translate the following medical flashcard content to Brazilian Portuguese. Keep medical terms accurate. Return ONLY the translation in this exact format:
-
-QUESTÃO: [translated question]
-A. [option] B. [option] C. [option] D. [option]
-RESPOSTA CORRETA: [translated answer]
-EXPLICAÇÃO: [translated explanation]
-PONTO-CHAVE: [translated key point]
-
-Content to translate:
-QUESTION: \${card.q}
-OPTIONS: \${(card.w||[]).map((o,i)=>String.fromCharCode(65+i)+'. '+o).join(' ')}
-CORRECT ANSWER: \${card.c}
-EXPLANATION: \${(card.e||'').replace(/<[^>]+>/g,' ').slice(0,500)}
-KEY POINT: \${(card.kp||'')}`,
+    custom: `You are a brilliant attending physician. The student has a question about this USMLE topic:\n\n${ctx}\n\nStudent question: "${document.getElementById('att-ask-input')?.value||''}"\n\nAnswer clearly and clinically in 2-3 paragraphs. Focus on what's relevant for USMLE boards.`,
+    translate: `Translate the following medical flashcard content to Brazilian Portuguese. Keep medical terms accurate. Return ONLY the translation in this exact format:\n\nQUESTÃO: [translated question]\nA. [option] B. [option] C. [option] D. [option]\nRESPOSTA CORRETA: [translated answer]\nEXPLICAÇÃO: [translated explanation]\nPONTO-CHAVE: [translated key point]\n\nContent to translate:\nQUESTION: ${card.q}\nOPTIONS: ${(card.w||[]).map((o,i)=>String.fromCharCode(65+i)+'. '+o).join(' ')}\nCORRECT ANSWER: ${card.c}\nEXPLANATION: ${(card.e||'').replace(/<[^>]+>/g,' ').slice(0,500)}\nKEY POINT: ${(card.kp||'')}`,
   };
 
   const typeLabels = {
-    why:'Why Your Answer', explain:'Deeper Explanation',
+    why:'Why This Answer', explain:'Deeper Explanation',
     mcq:'Practice Questions', surprise:'Clinical Pearl',
-    translate:'Tradução PT-BR'
+    custom:'Your Question', translate:'Tradução PT-BR'
   };
 
   try {
