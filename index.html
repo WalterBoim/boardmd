@@ -1296,7 +1296,7 @@ html.light .att-btn{background:var(--surface2);}
     </div>
   </header>
 
-  <!-- LEADERBOARD PANEL --><!-- shelf-v22 -->
+  <!-- LEADERBOARD PANEL --><!-- shelf-v23 -->
   <div class="lb-panel" id="lb-panel">
     <div>
       <div class="lb-header-title">Global Ranking</div>
@@ -2818,16 +2818,14 @@ function revealAnswer(sel,card){
   }
   // CASO 2: d vazio mas e contém distractors misturados
   else if(wrongOpts.length > 0 && eRaw){
-    // Encontrar onde começam as explicações dos distractors no campo e
-    // Procurar pelo nome de qualquer opção errada em bold
+    // Só tenta separar se os distractors aparecem em BOLD no texto
     let splitIdx = -1;
     for(const w of wrongOpts){
       const esc = w.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
-      // Procurar <b>Nome</b> ou <strong>Nome</strong> no texto
+      // APENAS procura com bold — não texto plano (evita falsos positivos)
       const patterns = [
         new RegExp('<b>\\s*'+esc,'i'),
         new RegExp('<strong>\\s*'+esc,'i'),
-        new RegExp('\\b'+esc+'\\b(?!\\s+is\\s+the\\s+correct)','i')
       ];
       for(const pat of patterns){
         const m = eRaw.search(pat);
