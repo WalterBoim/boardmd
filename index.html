@@ -959,7 +959,16 @@ html.light { --uw-hover:#f0f7ff; --uw-correct:#e8f5e9; --uw-wrong:#fdecea; --uw-
 #app-auth-menu button.aam-signout{color:var(--rose);}
 #app-auth-menu button.aam-signout:hover{background:rgba(244,63,94,.08);}
 
-/* ── BOARDMD ATTENDING ── */
+/* ── HIGHLIGHT SYSTEM ── */
+.hl-yellow { background: rgba(250,204,21,.35); border-radius: 2px; cursor: pointer; }
+.hl-green  { background: rgba(34,197,94,.28);  border-radius: 2px; cursor: pointer; }
+.hl-blue   { background: rgba(59,130,246,.28); border-radius: 2px; cursor: pointer; }
+.hl-btn { width:22px;height:22px;border-radius:50%;border:2px solid transparent;cursor:pointer;transition:all .15s;flex-shrink:0; }
+.hl-btn.hl-active { transform:scale(1.2);border-color:rgba(0,0,0,.3); }
+.hl-btn-y { background:#fbbf24; }
+.hl-btn-g { background:#22c55e; }
+.hl-btn-b { background:#3b82f6; }
+.hl-toolbar { display:flex;align-items:center;gap:6px;padding:0 4px; }
 #attending-overlay{position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:4000;display:none;align-items:flex-end;justify-content:center;backdrop-filter:blur(4px);}
 #attending-overlay.active{display:flex;}
 #attending-panel{background:var(--surface);border:1px solid var(--border);border-top-left-radius:20px;border-top-right-radius:20px;width:100%;max-width:760px;max-height:82vh;display:flex;flex-direction:column;overflow:hidden;animation:slideUpPanel .25s cubic-bezier(.34,1.2,.64,1);}
@@ -975,6 +984,23 @@ html.light { --uw-hover:#f0f7ff; --uw-correct:#e8f5e9; --uw-wrong:#fdecea; --uw-
 .att-usage{font-size:10px;font-family:'JetBrains Mono',monospace;color:var(--text-faint);padding:0 20px 10px;border-bottom:1px solid var(--border);flex-shrink:0;}
 .att-usage span{color:var(--accent);}
 .att-buttons{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;padding:14px 16px;border-bottom:1px solid var(--border);flex-shrink:0;}
+/* ── HIGHLIGHT SYSTEM ─────────────────────────────────── */
+.hl-toolbar{display:flex;align-items:center;gap:6px;padding:5px 18px;background:var(--surface);border-bottom:1px solid var(--border);}
+.hl-btn{width:22px;height:22px;border-radius:50%;border:2px solid transparent;cursor:pointer;transition:all .15s;flex-shrink:0;outline:none;}
+.hl-btn:hover{transform:scale(1.15);}
+.hl-btn.active{border-color:var(--text);transform:scale(1.15);}
+.hl-yellow{background:#fde68a;}
+.hl-green{background:#bbf7d0;}
+.hl-blue{background:#bfdbfe;}
+.hl-erase{background:none!important;border:1px solid var(--border)!important;font-size:10px;color:var(--text-faint);width:auto!important;padding:0 7px;border-radius:6px;font-family:'JetBrains Mono',monospace;height:22px;display:flex;align-items:center;}
+.hl-erase:hover{border-color:var(--rose)!important;color:var(--rose);}
+mark.hl-yellow{background:#fde68a;color:inherit;border-radius:2px;cursor:pointer;}
+mark.hl-green{background:#bbf7d0;color:inherit;border-radius:2px;cursor:pointer;}
+mark.hl-blue{background:#bfdbfe;color:inherit;border-radius:2px;cursor:pointer;}
+html.light mark.hl-yellow{background:#fef08a;}
+html.light mark.hl-green{background:#86efac;}
+html.light mark.hl-blue{background:#93c5fd;}
+
 .att-btn{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:10px 12px;cursor:pointer;text-align:left;transition:all .15s;display:flex;align-items:flex-start;gap:8px;}
 .att-btn:hover{border-color:rgba(99,102,241,.5);background:rgba(99,102,241,.06);}
 .att-btn:disabled{opacity:.4;cursor:not-allowed;}
@@ -1202,6 +1228,13 @@ html.light .att-btn{background:var(--surface2);}
           <span style="font-size:10px;font-weight:800;letter-spacing:.03em">BID</span>
         </button>
         <div class="hdr-divider"></div>
+        <!-- Highlight toolbar -->
+        <div class="hl-toolbar" id="hl-toolbar" title="Highlight text">
+          <button class="hl-btn hl-btn-y" id="hl-y" onclick="setHlColor('yellow')" title="Yellow highlight"></button>
+          <button class="hl-btn hl-btn-g" id="hl-g" onclick="setHlColor('green')"  title="Green highlight"></button>
+          <button class="hl-btn hl-btn-b" id="hl-b" onclick="setHlColor('blue')"   title="Blue highlight"></button>
+        </div>
+        <div class="hdr-divider"></div>
         <!-- Theme -->
         <button class="hdr-icon-btn" id="theme-toggle-app" onclick="toggleTheme()" title="Toggle theme">
           <svg id="theme-icon-app" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
@@ -1228,6 +1261,13 @@ html.light .att-btn{background:var(--surface2);}
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
         </button>
         <!-- BoardMD Attending — acessível apenas inline no card -->
+        <div class="hdr-divider"></div>
+        <!-- Highlight tools -->
+        <div id="hl-btns" style="display:flex;align-items:center;gap:3px;">
+          <button id="hl-y" onclick="setHlColor('yellow')" title="Highlight yellow" style="width:18px;height:18px;border-radius:4px;border:2px solid transparent;background:#fde68a;cursor:pointer;transition:all .15s;flex-shrink:0;"></button>
+          <button id="hl-g" onclick="setHlColor('green')" title="Highlight green" style="width:18px;height:18px;border-radius:4px;border:2px solid transparent;background:#86efac;cursor:pointer;transition:all .15s;flex-shrink:0;"></button>
+          <button id="hl-b" onclick="setHlColor('blue')" title="Highlight blue" style="width:18px;height:18px;border-radius:4px;border:2px solid transparent;background:#93c5fd;cursor:pointer;transition:all .15s;flex-shrink:0;"></button>
+        </div>
         <div class="hdr-divider"></div>
         <!-- Font size -->
         <div class="font-ctrl">
@@ -1276,7 +1316,7 @@ html.light .att-btn{background:var(--surface2);}
     </div>
   </header>
 
-  <!-- LEADERBOARD PANEL --><!-- shelf-v18 -->
+  <!-- LEADERBOARD PANEL --><!-- shelf-v19 -->
   <div class="lb-panel" id="lb-panel">
     <div>
       <div class="lb-header-title">Global Ranking</div>
@@ -1457,7 +1497,7 @@ html.light .att-btn{background:var(--surface2);}
             </div>
           </div>
           <div class="card-body">
-            <div class="card-question" id="c-q">Loading…</div>
+            <div class="card-question hl-zone" id="c-q">Loading…</div>
             <div class="options" id="c-opts"></div>
           </div>
           <!-- Response Distribution -->
@@ -1479,11 +1519,11 @@ html.light .att-btn{background:var(--surface2);}
             </div>
             <div class="exp-section">
               <div class="exp-label"><span class="exp-label-icon" style="background:rgba(59,127,255,.15);color:var(--accent)">≡</span>Explanation</div>
-              <div class="exp-text" id="exp-txt"></div>
+              <div class="exp-text hl-zone" id="exp-txt"></div>
             </div>
             <div class="exp-section" id="exp-dist-wrap" style="display:none">
               <div class="exp-label"><span class="exp-label-icon" style="background:rgba(244,63,94,.15);color:var(--rose)"></span>Why the others are wrong</div>
-              <div class="exp-dist" id="exp-dist"></div>
+              <div class="exp-dist hl-zone" id="exp-dist"></div>
             </div>
           </div>
           <div id="key-point-wrap" style="display:none;padding:0 18px 14px;"></div>
@@ -2178,9 +2218,16 @@ function ensureStudyUI(){
           <span class="card-qid" id="c-qid" style="display:none">—</span>
         </div>
       </div>
+      <!-- HIGHLIGHT TOOLBAR -->
+      <div class="hl-toolbar" id="hl-toolbar">
+        <button class="hl-btn hl-yellow" id="hl-btn-yellow" onclick="setHlColor('yellow')" title="Yellow highlight"></button>
+        <button class="hl-btn hl-green"  id="hl-btn-green"  onclick="setHlColor('green')"  title="Green highlight"></button>
+        <button class="hl-btn hl-blue"   id="hl-btn-blue"   onclick="setHlColor('blue')"   title="Blue highlight"></button>
+        <button class="hl-btn hl-erase"  id="hl-btn-erase"  onclick="eraseAllHighlights()" title="Clear all highlights">✕ clear</button>
+      </div>
       <div class="card-body">
-        <div class="card-question" id="c-q">Loading…</div>
-        <div class="options" id="c-opts"></div>
+        <div class="card-question hl-zone hl-q" id="c-q">Loading…</div>
+        <div class="options hl-zone hl-q" id="c-opts"></div>
       </div>
       <div class="explanation" id="c-exp">
         <div class="exp-section">
@@ -2710,6 +2757,9 @@ function launchBidSession(){
 function revealAnswer(sel,card){
   if(revealed) return;
   revealed=true;
+
+  // Limpa grifos da pergunta ao revelar — mantém só os da explicação
+  clearQHighlights();
   const answeredCorrectly=(sel===card.c);
 
   if(typeof awardCoins === 'function'){
@@ -4716,6 +4766,9 @@ window.renderCard = function(){
     const qEl = document.getElementById('c-q');
     if(qEl) qEl.textContent = card.q;
   }
+  // Restaura highlights salvos para este card
+  window._currentHlCardId = card.id;
+  setTimeout(() => applyHighlightsToCard(card.id), 50);
 };
 </script>
 <style>
@@ -5375,6 +5428,128 @@ EXPLANATION: ${(card.e||'').replace(/<[^>]+>/g,' ').slice(0,300)}`;
   setTimeout(()=>{ respWrap.scrollIntoView({ behavior:'smooth', block:'nearest' }); }, 80);
 }
 
+// ── HIGHLIGHT SYSTEM ─────────────────────────────────────────────────────
+const HL_KEY = 'bmd_highlights_v1';
+let _hlColor = null; // null = mode off
+let _hlData = {}; // {cardId: {q: [...ranges], e: [...ranges]}}
+
+function loadHlData(){
+  try{ _hlData = JSON.parse(localStorage.getItem(HL_KEY)||'{}'); }catch(e){ _hlData={}; }
+}
+function saveHlData(){
+  try{ localStorage.setItem(HL_KEY, JSON.stringify(_hlData)); }catch(e){}
+}
+loadHlData();
+
+function setHlColor(color){
+  if(_hlColor === color){
+    _hlColor = null;
+  } else {
+    _hlColor = color;
+  }
+  // Update button states
+  ['yellow','green','blue'].forEach(c=>{
+    const btn = document.getElementById('hl-btn-'+c);
+    if(btn) btn.classList.toggle('active', _hlColor===c);
+  });
+}
+
+function eraseAllHighlights(){
+  const card = getCurrentCard();
+  if(!card) return;
+  delete _hlData[card.id];
+  saveHlData();
+  applyHighlights(card.id);
+  _hlColor = null;
+  ['yellow','green','blue'].forEach(c=>{
+    const btn = document.getElementById('hl-btn-'+c);
+    if(btn) btn.classList.remove('active');
+  });
+}
+
+function getCurrentCard(){
+  const full = [...deck,...againQueue];
+  if(!full.length || idx >= full.length) return null;
+  return full[idx];
+}
+
+// Apply highlights from stored data to DOM
+function applyHighlights(cardId){
+  const zones = ['exp-txt','exp-dist'];
+  zones.forEach(zoneId=>{
+    const el = document.getElementById(zoneId);
+    if(!el) return;
+    // Remove existing marks
+    el.querySelectorAll('mark.hl-yellow,mark.hl-green,mark.hl-blue').forEach(m=>{
+      const parent = m.parentNode;
+      parent.replaceChild(document.createTextNode(m.textContent), m);
+      parent.normalize();
+    });
+  });
+  // Also clear q zone
+  ['c-q'].forEach(zoneId=>{
+    const el = document.getElementById(zoneId);
+    if(!el) return;
+    el.querySelectorAll('mark.hl-yellow,mark.hl-green,mark.hl-blue').forEach(m=>{
+      const parent = m.parentNode;
+      parent.replaceChild(document.createTextNode(m.textContent), m);
+      parent.normalize();
+    });
+  });
+}
+
+// Clear question-zone highlights (called when answer is revealed)
+function clearQHighlights(){
+  ['c-q','c-opts'].forEach(zoneId=>{
+    const el = document.getElementById(zoneId);
+    if(!el) return;
+    el.querySelectorAll('mark.hl-yellow,mark.hl-green,mark.hl-blue').forEach(m=>{
+      const parent = m.parentNode;
+      parent.replaceChild(document.createTextNode(m.textContent), m);
+      parent.normalize();
+    });
+  });
+}
+
+// Handle text selection for highlighting
+document.addEventListener('mouseup', handleHlSelection);
+document.addEventListener('touchend', handleHlSelection);
+
+function handleHlSelection(e){
+  if(!_hlColor) return;
+  const sel = window.getSelection();
+  if(!sel || sel.isCollapsed || !sel.toString().trim()) return;
+  
+  const range = sel.getRangeAt(0);
+  const container = range.commonAncestorContainer;
+  
+  // Check if selection is within a highlight zone
+  const hlZones = document.querySelectorAll('.hl-zone, #exp-txt, #exp-dist, #c-q');
+  let inZone = false;
+  for(const zone of hlZones){
+    if(zone.contains(container)){ inZone = true; break; }
+  }
+  if(!inZone){ sel.removeAllRanges(); return; }
+  
+  // Apply highlight mark
+  try {
+    const mark = document.createElement('mark');
+    mark.className = 'hl-'+_hlColor;
+    mark.onclick = function(ev){
+      ev.stopPropagation();
+      // Click on highlight removes it
+      const parent = this.parentNode;
+      parent.replaceChild(document.createTextNode(this.textContent), this);
+      parent.normalize();
+    };
+    range.surroundContents(mark);
+    sel.removeAllRanges();
+  } catch(err){
+    // surroundContents fails if selection crosses elements — ignore
+    sel.removeAllRanges();
+  }
+}
+
 // Rastreia qual opção o aluno escolheu
 window.lastChosenIdx = undefined;
 
@@ -5489,6 +5664,18 @@ document.addEventListener('click', function(e){
   }
 });
 </script>
+
+<style>
+/* ── HIGHLIGHT SYSTEM ── */
+.hl-yellow { background: #fde68a; border-radius: 2px; cursor: pointer; }
+.hl-green  { background: #86efac; border-radius: 2px; cursor: pointer; }
+.hl-blue   { background: #93c5fd; border-radius: 2px; cursor: pointer; }
+html.dark .hl-yellow { background: rgba(253,230,138,.35); color: var(--text); }
+html.dark .hl-green  { background: rgba(134,239,172,.3);  color: var(--text); }
+html.dark .hl-blue   { background: rgba(147,197,253,.3);  color: var(--text); }
+.hl-btn-active { border-color: #374151 !important; box-shadow: 0 0 0 2px rgba(0,0,0,.3); transform: scale(1.15); }
+html.dark .hl-btn-active { border-color: #fff !important; }
+</style>
 
 </body>
 </html>
