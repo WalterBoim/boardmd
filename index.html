@@ -1273,8 +1273,8 @@ html.light .att-btn{background:var(--surface2);}
       <button class="deck-tab" id="tab-s2"         onclick="switchDeckTab('s2')">Rapid Review</button>
       <button class="deck-tab" id="tab-core"       onclick="switchDeckTab('core')">Core Review</button>
       <button class="deck-tab" id="tab-hy"         onclick="switchDeckTab('hy')">HY Concepts</button>
-      <span class="tab-group-sep">SHELF</span>
-      <button class="deck-tab" id="tab-shelf_surgery" onclick="switchDeckTab('shelf_surgery')">Surgery</button>
+      <span class="tab-group-sep" id="shelf-sep" style="display:flex!important">SHELF</span>
+      <button class="deck-tab" id="tab-shelf_surgery" onclick="switchDeckTab('shelf_surgery')" style="display:block!important">Surgery</button>
     </div>
   </header>
 
@@ -2045,10 +2045,9 @@ function openApp(dk){
 function updateHeaderTabs(){
   document.querySelectorAll('.deck-tab').forEach(tab=>{
     const dk = tab.id.replace('tab-','');
+    if(SHELF_DECKS.includes(dk)) return; // SHELF: nunca esconde
     const isS1 = STEP1_DECKS.includes(dk);
     const isS2 = STEP2_DECKS.includes(dk);
-    const isShelf = SHELF_DECKS.includes(dk);
-    if(isShelf){ tab.style.display=''; return; } // SHELF sempre visível
     if(currentStep==='s1'){
       tab.style.display = isS1 ? '' : 'none';
     } else {
@@ -2056,7 +2055,7 @@ function updateHeaderTabs(){
     }
   });
   document.querySelectorAll('.tab-group-sep').forEach((sep,i)=>{
-    if(i===2){ sep.style.display=''; return; } // SHELF separator sempre visível
+    if(sep.id==='shelf-sep') return; // SHELF separator: nunca esconde
     if(currentStep==='s1') sep.style.display = i===0 ? '' : 'none';
     else sep.style.display = i===1 ? '' : 'none';
   });
