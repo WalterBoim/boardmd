@@ -1276,7 +1276,7 @@ html.light .att-btn{background:var(--surface2);}
     </div>
   </header>
 
-  <!-- LEADERBOARD PANEL --><!-- shelf-v17 -->
+  <!-- LEADERBOARD PANEL --><!-- shelf-v18 -->
   <div class="lb-panel" id="lb-panel">
     <div>
       <div class="lb-header-title">Global Ranking</div>
@@ -2766,10 +2766,25 @@ function revealAnswer(sel,card){
     if(dLines.length > 1){
       distHtml = dLines.map(line=>{
         line = line.trim();
-        // Negrito no nome da opção errada
+        // Negrito no nome da opção errada — tenta match no início da linha
+        let bolded = false;
         for(const w of wrongOpts){
           const esc = w.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
-          line = line.replace(new RegExp('^'+esc,'i'), '<strong>'+w+'</strong>');
+          // Match exato no início
+          if(new RegExp('^'+esc,'i').test(line)){
+            line = line.replace(new RegExp('^'+esc,'i'), '<strong>'+w+'</strong>');
+            bolded = true; break;
+          }
+          // Match parcial — primeiras 2 palavras
+          const words2 = w.split(/\s+/).slice(0,2).join('\\s+');
+          if(words2 && new RegExp('^'+words2,'i').test(line)){
+            const m = line.match(new RegExp('^('+words2+'[^—\\-]*?)([—\\-])', 'i'));
+            if(m){ line = '<strong>'+m[1].trim()+'</strong>'+m[2]+line.slice(m[0].length); bolded = true; break; }
+          }
+        }
+        // Se não encontrou match, tenta negrito no texto antes do primeiro — ou -
+        if(!bolded){
+          line = line.replace(/^([^—\-]{3,40})(—|-)/, '<strong>$1</strong>$2');
         }
         return '<div class="dist-item">'+(/<[a-z][^>]*>/i.test(line)?line:mdToHtml(line))+'</div>';
       }).join('');
