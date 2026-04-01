@@ -2046,6 +2046,8 @@ function updateHeaderTabs(){
     const dk = tab.id.replace('tab-','');
     const isS1 = STEP1_DECKS.includes(dk);
     const isS2 = STEP2_DECKS.includes(dk);
+    const isShelf = SHELF_DECKS.includes(dk);
+    if(isShelf){ tab.style.display=''; return; } // SHELF sempre visível
     if(currentStep==='s1'){
       tab.style.display = isS1 ? '' : 'none';
     } else {
@@ -2053,6 +2055,7 @@ function updateHeaderTabs(){
     }
   });
   document.querySelectorAll('.tab-group-sep').forEach((sep,i)=>{
+    if(i===2){ sep.style.display=''; return; } // SHELF separator sempre visível
     if(currentStep==='s1') sep.style.display = i===0 ? '' : 'none';
     else sep.style.display = i===1 ? '' : 'none';
   });
