@@ -1276,7 +1276,7 @@ html.light .att-btn{background:var(--surface2);}
     </div>
   </header>
 
-  <!-- LEADERBOARD PANEL --><!-- shelf-v14 -->
+  <!-- LEADERBOARD PANEL --><!-- shelf-v15 -->
   <div class="lb-panel" id="lb-panel">
     <div>
       <div class="lb-header-title">Global Ranking</div>
@@ -5273,7 +5273,7 @@ EXPLANATION: ${(card.e||'').replace(/<[^>]+>/g,' ').slice(0,300)}`;
   const prompts = {
     why: `You are a brilliant, warm attending physician. The student just answered this USMLE board question:\n\n${ctx}\n\nIn 2-3 paragraphs: acknowledge right/wrong (one sentence). Explain WHY this is the correct answer using core pathophysiology. Be direct, clinical — like a great attending, not a textbook. End with one punchy clinical pearl.`,
     explain: `You are a brilliant attending. The student wants deeper understanding:\n\n${ctx}\n\nTeach this concept at the whiteboard. One vivid analogy. Cover: pathophysiology, clinical clues, board trap. 3 paragraphs max.`,
-    mcq: `You are a brilliant USMLE question writer. Based on this topic:\n\n${ctx}\n\nWrite 3 new USMLE-style MCQs on the SAME concept. Return ONLY valid JSON, no markdown, no extra text:\n{"questions":[{"stem":"[clinical vignette]","options":["A. text","B. text","C. text","D. text"],"correct":"A","explanation":"[2-3 sentence explanation of why A is correct and others are wrong]"},{"stem":"[clinical vignette]","options":["A. text","B. text","C. text","D. text"],"correct":"B","explanation":"[2-3 sentence explanation]"},{"stem":"[clinical vignette]","options":["A. text","B. text","C. text","D. text"],"correct":"C","explanation":"[2-3 sentence explanation]"}]}`,
+    mcq: `You are a brilliant USMLE question writer. Based on this topic:\n\n${ctx}\n\nWrite 3 new USMLE-style MCQs on the SAME concept. Return ONLY valid JSON, no markdown, no extra text:\n{"questions":[{"stem":"[clinical vignette]","options":["A. text","B. text","C. text","D. text"],"correct":"A","explanation":"[2-3 sentences why A is correct]","distractors":{"B":"[why B is wrong]","C":"[why C is wrong]","D":"[why D is wrong]"},"keypoint":"[one punchy ≤15 word board pearl]"},{"stem":"[vignette]","options":["A. text","B. text","C. text","D. text"],"correct":"B","explanation":"[2-3 sentences]","distractors":{"A":"[why wrong]","C":"[why wrong]","D":"[why wrong]"},"keypoint":"[≤15 word pearl]"},{"stem":"[vignette]","options":["A. text","B. text","C. text","D. text"],"correct":"C","explanation":"[2-3 sentences]","distractors":{"A":"[why wrong]","B":"[why wrong]","D":"[why wrong]"},"keypoint":"[≤15 word pearl]"}]}`,
     surprise: `You are a brilliant attending. Give ONE unforgettable clinical pearl about:\n\n${ctx}\n\nSomething NOT in the explanation — a real-world connection, classic trick, or board trap. 2 paragraphs max. Be vivid.`,
     custom: `You are a brilliant attending physician. The student has a question about this USMLE topic:\n\n${ctx}\n\nStudent question: "${document.getElementById('att-ask-input')?.value||''}"\n\nAnswer clearly and clinically in 2-3 paragraphs. Focus on what's relevant for USMLE boards.`,
     translate: `Translate the following medical flashcard content to Brazilian Portuguese. Keep medical terms accurate. Return ONLY the translation in this exact format:\n\nQUESTÃO: [translated question]\nA. [option] B. [option] C. [option] D. [option]\nRESPOSTA CORRETA: [translated answer]\nEXPLICAÇÃO: [translated explanation]\nPONTO-CHAVE: [translated key point]\n\nContent to translate:\nQUESTION: ${card.q}\nOPTIONS: ${(card.w||[]).map((o,i)=>String.fromCharCode(65+i)+'. '+o).join(' ')}\nCORRECT ANSWER: ${card.c}\nEXPLANATION: ${(card.e||'').replace(/<[^>]+>/g,' ').slice(0,500)}\nKEY POINT: ${(card.kp||'')}`,
@@ -5353,12 +5353,16 @@ function renderInteractiveMCQs(questions, container){
           <span style="font-size:9px;font-weight:800;letter-spacing:.1em;color:var(--text-faint);font-family:'JetBrains Mono',monospace;">Q${qi+1}</span>
           <p style="margin:6px 0 0;font-size:13px;color:var(--text);line-height:1.55;font-family:'Inter',sans-serif;">${q.stem}</p>
         </div>
-        <div style="padding:8px 10px;display:flex;flex-direction:column;gap:6px;" id="att-mcq-opts-${qi}">
+        <div style="padding:8px 10px;display:flex;flex-direction:column;gap:6px;" id="att-mcq-opts-${qi}" 
+          data-correct="${q.correct}" 
+          data-exp="${(q.explanation||'').replace(/"/g,'&quot;')}"
+          data-dist="${JSON.stringify(q.distractors||{}).replace(/"/g,'&quot;')}"
+          data-kp="${(q.keypoint||'').replace(/"/g,'&quot;')}">
           ${q.options.map((opt, oi) => `
-            <button onclick="checkAttMCQ(${qi},'${q.correct}','${String.fromCharCode(65+oi)}','${q.explanation.replace(/'/g,"&#39;")}')" 
+            <button onclick="checkAttMCQ(${qi},'${String.fromCharCode(65+oi)}')" 
               style="text-align:left;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:9px 12px;cursor:pointer;font-size:12px;font-family:'Inter',sans-serif;color:var(--text);transition:all .15s;display:flex;align-items:center;gap:8px;"
-              onmouseover="if(!this.dataset.answered)this.style.borderColor='rgba(139,92,246,.4)'"
-              onmouseout="if(!this.dataset.answered)this.style.borderColor='var(--border)'"
+              onmouseover="this.style.borderColor='rgba(139,92,246,.4)'"
+              onmouseout="this.style.borderColor='var(--border)'"
               id="att-mcq-${qi}-opt-${oi}">
               <span style="width:22px;height:22px;border-radius:50%;border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;">${String.fromCharCode(65+oi)}</span>
               ${opt.replace(/^[A-D]\.\s*/,'')}
@@ -5374,40 +5378,74 @@ function renderInteractiveMCQs(questions, container){
   container.innerHTML = `<div class="att-response-msg"><div class="att-response-label">Practice Questions</div>${html}</div>`;
 }
 
-function checkAttMCQ(qi, correct, chosen, explanation){
+function checkAttMCQ(qi, chosen){
   const block = document.getElementById(`att-mcq-${qi}`);
   if(!block || block.dataset.answered) return;
   block.dataset.answered = '1';
-  
-  // Desabilita todos os botões e colore
-  const opts = block.querySelectorAll('button');
+
+  const optsDiv = document.getElementById(`att-mcq-opts-${qi}`);
+  const correct = optsDiv.dataset.correct;
+  const explanation = optsDiv.dataset.exp;
+  const keypoint = optsDiv.dataset.kp;
+  let distractors = {};
+  try { distractors = JSON.parse(optsDiv.dataset.dist.replace(/&quot;/g,'"')); } catch(e){}
+
+  // Colore botões
+  const opts = optsDiv.querySelectorAll('button');
   opts.forEach(btn => {
     btn.style.cursor = 'default';
     btn.disabled = true;
-    const letter = btn.id.split('-').pop();
-    const optLetter = String.fromCharCode(65 + parseInt(letter));
+    btn.onmouseover = null;
+    btn.onmouseout = null;
+    const oi = parseInt(btn.id.split('-').pop());
+    const optLetter = String.fromCharCode(65 + oi);
     if(optLetter === correct){
       btn.style.borderColor = '#22c55e';
       btn.style.background = 'rgba(34,197,94,.1)';
       btn.style.color = '#22c55e';
+      btn.querySelector('span').style.borderColor = '#22c55e';
     } else if(optLetter === chosen && chosen !== correct){
       btn.style.borderColor = '#f43f5e';
       btn.style.background = 'rgba(244,63,94,.08)';
       btn.style.color = '#f43f5e';
+      btn.querySelector('span').style.borderColor = '#f43f5e';
     }
   });
 
-  // Mostra resultado
   const isCorrect = chosen === correct;
   const expDiv = document.getElementById(`att-mcq-exp-${qi}`);
   expDiv.style.display = 'block';
-  expDiv.style.background = isCorrect ? 'rgba(34,197,94,.06)' : 'rgba(244,63,94,.06)';
+
+  // Distractors
+  let distractorHtml = '';
+  const wrongEntries = Object.entries(distractors);
+  if(wrongEntries.length){
+    distractorHtml = `<div style="margin-top:10px;display:flex;flex-direction:column;gap:5px;">
+      <div style="font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text-faint);font-family:'JetBrains Mono',monospace;margin-bottom:2px;">Why the others are wrong</div>
+      ${wrongEntries.map(([letter, reason]) => `
+        <div style="display:flex;gap:8px;font-size:12px;line-height:1.5;font-family:'Inter',sans-serif;">
+          <span style="font-weight:700;color:var(--rose);flex-shrink:0;">${letter}.</span>
+          <span style="color:var(--text-dim);">${reason}</span>
+        </div>`).join('')}
+    </div>`;
+  }
+
+  // Key point
+  const kpHtml = keypoint ? `
+    <div style="margin-top:10px;padding:8px 12px;background:rgba(59,127,255,.08);border-left:3px solid var(--accent);border-radius:0 6px 6px 0;">
+      <div style="font-size:9px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);font-family:'JetBrains Mono',monospace;">Key Point</div>
+      <div style="font-size:12px;color:var(--text);margin-top:3px;font-family:'Inter',sans-serif;font-weight:600;">${keypoint}</div>
+    </div>` : '';
+
+  expDiv.style.background = isCorrect ? 'rgba(34,197,94,.04)' : 'rgba(244,63,94,.04)';
   expDiv.style.borderTopColor = isCorrect ? 'rgba(34,197,94,.2)' : 'rgba(244,63,94,.2)';
   expDiv.innerHTML = `
-    <div style="font-size:11px;font-weight:700;color:${isCorrect?'var(--emerald)':'var(--rose)'};margin-bottom:4px;font-family:'Inter',sans-serif;">
+    <div style="font-size:11px;font-weight:700;color:${isCorrect?'var(--emerald)':'var(--rose)'};margin-bottom:6px;font-family:'Inter',sans-serif;">
       ${isCorrect ? '✓ Correct' : '✗ Incorrect — correct answer: ' + correct}
     </div>
-    <div style="font-size:12px;color:var(--text);line-height:1.6;font-family:'Inter',sans-serif;">${explanation}</div>`;
+    <div style="font-size:12px;color:var(--text);line-height:1.6;font-family:'Inter',sans-serif;">${explanation}</div>
+    ${distractorHtml}
+    ${kpHtml}`;
 }
 document.addEventListener('click', function(e){
   const btn = e.target.closest('.opt-btn');
