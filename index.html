@@ -1280,7 +1280,7 @@ html.light .att-btn{background:var(--surface2);}
     </div>
   </header>
 
-  <!-- LEADERBOARD PANEL --><!-- shelf-v7 -->
+  <!-- LEADERBOARD PANEL --><!-- shelf-v8 -->
   <div class="lb-panel" id="lb-panel">
     <div>
       <div class="lb-header-title">Global Ranking</div>
@@ -1983,7 +1983,9 @@ function buildDeckHomeTable(){
       <td>
         <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
           <div><div class="dt-name">${name}</div><div class="dt-sub">${sub}</div></div>
-          
+          <button onclick="event.stopPropagation();switchDeck('${id}');openSettings();" title="Settings" style="background:none;border:none;color:var(--text-faint);cursor:pointer;padding:4px 6px;border-radius:6px;display:flex;align-items:center;opacity:.6;transition:opacity .15s;flex-shrink:0;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='.6'">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          </button>
         </div>
       </td>
       <td class="dt-num ${nw>0?'dt-new':'dt-zero'}">${nw}</td>
