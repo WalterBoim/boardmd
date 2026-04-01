@@ -959,16 +959,14 @@ html.light { --uw-hover:#f0f7ff; --uw-correct:#e8f5e9; --uw-wrong:#fdecea; --uw-
 #app-auth-menu button.aam-signout{color:var(--rose);}
 #app-auth-menu button.aam-signout:hover{background:rgba(244,63,94,.08);}
 
-/* ── HIGHLIGHT SYSTEM ── */
-.hl-yellow { background: rgba(250,204,21,.35); border-radius: 2px; cursor: pointer; }
-.hl-green  { background: rgba(34,197,94,.28);  border-radius: 2px; cursor: pointer; }
-.hl-blue   { background: rgba(59,130,246,.28); border-radius: 2px; cursor: pointer; }
-.hl-btn { width:22px;height:22px;border-radius:50%;border:2px solid transparent;cursor:pointer;transition:all .15s;flex-shrink:0; }
-.hl-btn.hl-active { transform:scale(1.2);border-color:rgba(0,0,0,.3); }
-.hl-btn-y { background:#fbbf24; }
-.hl-btn-g { background:#22c55e; }
-.hl-btn-b { background:#3b82f6; }
-.hl-toolbar { display:flex;align-items:center;gap:6px;padding:0 4px; }
+/* ── HIGHLIGHT BUTTONS ── */
+.hl-btn{width:22px;height:22px;border-radius:50%;border:2px solid transparent;cursor:pointer;transition:all .15s;flex-shrink:0;outline:none;}
+.hl-btn:hover{transform:scale(1.15);}
+.hl-btn.hl-active,.hl-btn.active{border-color:var(--text);transform:scale(1.15);}
+.hl-btn-y{background:#fbbf24;}
+.hl-btn-g{background:#22c55e;}
+.hl-btn-b{background:#3b82f6;}
+.hl-toolbar{display:flex;align-items:center;gap:6px;padding:0 4px;}
 #attending-overlay{position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:4000;display:none;align-items:flex-end;justify-content:center;backdrop-filter:blur(4px);}
 #attending-overlay.active{display:flex;}
 #attending-panel{background:var(--surface);border:1px solid var(--border);border-top-left-radius:20px;border-top-right-radius:20px;width:100%;max-width:760px;max-height:82vh;display:flex;flex-direction:column;overflow:hidden;animation:slideUpPanel .25s cubic-bezier(.34,1.2,.64,1);}
@@ -984,22 +982,6 @@ html.light { --uw-hover:#f0f7ff; --uw-correct:#e8f5e9; --uw-wrong:#fdecea; --uw-
 .att-usage{font-size:10px;font-family:'JetBrains Mono',monospace;color:var(--text-faint);padding:0 20px 10px;border-bottom:1px solid var(--border);flex-shrink:0;}
 .att-usage span{color:var(--accent);}
 .att-buttons{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;padding:14px 16px;border-bottom:1px solid var(--border);flex-shrink:0;}
-/* ── HIGHLIGHT SYSTEM ─────────────────────────────────── */
-.hl-toolbar{display:flex;align-items:center;gap:6px;padding:5px 18px;background:var(--surface);border-bottom:1px solid var(--border);}
-.hl-btn{width:22px;height:22px;border-radius:50%;border:2px solid transparent;cursor:pointer;transition:all .15s;flex-shrink:0;outline:none;}
-.hl-btn:hover{transform:scale(1.15);}
-.hl-btn.active{border-color:var(--text);transform:scale(1.15);}
-.hl-yellow{background:#fde68a;}
-.hl-green{background:#bbf7d0;}
-.hl-blue{background:#bfdbfe;}
-.hl-erase{background:none!important;border:1px solid var(--border)!important;font-size:10px;color:var(--text-faint);width:auto!important;padding:0 7px;border-radius:6px;font-family:'JetBrains Mono',monospace;height:22px;display:flex;align-items:center;}
-.hl-erase:hover{border-color:var(--rose)!important;color:var(--rose);}
-mark.hl-yellow{background:#fde68a;color:inherit;border-radius:2px;cursor:pointer;}
-mark.hl-green{background:#bbf7d0;color:inherit;border-radius:2px;cursor:pointer;}
-mark.hl-blue{background:#bfdbfe;color:inherit;border-radius:2px;cursor:pointer;}
-html.light mark.hl-yellow{background:#fef08a;}
-html.light mark.hl-green{background:#86efac;}
-html.light mark.hl-blue{background:#93c5fd;}
 
 .att-btn{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:10px 12px;cursor:pointer;text-align:left;transition:all .15s;display:flex;align-items:flex-start;gap:8px;}
 .att-btn:hover{border-color:rgba(99,102,241,.5);background:rgba(99,102,241,.06);}
@@ -1264,9 +1246,7 @@ html.light .att-btn{background:var(--surface2);}
         <div class="hdr-divider"></div>
         <!-- Highlight tools -->
         <div id="hl-btns" style="display:flex;align-items:center;gap:3px;">
-          <button id="hl-y" onclick="setHlColor('yellow')" title="Highlight yellow" style="width:18px;height:18px;border-radius:4px;border:2px solid transparent;background:#fde68a;cursor:pointer;transition:all .15s;flex-shrink:0;"></button>
-          <button id="hl-g" onclick="setHlColor('green')" title="Highlight green" style="width:18px;height:18px;border-radius:4px;border:2px solid transparent;background:#86efac;cursor:pointer;transition:all .15s;flex-shrink:0;"></button>
-          <button id="hl-b" onclick="setHlColor('blue')" title="Highlight blue" style="width:18px;height:18px;border-radius:4px;border:2px solid transparent;background:#93c5fd;cursor:pointer;transition:all .15s;flex-shrink:0;"></button>
+          
         </div>
         <div class="hdr-divider"></div>
         <!-- Font size -->
@@ -1316,7 +1296,7 @@ html.light .att-btn{background:var(--surface2);}
     </div>
   </header>
 
-  <!-- LEADERBOARD PANEL --><!-- shelf-v19 -->
+  <!-- LEADERBOARD PANEL --><!-- shelf-v21 -->
   <div class="lb-panel" id="lb-panel">
     <div>
       <div class="lb-header-title">Global Ranking</div>
@@ -2217,13 +2197,6 @@ function ensureStudyUI(){
           <span class="card-deck-badge" id="c-deck-badge" style="display:none"></span>
           <span class="card-qid" id="c-qid" style="display:none">—</span>
         </div>
-      </div>
-      <!-- HIGHLIGHT TOOLBAR -->
-      <div class="hl-toolbar" id="hl-toolbar">
-        <button class="hl-btn hl-yellow" id="hl-btn-yellow" onclick="setHlColor('yellow')" title="Yellow highlight"></button>
-        <button class="hl-btn hl-green"  id="hl-btn-green"  onclick="setHlColor('green')"  title="Green highlight"></button>
-        <button class="hl-btn hl-blue"   id="hl-btn-blue"   onclick="setHlColor('blue')"   title="Blue highlight"></button>
-        <button class="hl-btn hl-erase"  id="hl-btn-erase"  onclick="eraseAllHighlights()" title="Clear all highlights">✕ clear</button>
       </div>
       <div class="card-body">
         <div class="card-question hl-zone hl-q" id="c-q">Loading…</div>
@@ -5666,15 +5639,17 @@ document.addEventListener('click', function(e){
 </script>
 
 <style>
-/* ── HIGHLIGHT SYSTEM ── */
-.hl-yellow { background: #fde68a; border-radius: 2px; cursor: pointer; }
-.hl-green  { background: #86efac; border-radius: 2px; cursor: pointer; }
-.hl-blue   { background: #93c5fd; border-radius: 2px; cursor: pointer; }
-html.dark .hl-yellow { background: rgba(253,230,138,.35); color: var(--text); }
-html.dark .hl-green  { background: rgba(134,239,172,.3);  color: var(--text); }
-html.dark .hl-blue   { background: rgba(147,197,253,.3);  color: var(--text); }
-.hl-btn-active { border-color: #374151 !important; box-shadow: 0 0 0 2px rgba(0,0,0,.3); transform: scale(1.15); }
-html.dark .hl-btn-active { border-color: #fff !important; }
+/* ── HIGHLIGHT SYSTEM — cores calibradas para dark e light ── */
+/* Light mode: cores vivas mas não saturadas demais */
+mark.hl-yellow, .hl-yellow { background:#fef08a; color:#1a1a1a; border-radius:2px; cursor:pointer; }
+mark.hl-green,  .hl-green  { background:#bbf7d0; color:#1a1a1a; border-radius:2px; cursor:pointer; }
+mark.hl-blue,   .hl-blue   { background:#bae6fd; color:#1a1a1a; border-radius:2px; cursor:pointer; }
+/* Dark mode: fundo suave semitransparente, texto claro legível */
+html.dark mark.hl-yellow, html.dark .hl-yellow { background:rgba(234,179,8,.22);  color:var(--text); }
+html.dark mark.hl-green,  html.dark .hl-green  { background:rgba(34,197,94,.18);  color:var(--text); }
+html.dark mark.hl-blue,   html.dark .hl-blue   { background:rgba(56,189,248,.18); color:var(--text); }
+.hl-btn-active { border-color:#374151!important; box-shadow:0 0 0 2px rgba(0,0,0,.3); transform:scale(1.15); }
+html.dark .hl-btn-active { border-color:#fff!important; }
 </style>
 
 </body>
