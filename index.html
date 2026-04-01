@@ -1273,7 +1273,6 @@ html.light .att-btn{background:var(--surface2);}
       <button class="deck-tab" id="tab-s2"         onclick="switchDeckTab('s2')">Rapid Review</button>
       <button class="deck-tab" id="tab-core"       onclick="switchDeckTab('core')">Core Review</button>
       <button class="deck-tab" id="tab-hy"         onclick="switchDeckTab('hy')">HY Concepts</button>
-      <span class="tab-group-sep">SHELF</span>
       <button class="deck-tab" id="tab-shelf_surgery" onclick="switchDeckTab('shelf_surgery')">Surgery</button>
     </div>
   </header>
@@ -1882,10 +1881,14 @@ function buildDeckManage(){
     {id:'boardmd_s2',name:'BoardMD S2'},{id:'core',name:'Core Review'},
     {id:'s2',name:'Rapid Review'},{id:'hy',name:'HY Concepts'},
   ];
+  const shelfDecks=[
+    {id:'shelf_surgery',name:'Surgery'},
+  ];
+  const shelfIds=['shelf_surgery'];
   // Show only decks for current step
-  const stepIds   = currentStep==='s1' ? s1Ids   : s2Ids;
-  const stepDecks = currentStep==='s1' ? s1Decks : s2Decks;
-  const stepLabel = currentStep==='s1' ? 'STEP 1' : 'STEP 2 CK';
+  const stepIds   = currentStep==='s1' ? s1Ids   : currentStep==='shelf' ? shelfIds : s2Ids;
+  const stepDecks = currentStep==='s1' ? s1Decks : currentStep==='shelf' ? shelfDecks : s2Decks;
+  const stepLabel = currentStep==='s1' ? 'STEP 1' : currentStep==='shelf' ? 'SHELF' : 'STEP 2 CK';
   const allActive = stepIds.every(id=>!hiddenDecks.includes(id));
   const wrap=document.getElementById('deck-manage-chips');
   if(!wrap) return;
@@ -1921,7 +1924,7 @@ function toggleAllStep(ids){
   saveHiddenDecks();buildDeckHomeTable();buildDeckManage();
 }
 function toggleAllDecks(){
-  const allIds=['boardmd_s1','s1_core','s1','hy1','fa_step1','fa_s1','arrows','ethics','boardmd_s2','core','s2','hy'];
+  const allIds=['boardmd_s1','s1_core','s1','hy1','fa_step1','fa_s1','arrows','ethics','boardmd_s2','core','s2','hy','shelf_surgery'];
   const allActive=allIds.every(id=>!hiddenDecks.includes(id));
   hiddenDecks=allActive?[...allIds]:[];
   saveHiddenDecks();buildDeckHomeTable();buildDeckManage();
@@ -2016,13 +2019,13 @@ function goHome(){
 // Track which step the user is studying
 let currentStep = localStorage.getItem('bmd_step') || 's1'; // 's1' or 's2'
 const STEP1_DECKS = ['boardmd_s1','s1_core','s1','hy1','fa_step1','fa_s1','arrows','ethics'];
-const STEP2_DECKS = ['boardmd_s2','core','s2','hy','shelf_surgery'];
+const STEP2_DECKS = ['boardmd_s2','core','s2','hy'];
+const SHELF_DECKS = ['shelf_surgery'];
 
 function openApp(dk){
   document.getElementById('landing').style.display='none';
   document.getElementById('app').classList.add('active');
   applyFont();
-  // Set currentStep based on which deck was selected
   if(STEP2_DECKS.includes(dk)){
     currentStep='s2';
   } else {
@@ -2033,14 +2036,12 @@ function openApp(dk){
   document.querySelectorAll('.deck-tab').forEach(t=>t.classList.toggle('active',t.id==='tab-'+dk));
   const lbl=document.getElementById('deck-label');
   if(lbl) lbl.textContent=(DECK_META[dk]||{}).short||dk;
-  // Filter header tabs to show only relevant step
   updateHeaderTabs();
   showDeckHome();
   window.scrollTo(0,0);
 }
 
 function updateHeaderTabs(){
-  // Show only tabs for the current step + separator
   document.querySelectorAll('.deck-tab').forEach(tab=>{
     const dk = tab.id.replace('tab-','');
     const isS1 = STEP1_DECKS.includes(dk);
@@ -2051,9 +2052,7 @@ function updateHeaderTabs(){
       tab.style.display = isS2 ? '' : 'none';
     }
   });
-  // Show/hide step separator labels
   document.querySelectorAll('.tab-group-sep').forEach((sep,i)=>{
-    // i=0 is STEP 1, i=1 is STEP 2 CK
     if(currentStep==='s1') sep.style.display = i===0 ? '' : 'none';
     else sep.style.display = i===1 ? '' : 'none';
   });
@@ -4246,7 +4245,7 @@ function _syncFC(nw,lrn,du,st){
   else if(st===2)d.classList.add('cfc-active');
 }
 
-var _sR=[],_sD='all',_s1=['boardmd_s1','s1_core','s1','s1core','fa_s1','arrows','hy1','ethics'],_s2=['boardmd_s2','s2','core','hy','shelf_surgery'];
+var _sR=[],_sD='all',_s1=['boardmd_s1','s1_core','s1','s1core','fa_s1','arrows','hy1','ethics'],_s2=['boardmd_s2','s2','core','hy'],_shelf=['shelf_surgery'];
 var _dkL={boardmd_s1:'BoardMD Step 1',boardmd_s2:'BoardMD Step 2 CK',s1:'Step 1 · Rapid',s2:'Step 2 CK · Rapid',core:'Step 2 CK · Core',s1core:'Step 1 · Core',hy:'Step 2 CK · HY',hy1:'Step 1 · HY',fa_s1:'Clinical Patterns',ethics:'Ethics',arrows:'Arrows',shelf_surgery:'BoardMD Shelf'};
 function openCardSearch(){document.getElementById('search-overlay').style.display='flex';setTimeout(function(){document.getElementById('search-input').focus();},80);document.getElementById('search-open-btn').classList.add('active');}
 function closeCardSearch(){document.getElementById('search-overlay').style.display='none';document.getElementById('search-open-btn').classList.remove('active');}
@@ -4257,7 +4256,7 @@ function runCardSearch(){
   if(q.length<2){re.innerHTML='<div style="text-align:center;color:var(--text-faint);font-size:13px;padding:32px 0">Start typing…</div>';ac.style.display='none';_sR=[];return;}
   var terms=q.split(' ').filter(function(t){return t.length>1;});_sR=[];
   ['boardmd_s1','boardmd_s2','s1','s2','core','s1core','hy','hy1','fa_s1','ethics','arrows','shelf_surgery'].forEach(function(dk){
-    if(_sD==='step1'&&_s1.indexOf(dk)<0)return;if(_sD==='step2'&&_s2.indexOf(dk)<0)return;
+    if(_sD==='step1'&&_s1.indexOf(dk)<0)return;if(_sD==='step2'&&_s2.indexOf(dk)<0)return;if(_sD==='shelf'&&_shelf.indexOf(dk)<0)return;
     if(_sD!=='all'&&_sD!=='step1'&&_sD!=='step2'&&_sD!==dk)return;
     (DECKS[dk]||[]).forEach(function(card){
       var h=[card.q||'',card.c||'',(card.w||[]).join(' '),card.system||'',card.topic||'',card.d||''].join(' ').toLowerCase();
