@@ -1273,12 +1273,11 @@ html.light .att-btn{background:var(--surface2);}
       <button class="deck-tab" id="tab-s2"         onclick="switchDeckTab('s2')">Rapid Review</button>
       <button class="deck-tab" id="tab-core"       onclick="switchDeckTab('core')">Core Review</button>
       <button class="deck-tab" id="tab-hy"         onclick="switchDeckTab('hy')">HY Concepts</button>
-      <span class="tab-group-sep" id="shelf-sep" style="display:flex!important">SHELF</span>
-      <button class="deck-tab" id="tab-shelf_surgery" onclick="switchDeckTab('shelf_surgery')" style="display:block!important">Surgery</button>
+      <button class="deck-tab" id="tab-shelf_surgery" onclick="switchDeckTab('shelf_surgery')">BoardMD Shelf</button>
     </div>
   </header>
 
-  <!-- LEADERBOARD PANEL --><!-- shelf-v2 -->
+  <!-- LEADERBOARD PANEL --><!-- shelf-v3 -->
   <div class="lb-panel" id="lb-panel">
     <div>
       <div class="lb-header-title">Global Ranking</div>
@@ -1871,7 +1870,7 @@ function saveHiddenDecks(){try{localStorage.setItem('bmd_hidden_decks',JSON.stri
 
 function buildDeckManage(){
   const s1Ids=['boardmd_s1','s1_core','s1','hy1','fa_step1','fa_s1','arrows','ethics'];
-  const s2Ids=['boardmd_s2','core','s2','hy'];
+  const s2Ids=['boardmd_s2','core','s2','hy','shelf_surgery'];
   const s1Decks=[
     {id:'boardmd_s1',name:'BoardMD S1'},{id:'s1_core',name:'Core Review'},
     {id:'s1',name:'Rapid Review'},{id:'hy1',name:'HY Concepts'},
@@ -1881,15 +1880,11 @@ function buildDeckManage(){
   const s2Decks=[
     {id:'boardmd_s2',name:'BoardMD S2'},{id:'core',name:'Core Review'},
     {id:'s2',name:'Rapid Review'},{id:'hy',name:'HY Concepts'},
+    {id:'shelf_surgery',name:'BoardMD Shelf'},
   ];
-  const shelfDecks=[
-    {id:'shelf_surgery',name:'Surgery'},
-  ];
-  const shelfIds=['shelf_surgery'];
-  // Show only decks for current step
-  const stepIds   = currentStep==='s1' ? s1Ids   : currentStep==='shelf' ? shelfIds : s2Ids;
-  const stepDecks = currentStep==='s1' ? s1Decks : currentStep==='shelf' ? shelfDecks : s2Decks;
-  const stepLabel = currentStep==='s1' ? 'STEP 1' : currentStep==='shelf' ? 'SHELF' : 'STEP 2 CK';
+  const stepIds   = currentStep==='s1' ? s1Ids   : s2Ids;
+  const stepDecks = currentStep==='s1' ? s1Decks : s2Decks;
+  const stepLabel = currentStep==='s1' ? 'STEP 1' : 'STEP 2 CK';
   const allActive = stepIds.every(id=>!hiddenDecks.includes(id));
   const wrap=document.getElementById('deck-manage-chips');
   if(!wrap) return;
@@ -2020,7 +2015,7 @@ function goHome(){
 // Track which step the user is studying
 let currentStep = localStorage.getItem('bmd_step') || 's1'; // 's1' or 's2'
 const STEP1_DECKS = ['boardmd_s1','s1_core','s1','hy1','fa_step1','fa_s1','arrows','ethics'];
-const STEP2_DECKS = ['boardmd_s2','core','s2','hy'];
+const STEP2_DECKS = ['boardmd_s2','core','s2','hy','shelf_surgery'];
 const SHELF_DECKS = ['shelf_surgery'];
 
 function openApp(dk){
@@ -2045,7 +2040,6 @@ function openApp(dk){
 function updateHeaderTabs(){
   document.querySelectorAll('.deck-tab').forEach(tab=>{
     const dk = tab.id.replace('tab-','');
-    if(SHELF_DECKS.includes(dk)) return; // SHELF: nunca esconde
     const isS1 = STEP1_DECKS.includes(dk);
     const isS2 = STEP2_DECKS.includes(dk);
     if(currentStep==='s1'){
@@ -2055,7 +2049,6 @@ function updateHeaderTabs(){
     }
   });
   document.querySelectorAll('.tab-group-sep').forEach((sep,i)=>{
-    if(sep.id==='shelf-sep') return; // SHELF separator: nunca esconde
     if(currentStep==='s1') sep.style.display = i===0 ? '' : 'none';
     else sep.style.display = i===1 ? '' : 'none';
   });
