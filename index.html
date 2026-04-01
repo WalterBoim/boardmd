@@ -1296,7 +1296,7 @@ html.light .att-btn{background:var(--surface2);}
     </div>
   </header>
 
-  <!-- LEADERBOARD PANEL --><!-- shelf-v21 -->
+  <!-- LEADERBOARD PANEL --><!-- shelf-v22 -->
   <div class="lb-panel" id="lb-panel">
     <div>
       <div class="lb-header-title">Global Ranking</div>
@@ -5432,7 +5432,7 @@ function eraseAllHighlights(){
   if(!card) return;
   delete _hlData[card.id];
   saveHlData();
-  applyHighlights(card.id);
+  applyHighlightsToCard(card.id);
   _hlColor = null;
   ['yellow','green','blue'].forEach(c=>{
     const btn = document.getElementById('hl-btn-'+c);
@@ -5482,6 +5482,8 @@ function clearQHighlights(){
       parent.normalize();
     });
   });
+  // Save updated state (q cleared, e preserved)
+  _saveCardHighlights();
 }
 
 // Handle text selection for highlighting
@@ -5517,10 +5519,45 @@ function handleHlSelection(e){
     };
     range.surroundContents(mark);
     sel.removeAllRanges();
+    // Save highlights for current card
+    _saveCardHighlights();
   } catch(err){
     // surroundContents fails if selection crosses elements — ignore
     sel.removeAllRanges();
   }
+}
+
+function _saveCardHighlights(){
+  const card = getCurrentCard();
+  if(!card) return;
+  if(!_hlData[card.id]) _hlData[card.id] = {};
+  // Save innerHTML of each zone
+  ['c-q','exp-txt','exp-dist'].forEach(zoneId=>{
+    const el = document.getElementById(zoneId);
+    if(el) _hlData[card.id][zoneId] = el.innerHTML;
+  });
+  saveHlData();
+}
+
+function applyHighlightsToCard(cardId){
+  const saved = _hlData[cardId];
+  if(!saved) return;
+  ['c-q','exp-txt','exp-dist'].forEach(zoneId=>{
+    if(!saved[zoneId]) return;
+    const el = document.getElementById(zoneId);
+    if(!el) return;
+    el.innerHTML = saved[zoneId];
+    // Re-attach click handlers to marks
+    el.querySelectorAll('mark.hl-yellow,mark.hl-green,mark.hl-blue').forEach(m=>{
+      m.onclick = function(ev){
+        ev.stopPropagation();
+        const parent = this.parentNode;
+        parent.replaceChild(document.createTextNode(this.textContent), this);
+        parent.normalize();
+        _saveCardHighlights();
+      };
+    });
+  });
 }
 
 // Rastreia qual opção o aluno escolheu
