@@ -1296,7 +1296,7 @@ html.light .att-btn{background:var(--surface2);}
     </div>
   </header>
 
-  <!-- LEADERBOARD PANEL --><!-- shelf-v36 -->
+  <!-- LEADERBOARD PANEL --><!-- shelf-v37 -->
   <div class="lb-panel" id="lb-panel">
     <div>
       <div class="lb-header-title">Global Ranking</div>
@@ -3014,10 +3014,10 @@ function revealAnswer(sel,card){
   }
 
   // Imagem pós-resposta
-  const _iw=document.getElementById('card-img-wrap');
-  const _ie=document.getElementById('card-img-el');
-  const _ic=document.getElementById('card-img-credit');
-  const _il=document.getElementById('card-img-license');
+  const _iw=document.getElementById('c-img-wrap');
+  const _ie=document.getElementById('c-img');
+  const _ic=document.getElementById('c-img-credit');
+  const _il=document.getElementById('c-img-license');
   if(_iw&&_ie){
     if(card.img&&card.img.url){
       _ie.src=card.img.url;
@@ -5309,6 +5309,7 @@ function injectAttendingInline(card, sel){
   const wrap = document.createElement('div');
   wrap.id = 'att-inline-wrap';
   wrap.className = 'att-inline';
+  wrap.style.width = '100%';
   wrap.innerHTML = `
     <div class="att-inline-header">
       <div class="att-inline-left">
