@@ -1304,7 +1304,7 @@ html.light .att-btn{background:var(--surface2);}
     </div>
   </header>
 
-  <!-- LEADERBOARD PANEL --><!-- shelf-v32 -->
+  <!-- LEADERBOARD PANEL --><!-- shelf-v34 -->
   <div class="lb-panel" id="lb-panel">
     <div>
       <div class="lb-header-title">Global Ranking</div>
@@ -2131,6 +2131,42 @@ function buildFilterBar(){
 function buildSidebar(){
   const sb=document.getElementById('sidebar');
   const layout=document.getElementById('app-layout-wrap');
+
+  // Se estiver no shelf, mostra rotações em vez de sistemas
+  const isShelf = SHELF_DECKS.includes(currentDeck) || currentDeck === '_shelf_all';
+  if(isShelf){
+    sb.style.display='';if(layout)layout.style.justifyContent='';
+    const shelfRotations = [
+      {id:'shelf_em',      label:'Emergency Medicine'},
+      {id:'shelf_surgery', label:'Surgery'},
+    ];
+    // Adiciona outras rotações se existirem no deck
+    const allShelfDecks = getCards().reduce((acc,c)=>{ if(c.deck&&!acc.includes(c.deck)) acc.push(c.deck); return acc; },[]);
+    const rotationOrder = ['shelf_em','shelf_fm','shelf_im','shelf_obgyn','shelf_peds','shelf_psych','shelf_neuro','shelf_surgery'];
+    const availableRotations = rotationOrder.filter(d=>allShelfDecks.includes(d));
+    const rotationLabels = {
+      shelf_em:'Emergency Medicine', shelf_surgery:'Surgery', shelf_fm:'Family Medicine',
+      shelf_im:'Internal Medicine', shelf_obgyn:'OB/GYN', shelf_peds:'Pediatrics',
+      shelf_psych:'Psychiatry', shelf_neuro:'Neurology'
+    };
+    const cards = getCards();
+    sb.innerHTML=`
+      <button class="sys-btn ${currentDeck==='_shelf_all'||SHELF_DECKS.includes(currentDeck)?'active':''}" 
+        data-sys="all" onclick="selectSystem('all');deck=getCards();againQueue=[];idx=0;revealed=false;showCard();updateHeaderCounts();document.querySelectorAll('[data-deck-filter]').forEach(b=>b.classList.remove('active'));" style="margin-bottom:4px;">
+        All <span class="sys-cnt">${cards.length}</span>
+      </button>
+      <div class="sys-sep"></div>
+      <div style="font-size:9px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--text-faint);padding:6px 8px 4px;">Rotations</div>
+      ${availableRotations.map(deckId=>{
+        const cnt = cards.filter(c=>c.deck===deckId).length;
+        return `<button class="sys-btn" data-deck-filter="${deckId}" onclick="filterShelfByDeck('${deckId}')" >
+          <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1">${rotationLabels[deckId]||deckId}</span>
+          <span class="sys-cnt">${cnt}</span>
+        </button>`;
+      }).join('')}`;
+    return;
+  }
+
   const sysList=getSystems();
   if(sysList.length<5){sb.style.display='none';if(layout)layout.style.justifyContent='center';return;}
   sb.style.display='';if(layout)layout.style.justifyContent='';
@@ -2153,6 +2189,21 @@ function buildSidebar(){
           <span class="sys-cnt">${cnt}</span>
         </button>`).join('')}
     </div>`;
+}
+
+function filterShelfByDeck(deckId){
+  // Filtra cards pelo deck da rotação dentro do shelf
+  document.querySelectorAll('[data-deck-filter]').forEach(b=>b.classList.toggle('active', b.dataset.deckFilter===deckId));
+  document.querySelectorAll('[data-sys]').forEach(b=>b.classList.remove('active'));
+  const allCards = DECKS[currentDeck] || [];
+  const filtered = allCards.filter(c=>c.deck===deckId);
+  deck = filtered;
+  againQueue = [];
+  idx = 0;
+  revealed = false;
+  showCard();
+  updateHeaderCounts();
+}
 }
 
 function toggleSidebar(){
@@ -5176,21 +5227,21 @@ function showAppAuthMenu(){
 <!-- BOARDMD ATTENDING — inline inside each card -->
 <style>
 /* ── BOARDMD ATTENDING inline ── */
-.att-inline{margin:0 0 20px;border:1px solid rgba(139,92,246,.2);border-radius:12px;overflow:hidden;background:rgba(99,102,241,.03);}
-html.light .att-inline{background:rgba(99,102,241,.04);border-color:rgba(139,92,246,.18);}
-.att-inline-header{display:flex;align-items:center;justify-content:space-between;padding:10px 14px 8px;border-bottom:1px solid rgba(139,92,246,.12);}
-.att-inline-left{display:flex;align-items:center;gap:7px;}
-.att-inline-badge{width:24px;height:24px;border-radius:6px;background:linear-gradient(135deg,#6366f1,#8b5cf6);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
-.att-inline-badge svg{width:12px;height:12px;stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
-.att-inline-title{font-size:11px;font-weight:700;color:#8b5cf6;font-family:'Inter',sans-serif;letter-spacing:.03em;}
-.att-inline-btns{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;padding:8px 10px;}
-.att-ibtn{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:8px 4px;cursor:pointer;text-align:center;transition:all .15s;display:flex;flex-direction:column;align-items:center;gap:3px;font-family:'Inter',sans-serif;}
+.att-inline{margin:0 0 20px;border:1.5px solid var(--border);border-radius:var(--radius);overflow:hidden;background:var(--surface);}
+html.light .att-inline{background:var(--surface);border-color:var(--border);}
+.att-inline-header{display:flex;align-items:center;justify-content:space-between;padding:12px 16px 10px;border-bottom:1px solid var(--border);}
+.att-inline-left{display:flex;align-items:center;gap:8px;}
+.att-inline-badge{width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,#6366f1,#8b5cf6);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.att-inline-badge svg{width:14px;height:14px;stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+.att-inline-title{font-size:13px;font-weight:700;color:#8b5cf6;font-family:'Inter',sans-serif;letter-spacing:.02em;}
+.att-inline-btns{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:12px 14px;}
+.att-ibtn{background:var(--surface2);border:1px solid var(--border);border-radius:9px;padding:10px 6px;cursor:pointer;text-align:center;transition:all .15s;display:flex;flex-direction:column;align-items:center;gap:3px;font-family:'Inter',sans-serif;}
 .att-ibtn:hover{border-color:rgba(139,92,246,.5);background:rgba(99,102,241,.07);transform:translateY(-1px);}
 .att-ibtn:disabled{opacity:.38;cursor:not-allowed;transform:none;}
 .att-ibtn-emoji{display:none;}
-.att-ibtn-label{font-size:9px;font-weight:700;color:var(--text-dim);line-height:1.2;}
+.att-ibtn-label{font-size:11px;font-weight:700;color:var(--text-dim);line-height:1.2;}
 html.light .att-ibtn{background:var(--surface2);}
-.att-inline-response{padding:0 12px 12px;display:none;}
+.att-inline-response{padding:0 14px 14px;display:none;}
 .att-inline-response.visible{display:block;}
 .att-thinking{display:flex;align-items:center;gap:8px;padding:10px 2px;color:var(--text-faint);font-size:13px;font-family:'Inter',sans-serif;}
 .att-thinking-dots{display:flex;gap:3px;}
@@ -5265,12 +5316,12 @@ function injectAttendingInline(card, sel){
         <span class="att-ibtn-label">Surprise me</span>
       </button>
     </div>
-    <div style="display:flex;gap:8px;padding:0 10px 10px;align-items:center;position:relative;">
-      <input id="att-ask-input" type="text" placeholder="Ask anything about this topic…" style="flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:'Inter',sans-serif;font-size:12px;padding:8px 32px 8px 12px;outline:none;transition:border-color .15s;" onfocus="this.style.borderColor='rgba(139,92,246,.5)'" onblur="this.style.borderColor='var(--border)'" onkeydown="if(event.key==='Enter'){event.preventDefault();askAttendingInline('custom',null);}else if(event.key==='Escape'){this.value='';}" oninput="document.getElementById('att-ask-clear').style.display=this.value?'flex':'none'">
-      <button id="att-ask-clear" onclick="document.getElementById('att-ask-input').value='';this.style.display='none';document.getElementById('att-ask-input').focus();" style="display:none;position:absolute;right:70px;background:none;border:none;color:var(--text-faint);cursor:pointer;font-size:14px;padding:4px;line-height:1;">&#x2715;</button>
-      <button ${dis} onclick="askAttendingInline('custom',null)" style="background:rgba(99,102,241,.12);border:1px solid rgba(139,92,246,.3);border-radius:8px;color:#8b5cf6;font-family:'Inter',sans-serif;font-size:11px;font-weight:700;padding:8px 14px;cursor:pointer;white-space:nowrap;transition:all .15s;flex-shrink:0;" onmouseover="this.style.background='rgba(99,102,241,.22)'" onmouseout="this.style.background='rgba(99,102,241,.12)'">Ask</button>
+    <div style="display:flex;gap:8px;padding:0 14px 12px;align-items:center;position:relative;">
+      <input id="att-ask-input" type="text" placeholder="Ask anything about this topic…" style="flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:9px;color:var(--text);font-family:'Inter',sans-serif;font-size:13px;padding:9px 32px 9px 12px;outline:none;transition:border-color .15s;" onfocus="this.style.borderColor='rgba(139,92,246,.5)'" onblur="this.style.borderColor='var(--border)'" onkeydown="if(event.key==='Enter'){event.preventDefault();askAttendingInline('custom',null);}else if(event.key==='Escape'){this.value='';}" oninput="document.getElementById('att-ask-clear').style.display=this.value?'flex':'none'">
+      <button id="att-ask-clear" onclick="document.getElementById('att-ask-input').value='';this.style.display='none';document.getElementById('att-ask-input').focus();" style="display:none;position:absolute;right:80px;background:none;border:none;color:var(--text-faint);cursor:pointer;font-size:14px;padding:4px;line-height:1;">&#x2715;</button>
+      <button ${dis} onclick="askAttendingInline('custom',null)" style="background:rgba(99,102,241,.12);border:1px solid rgba(139,92,246,.3);border-radius:9px;color:#8b5cf6;font-family:'Inter',sans-serif;font-size:12px;font-weight:700;padding:9px 16px;cursor:pointer;white-space:nowrap;transition:all .15s;flex-shrink:0;" onmouseover="this.style.background='rgba(99,102,241,.22)'" onmouseout="this.style.background='rgba(99,102,241,.12)'">Ask</button>
     </div>
-    <div style="padding:0 10px 8px;font-size:9px;color:var(--text-faint);font-family:'Inter',sans-serif;line-height:1.4;">For educational purposes only. Not medical advice.</div>
+    <div style="padding:0 14px 10px;font-size:11px;color:var(--text-faint);font-family:'Inter',sans-serif;line-height:1.4;">For educational purposes only. Not medical advice.</div>
     <div class="att-inline-response" id="att-inline-response"></div>`;
 
   // Insere no study-inner, entre o card e os botões FSRS
