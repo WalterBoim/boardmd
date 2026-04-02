@@ -1299,12 +1299,11 @@ html.light .att-btn{background:var(--surface2);}
       <button class="deck-tab" id="tab-s2"         onclick="switchDeckTab('s2')">Rapid Review</button>
       <button class="deck-tab" id="tab-core"       onclick="switchDeckTab('core')">Core Review</button>
       <button class="deck-tab" id="tab-hy"         onclick="switchDeckTab('hy')">HY Concepts</button>
-      <button class="deck-tab" id="tab-shelf_surgery" onclick="switchDeckTab('shelf_surgery')">Surgery Shelf</button>
-      <button class="deck-tab" id="tab-shelf_em" onclick="switchDeckTab('shelf_em')">EM Shelf</button>
+      <button class="deck-tab" id="tab-shelf"      onclick="switchDeckTab('shelf_em')">BoardMD Shelf</button>
     </div>
   </header>
 
-  <!-- LEADERBOARD PANEL --><!-- shelf-v34 -->
+  <!-- LEADERBOARD PANEL --><!-- shelf-v35 -->
   <div class="lb-panel" id="lb-panel">
     <div>
       <div class="lb-header-title">Global Ranking</div>
@@ -2102,7 +2101,33 @@ function switchDeck(dk){
   buildFilterBar();buildSidebar();selectSystem('all');
 }
 
-function switchDeckTab(dk){hideDeckHome();switchDeck(dk);}
+function switchDeckTab(dk){
+  hideDeckHome();
+  // Shelf: carrega todos os decks shelf juntos
+  if(dk === 'shelf_em' || dk === 'shelf_surgery' || dk === 'shelf'){
+    // Combina todos os SHELF_DECKS disponíveis
+    const combined = SHELF_DECKS.reduce((acc, d) => {
+      if(DECKS[d]) acc = acc.concat(DECKS[d]);
+      return acc;
+    }, []);
+    currentDeck = 'shelf_em'; // usa shelf_em como referência
+    DECKS['_shelf_combined'] = combined;
+    currentDeck = '_shelf_combined';
+    deck = combined;
+    againQueue = [];
+    idx = 0;
+    revealed = false;
+    // Marca a aba como ativa
+    document.querySelectorAll('.deck-tab').forEach(b => b.classList.remove('active'));
+    const shelfTab = document.getElementById('tab-shelf');
+    if(shelfTab) shelfTab.classList.add('active');
+    updateHeaderCounts();
+    buildSidebar();
+    showCard();
+    return;
+  }
+  switchDeck(dk);
+}
 
 function getCards(){return DECKS[currentDeck]||[];}
 function getSystems(){
@@ -2133,7 +2158,7 @@ function buildSidebar(){
   const layout=document.getElementById('app-layout-wrap');
 
   // Se estiver no shelf, mostra rotações em vez de sistemas
-  const isShelf = SHELF_DECKS.includes(currentDeck) || currentDeck === '_shelf_all';
+  const isShelf = SHELF_DECKS.includes(currentDeck) || currentDeck === '_shelf_all' || currentDeck === '_shelf_combined';
   if(isShelf){
     sb.style.display='';if(layout)layout.style.justifyContent='';
     const shelfRotations = [
@@ -2141,7 +2166,7 @@ function buildSidebar(){
       {id:'shelf_surgery', label:'Surgery'},
     ];
     // Adiciona outras rotações se existirem no deck
-    const allShelfDecks = getCards().reduce((acc,c)=>{ if(c.deck&&!acc.includes(c.deck)) acc.push(c.deck); return acc; },[]);
+    const allShelfDecks = (DECKS[currentDeck]||[]).reduce((acc,c)=>{ if(c.deck&&!acc.includes(c.deck)) acc.push(c.deck); return acc; },[]);
     const rotationOrder = ['shelf_em','shelf_fm','shelf_im','shelf_obgyn','shelf_peds','shelf_psych','shelf_neuro','shelf_surgery'];
     const availableRotations = rotationOrder.filter(d=>allShelfDecks.includes(d));
     const rotationLabels = {
@@ -2149,7 +2174,7 @@ function buildSidebar(){
       shelf_im:'Internal Medicine', shelf_obgyn:'OB/GYN', shelf_peds:'Pediatrics',
       shelf_psych:'Psychiatry', shelf_neuro:'Neurology'
     };
-    const cards = getCards();
+    const cards = DECKS[currentDeck] || deck || [];
     sb.innerHTML=`
       <button class="sys-btn ${currentDeck==='_shelf_all'||SHELF_DECKS.includes(currentDeck)?'active':''}" 
         data-sys="all" onclick="selectSystem('all');deck=getCards();againQueue=[];idx=0;revealed=false;showCard();updateHeaderCounts();document.querySelectorAll('[data-deck-filter]').forEach(b=>b.classList.remove('active'));" style="margin-bottom:4px;">
@@ -2195,7 +2220,7 @@ function filterShelfByDeck(deckId){
   // Filtra cards pelo deck da rotação dentro do shelf
   document.querySelectorAll('[data-deck-filter]').forEach(b=>b.classList.toggle('active', b.dataset.deckFilter===deckId));
   document.querySelectorAll('[data-sys]').forEach(b=>b.classList.remove('active'));
-  const allCards = DECKS[currentDeck] || [];
+  const allCards = DECKS[currentDeck] || deck || [];
   const filtered = allCards.filter(c=>c.deck===deckId);
   deck = filtered;
   againQueue = [];
