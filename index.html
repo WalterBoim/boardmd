@@ -2737,18 +2737,19 @@ function revealAnswer(sel,card){
       const patterns = [
         new RegExp('<b>\\s*'+esc,'i'),
         new RegExp('<strong>\\s*'+esc,'i'),
-        new RegExp('\\b'+esc+'\\b(?!\\s+is\\s+the\\s+correct)','i')
+        new RegExp('\\b'+esc+'\\b(?!\\s+is\\s+the\\s+correct)','i'),
+        new RegExp('(?<=\\.\\s{0,3})(?:The\\s+)?'+esc,'i'),
       ];
       for(const pat of patterns){
         const m = eRaw.search(pat);
-        if(m > 50 && (splitIdx === -1 || m < splitIdx)){
+        if(m > 40 && (splitIdx === -1 || m < splitIdx)){
           splitIdx = m;
           break;
         }
       }
     }
 
-    if(splitIdx > 50){
+    if(splitIdx > 40){
       // Separar em duas partes
       expHtml = eRaw.substring(0, splitIdx).trim();
       const distRaw = eRaw.substring(splitIdx).trim();
