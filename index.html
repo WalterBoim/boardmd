@@ -2224,6 +2224,8 @@ function renderCard(){
   _cardState=state.state;
   const ivs=getIntervals(state);
   // Reset explanation and distractors for new card
+  const oldAtt = document.getElementById('att-inline-wrap');
+  if(oldAtt) oldAtt.remove();
   const _expEl=document.getElementById('c-exp');
   if(_expEl) _expEl.classList.remove('visible');
   const _dw=document.getElementById('exp-dist-wrap');
