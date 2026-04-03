@@ -5111,8 +5111,7 @@ function injectAttendingInline(card, sel){
   const blocked = !isPro && left <= 0;
   const dis = blocked ? 'disabled' : '';
 
-  const usageLine = isPro
-    ? '<span style="font-size:10px;font-family:monospace;color:var(--emerald);"> Pro — unlimited</span>'
+  const usageLine = "";font-family:monospace;color:var(--emerald);"> Pro — unlimited</span>'
     : `<span style="font-size:10px;font-family:monospace;color:${left>0?'var(--text-faint)':'var(--rose)'};">${left}/${ATT_FREE_LIMIT} free today</span>`;
 
   const wrap = document.createElement('div');
