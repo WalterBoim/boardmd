@@ -1480,7 +1480,7 @@ html.light .att-btn{background:var(--surface2);}
           </div>
           <div id="key-point-wrap" style="display:none;padding:0 18px 14px;"></div>
           <div style="padding:0 18px 8px;display:flex;justify-content:flex-end;">
-            <button id="report-issue-btn" onclick="openReportIssue()" style="background:none;border:none;cursor:pointer;font-size:10px;font-weight:600;color:var(--text-faint);font-family:'JetBrains Mono',monospace;padding:2px 0;opacity:.5;transition:opacity .15s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='.5'">⚑ Report Issue</button>
+            <button id="report-issue-btn" onclick="openReportIssue()" style="background:none;border:none;cursor:pointer;font-size:10px;font-weight:600;color:var(--text-faint);font-family:'JetBrains Mono',monospace;padding:2px 0;opacity:.5;transition:opacity .15s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='.5'"> Report Issue</button>
           </div>
           <div class="card-footer-counter">
             <span class="cfc-new" id="cfc-new">0</span>
@@ -2158,7 +2158,7 @@ function ensureStudyUI(){
       </div>
       <div class="explanation" id="c-exp">
         <div class="exp-section">
-          <div class="exp-label"><span class="exp-label-icon" style="background:rgba(34,197,94,.15);color:var(--emerald)">✓</span>Correct answer</div>
+          <div class="exp-label"><span class="exp-label-icon" style="background:rgba(34,197,94,.15);color:var(--emerald)"></span>Correct answer</div>
           <div class="exp-correct"><div class="exp-correct-inner" id="exp-ans"></div></div>
         </div>
         <div id="c-img-wrap" style="display:none" class="card-img-wrap">
@@ -2173,7 +2173,7 @@ function ensureStudyUI(){
           <div class="exp-text" id="exp-txt"></div>
         </div>
         <div class="exp-section" id="exp-dist-wrap">
-          <div class="exp-label"><span class="exp-label-icon" style="background:rgba(244,63,94,.15);color:var(--rose)">✗</span>Why the others are wrong</div>
+          <div class="exp-label"><span class="exp-label-icon" style="background:rgba(244,63,94,.15);color:var(--rose)"></span>Why the others are wrong</div>
           <div class="exp-dist" id="exp-dist"></div>
         </div>
       </div>
@@ -2390,11 +2390,11 @@ function renderCard(){
       const elimBtn=document.createElement('span');
       elimBtn.className='opt-elim';
       elimBtn.title='Eliminate option';
-      elimBtn.textContent='✕';
+      elimBtn.textContent='';
       elimBtn.onclick=(e)=>{
         e.stopPropagation();
         btn.classList.toggle('eliminated');
-        elimBtn.textContent=btn.classList.contains('eliminated')?'↩':'✕';
+        elimBtn.textContent=btn.classList.contains('eliminated')?'↩':'';
         elimBtn.title=btn.classList.contains('eliminated')?'Restore':'Eliminate';
       };
       // Strip trailing (XX%) from option text — these are clinical frequencies, not UX
@@ -2646,13 +2646,13 @@ function searchBids(){
     found.forEach(({bid,card})=>{
       const row=document.createElement('div');
       row.className='qid-result-row qid-result-found';
-      row.innerHTML=`<span class="qid-result-label" style="color:#8b5cf6">BID ${bid}</span><span class="qid-result-topic">${card.topic||card.system||'—'}</span><span style="color:var(--emerald)">✓</span>`;
+      row.innerHTML=`<span class="qid-result-label" style="color:#8b5cf6">BID ${bid}</span><span class="qid-result-topic">${card.topic||card.system||'—'}</span><span style="color:var(--emerald)"></span>`;
       resList.appendChild(row);
     });
     missing.forEach(bid=>{
       const row=document.createElement('div');
       row.className='qid-result-row qid-result-miss';
-      row.innerHTML=`<span class="qid-result-label" style="color:#8b5cf6">BID ${bid}</span><span class="qid-result-topic">Not found</span><span style="color:var(--rose)">✗</span>`;
+      row.innerHTML=`<span class="qid-result-label" style="color:#8b5cf6">BID ${bid}</span><span class="qid-result-topic">Not found</span><span style="color:var(--rose)"></span>`;
       resList.appendChild(row);
     });
   }
@@ -2975,7 +2975,7 @@ function showDone(){
   if(!si) return;
   si.innerHTML=`
     <div class="done-wrap">
-      <h2>Session complete ✓</h2>
+      <h2>Session complete </h2>
       <p style="margin-bottom:16px">${total} cards · ${pct}% correct</p>
       <div style="display:flex;gap:16px;justify-content:center;margin-bottom:24px;font-family:'JetBrains Mono',monospace;font-size:13px;">
         <span style="color:var(--rose)">Again: ${again}</span>
@@ -3149,13 +3149,13 @@ function searchQids(){
     found.forEach(({qid,card})=>{
       const row=document.createElement('div');
       row.className='qid-result-row qid-result-found';
-      row.innerHTML=`<span class="qid-result-label">QID ${qid}</span><span class="qid-result-topic">${card.topic||card.system||'—'}</span><span style="color:var(--emerald)">✓</span>`;
+      row.innerHTML=`<span class="qid-result-label">QID ${qid}</span><span class="qid-result-topic">${card.topic||card.system||'—'}</span><span style="color:var(--emerald)"></span>`;
       resList.appendChild(row);
     });
     missing.forEach(qid=>{
       const row=document.createElement('div');
       row.className='qid-result-row qid-result-miss';
-      row.innerHTML=`<span class="qid-result-label">QID ${qid}</span><span class="qid-result-topic">Not in current dataset</span><span style="color:var(--rose)">✗</span>`;
+      row.innerHTML=`<span class="qid-result-label">QID ${qid}</span><span class="qid-result-topic">Not in current dataset</span><span style="color:var(--rose)"></span>`;
       resList.appendChild(row);
     });
   }
@@ -3612,55 +3612,55 @@ function switchLbTab(tab, el){
 function countryFlag(country){
   if(!country) return '';
   const map = {
-    'united states':'🇺🇸','usa':'🇺🇸','us':'🇺🇸',
-    'brazil':'🇧🇷','brasil':'🇧🇷',
-    'india':'🇮🇳',
-    'pakistan':'🇵🇰',
-    'nigeria':'🇳🇬',
-    'canada':'🇨🇦',
-    'mexico':'🇲🇽','méxico':'🇲🇽',
-    'uk':'🇬🇧','united kingdom':'🇬🇧','england':'🇬🇧',
-    'australia':'🇦🇺',
-    'germany':'🇩🇪','deutschland':'🇩🇪',
-    'france':'🇫🇷',
-    'spain':'🇪🇸','españa':'🇪🇸',
-    'italy':'🇮🇹','italia':'🇮🇹',
-    'china':'🇨🇳',
-    'japan':'🇯🇵',
-    'south korea':'🇰🇷','korea':'🇰🇷',
-    'egypt':'🇪🇬',
-    'saudi arabia':'🇸🇦',
-    'uae':'🇦🇪','united arab emirates':'🇦🇪',
-    'argentina':'🇦🇷',
-    'colombia':'🇨🇴',
-    'venezuela':'🇻🇪',
-    'peru':'🇵🇪',
-    'chile':'🇨🇱',
-    'philippines':'🇵🇭',
-    'iran':'🇮🇷',
-    'turkey':'🇹🇷','türkiye':'🇹🇷',
-    'greece':'🇬🇷',
-    'portugal':'🇵🇹',
-    'poland':'🇵🇱',
-    'romania':'🇷🇴',
-    'russia':'🇷🇺',
-    'ukraine':'🇺🇦',
-    'israel':'🇮🇱',
-    'jamaica':'🇯🇲',
-    'trinidad':'🇹🇹','trinidad and tobago':'🇹🇹',
-    'haiti':'🇭🇹',
-    'dominican republic':'🇩🇴',
-    'ghana':'🇬🇭',
-    'ethiopia':'🇪🇹',
-    'kenya':'🇰🇪',
-    'south africa':'🇿🇦',
-    'new zealand':'🇳🇿',
-    'singapore':'🇸🇬',
-    'malaysia':'🇲🇾',
-    'indonesia':'🇮🇩',
-    'bangladesh':'🇧🇩',
-    'nepal':'🇳🇵',
-    'sri lanka':'🇱🇰',
+    'united states':'','usa':'','us':'',
+    'brazil':'','brasil':'',
+    'india':'',
+    'pakistan':'',
+    'nigeria':'',
+    'canada':'',
+    'mexico':'','méxico':'',
+    'uk':'','united kingdom':'','england':'',
+    'australia':'',
+    'germany':'','deutschland':'',
+    'france':'',
+    'spain':'','españa':'',
+    'italy':'','italia':'',
+    'china':'',
+    'japan':'',
+    'south korea':'','korea':'',
+    'egypt':'',
+    'saudi arabia':'',
+    'uae':'','united arab emirates':'',
+    'argentina':'',
+    'colombia':'',
+    'venezuela':'',
+    'peru':'',
+    'chile':'',
+    'philippines':'',
+    'iran':'',
+    'turkey':'','türkiye':'',
+    'greece':'',
+    'portugal':'',
+    'poland':'',
+    'romania':'',
+    'russia':'',
+    'ukraine':'',
+    'israel':'',
+    'jamaica':'',
+    'trinidad':'','trinidad and tobago':'',
+    'haiti':'',
+    'dominican republic':'',
+    'ghana':'',
+    'ethiopia':'',
+    'kenya':'',
+    'south africa':'',
+    'new zealand':'',
+    'singapore':'',
+    'malaysia':'',
+    'indonesia':'',
+    'bangladesh':'',
+    'nepal':'',
+    'sri lanka':'',
   };
   const key = country.toLowerCase().trim();
   return map[key] || '';
@@ -3920,7 +3920,7 @@ async function renderLeaderboard(){
           Logged as <strong style="color:var(--text)">${me.name}</strong> · ${me.univ||''} ${me.country?'· '+countryFlag(me.country)+' '+me.country:''}
         </div>
         <button onclick="editLbName()" style="background:none;border:1px solid var(--border);border-radius:8px;padding:7px 14px;font-size:12px;font-weight:700;color:var(--text-dim);cursor:pointer;font-family:'Inter',sans-serif;transition:all .15s;" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text-dim)'">
-          ✎ Edit profile
+           Edit profile
         </button>
       ` : `
         <button class="lb-join-btn" onclick="document.getElementById('lb-content').innerHTML='';renderLeaderboard();" style="font-size:11px;padding:7px 16px;opacity:.7;">Join Leaderboard</button>
@@ -4354,7 +4354,7 @@ function studySearchResults(){
         <div style="font-family:'Instrument Serif',serif;font-size:22px;color:var(--text)">Edit Card</div>
         <div style="font-size:11px;color:var(--text-faint);margin-top:3px;font-family:'JetBrains Mono',monospace" id="editor-card-id"></div>
       </div>
-      <button class="qid-close" onclick="closeCardEditor()">✕</button>
+      <button class="qid-close" onclick="closeCardEditor()"></button>
     </div>
 
     <div style="display:flex;flex-direction:column;gap:14px">
@@ -4398,7 +4398,7 @@ function studySearchResults(){
       <button onclick="saveCardEdit()" style="background:var(--accent);color:#fff;border:none;border-radius:9px;padding:11px 26px;font-family:'Lato',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:all .15s" onmouseover="this.style.background='#5a8fff'" onmouseout="this.style.background='var(--accent)'">Save Changes</button>
       <button onclick="resetCardEdit()" style="background:none;color:var(--rose);border:1px solid rgba(244,63,94,.3);border-radius:9px;padding:11px 18px;font-family:'Lato',sans-serif;font-size:13px;cursor:pointer;transition:all .15s" onmouseover="this.style.background='rgba(244,63,94,.08)'" onmouseout="this.style.background='none'">Reset</button>
       <button onclick="closeCardEditor();showEditsManager()" style="background:none;color:var(--text-faint);border:1px solid var(--border);border-radius:9px;padding:11px 18px;font-family:'Lato',sans-serif;font-size:13px;cursor:pointer;transition:all .15s;margin-left:auto" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text-faint)'">My Edits →</button>
-      <span id="editor-saved-msg" style="font-size:12px;color:var(--emerald);font-weight:700;opacity:0;transition:opacity .3s">Saved ✓</span>
+      <span id="editor-saved-msg" style="font-size:12px;color:var(--emerald);font-weight:700;opacity:0;transition:opacity .3s">Saved </span>
     </div>
   </div>
 </div>
@@ -4576,7 +4576,7 @@ function showEditsManager(){
         <div style="font-size:10px;font-weight:700;color:var(--text-faint);font-family:'JetBrains Mono',monospace;margin-bottom:3px">${id} · ${deck.toUpperCase()} · ${date}</div>
         <div style="font-size:13px;color:var(--text);line-height:1.4">${qPreview}</div>
       </div>
-      <button onclick="deleteEditById('${id}')" style="background:none;border:1px solid rgba(244,63,94,.3);border-radius:6px;padding:3px 9px;color:var(--rose);font-size:11px;cursor:pointer;flex-shrink:0;font-family:'JetBrains Mono',monospace;font-weight:700">✕</button>
+      <button onclick="deleteEditById('${id}')" style="background:none;border:1px solid rgba(244,63,94,.3);border-radius:6px;padding:3px 9px;color:var(--rose);font-size:11px;cursor:pointer;flex-shrink:0;font-family:'JetBrains Mono',monospace;font-weight:700"></button>
     </div>`;
   }
 
@@ -4590,7 +4590,7 @@ function showEditsManager(){
           <div style="font-family:'Instrument Serif',serif;font-size:20px;color:var(--text)">My Card Edits</div>
           <div style="font-size:12px;color:var(--text-faint);margin-top:3px">${count} card${count!==1?'s':''} edited</div>
         </div>
-        <button class="qid-close" onclick="document.getElementById('edits-manager-overlay').remove()">✕</button>
+        <button class="qid-close" onclick="document.getElementById('edits-manager-overlay').remove()"></button>
       </div>
       <div style="overflow-y:auto;flex:1;">${rows}</div>
       <div style="padding:16px 24px;border-top:1px solid var(--border);display:flex;gap:10px;">
@@ -5112,7 +5112,7 @@ function injectAttendingInline(card, sel){
   const dis = blocked ? 'disabled' : '';
 
   const usageLine = isPro
-    ? '<span style="font-size:10px;font-family:monospace;color:var(--emerald);">✓ Pro — unlimited</span>'
+    ? '<span style="font-size:10px;font-family:monospace;color:var(--emerald);"> Pro — unlimited</span>'
     : `<span style="font-size:10px;font-family:monospace;color:${left>0?'var(--text-faint)':'var(--rose)'};">${left}/${ATT_FREE_LIMIT} free today</span>`;
 
   const wrap = document.createElement('div');
@@ -5138,7 +5138,7 @@ function injectAttendingInline(card, sel){
         <span class="att-ibtn-label">Explain better</span>
       </button>
       <button class="att-ibtn" ${dis} onclick="askAttendingInline('mcq',this)">
-        <span class="att-ibtn-emoji">📝</span>
+        <span class="att-ibtn-emoji"></span>
         <span class="att-ibtn-label">More MCQs</span>
       </button>
       <button class="att-ibtn" ${dis} onclick="askAttendingInline('surprise',this)">
@@ -5204,7 +5204,7 @@ async function askAttendingInline(type, btnEl){
 OPTIONS:
 ${opts}
 CORRECT ANSWER: ${card.c}
-STUDENT SELECTED: ${userChoice} (${wasCorrect ? 'CORRECT ✓' : 'INCORRECT ✗'})
+STUDENT SELECTED: ${userChoice} (${wasCorrect ? 'CORRECT ' : 'INCORRECT '})
 TOPIC: ${card.topic||''} | SYSTEM: ${card.system||''}
 EXPLANATION: ${(card.e||'').replace(/<[^>]+>/g,' ').slice(0,300)}`;
 
@@ -5217,7 +5217,7 @@ EXPLANATION: ${(card.e||'').replace(/<[^>]+>/g,' ').slice(0,300)}`;
 
   const typeLabels = {
     why:' Why Your Answer', explain:' Deeper Explanation',
-    mcq:'📝 Practice Questions', surprise:' Clinical Pearl'
+    mcq:' Practice Questions', surprise:' Clinical Pearl'
   };
 
   try {
@@ -5227,7 +5227,7 @@ EXPLANATION: ${(card.e||'').replace(/<[^>]+>/g,' ').slice(0,300)}`;
       responseText = typeof response === 'string' ? response
         : (response?.message?.content || response?.text || JSON.stringify(response));
     } else {
-      responseText = '⚠️ AI Attending not available — check your connection and try again.';
+      responseText = ' AI Attending not available — check your connection and try again.';
     }
 
     const formatted = responseText
