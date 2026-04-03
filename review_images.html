@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BoardMD — Image Review</title>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #080c12;
+  --surface: #0e1420;
+  --surface2: #141c2e;
+  --border: #1e2a42;
+  --accent: #3b7fff;
+  --rose: #f43f5e;
+  --emerald: #22c55e;
+  --gold: #e8a836;
+  --text: #e8edf5;
+  --text-dim: #7a8aa8;
+  --text-faint: #3a4a68;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Lato', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+}
+header {
+  padding: 24px 40px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  background: rgba(8,12,18,.95);
+  backdrop-filter: blur(20px);
+  z-index: 100;
+}
+.logo {
+  font-family: 'Instrument Serif', serif;
+  font-size: 22px;
+}
+.logo span { color: var(--accent); }
+.stats {
+  display: flex;
+  gap: 24px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  color: var(--text-dim);
+}
+.stat-val { color: var(--text); font-weight: 500; }
+.controls {
+  padding: 20px 40px;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  border-bottom: 1px solid var(--border);
+  flex-wrap: wrap;
+}
+.filter-btn {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  color: var(--text-dim);
+  padding: 7px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-family: 'Lato', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  transition: all .2s;
+}
+.filter-btn:hover, .filter-btn.active {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: rgba(59,127,255,.08);
+}
+.search-input {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 7px 16px;
+  border-radius: 8px;
+  font-family: 'Lato', sans-serif;
+  font-size: 13px;
+  outline: none;
+  width: 240px;
+  transition: border-color .2s;
+}
+.search-input:focus { border-color: var(--accent); }
+.search-input::placeholder { color: var(--text-faint); }
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 16px;
+  padding: 24px 40px;
+}
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  transition: border-color .2s, transform .2s;
+  position: relative;
+}
+.card:hover {
+  border-color: var(--border-bright, #2a3a58);
+  transform: translateY(-2px);
+}
+.card.removed {
+  opacity: .3;
+  pointer-events: none;
+}
+.card.flagged {
+  border-color: var(--rose);
+}
+.img-wrap {
+  width: 100%;
+  height: 160px;
+  overflow: hidden;
+  background: var(--surface2);
+  position: relative;
+}
+.img-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform .3s;
+}
+.card:hover .img-wrap img { transform: scale(1.04); }
+.img-error {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: var(--text-faint);
+  font-size: 12px;
+  font-family: 'JetBrains Mono', monospace;
+}
+.card-body {
+  padding: 12px 14px;
+}
+.answer {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 4px;
+  line-height: 1.4;
+}
+.img-title {
+  font-size: 11px;
+  color: var(--text-dim);
+  font-family: 'JetBrains Mono', monospace;
+  margin-bottom: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.deck-tag {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  padding: 2px 7px;
+  border-radius: 4px;
+  background: rgba(59,127,255,.12);
+  color: var(--accent);
+  margin-bottom: 10px;
+}
+.card-actions {
+  display: flex;
+  gap: 6px;
+}
+.btn-remove {
+  flex: 1;
+  background: rgba(244,63,94,.1);
+  border: 1px solid rgba(244,63,94,.3);
+  color: var(--rose);
+  padding: 6px 0;
+  border-radius: 7px;
+  cursor: pointer;
+  font-family: 'Lato', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  transition: all .2s;
+}
+.btn-remove:hover {
+  background: rgba(244,63,94,.2);
+  border-color: var(--rose);
+}
+.btn-keep {
+  flex: 1;
+  background: rgba(34,197,94,.1);
+  border: 1px solid rgba(34,197,94,.3);
+  color: var(--emerald);
+  padding: 6px 0;
+  border-radius: 7px;
+  cursor: pointer;
+  font-family: 'Lato', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  transition: all .2s;
+}
+.btn-keep:hover {
+  background: rgba(34,197,94,.2);
+  border-color: var(--emerald);
+}
+.badge-kept {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: rgba(34,197,94,.9);
+  color: white;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 4px;
+  font-family: 'JetBrains Mono', monospace;
+}
+.empty {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 80px 0;
+  color: var(--text-faint);
+  font-family: 'Instrument Serif', serif;
+  font-size: 22px;
+}
+.toast {
+  position: fixed;
+  bottom: 32px;
+  right: 32px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 12px 20px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 700;
+  z-index: 999;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: all .3s;
+  pointer-events: none;
+}
+.toast.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+.toast.success { border-color: var(--emerald); color: var(--emerald); }
+.toast.error   { border-color: var(--rose);    color: var(--rose); }
+.loading {
+  text-align: center;
+  padding: 80px 40px;
+  color: var(--text-dim);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+}
+.spinner {
+  width: 32px;
+  height: 32px;
+  border: 2px solid var(--border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin .8s linear infinite;
+  margin: 0 auto 16px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">Board<span>MD</span> <span style="font-size:14px;color:var(--text-dim);font-family:'Lato',sans-serif;font-weight:400;">— Image Review</span></div>
+  <div class="stats">
+    <span>Total <span class="stat-val" id="stat-total">—</span></span>
+    <span>Kept <span class="stat-val" style="color:var(--emerald)" id="stat-kept">0</span></span>
+    <span>Removed <span class="stat-val" style="color:var(--rose)" id="stat-removed">0</span></span>
+    <span>Pending <span class="stat-val" style="color:var(--gold)" id="stat-pending">—</span></span>
+  </div>
+</header>
+
+<div class="controls">
+  <input class="search-input" type="text" placeholder="Search answer..." id="search-input" oninput="filterCards()">
+  <button class="filter-btn active" onclick="setFilter('all', this)">All</button>
+  <button class="filter-btn" onclick="setFilter('pending', this)">Pending</button>
+  <button class="filter-btn" onclick="setFilter('kept', this)">Kept</button>
+  <button class="filter-btn" onclick="setFilter('removed', this)">Removed</button>
+  <button class="filter-btn" style="margin-left:auto;border-color:var(--rose);color:var(--rose)" onclick="removeAllFlagged()">Remove All Flagged</button>
+</div>
+
+<div id="grid" class="grid">
+  <div class="loading">
+    <div class="spinner"></div>
+    Loading images from Supabase...
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const SUPA_URL = 'https://hwdcgbcnphkmxaasties.supabase.co';
+const SUPA_KEY = 'sb_publishable_kgmsWjn-0nH9qxCnNCv0kg_QtU4C_w_c2uxuXvXJsGq0m75B_HG7I8PjixJT4FRs5k';
+
+let allCards = [];
+let cardStates = {}; // id -> 'pending' | 'kept' | 'removed'
+let currentFilter = 'all';
+
+async function loadCards() {
+  try {
+    let cards = [];
+    let offset = 0;
+    while (true) {
+      const res = await fetch(
+        `${SUPA_URL}/rest/v1/cards?select=id,c,deck,img&img=not.is.null&limit=1000&offset=${offset}`,
+        { headers: { apikey: SUPA_KEY, Authorization: `Bearer ${SUPA_KEY}` } }
+      );
+      const batch = await res.json();
+      if (!Array.isArray(batch) || batch.length === 0) break;
+      cards = cards.concat(batch);
+      if (batch.length < 1000) break;
+      offset += 1000;
+    }
+    allCards = cards;
+    cards.forEach(c => cardStates[c.id] = 'pending');
+    updateStats();
+    renderGrid();
+  } catch (e) {
+    document.getElementById('grid').innerHTML = `<div class="empty">Error loading cards: ${e.message}</div>`;
+  }
+}
+
+function updateStats() {
+  const total   = allCards.length;
+  const kept    = Object.values(cardStates).filter(s => s === 'kept').length;
+  const removed = Object.values(cardStates).filter(s => s === 'removed').length;
+  const pending = total - kept - removed;
+  document.getElementById('stat-total').textContent   = total;
+  document.getElementById('stat-kept').textContent    = kept;
+  document.getElementById('stat-removed').textContent = removed;
+  document.getElementById('stat-pending').textContent = pending;
+}
+
+function setFilter(f, btn) {
+  currentFilter = f;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderGrid();
+}
+
+function filterCards() {
+  renderGrid();
+}
+
+function renderGrid() {
+  const search = document.getElementById('search-input').value.toLowerCase();
+  const grid   = document.getElementById('grid');
+
+  let cards = allCards.filter(c => {
+    const state   = cardStates[c.id] || 'pending';
+    const matchF  = currentFilter === 'all' || state === currentFilter;
+    const matchS  = !search || (c.c || '').toLowerCase().includes(search);
+    return matchF && matchS;
+  });
+
+  if (cards.length === 0) {
+    grid.innerHTML = '<div class="empty">No cards match this filter.</div>';
+    return;
+  }
+
+  grid.innerHTML = cards.map(card => {
+    const img   = typeof card.img === 'string' ? JSON.parse(card.img) : card.img;
+    const state = cardStates[card.id] || 'pending';
+    const title = img?.credit?.replace('Wikimedia Commons — ', '').replace('Wikipedia — ', '') || '';
+    return `
+      <div class="card ${state === 'removed' ? 'removed' : ''}" id="card-${card.id}">
+        <div class="img-wrap">
+          <img src="${img?.url || ''}" alt="${card.c || ''}"
+               onerror="this.parentElement.innerHTML='<div class=\\'img-error\\'>Image unavailable</div>'">
+          ${state === 'kept' ? '<div class="badge-kept">KEPT</div>' : ''}
+        </div>
+        <div class="card-body">
+          <div class="deck-tag">${card.deck || 'unknown'}</div>
+          <div class="answer">${card.c || ''}</div>
+          <div class="img-title" title="${title}">${title}</div>
+          <div class="card-actions">
+            <button class="btn-remove" onclick="removeImage('${card.id}')">Remove</button>
+            <button class="btn-keep"   onclick="keepImage('${card.id}')">Keep</button>
+          </div>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+async function removeImage(id) {
+  const el = document.getElementById(`card-${id}`);
+  if (el) el.style.opacity = '0.5';
+  try {
+    const res = await fetch(
+      `${SUPA_URL}/rest/v1/cards?id=eq.${id}`,
+      {
+        method: 'PATCH',
+        headers: {
+          apikey: SUPA_KEY,
+          Authorization: `Bearer ${SUPA_KEY}`,
+          'Content-Type': 'application/json',
+          Prefer: 'return=minimal'
+        },
+        body: JSON.stringify({ img: null })
+      }
+    );
+    if (res.ok) {
+      cardStates[id] = 'removed';
+      updateStats();
+      renderGrid();
+      showToast('Image removed', 'success');
+    } else {
+      if (el) el.style.opacity = '1';
+      showToast('Error removing image', 'error');
+    }
+  } catch (e) {
+    if (el) el.style.opacity = '1';
+    showToast('Network error', 'error');
+  }
+}
+
+function keepImage(id) {
+  cardStates[id] = 'kept';
+  updateStats();
+  renderGrid();
+  showToast('Marked as kept', 'success');
+}
+
+async function removeAllFlagged() {
+  const pending = allCards.filter(c => cardStates[c.id] === 'pending');
+  if (!confirm(`Remove all ${pending.length} unreviewed images? This cannot be undone.`)) return;
+  for (const card of pending) {
+    await removeImage(card.id);
+    await new Promise(r => setTimeout(r, 100));
+  }
+}
+
+function showToast(msg, type = '') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = `toast show ${type}`;
+  setTimeout(() => t.className = 'toast', 2500);
+}
+
+loadCards();
+</script>
+</body>
+</html>
