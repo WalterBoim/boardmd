@@ -319,7 +319,7 @@ async function loadCards() {
       );
       const batch = await res.json();
       if (!Array.isArray(batch) || batch.length === 0) break;
-      cards = cards.concat(batch);
+      cards = cards.concat(batch.filter(c => c.img !== null && c.img !== undefined));
       if (batch.length < 1000) break;
       offset += 1000;
     }
