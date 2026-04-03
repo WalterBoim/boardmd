@@ -5130,11 +5130,11 @@ function injectAttendingInline(card, sel){
     </div>
     <div class="att-inline-btns">
       <button class="att-ibtn" ${dis} onclick="askAttendingInline('why',this)">
-        <span class="att-ibtn-emoji">🤔</span>
+        <span class="att-ibtn-emoji"></span>
         <span class="att-ibtn-label">Why my answer?</span>
       </button>
       <button class="att-ibtn" ${dis} onclick="askAttendingInline('explain',this)">
-        <span class="att-ibtn-emoji">📖</span>
+        <span class="att-ibtn-emoji"></span>
         <span class="att-ibtn-label">Explain better</span>
       </button>
       <button class="att-ibtn" ${dis} onclick="askAttendingInline('mcq',this)">
@@ -5142,7 +5142,7 @@ function injectAttendingInline(card, sel){
         <span class="att-ibtn-label">More MCQs</span>
       </button>
       <button class="att-ibtn" ${dis} onclick="askAttendingInline('surprise',this)">
-        <span class="att-ibtn-emoji">⭐</span>
+        <span class="att-ibtn-emoji"></span>
         <span class="att-ibtn-label">Surprise me</span>
       </button>
     </div>
@@ -5216,8 +5216,8 @@ EXPLANATION: ${(card.e||'').replace(/<[^>]+>/g,' ').slice(0,300)}`;
   };
 
   const typeLabels = {
-    why:'🤔 Why Your Answer', explain:'📖 Deeper Explanation',
-    mcq:'📝 Practice Questions', surprise:'⭐ Clinical Pearl'
+    why:' Why Your Answer', explain:' Deeper Explanation',
+    mcq:'📝 Practice Questions', surprise:' Clinical Pearl'
   };
 
   try {
@@ -5275,4 +5275,3 @@ document.addEventListener('click', function(e){
 
 </body>
 </html>
-
