@@ -324,7 +324,7 @@ async function loadCards() {
       offset += 1000;
     }
     allCards = cards;
-    cards.forEach(c => cardStates[c.id] = 'pending');
+    const savedKept = JSON.parse(localStorage.getItem("boardmd_kept") || "[]");n    cards.forEach(c => { cardStates[c.id] = savedKept.includes(c.id) ? "kept" : "pending"; });
     updateStats();
     renderGrid();
   } catch (e) {
