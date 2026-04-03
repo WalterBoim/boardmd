@@ -2951,9 +2951,13 @@ function revealAnswer(sel,card){
     } else {
       // Não conseguiu separar — explanation pura no e, gerar distractors genéricos
       expHtml = eRaw;
-      distHtml = wrongOpts.map(w=>
-        '<div class="dist-item"><strong>'+w+'</strong> — This option does not fit the clinical presentation described.</div>'
-      ).join('');
+      distHtml = wrongOpts.map(w=>{
+        const sentences = eRaw.replace(/<[^>]*>/g,'').split(/(?<=[.!?])\s+/);
+        const wWords = w.split(/\s+/).slice(0,3).join('.{0,15}');
+        const pat = new RegExp(wWords, 'i');
+        const match = sentences.find(s => pat.test(s));
+        return '<div class="dist-item"><strong>'+w+'</strong> — '+(match ? match.trim()+'.' : 'See explanation above.')+'</div>';
+      }).join('');
     }
   }
 
