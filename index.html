@@ -1838,7 +1838,7 @@ function hideDeckHome(){
 }
 
 // ── DECK VISIBILITY ───────────────────────────────────────────────────
-let hiddenDecks=JSON.parse(localStorage.getItem('bmd_hidden_decks')||'[]');
+let hiddenDecks=JSON.parse(localStorage.getItem('bmd_hidden_decks')||'[]').filter(d=>d!=='shelf_surgery'&&d!=='shelf_em');
 function saveHiddenDecks(){try{localStorage.setItem('bmd_hidden_decks',JSON.stringify(hiddenDecks));}catch(e){}}
 
 function buildDeckManage(){
