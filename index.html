@@ -2953,9 +2953,10 @@ function revealAnswer(sel,card){
       expHtml = eRaw;
       distHtml = wrongOpts.map(w=>{
         const sentences = eRaw.replace(/<[^>]*>/g,'').split(/(?<=[.!?])\s+/);
-        const wWords = w.split(/\s+/).slice(0,3).join('.{0,15}');
+        const wWords = w.split(/\s+/).slice(0,2).join('.{0,10}');
         const pat = new RegExp(wWords, 'i');
-        const match = sentences.find(s => pat.test(s));
+        const match = sentences.find(s => pat.test(s)) || 
+                      sentences.find(s => new RegExp(w.split(/\s+/)[0], 'i').test(s));
         return '<div class="dist-item"><strong>'+w+'</strong> — '+(match ? match.trim()+'.' : 'See explanation above.')+'</div>';
       }).join('');
     }
