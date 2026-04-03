@@ -2951,13 +2951,21 @@ function revealAnswer(sel,card){
     } else {
       // Não conseguiu separar — explanation pura no e, gerar distractors genéricos
       expHtml = eRaw;
+      const usedSentences = [];
       distHtml = wrongOpts.map(w=>{
         const sentences = eRaw.replace(/<[^>]*>/g,'').split(/(?<=[.!?])\s+/);
         const wWords = w.split(/\s+/).slice(0,3).join('.{0,15}');
         const pat = new RegExp(wWords, 'i');
         const match = sentences.find(s => pat.test(s));
+        if(match) usedSentences.push(match.trim());
         return '<div class="dist-item"><strong>'+w+'</strong> — '+(match ? match.trim()+'.' : 'See explanation above.')+'</div>';
       }).join('');
+      // Remove frases usadas nas erradas da explicacao principal
+      let cleanExp = eRaw.replace(/<[^>]*>/g,'');
+      usedSentences.forEach(s => {
+        const esc = s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+        expHtml = expHtml.replace(new RegExp(esc+'\\.?\\s*','g'),'');
+      });
     }
   }
 
