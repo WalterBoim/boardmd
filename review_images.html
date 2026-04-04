@@ -314,17 +314,17 @@ async function loadCards() {
     let offset = 0;
     while (true) {
       const res = await fetch(
-        `${SUPA_URL}/rest/v1/cards?select=id,c,deck,img&limit=1000&offset=${offset}`,
+        `${SUPA_URL}/rest/v1/cards?select=id,c,deck,img&img=not.eq.null&limit=1000&offset=${offset}`,
         { headers: { apikey: SUPA_KEY, Authorization: `Bearer ${SUPA_KEY}` } }
       );
       const batch = await res.json();
       if (!Array.isArray(batch) || batch.length === 0) break;
-      cards = cards.concat(batch.filter(c => c.img !== null && c.img !== undefined));
+      cards = cards.concat(batch);
       if (batch.length < 1000) break;
       offset += 1000;
     }
     allCards = cards;
-    const savedKept = JSON.parse(localStorage.getItem("boardmd_kept") || "[]");n    cards.forEach(c => { cardStates[c.id] = savedKept.includes(c.id) ? "kept" : "pending"; });
+    cards.forEach(c => cardStates[c.id] = 'pending');
     updateStats();
     renderGrid();
   } catch (e) {
