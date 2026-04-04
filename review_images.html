@@ -148,7 +148,7 @@ async function loadCards() {
     let offset = 0;
     while (true) {
       const res = await fetch(
-        `${SUPA_URL}/rest/v1/cards?select=id,c,deck,img&not.img=is.null&limit=1000&offset=${offset}`,
+        `${SUPA_URL}/rest/v1/cards?select=id,c,deck,img&img=not.is.null&limit=1000&offset=${offset}`,
         { headers: { apikey: SUPA_KEY, Authorization: `Bearer ${SUPA_KEY}` } }
       );
       const batch = await res.json();
