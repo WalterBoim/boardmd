@@ -8,7 +8,7 @@ from requests_oauthlib import OAuth1
 from supabase import create_client
 
 SUPA_URL       = 'https://hwdcgbcnphkmxaasties.supabase.co'
-SUPA_KEY       = 'sb_secret_8JKUqdUWu6EIDetxG8G3vA_BdqmPq0X'
+SUPA_KEY       = 'SUPABASE_KEY_REMOVED'
 BUCKET         = 'boardmd-images'
 STORAGE_PUBLIC = f'{SUPA_URL}/storage/v1/object/public/{BUCKET}'
 PROGRESS_FILE  = 'progress_direct_images.json'
