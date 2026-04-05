@@ -2844,6 +2844,19 @@ function revealAnswer(sel,card){
   // CASO 1: campo d preenchido → usar diretamente
   if(card.d && card.d.trim()){
     let dClean = card.d.trim();
+
+    // Tenta parse JSON primeiro
+    try {
+      const dObj = JSON.parse(dClean);
+      if(typeof dObj === 'object' && dObj !== null && !Array.isArray(dObj)){
+        distHtml = Object.entries(dObj).map(([key, val])=>
+          '<div class="dist-item"><strong>'+key+'</strong> — '+val+'</div>'
+        ).join('');
+        expHtml = eRaw;
+      }
+    } catch(e) {}
+
+    if(!distHtml){
     dClean = dClean.replace(/<[^>]*>\s*Distractor(?:\s+Notes)?(?:\s*\([^)]*\))?:?\s*<\/[^>]*>/gi, '');
     dClean = dClean.replace(/<strong>\s*Distractor(?:\s+Notes)?(?:\s*\([^)]*\))?:?\s*<\/strong>/gi, '');
     dClean = dClean.replace(/^Distractor(?:\s+Notes)?(?:\s*\([^)]*\))?:?\s*/i, '');
