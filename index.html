@@ -4709,6 +4709,7 @@ function saveCardEdit(){
     w: edits[card.id].w,
     e: edits[card.id].d,
     system: edits[card.id].system,
+    d: edits[card.id].d,
     topic: edits[card.id].topic
   };
   fetch(SUPA_URL + '/rest/v1/cards?id=eq.' + card.id, {
