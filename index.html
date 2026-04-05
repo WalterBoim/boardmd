@@ -1899,7 +1899,7 @@ function buildDeckManage(){
   const s2Decks=[
     {id:'boardmd_s2',name:'BoardMD S2'},{id:'core',name:'Core Review'},
     {id:'s2',name:'Rapid Review'},
-    {id:'shelf_surgery',name:'BoardMD Shelf',group:['shelf_surgery','shelf_em','shelf_fm','shelf_im','shelf_neuro','shelf_obgyn','shelf_peds','shelf_psych']},
+    {id:'shelf_surgery',name:'BoardMD Shelf'},
   ];
   const stepIds   = currentStep==='s1' ? s1Ids   : s2Ids;
   const stepDecks = currentStep==='s1' ? s1Decks : s2Decks;
@@ -2023,9 +2023,10 @@ function buildDeckHomeTable(){
         </td>
         <td class="dt-num ${shelfNew>0?'dt-new':'dt-zero'}">${shelfNew}</td>
         <td class="dt-num ${shelfLrn>0?'dt-lrn':'dt-zero'}">${shelfLrn}</td>
-        <td class="dt-num ${shelfRev>0?'dt-rev':'dt-zero'}">${shelfRev}
-          <button class="dt-settings-btn" onclick="event.stopPropagation();openSettings('shelf_surgery')" title="Settings">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        <td class="dt-num ${shelfRev>0?'dt-rev':'dt-zero'}">${shelfRev}</td>
+        <td style="text-align:center;padding:0 12px;">
+          <button onclick="event.stopPropagation();switchDeck('shelf_surgery');openSettings();" title="Settings" style="background:none;border:none;color:var(--text-faint);cursor:pointer;padding:4px 6px;border-radius:6px;display:inline-flex;align-items:center;opacity:.5;transition:opacity .15s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='.5'">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
           </button>
         </td>`;
       tbody.appendChild(hdr);
