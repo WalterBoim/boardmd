@@ -4573,6 +4573,8 @@ function studySearchResults(){
       <div>
         <label style="font-size:10px;font-weight:700;letter-spacing:.08em;color:var(--text-faint);font-family:'JetBrains Mono',monospace;text-transform:uppercase;display:block;margin-bottom:6px">Explanation</label>
         <textarea id="editor-exp" style="width:100%;min-height:110px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:'Lato',sans-serif;font-size:13px;padding:12px;resize:vertical;line-height:1.6;transition:border-color .15s;outline:none" onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border)'"></textarea>
+        <label style="font-size:10px;font-weight:700;letter-spacing:.08em;color:var(--text-faint);font-family:'JetBrains Mono',monospace;text-transform:uppercase;display:block;margin-top:12px;margin-bottom:6px">Why the Others Are Wrong</label>
+        <textarea id="editor-dist" placeholder="Distractor explanations (one per line: OptionText — reason)" style="width:100%;min-height:90px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:'Lato',sans-serif;font-size:13px;padding:12px;resize:vertical;line-height:1.6;transition:border-color .15s;outline:none" onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border)'"></textarea>
       </div>
 
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
@@ -4623,6 +4625,7 @@ function openCardEditor(){
   document.getElementById('editor-card-id').textContent = 'ID: ' + card.id + (card.qid ? '  ·  QID ' + card.qid : '');
   document.getElementById('editor-q').value = c.q || '';
   document.getElementById('editor-exp').value = c.e || '';
+  document.getElementById('editor-dist').value = c.d || '';
   document.getElementById('editor-system').value = c.system || '';
   document.getElementById('editor-topic').value = c.topic || '';
 
@@ -4668,6 +4671,7 @@ function saveCardEdit(){
 
   const newQ = document.getElementById('editor-q').value.trim();
   const newExp = document.getElementById('editor-exp').value.trim();
+  const newDist = document.getElementById('editor-dist').value.trim();
   const newSystem = document.getElementById('editor-system').value.trim();
   const newTopic = document.getElementById('editor-topic').value.trim();
 
@@ -4686,7 +4690,7 @@ function saveCardEdit(){
     q: newQ || card.q,
     c: correctText || card.c,
     w: wrongTexts.length ? wrongTexts : card.w,
-    d: newExp || card.d,
+    d: newDist || card.d,
     system: newSystem || card.system,
     topic: newTopic || card.topic,
     _edited: true,
