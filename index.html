@@ -1969,19 +1969,28 @@ function buildDeckHomeTable(){
     {id:'boardmd_s2', name:'BoardMD · Step 2 CK',         sub:'Adaptive MCQs · 15,623 cards',    step:'s2'},
     {id:'s2',         name:'Step 2 CK · Rapid Review',    sub:'Clinical Essentials · 522 cards', step:'s2'},
     {id:'core',       name:'Step 2 CK · Core Review',     sub:'Board-Focused · 4,107 cards',     step:'s2'},
-    {id:'shelf_fm',    name:'BoardMD Shelf - Family Medicine', sub:'Shelf Exam - 0 cards', step:'s2'},
-    {id:'shelf_im',    name:'BoardMD Shelf - Internal Medicine',sub:'Shelf Exam - 0 cards', step:'s2'},
-    {id:'shelf_neuro', name:'BoardMD Shelf - Neurology',        sub:'Shelf Exam - 0 cards', step:'s2'},
-    {id:'shelf_obgyn', name:'BoardMD Shelf - OB/GYN',           sub:'Shelf Exam - 0 cards', step:'s2'},
-    {id:'shelf_peds',  name:'BoardMD Shelf - Pediatrics',       sub:'Shelf Exam - 0 cards', step:'s2'},
-    {id:'shelf_psych', name:'BoardMD Shelf - Psychiatry',       sub:'Shelf Exam - 0 cards', step:'s2'},
-    {id:'shelf_surgery', name:'BoardMD Shelf',           sub:'Shelf Exams · 100 cards',         step:'s2'},
-    {id:'shelf_em',      name:'BoardMD Shelf EM',         sub:'Shelf Exams · 96 cards',          step:'s2'},
+    {id:'shelf_em',      name:'BoardMD Shelf · Emergency Medicine', sub:'Shelf Exam · 96 cards',            step:'s2', shelf:true},
+    {id:'shelf_surgery', name:'BoardMD Shelf · Surgery',             sub:'Shelf Exam · 100 cards',           step:'s2', shelf:true},
+    {id:'shelf_im',      name:'BoardMD Shelf · Internal Medicine',   sub:'Shelf Exam · Coming soon',         step:'s2', shelf:true, soon:true},
+    {id:'shelf_fm',      name:'BoardMD Shelf · Family Medicine',     sub:'Shelf Exam · Coming soon',         step:'s2', shelf:true, soon:true},
+    {id:'shelf_obgyn',   name:'BoardMD Shelf · OB/GYN',              sub:'Shelf Exam · Coming soon',         step:'s2', shelf:true, soon:true},
+    {id:'shelf_peds',    name:'BoardMD Shelf · Pediatrics',          sub:'Shelf Exam · Coming soon',         step:'s2', shelf:true, soon:true},
+    {id:'shelf_psych',   name:'BoardMD Shelf · Psychiatry',          sub:'Shelf Exam · Coming soon',         step:'s2', shelf:true, soon:true},
+    {id:'shelf_neuro',   name:'BoardMD Shelf · Neurology',           sub:'Shelf Exam · Coming soon',         step:'s2', shelf:true, soon:true},
   ];
   // Filter by current step
   const decks = allDecksConfig.filter(d => d.step === currentStep);
   buildDeckManage();
-  decks.filter(({id})=>!hiddenDecks.includes(id)).forEach(({id,name,sub})=>{
+  let shelfHeaderAdded=false;
+  decks.filter(({id})=>!hiddenDecks.includes(id)).forEach(({id,name,sub,shelf,soon})=>{
+    // Add BoardMD Shelf group header before first shelf deck
+    if(shelf && !shelfHeaderAdded){
+      shelfHeaderAdded=true;
+      const hdr=document.createElement('tr');
+      hdr.style.cssText='pointer-events:none;';
+      hdr.innerHTML=`<td colspan="4" style="padding:16px 12px 6px;font-family:\'Instrument Serif\',serif;font-size:13px;font-weight:700;color:var(--accent);letter-spacing:.06em;text-transform:uppercase;border-top:1px solid var(--border)">BoardMD Shelf</td>`;
+      tbody.appendChild(hdr);
+    }
     const cards=DECKS[id]||[];
     // Re-read today from storage for cross-tab accuracy
     const today=dayStamp();
@@ -2004,7 +2013,12 @@ function buildDeckHomeTable(){
     tr.onclick=()=>{switchDeckAndStudy(id);};
     tr.innerHTML=`
       <td>
-        <div><div class="dt-name">${name}</div><div class="dt-sub">${sub}</div></div>
+        <div style="display:flex;align-items:center;gap:8px;${shelf?'padding-left:12px':''}">
+          <div>
+            <div class="dt-name">${shelf?name.replace('BoardMD Shelf · ',''):name}${soon?'<span style="margin-left:6px;font-size:9px;font-weight:700;color:var(--text-faint);background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:1px 5px;vertical-align:middle">SOON</span>':''}</div>
+            <div class="dt-sub">${sub}</div>
+          </div>
+        </div>
       </td>
       <td class="dt-num ${nw>0?'dt-new':'dt-zero'}">${nw}</td>
       <td class="dt-num ${lrn>0?'dt-lrn':'dt-zero'}">${lrn}</td>
