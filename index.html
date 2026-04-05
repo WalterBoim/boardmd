@@ -2761,7 +2761,7 @@ function searchBids(){
   bids.forEach(bid=>{
     let match=null;
     for(const dk of boardmdDecks){
-      const cards=DECKS[dk]||[];
+      const cards=(window.DECKS||DECKS)[dk]||[];
       match=cards.find(c=>(c.id||'').replace(/^boardmd_s[12]_/,'')===bid);
       if(match) break;
     }
@@ -3317,7 +3317,7 @@ function searchQids(){
     // Collect ALL cards with this QID across ALL decks
     let matches=[];
     for(const dk of searchDecks){
-      const cards=DECKS[dk]||[];
+      const cards=(window.DECKS||DECKS)[dk]||[];
       const hits=cards.filter(c=>
         String(c.qid)===qid ||
         c.qid===parseInt(qid)
