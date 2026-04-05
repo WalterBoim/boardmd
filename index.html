@@ -4643,6 +4643,15 @@ function openCardEditor(){
 
   const overlay = document.getElementById('card-editor-overlay');
   overlay.style.display = 'flex';
+  const imgSection = document.getElementById('editor-img-section');
+  if(imgSection){
+    imgSection.style.display = 'block';
+    const hasImg = card.img && card.img.url;
+    const currentDiv = document.getElementById('editor-img-current');
+    const imgEl = document.getElementById('editor-img-preview');
+    if(hasImg){ if(imgEl) imgEl.src = card.img.url; if(currentDiv) currentDiv.style.display='flex'; }
+    else { if(currentDiv) currentDiv.style.display='none'; }
+  }
   document.getElementById('editor-saved-msg').style.opacity = '0';
 }
 
@@ -4717,6 +4726,38 @@ function saveCardEdit(){
   setTimeout(()=>{ msg.style.opacity='0'; closeCardEditor(); renderCard(); }, 1200);
 }
 
+async function setCardImage(){
+  if(!_editingCard) return;
+  const url = (document.getElementById('editor-img-url').value||'').trim();
+  if(!url){ alert('Paste an image URL first.'); return; }
+  const imgObj = {url:url, alt:_editingCard.c||'', credit:'Manual', license:'CC BY-SA', source:'Manual'};
+  const r = await fetch(SUPA_URL+'/rest/v1/cards?id=eq.'+_editingCard.id, {
+    method:'PATCH',
+    headers:{'apikey':SUPA_ANON,'Authorization':'Bearer '+SUPA_ANON,'Content-Type':'application/json','Prefer':'return=minimal'},
+    body:JSON.stringify({img:imgObj})
+  });
+  if(r.ok){
+    _editingCard.img=imgObj;
+    document.getElementById('editor-img-preview').src=url;
+    document.getElementById('editor-img-current').style.display='flex';
+    document.getElementById('editor-img-url').value='';
+    renderCard();
+  }
+}
+async function removeCardImage(){
+  if(!_editingCard) return;
+  if(!confirm('Remove image from this card?')) return;
+  const r = await fetch(SUPA_URL+'/rest/v1/cards?id=eq.'+_editingCard.id, {
+    method:'PATCH',
+    headers:{'apikey':SUPA_ANON,'Authorization':'Bearer '+SUPA_ANON,'Content-Type':'application/json','Prefer':'return=minimal'},
+    body:JSON.stringify({img:null})
+  });
+  if(r.ok){
+    _editingCard.img=null;
+    document.getElementById('editor-img-current').style.display='none';
+    renderCard();
+  }
+}
 function resetCardEdit(){
   if(!_editingCard) return;
   if(!confirm('Reset this card to its original content? Your edits will be lost.')) return;
