@@ -4722,7 +4722,20 @@ function saveCardEdit(){
     },
     body: JSON.stringify(supaUpdate)
   }).then(r => {
-    if(r.ok) console.log('Supabase updated:', card.id);
+    if(r.ok){
+      console.log('Supabase updated:', card.id);
+      // Invalida cache IndexedDB para este card
+      try{
+        const req = indexedDB.open('boardmd_cache');
+        req.onsuccess = e => {
+          const db = e.target.result;
+          if(db.objectStoreNames.contains('cards')){
+            const tx = db.transaction('cards','readwrite');
+            tx.objectStore('cards').delete(card.id);
+          }
+        };
+      }catch(ex){}
+    }
     else r.text().then(t => console.error('Supabase error:', t));
   }).catch(e => console.error('Supabase fetch error:', e));
 
