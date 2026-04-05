@@ -2844,20 +2844,9 @@ function revealAnswer(sel,card){
   // CASO 1: campo d preenchido → usar diretamente
   if(card.d && card.d.trim()){
     let dClean = card.d.trim();
-
-    // Tenta parse JSON primeiro
-    try {
-      const dObj = JSON.parse(dClean);
-      if(typeof dObj === 'object' && dObj !== null && !Array.isArray(dObj)){
-        distHtml = Object.entries(dObj).map(([key, val])=>
-          '<div class="dist-item"><strong>'+key+'</strong> — '+val+'</div>'
-        ).join('');
-        expHtml = eRaw;
-      }
-    } catch(e) {}
-
+    try{const dObj=JSON.parse(dClean);if(dObj&&typeof dObj==='object'&&!Array.isArray(dObj)){distHtml=Object.entries(dObj).map(([k,v])=>'<div class="dist-item"><strong>'+k+'</strong> — '+v+'</div>').join('');expHtml=eRaw;}}catch(e){}
     if(!distHtml){
-    dClean = dClean.replace(/<[^>]*>\s*Distractor(?:\s+Notes)?(?:\s*\([^)]*\))?:?\s*<\/[^>]*>/gi, '');
+    dClean=dClean.replace(/<[^>]*>\s*Distractor(?:\s+Notes)?(?:\s*\([^)]*\))?:?\s*<\/[^>]*>/gi, '');
     dClean = dClean.replace(/<strong>\s*Distractor(?:\s+Notes)?(?:\s*\([^)]*\))?:?\s*<\/strong>/gi, '');
     dClean = dClean.replace(/^Distractor(?:\s+Notes)?(?:\s*\([^)]*\))?:?\s*/i, '');
     // Formatar cada linha do d como item separado
@@ -2910,6 +2899,7 @@ function revealAnswer(sel,card){
       distHtml = '<div class="dist-item">'+(/<[a-z][^>]*>/i.test(dClean)?dClean:mdToHtml(dClean))+'</div>';
     }
     expHtml = eRaw;
+    } // end if(!distHtml)
   }
   // CASO 2: d vazio mas e contém distractors misturados
   else if(wrongOpts.length > 0 && eRaw){
