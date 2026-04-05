@@ -1898,9 +1898,8 @@ function buildDeckManage(){
   ];
   const s2Decks=[
     {id:'boardmd_s2',name:'BoardMD S2'},{id:'core',name:'Core Review'},
-    {id:'s2',name:'Rapid Review'},{id:'hy',name:'HY Concepts'},
-    {id:'shelf_surgery',name:'BoardMD Shelf'},
-    {id:'shelf_em',name:'BoardMD Shelf EM'},
+    {id:'s2',name:'Rapid Review'},
+    {id:'shelf_surgery',name:'BoardMD Shelf',group:['shelf_surgery','shelf_em','shelf_fm','shelf_im','shelf_neuro','shelf_obgyn','shelf_peds','shelf_psych']},
   ];
   const stepIds   = currentStep==='s1' ? s1Ids   : s2Ids;
   const stepDecks = currentStep==='s1' ? s1Decks : s2Decks;
@@ -1986,9 +1985,49 @@ function buildDeckHomeTable(){
     // Add BoardMD Shelf group header before first shelf deck
     if(shelf && !shelfHeaderAdded){
       shelfHeaderAdded=true;
+      // Count total shelf cards
+      const shelfIds=['shelf_em','shelf_surgery'];
+      let shelfNew=0,shelfLrn=0,shelfRev=0;
+      shelfIds.forEach(sid=>{
+        const sc=(window.DECKS||DECKS)[sid]||[];
+        const sNewSeen=todayData[sid]?.newSeen||0;
+        const sNewLeft=Math.max(0,c.newPerDay-sNewSeen);
+        let sc2=0;
+        sc.forEach(card=>{
+          const s=getState(card.id);
+          if(s.state===ST_NEW&&sc2<sNewLeft){shelfNew++;sc2++;}
+          else if((s.state===ST_LRN||s.state===ST_RLN)&&s.due<=now+1200000)shelfLrn++;
+          else if(s.state===ST_REV&&s.due<=now+86400000)shelfRev++;
+        });
+      });
       const hdr=document.createElement('tr');
-      hdr.style.cssText='pointer-events:none;';
-      hdr.innerHTML=`<td colspan="4" style="padding:16px 12px 6px;font-family:\'Instrument Serif\',serif;font-size:13px;font-weight:700;color:var(--accent);letter-spacing:.06em;text-transform:uppercase;border-top:1px solid var(--border)">BoardMD Shelf</td>`;
+      hdr.style.cssText='cursor:pointer;border-top:1px solid var(--border);';
+      hdr.id='shelf-accordion-row';
+      hdr.onclick=()=>{
+        const open=hdr.dataset.open==='1';
+        hdr.dataset.open=open?'0':'1';
+        const arrow=hdr.querySelector('.shelf-arrow');
+        if(arrow) arrow.style.transform=open?'rotate(0deg)':'rotate(90deg)';
+        document.querySelectorAll('.shelf-sub-row').forEach(r=>{r.style.display=open?'none':'';});
+      };
+      hdr.dataset.open='0';
+      hdr.innerHTML=`
+        <td style="padding:14px 12px;">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span class="shelf-arrow" style="color:var(--accent);font-size:12px;transition:transform .2s;transform:rotate(0deg)">▶</span>
+            <div>
+              <div class="dt-name" style="color:var(--accent)">BoardMD Shelf</div>
+              <div class="dt-sub">Shelf Exams · 8 rotations</div>
+            </div>
+          </div>
+        </td>
+        <td class="dt-num ${shelfNew>0?'dt-new':'dt-zero'}">${shelfNew}</td>
+        <td class="dt-num ${shelfLrn>0?'dt-lrn':'dt-zero'}">${shelfLrn}</td>
+        <td class="dt-num ${shelfRev>0?'dt-rev':'dt-zero'}">${shelfRev}
+          <button class="dt-settings-btn" onclick="event.stopPropagation();openSettings('shelf_surgery')" title="Settings">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          </button>
+        </td>`;
       tbody.appendChild(hdr);
     }
     const cards=DECKS[id]||[];
@@ -2009,8 +2048,9 @@ function buildDeckHomeTable(){
     });
     totalNew+=nw;totalLrn+=lrn;totalRev+=rev;
     const tr=document.createElement('tr');
+    if(shelf) { tr.classList.add('shelf-sub-row'); tr.style.display='none'; }
     if(id===currentDeck) tr.classList.add('dt-active');
-    tr.onclick=()=>{switchDeckAndStudy(id);};
+    tr.onclick=()=>{ if(!soon) switchDeckAndStudy(id); };
     tr.innerHTML=`
       <td>
         <div style="display:flex;align-items:center;gap:8px;${shelf?'padding-left:12px':''}">
