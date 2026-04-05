@@ -67,7 +67,7 @@ html.light .footer{border-color:var(--border);}
 .theme-toggle:hover{border-color:var(--accent);color:var(--accent);}
 .theme-toggle svg{width:16px;height:16px;}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:'Lato','Helvetica Neue',Arial,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:var(--font-size);line-height:1.6;overflow-x:hidden;max-width:100vw;}
+body{font-family:'Lato','Helvetica Neue',Arial,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:var(--font-size);line-height:1.6;overflow-x:hidden;}
 
 /* ── NAV ── */
 .nav{display:flex;align-items:center;justify-content:space-between;padding:20px 40px;position:sticky;top:0;z-index:100;background:rgba(8,12,18,.88);backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,.05);}
@@ -409,10 +409,7 @@ html.light .qid-textarea{background:var(--surface2);}
   .stats-row{display:grid;grid-template-columns:repeat(2,1fr);}
   .section{padding:50px 20px;}
   .sidebar{display:none;}
-  .app-layout{display:block;width:100%;overflow-x:hidden;}
-  .study-main{padding:12px 8px;width:100%;box-sizing:border-box;overflow-x:hidden;}
-  .study-inner{max-width:100%;width:100%;padding:0;box-sizing:border-box;}
-  #app{overflow-x:hidden;max-width:100vw;}
+  
   .fsrs-btn{max-width:none;}
   .profile-stats-grid{grid-template-columns:repeat(2,1fr);}
   .badges-grid{grid-template-columns:repeat(2,1fr) !important;}
@@ -959,14 +956,7 @@ html.light { --uw-hover:#f0f7ff; --uw-correct:#e8f5e9; --uw-wrong:#fdecea; --uw-
 #app-auth-menu button.aam-signout{color:var(--rose);}
 #app-auth-menu button.aam-signout:hover{background:rgba(244,63,94,.08);}
 
-/* ── HIGHLIGHT BUTTONS ── */
-.hl-btn{width:22px;height:22px;border-radius:50%;border:2px solid transparent;cursor:pointer;transition:all .15s;flex-shrink:0;outline:none;}
-.hl-btn:hover{transform:scale(1.15);}
-.hl-btn.hl-active,.hl-btn.active{border-color:var(--text);transform:scale(1.15);}
-.hl-btn-y{background:#f5c800;}
-.hl-btn-g{background:#22c55e;}
-.hl-btn-b{background:#38bdf8;}
-.hl-toolbar{display:flex;align-items:center;gap:6px;padding:0 4px;}
+/* ── BOARDMD ATTENDING ── */
 #attending-overlay{position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:4000;display:none;align-items:flex-end;justify-content:center;backdrop-filter:blur(4px);}
 #attending-overlay.active{display:flex;}
 #attending-panel{background:var(--surface);border:1px solid var(--border);border-top-left-radius:20px;border-top-right-radius:20px;width:100%;max-width:760px;max-height:82vh;display:flex;flex-direction:column;overflow:hidden;animation:slideUpPanel .25s cubic-bezier(.34,1.2,.64,1);}
@@ -982,7 +972,6 @@ html.light { --uw-hover:#f0f7ff; --uw-correct:#e8f5e9; --uw-wrong:#fdecea; --uw-
 .att-usage{font-size:10px;font-family:'JetBrains Mono',monospace;color:var(--text-faint);padding:0 20px 10px;border-bottom:1px solid var(--border);flex-shrink:0;}
 .att-usage span{color:var(--accent);}
 .att-buttons{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;padding:14px 16px;border-bottom:1px solid var(--border);flex-shrink:0;}
-
 .att-btn{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:10px 12px;cursor:pointer;text-align:left;transition:all .15s;display:flex;align-items:flex-start;gap:8px;}
 .att-btn:hover{border-color:rgba(99,102,241,.5);background:rgba(99,102,241,.06);}
 .att-btn:disabled{opacity:.4;cursor:not-allowed;}
@@ -1057,8 +1046,8 @@ html.light .att-btn{background:var(--surface2);}
       <button class="btn-hs" onclick="scrollTo({top:document.getElementById('decks').offsetTop-80,behavior:'smooth'})">Explore decks</button>
     </div>
     <div class="stats-row" style="display:grid;grid-template-columns:repeat(3,1fr);">
-      <div class="stat-item"><span class="stat-num">51,577</span><span class="stat-label">Total Cards</span></div>
-      <div class="stat-item"><span class="stat-num">10</span><span class="stat-label">Decks</span></div>
+      <div class="stat-item"><span class="stat-num">31,814</span><span class="stat-label">Total Cards</span></div>
+      <div class="stat-item"><span class="stat-num">8</span><span class="stat-label">Decks</span></div>
       <div class="stat-item"><span class="stat-num">Free</span><span class="stat-label">To Start</span></div>
       <div class="stat-item"><span class="stat-num">FSRS-5</span><span class="stat-label">Algorithm</span></div>
       <div class="stat-item"><span class="stat-num">MDCoins</span><span class="stat-label">Rewards</span></div>
@@ -1071,7 +1060,7 @@ html.light .att-btn{background:var(--surface2);}
   <div class="section" id="decks">
     <div class="section-label">Our Decks</div>
     <div class="section-title">Everything you need.<br>Step 1 &amp; Step 2 CK.</div>
-    <p class="section-sub">From rapid review to high-yield concept mastery — organized by exam, built for performance.</p>
+    <p class="section-sub">From rapid review to complete qbank companions — organized by exam, built for performance.</p>
     <div class="decks-step-label">
       <div class="decks-step-badge step1-badge">Step 1</div>
       <div class="decks-step-line"></div>
@@ -1082,43 +1071,43 @@ html.light .att-btn{background:var(--surface2);}
         <div class="deck-name">Step 1 · Rapid Review</div><div class="deck-title">High-Yield Foundation</div>
         <div class="deck-desc">Core pathophysiology, biochemistry and pharmacology. The fastest way to cover Step 1 essentials.</div>
         <div class="deck-tags"><span class="deck-tag">Pathophysiology</span><span class="deck-tag">Pharmacology</span><span class="deck-tag">728 cards</span></div>
-        <div class="deck-footer"><div class="deck-count"><strong>728</strong> <span>cards</span></div><button class="btn-deck" onclick="event.stopPropagation();this.closest('[onclick]').onclick()">Study now →</button></div>
+        <div class="deck-footer"><div class="deck-count"><strong>728</strong> <span>cards</span></div><button class="btn-deck">Study now →</button></div>
       </div>
       <div class="deck-card s1" onclick="openApp('hy1')">
         <div class="deck-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="color:#3b7fff"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div>
         <div class="deck-name">Step 1 · HY Concepts</div><div class="deck-title">Highest Yield</div>
         <div class="deck-desc">The most tested Step 1 concepts curated for maximum score impact per hour studied.</div>
         <div class="deck-tags"><span class="deck-tag">High-Yield</span><span class="deck-tag">Step 1</span><span class="deck-tag">395 cards</span></div>
-        <div class="deck-footer"><div class="deck-count"><strong>395</strong> <span>cards</span></div><button class="btn-deck" onclick="event.stopPropagation();this.closest('[onclick]').onclick()">Study now →</button></div>
+        <div class="deck-footer"><div class="deck-count"><strong>395</strong> <span>cards</span></div><button class="btn-deck">Study now →</button></div>
       </div>
       <div class="deck-card s1" onclick="openApp('fa_s1')">
         <div class="deck-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="color:#3b7fff"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></div>
         <div class="deck-name">Step 1 · Clinical Patterns</div><div class="deck-title">Clinical MCQ Patterns</div>
         <div class="deck-desc">Clinical MCQ patterns covering every Step 1 system — sharpen your diagnostic reasoning across all disciplines.</div>
         <div class="deck-tags"><span class="deck-tag">All Systems</span><span class="deck-tag">Clinical</span><span class="deck-tag">5,158 cards</span></div>
-        <div class="deck-footer"><div class="deck-count"><strong>5,158</strong> <span>cards</span></div><button class="btn-deck" onclick="event.stopPropagation();this.closest('[onclick]').onclick()">Study now →</button></div>
+        <div class="deck-footer"><div class="deck-count"><strong>5,158</strong> <span>cards</span></div><button class="btn-deck">Study now →</button></div>
       </div>
       <div class="deck-card s1" onclick="openApp('arrows')">
         <div class="deck-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="color:#3b7fff"><path d="M7 17L17 7M7 7h10v10"/></svg></div>
         <div class="deck-name">Arrows USMLE</div><div class="deck-title">↑↓ Trends &amp; Patterns</div>
         <div class="deck-desc">Master lab value trends, hormonal axes, and hemodynamic changes — as high-yield MCQs.</div>
         <div class="deck-tags"><span class="deck-tag">Lab Values</span><span class="deck-tag">Trends</span><span class="deck-tag">390 cards</span></div>
-        <div class="deck-footer"><div class="deck-count"><strong>390</strong> <span>cards</span></div><button class="btn-deck" onclick="event.stopPropagation();this.closest('[onclick]').onclick()">Study now →</button></div>
+        <div class="deck-footer"><div class="deck-count"><strong>390</strong> <span>cards</span></div><button class="btn-deck">Study now →</button></div>
       </div>
       <div class="deck-card s1" onclick="openApp('ethics')">
         <div class="deck-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="color:#3b7fff"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
         <div class="deck-name">HY Ethics &amp; Communication</div><div class="deck-title">Social Sciences</div>
         <div class="deck-desc">High-yield ethics and communication scenarios — always on the exam, often neglected.</div>
         <div class="deck-tags"><span class="deck-tag">Ethics</span><span class="deck-tag">Communication</span><span class="deck-tag">251 cards</span></div>
-        <div class="deck-footer"><div class="deck-count"><strong>251</strong> <span>cards</span></div><button class="btn-deck" onclick="event.stopPropagation();this.closest('[onclick]').onclick()">Study now →</button></div>
+        <div class="deck-footer"><div class="deck-count"><strong>251</strong> <span>cards</span></div><button class="btn-deck">Study now →</button></div>
       </div>
     
       <div class="deck-card s1" onclick="openApp('boardmd_s1')">
         <div class="deck-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="color:#3b7fff"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg></div>
         <div class="deck-name">BoardMD · Step 1</div><div class="deck-title">Adaptive MCQ System</div>
-        <div class="deck-desc">Comprehensive USMLE Step 1 MCQs with spaced repetition — objective-tagged for targeted review.</div>
-        <div class="deck-tags"><span class="deck-tag">Adaptive</span><span class="deck-tag">Objective-Tagged</span><span class="deck-tag">4,056 cards</span></div>
-        <div class="deck-footer"><div class="deck-count"><strong>4,056</strong> <span>cards</span></div><button class="btn-deck" onclick="event.stopPropagation();this.closest('[onclick]').onclick()">Study now →</button></div>
+        <div class="deck-desc">Comprehensive USMLE Step 1 MCQs with spaced repetition — QID-tagged for targeted review.</div>
+        <div class="deck-tags"><span class="deck-tag">Adaptive</span><span class="deck-tag">QID Tagged</span><span class="deck-tag">4,056 cards</span></div>
+        <div class="deck-footer"><div class="deck-count"><strong>4,056</strong> <span>cards</span></div><button class="btn-deck">Study now →</button></div>
       </div>
     </div>
     <div class="decks-step-label" style="margin-top:56px">
@@ -1131,37 +1120,30 @@ html.light .att-btn{background:var(--surface2);}
         <div class="deck-name">Step 2 CK · Rapid Review</div><div class="deck-title">Clinical Essentials</div>
         <div class="deck-desc">Clinical vignettes and management decisions across all 16 systems — built for Step 2 CK performance.</div>
         <div class="deck-tags"><span class="deck-tag">Clinical</span><span class="deck-tag">Management</span><span class="deck-tag">522 cards</span></div>
-        <div class="deck-footer"><div class="deck-count"><strong>522</strong> <span>cards</span></div><button class="btn-deck" onclick="event.stopPropagation();this.closest('[onclick]').onclick()">Study now →</button></div>
+        <div class="deck-footer"><div class="deck-count"><strong>522</strong> <span>cards</span></div><button class="btn-deck">Study now →</button></div>
       </div>
       <div class="deck-card s2" onclick="openApp('core')">
         <div class="deck-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="color:#e8a836"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M12 11h4M12 16h4M8 11h.01M8 16h.01"/></svg></div>
-        <div class="deck-name">Step 2 CK · Core Review</div><div class="deck-title">Learning Objectives</div>
-        <div class="deck-desc">One MCQ per Step 2 CK learning objective — objective-tagged for seamless integration with your study workflow.</div>
-        <div class="deck-tags"><span class="deck-tag">Objective-Tagged</span><span class="deck-tag">4,107 cards</span><span class="deck-tag">All Systems</span></div>
-        <div class="deck-footer"><div class="deck-count"><strong>4,107</strong> <span>cards</span></div><button class="btn-deck" onclick="event.stopPropagation();this.closest('[onclick]').onclick()">Study now →</button></div>
+        <div class="deck-name">Step 2 CK · Core Review</div><div class="deck-title">Qbank Companion</div>
+        <div class="deck-desc">One MCQ per Step 2 CK learning objective — QID-tagged for seamless integration with your qbank workflow.</div>
+        <div class="deck-tags"><span class="deck-tag">QID Tagged</span><span class="deck-tag">4,107 cards</span><span class="deck-tag">All Systems</span></div>
+        <div class="deck-footer"><div class="deck-count"><strong>4,107</strong> <span>cards</span></div><button class="btn-deck">Study now →</button></div>
       </div>
       <div class="deck-card s2" onclick="openApp('hy')">
         <div class="deck-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="color:#e8a836"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div>
         <div class="deck-name">Step 2 CK · HY Concepts</div><div class="deck-title">Highest Yield</div>
         <div class="deck-desc">The most tested clinical concepts for Step 2 CK — maximum score impact per hour studied.</div>
         <div class="deck-tags"><span class="deck-tag">High-Yield</span><span class="deck-tag">Clinical</span><span class="deck-tag">144 cards</span></div>
-        <div class="deck-footer"><div class="deck-count"><strong>144</strong> <span>cards</span></div><button class="btn-deck" onclick="event.stopPropagation();this.closest('[onclick]').onclick()">Study now →</button></div>
+        <div class="deck-footer"><div class="deck-count"><strong>144</strong> <span>cards</span></div><button class="btn-deck">Study now →</button></div>
       </div>
     </div>
   
       <div class="deck-card s2" onclick="openApp('boardmd_s2')">
         <div class="deck-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="color:#e8a836"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg></div>
         <div class="deck-name">BoardMD · Step 2 CK</div><div class="deck-title">Adaptive MCQ System</div>
-        <div class="deck-desc">Comprehensive USMLE Step 2 CK MCQs with spaced repetition — objective-tagged for targeted review.</div>
-        <div class="deck-tags"><span class="deck-tag">Adaptive</span><span class="deck-tag">Objective-Tagged</span><span class="deck-tag">949 cards</span></div>
-        <div class="deck-footer"><div class="deck-count"><strong>949</strong> <span>cards</span></div><button class="btn-deck" onclick="event.stopPropagation();this.closest('[onclick]').onclick()">Study now →</button></div>
-      </div>
-      <div class="deck-card s2" onclick="switchDeckTab('shelf_em')">
-        <div class="deck-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="color:#f57314"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg></div>
-        <div class="deck-name">BoardMD Shelf</div><div class="deck-title">All Rotations</div>
-        <div class="deck-desc">High-yield Shelf Exam MCQs covering core rotation objectives — Surgery and Emergency Medicine live now.</div>
-        <div class="deck-tags"><span class="deck-tag">Shelf Exams</span><span class="deck-tag">196 cards</span></div>
-        <div class="deck-footer"><div class="deck-count"><strong>196</strong> <span>cards</span></div><button class="btn-deck" onclick="event.stopPropagation();switchDeckTab('shelf_em')">Study now →</button></div>
+        <div class="deck-desc">Comprehensive USMLE Step 2 CK MCQs with spaced repetition — QID-tagged for targeted review.</div>
+        <div class="deck-tags"><span class="deck-tag">Adaptive</span><span class="deck-tag">QID Tagged</span><span class="deck-tag">949 cards</span></div>
+        <div class="deck-footer"><div class="deck-count"><strong>949</strong> <span>cards</span></div><button class="btn-deck">Study now →</button></div>
       </div>
     </div>
 
@@ -1210,13 +1192,6 @@ html.light .att-btn{background:var(--surface2);}
           <span style="font-size:10px;font-weight:800;letter-spacing:.03em">BID</span>
         </button>
         <div class="hdr-divider"></div>
-        <!-- Highlight toolbar -->
-        <div class="hl-toolbar" id="hl-toolbar" title="Highlight text">
-          <button class="hl-btn hl-btn-y" id="hl-y" onclick="setHlColor('yellow')" title="Yellow highlight"></button>
-          <button class="hl-btn hl-btn-g" id="hl-g" onclick="setHlColor('green')"  title="Green highlight"></button>
-          <button class="hl-btn hl-btn-b" id="hl-b" onclick="setHlColor('blue')"   title="Blue highlight"></button>
-        </div>
-        <div class="hdr-divider"></div>
         <!-- Theme -->
         <button class="hdr-icon-btn" id="theme-toggle-app" onclick="toggleTheme()" title="Toggle theme">
           <svg id="theme-icon-app" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
@@ -1242,12 +1217,11 @@ html.light .att-btn{background:var(--surface2);}
         <button class="hdr-icon-btn" onclick="openSettings()" title="Settings">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
         </button>
-        <!-- BoardMD Attending — acessível apenas inline no card -->
-        <div class="hdr-divider"></div>
-        <!-- Highlight tools -->
-        <div id="hl-btns" style="display:flex;align-items:center;gap:3px;">
-          
-        </div>
+        <!-- BoardMD Attending -->
+        <button class="hdr-icon-btn" id="attending-btn" onclick="openAttending()" title="BoardMD Attending — AI Tutor" style="border-color:rgba(139,92,246,.35);color:#8b5cf6;gap:4px;">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 1 1 7.072 0l-.548.547A3.374 3.374 0 0 0 14 18.469V19a2 2 0 1 1-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+          <span style="font-size:10px;font-weight:800;letter-spacing:.02em">ATT</span>
+        </button>
         <div class="hdr-divider"></div>
         <!-- Font size -->
         <div class="font-ctrl">
@@ -1292,11 +1266,10 @@ html.light .att-btn{background:var(--surface2);}
       <button class="deck-tab" id="tab-s2"         onclick="switchDeckTab('s2')">Rapid Review</button>
       <button class="deck-tab" id="tab-core"       onclick="switchDeckTab('core')">Core Review</button>
       <button class="deck-tab" id="tab-hy"         onclick="switchDeckTab('hy')">HY Concepts</button>
-      <button class="deck-tab" id="tab-shelf"      onclick="switchDeckTab('shelf_em')">BoardMD Shelf</button>
     </div>
   </header>
 
-  <!-- LEADERBOARD PANEL --><!-- shelf-v37 -->
+  <!-- LEADERBOARD PANEL -->
   <div class="lb-panel" id="lb-panel">
     <div>
       <div class="lb-header-title">Global Ranking</div>
@@ -1323,11 +1296,11 @@ html.light .att-btn{background:var(--surface2);}
       <div style="display:flex;flex-direction:column;align-items:center;gap:8px;min-width:130px;">
         <div style="position:relative;width:120px;height:120px;">
           <svg viewBox="0 0 120 120" width="120" height="120">
-            <circle cx="60" cy="60" r="52" fill="none" stroke="var(--border)" stroke-width="7"/>
-            <circle id="perf-donut-correct" cx="60" cy="60" r="52" fill="none" stroke="#22c55e" stroke-width="7" stroke-linecap="round"
-              stroke-dasharray="327" stroke-dashoffset="327" transform="rotate(-90 60 60)" style="transition:stroke-dashoffset .6s ease"/>
-            <circle id="perf-donut-incorrect" cx="60" cy="60" r="52" fill="none" stroke="#f43f5e" stroke-width="7" stroke-linecap="round"
-              stroke-dasharray="327" stroke-dashoffset="327" transform="rotate(-90 60 60)" style="transition:stroke-dashoffset .6s ease;display:none"/>
+            <circle cx="60" cy="60" r="50" fill="none" stroke="var(--border)" stroke-width="12"/>
+            <circle id="perf-donut-correct" cx="60" cy="60" r="50" fill="none" stroke="#22c55e" stroke-width="12" stroke-linecap="round"
+              stroke-dasharray="314" stroke-dashoffset="314" transform="rotate(-90 60 60)" style="transition:stroke-dashoffset .6s ease"/>
+            <circle id="perf-donut-incorrect" cx="60" cy="60" r="50" fill="none" stroke="#f43f5e" stroke-width="12" stroke-linecap="round"
+              stroke-dasharray="314" stroke-dashoffset="314" transform="rotate(-90 60 60)" style="transition:stroke-dashoffset .6s ease;display:none"/>
           </svg>
           <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;">
             <div id="perf-pct" style="font-size:26px;font-weight:800;color:var(--text);font-family:'JetBrains Mono',monospace;">—</div>
@@ -1341,9 +1314,9 @@ html.light .att-btn{background:var(--surface2);}
       <div style="display:flex;flex-direction:column;align-items:center;gap:8px;min-width:130px;">
         <div style="position:relative;width:120px;height:120px;">
           <svg viewBox="0 0 120 120" width="120" height="120">
-            <circle cx="60" cy="60" r="52" fill="none" stroke="var(--border)" stroke-width="7"/>
-            <circle id="perf-donut-used" cx="60" cy="60" r="52" fill="none" stroke="var(--accent)" stroke-width="7" stroke-linecap="round"
-              stroke-dasharray="327" stroke-dashoffset="327" transform="rotate(-90 60 60)" style="transition:stroke-dashoffset .6s ease"/>
+            <circle cx="60" cy="60" r="50" fill="none" stroke="var(--border)" stroke-width="12"/>
+            <circle id="perf-donut-used" cx="60" cy="60" r="50" fill="none" stroke="var(--accent)" stroke-width="12" stroke-linecap="round"
+              stroke-dasharray="314" stroke-dashoffset="314" transform="rotate(-90 60 60)" style="transition:stroke-dashoffset .6s ease"/>
           </svg>
           <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;">
             <div id="perf-used-pct" style="font-size:26px;font-weight:800;color:var(--text);font-family:'JetBrains Mono',monospace;">—</div>
@@ -1422,7 +1395,6 @@ html.light .att-btn{background:var(--surface2);}
           <th>New</th>
           <th>Learning</th>
           <th>Review</th>
-          <th></th>
         </tr>
       </thead>
       <tbody id="dh-tbody">
@@ -1477,7 +1449,7 @@ html.light .att-btn{background:var(--surface2);}
             </div>
           </div>
           <div class="card-body">
-            <div class="card-question hl-zone" id="c-q">Loading…</div>
+            <div class="card-question" id="c-q">Loading…</div>
             <div class="options" id="c-opts"></div>
           </div>
           <!-- Response Distribution -->
@@ -1499,11 +1471,11 @@ html.light .att-btn{background:var(--surface2);}
             </div>
             <div class="exp-section">
               <div class="exp-label"><span class="exp-label-icon" style="background:rgba(59,127,255,.15);color:var(--accent)">≡</span>Explanation</div>
-              <div class="exp-text hl-zone" id="exp-txt"></div>
+              <div class="exp-text" id="exp-txt"></div>
             </div>
             <div class="exp-section" id="exp-dist-wrap" style="display:none">
               <div class="exp-label"><span class="exp-label-icon" style="background:rgba(244,63,94,.15);color:var(--rose)"></span>Why the others are wrong</div>
-              <div class="exp-dist hl-zone" id="exp-dist"></div>
+              <div class="exp-dist" id="exp-dist"></div>
             </div>
           </div>
           <div id="key-point-wrap" style="display:none;padding:0 18px 14px;"></div>
@@ -1586,7 +1558,7 @@ const DEFAULT_SETTINGS={
 let deckSettings={};
 (function(){
   try{deckSettings=JSON.parse(localStorage.getItem(SETTINGS_KEY)||'{}');}catch(e){}
-  const allDecks=['boardmd_s1','boardmd_s2','s1','s2','core','hy','hy1','arrows','fa_s1','ethics','s1_core','fa_step1','shelf_surgery','shelf_em'];
+  const allDecks=['boardmd_s1','boardmd_s2','s1','s2','core','hy','hy1','arrows','fa_s1','ethics','s1_core','fa_step1'];
   allDecks.forEach(dk=>{
     if(!deckSettings[dk]) deckSettings[dk]={...DEFAULT_SETTINGS};
     Object.keys(DEFAULT_SETTINGS).forEach(k=>{
@@ -1612,7 +1584,7 @@ let todayData={};
 (function(){
   try{todayData=JSON.parse(localStorage.getItem(TODAY_KEY)||'{}');}catch(e){}
   const today=dayStamp();
-  const allDecks=['boardmd_s1','boardmd_s2','s1','s2','core','hy','hy1','arrows','fa_s1','ethics','s1_core','fa_step1','shelf_surgery','shelf_em'];
+  const allDecks=['boardmd_s1','boardmd_s2','s1','s2','core','hy','hy1','arrows','fa_s1','ethics','s1_core','fa_step1'];
   allDecks.forEach(dk=>{
     if(!todayData[dk]||todayData[dk].date!==today) todayData[dk]={date:today,newSeen:0};
   });
@@ -1755,25 +1727,6 @@ function applyFont(){
   document.documentElement.style.setProperty('--font-size',fontSize+'px');
   const el=document.getElementById('fval');if(el) el.textContent=fontSize;
   try{localStorage.setItem('bmd_font',fontSize);}catch(e){}
-  // Inject dynamic style to override !important rules
-  let style = document.getElementById('bmd-font-override');
-  if(!style){
-    style = document.createElement('style');
-    style.id = 'bmd-font-override';
-    document.head.appendChild(style);
-  }
-  const px = fontSize+'px';
-  const sm = (fontSize-1)+'px';
-  style.textContent = `
-    .card-question { font-size: ${px} !important; }
-    .opt-btn { font-size: ${px} !important; }
-    .exp-text { font-size: ${px} !important; }
-    .exp-correct-inner { font-size: ${px} !important; }
-    .exp-dist { font-size: ${sm} !important; }
-    .dist-item { font-size: ${sm} !important; }
-    .key-point-line { font-size: ${sm} !important; }
-    .att-response-text { font-size: ${px} !important; }
-  `;
 }
 
 // ── SESSION STATE ────────────────────────────────────────────────────
@@ -1890,7 +1843,7 @@ function saveHiddenDecks(){try{localStorage.setItem('bmd_hidden_decks',JSON.stri
 
 function buildDeckManage(){
   const s1Ids=['boardmd_s1','s1_core','s1','hy1','fa_step1','fa_s1','arrows','ethics'];
-  const s2Ids=['boardmd_s2','core','s2','hy','shelf_surgery','shelf_em'];
+  const s2Ids=['boardmd_s2','core','s2','hy'];
   const s1Decks=[
     {id:'boardmd_s1',name:'BoardMD S1'},{id:'s1_core',name:'Core Review'},
     {id:'s1',name:'Rapid Review'},{id:'hy1',name:'HY Concepts'},
@@ -1900,9 +1853,8 @@ function buildDeckManage(){
   const s2Decks=[
     {id:'boardmd_s2',name:'BoardMD S2'},{id:'core',name:'Core Review'},
     {id:'s2',name:'Rapid Review'},{id:'hy',name:'HY Concepts'},
-    {id:'shelf_surgery',name:'BoardMD Shelf'},
-    {id:'shelf_em',name:'BoardMD Shelf EM'},
   ];
+  // Show only decks for current step
   const stepIds   = currentStep==='s1' ? s1Ids   : s2Ids;
   const stepDecks = currentStep==='s1' ? s1Decks : s2Decks;
   const stepLabel = currentStep==='s1' ? 'STEP 1' : 'STEP 2 CK';
@@ -1941,7 +1893,7 @@ function toggleAllStep(ids){
   saveHiddenDecks();buildDeckHomeTable();buildDeckManage();
 }
 function toggleAllDecks(){
-  const allIds=['boardmd_s1','s1_core','s1','hy1','fa_step1','fa_s1','arrows','ethics','boardmd_s2','core','s2','hy','shelf_surgery','shelf_em'];
+  const allIds=['boardmd_s1','s1_core','s1','hy1','fa_step1','fa_s1','arrows','ethics','boardmd_s2','core','s2','hy'];
   const allActive=allIds.every(id=>!hiddenDecks.includes(id));
   hiddenDecks=allActive?[...allIds]:[];
   saveHiddenDecks();buildDeckHomeTable();buildDeckManage();
@@ -1970,9 +1922,7 @@ function buildDeckHomeTable(){
     {id:'boardmd_s2', name:'BoardMD · Step 2 CK',         sub:'Adaptive MCQs · 15,623 cards',    step:'s2'},
     {id:'s2',         name:'Step 2 CK · Rapid Review',    sub:'Clinical Essentials · 522 cards', step:'s2'},
     {id:'core',       name:'Step 2 CK · Core Review',     sub:'Board-Focused · 4,107 cards',     step:'s2'},
-    {id:'hy',         name:'Step 2 CK · HY Concepts',     sub:'Highest Yield · 144 cards',       step:'s2'},
-    {id:'shelf_surgery', name:'BoardMD Shelf',           sub:'Shelf Exams · 100 cards',         step:'s2'},
-    {id:'shelf_em',      name:'BoardMD Shelf EM',         sub:'Shelf Exams · 96 cards',          step:'s2'},
+    {id:'hy',         name:'Step 2 CK · HY Concepts',     sub:'Highest Yield · 144 cards',       step:'s2'}
   ];
   // Filter by current step
   const decks = allDecksConfig.filter(d => d.step === currentStep);
@@ -2000,16 +1950,14 @@ function buildDeckHomeTable(){
     tr.onclick=()=>{switchDeckAndStudy(id);};
     tr.innerHTML=`
       <td>
-        <div><div class="dt-name">${name}</div><div class="dt-sub">${sub}</div></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+          <div><div class="dt-name">${name}</div><div class="dt-sub">${sub}</div></div>
+          
+        </div>
       </td>
       <td class="dt-num ${nw>0?'dt-new':'dt-zero'}">${nw}</td>
       <td class="dt-num ${lrn>0?'dt-lrn':'dt-zero'}">${lrn}</td>
-      <td class="dt-num ${rev>0?'dt-rev':'dt-zero'}">${rev}</td>
-      <td style="text-align:center;padding:0 12px;">
-        <button onclick="event.stopPropagation();switchDeck('${id}');openSettings();" title="Settings" style="background:none;border:none;color:var(--text-faint);cursor:pointer;padding:4px 6px;border-radius:6px;display:inline-flex;align-items:center;opacity:.5;transition:opacity .15s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='.5'">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-        </button>
-      </td>`;
+      <td class="dt-num ${rev>0?'dt-rev':'dt-zero'}">${rev}</td>`;
     tbody.appendChild(tr);
   });
   document.getElementById('dh-total-new').textContent=totalNew;
@@ -2040,13 +1988,13 @@ function goHome(){
 // Track which step the user is studying
 let currentStep = localStorage.getItem('bmd_step') || 's1'; // 's1' or 's2'
 const STEP1_DECKS = ['boardmd_s1','s1_core','s1','hy1','fa_step1','fa_s1','arrows','ethics'];
-const STEP2_DECKS = ['boardmd_s2','core','s2','hy','shelf_surgery','shelf_em'];
-const SHELF_DECKS = ['shelf_surgery','shelf_em'];
+const STEP2_DECKS = ['boardmd_s2','core','s2','hy'];
 
 function openApp(dk){
   document.getElementById('landing').style.display='none';
   document.getElementById('app').classList.add('active');
   applyFont();
+  // Set currentStep based on which deck was selected
   if(STEP2_DECKS.includes(dk)){
     currentStep='s2';
   } else {
@@ -2057,12 +2005,14 @@ function openApp(dk){
   document.querySelectorAll('.deck-tab').forEach(t=>t.classList.toggle('active',t.id==='tab-'+dk));
   const lbl=document.getElementById('deck-label');
   if(lbl) lbl.textContent=(DECK_META[dk]||{}).short||dk;
+  // Filter header tabs to show only relevant step
   updateHeaderTabs();
   showDeckHome();
   window.scrollTo(0,0);
 }
 
 function updateHeaderTabs(){
+  // Show only tabs for the current step + separator
   document.querySelectorAll('.deck-tab').forEach(tab=>{
     const dk = tab.id.replace('tab-','');
     const isS1 = STEP1_DECKS.includes(dk);
@@ -2073,7 +2023,9 @@ function updateHeaderTabs(){
       tab.style.display = isS2 ? '' : 'none';
     }
   });
+  // Show/hide step separator labels
   document.querySelectorAll('.tab-group-sep').forEach((sep,i)=>{
+    // i=0 is STEP 1, i=1 is STEP 2 CK
     if(currentStep==='s1') sep.style.display = i===0 ? '' : 'none';
     else sep.style.display = i===1 ? '' : 'none';
   });
@@ -2094,33 +2046,7 @@ function switchDeck(dk){
   buildFilterBar();buildSidebar();selectSystem('all');
 }
 
-function switchDeckTab(dk){
-  hideDeckHome();
-  // Shelf: carrega todos os decks shelf juntos
-  if(dk === 'shelf_em' || dk === 'shelf_surgery' || dk === 'shelf'){
-    // Combina todos os SHELF_DECKS disponíveis
-    const combined = SHELF_DECKS.reduce((acc, d) => {
-      if(DECKS[d]) acc = acc.concat(DECKS[d]);
-      return acc;
-    }, []);
-    currentDeck = 'shelf_em'; // usa shelf_em como referência
-    DECKS['_shelf_combined'] = combined;
-    currentDeck = '_shelf_combined';
-    deck = combined;
-    againQueue = [];
-    idx = 0;
-    revealed = false;
-    // Marca a aba como ativa
-    document.querySelectorAll('.deck-tab').forEach(b => b.classList.remove('active'));
-    const shelfTab = document.getElementById('tab-shelf');
-    if(shelfTab) shelfTab.classList.add('active');
-    updateHeaderCounts();
-    buildSidebar();
-    showCard();
-    return;
-  }
-  switchDeck(dk);
-}
+function switchDeckTab(dk){hideDeckHome();switchDeck(dk);}
 
 function getCards(){return DECKS[currentDeck]||[];}
 function getSystems(){
@@ -2149,42 +2075,6 @@ function buildFilterBar(){
 function buildSidebar(){
   const sb=document.getElementById('sidebar');
   const layout=document.getElementById('app-layout-wrap');
-
-  // Se estiver no shelf, mostra rotações em vez de sistemas
-  const isShelf = SHELF_DECKS.includes(currentDeck) || currentDeck === '_shelf_all' || currentDeck === '_shelf_combined';
-  if(isShelf){
-    sb.style.display='';if(layout)layout.style.justifyContent='';
-    const shelfRotations = [
-      {id:'shelf_em',      label:'Emergency Medicine'},
-      {id:'shelf_surgery', label:'Surgery'},
-    ];
-    // Adiciona outras rotações se existirem no deck
-    const allShelfDecks = (DECKS[currentDeck]||[]).reduce((acc,c)=>{ if(c.deck&&!acc.includes(c.deck)) acc.push(c.deck); return acc; },[]);
-    const rotationOrder = ['shelf_em','shelf_fm','shelf_im','shelf_obgyn','shelf_peds','shelf_psych','shelf_neuro','shelf_surgery'];
-    const availableRotations = rotationOrder.filter(d=>allShelfDecks.includes(d));
-    const rotationLabels = {
-      shelf_em:'Emergency Medicine', shelf_surgery:'Surgery', shelf_fm:'Family Medicine',
-      shelf_im:'Internal Medicine', shelf_obgyn:'OB/GYN', shelf_peds:'Pediatrics',
-      shelf_psych:'Psychiatry', shelf_neuro:'Neurology'
-    };
-    const cards = DECKS[currentDeck] || deck || [];
-    sb.innerHTML=`
-      <button class="sys-btn ${currentDeck==='_shelf_all'||SHELF_DECKS.includes(currentDeck)?'active':''}" 
-        data-sys="all" onclick="selectSystem('all');deck=getCards();againQueue=[];idx=0;revealed=false;showCard();updateHeaderCounts();document.querySelectorAll('[data-deck-filter]').forEach(b=>b.classList.remove('active'));" style="margin-bottom:4px;">
-        All <span class="sys-cnt">${cards.length}</span>
-      </button>
-      <div class="sys-sep"></div>
-      <div style="font-size:9px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--text-faint);padding:6px 8px 4px;">Rotations</div>
-      ${availableRotations.map(deckId=>{
-        const cnt = cards.filter(c=>c.deck===deckId).length;
-        return `<button class="sys-btn" data-deck-filter="${deckId}" onclick="filterShelfByDeck('${deckId}')" >
-          <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1">${rotationLabels[deckId]||deckId}</span>
-          <span class="sys-cnt">${cnt}</span>
-        </button>`;
-      }).join('')}`;
-    return;
-  }
-
   const sysList=getSystems();
   if(sysList.length<5){sb.style.display='none';if(layout)layout.style.justifyContent='center';return;}
   sb.style.display='';if(layout)layout.style.justifyContent='';
@@ -2207,20 +2097,6 @@ function buildSidebar(){
           <span class="sys-cnt">${cnt}</span>
         </button>`).join('')}
     </div>`;
-}
-
-function filterShelfByDeck(deckId){
-  // Filtra cards pelo deck da rotação dentro do shelf
-  document.querySelectorAll('[data-deck-filter]').forEach(b=>b.classList.toggle('active', b.dataset.deckFilter===deckId));
-  document.querySelectorAll('[data-sys]').forEach(b=>b.classList.remove('active'));
-  const allCards = DECKS[currentDeck] || deck || [];
-  const filtered = allCards.filter(c=>c.deck===deckId);
-  deck = filtered;
-  againQueue = [];
-  idx = 0;
-  revealed = false;
-  showCard();
-  updateHeaderCounts();
 }
 
 function toggleSidebar(){
@@ -2277,8 +2153,8 @@ function ensureStudyUI(){
         </div>
       </div>
       <div class="card-body">
-        <div class="card-question hl-zone hl-q" id="c-q">Loading…</div>
-        <div class="options hl-zone hl-q" id="c-opts"></div>
+        <div class="card-question" id="c-q">Loading…</div>
+        <div class="options" id="c-opts"></div>
       </div>
       <div class="explanation" id="c-exp">
         <div class="exp-section">
@@ -2338,9 +2214,6 @@ function shuffleOpts(card){
 // ── RENDER CARD ───────────────────────────────────────────────────────
 function renderCard(){
   revealed=false;
-  // Remove Attending block from previous card
-  const oldAtt = document.getElementById('att-inline-wrap');
-  if(oldAtt) oldAtt.remove();
   // Hide FSRS buttons until answer revealed
   const _fsrs=document.getElementById('fsrs-nav');
   if(_fsrs) _fsrs.classList.remove('visible');
@@ -2371,8 +2244,6 @@ function renderCard(){
       'hy1':'HY Concepts S1','hy':'HY Concepts S2',
       'fa_step1':'Foundations S1','fa_s1':'Clinical Patterns',
       'arrows':'Trends & Arrows','ethics':'HY Ethics',
-      'shelf_surgery':'BoardMD Shelf',
-      'shelf_em':'BoardMD Shelf EM',
     };
     deckLabelEl.textContent=(deckNames[card.deck]||card.deck||'').toUpperCase();
     // Popular deck badge no canto direito
@@ -2386,8 +2257,6 @@ function renderCard(){
         'hy1':'HY S1','hy':'HY S2',
         'fa_step1':'FA S1','fa_s1':'Patterns',
         'arrows':'Arrows','ethics':'Ethics',
-        'shelf_surgery':'Surgery',
-        'shelf_em':'Emergency Med',
       };
       const badgeName = badgeNames[card.deck]||card.deck||'';
       deckBadgeEl.textContent = badgeName;
@@ -2398,8 +2267,6 @@ function renderCard(){
         's1':'rgba(245,158,11,.15)','hy1':'rgba(245,158,11,.15)',
         'hy':'rgba(239,68,68,.15)','ethics':'rgba(239,68,68,.15)',
         'arrows':'rgba(168,85,247,.15)','fa_step1':'rgba(168,85,247,.15)',
-        'shelf_surgery':'rgba(245,115,20,.15)',
-        'shelf_em':'rgba(239,68,68,.15)',
       };
       const badgeTextColors={
         's1_core':'#6366f1','boardmd_s1':'#3b7fff',
@@ -2407,8 +2274,6 @@ function renderCard(){
         's1':'#f59e0b','hy1':'#f59e0b',
         'hy':'#ef4444','ethics':'#ef4444',
         'arrows':'#a855f7','fa_step1':'#a855f7',
-        'shelf_surgery':'#f57314',
-        'shelf_em':'#ef4444',
       };
       deckBadgeEl.style.background = badgeColors[card.deck]||'rgba(59,127,255,.1)';
       deckBadgeEl.style.color = badgeTextColors[card.deck]||'#3b7fff';
@@ -2812,9 +2677,6 @@ function launchBidSession(){
 function revealAnswer(sel,card){
   if(revealed) return;
   revealed=true;
-
-  // Limpa grifos da pergunta ao revelar — mantém só os da explicação
-  clearQHighlights();
   const answeredCorrectly=(sel===card.c);
 
   if(typeof awardCoins === 'function'){
@@ -2848,48 +2710,14 @@ function revealAnswer(sel,card){
     dClean = dClean.replace(/<strong>\s*Distractor(?:\s+Notes)?(?:\s*\([^)]*\))?:?\s*<\/strong>/gi, '');
     dClean = dClean.replace(/^Distractor(?:\s+Notes)?(?:\s*\([^)]*\))?:?\s*/i, '');
     // Formatar cada linha do d como item separado
-    // Tenta quebrar por \n primeiro, depois por padrões de separação
-    let dLines = dClean.split(/\n|<br\s*\/?>/i).filter(l=>l.trim());
-    
-    // Se veio tudo numa linha só, tenta quebrar pelos nomes das opções erradas
-    if(dLines.length === 1 && wrongOpts.length > 1){
-      let temp = dClean;
-      // Insere \n antes de cada nome de opção errada (exceto o primeiro)
-      let first = true;
-      for(const w of wrongOpts){
-        const esc = w.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
-        const pat = new RegExp('('+esc+')', 'i');
-        if(first){
-          first = false;
-          continue;
-        }
-        temp = temp.replace(pat, '\n$1');
-      }
-      const split2 = temp.split('\n').filter(l=>l.trim());
-      if(split2.length > 1) dLines = split2;
-    }
+    const dLines = dClean.split(/\n|<br\s*\/?>/i).filter(l=>l.trim());
     if(dLines.length > 1){
       distHtml = dLines.map(line=>{
         line = line.trim();
-        // Negrito no nome da opção errada — tenta match no início da linha
-        let bolded = false;
+        // Negrito no nome da opção errada
         for(const w of wrongOpts){
           const esc = w.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
-          // Match exato no início
-          if(new RegExp('^'+esc,'i').test(line)){
-            line = line.replace(new RegExp('^'+esc,'i'), '<strong>'+w+'</strong>');
-            bolded = true; break;
-          }
-          // Match parcial — primeiras 2 palavras
-          const words2 = w.split(/\s+/).slice(0,2).join('\\s+');
-          if(words2 && new RegExp('^'+words2,'i').test(line)){
-            const m = line.match(new RegExp('^('+words2+'[^—\\-]*?)([—\\-])', 'i'));
-            if(m){ line = '<strong>'+m[1].trim()+'</strong>'+m[2]+line.slice(m[0].length); bolded = true; break; }
-          }
-        }
-        // Se não encontrou match, tenta negrito no texto antes do primeiro — ou -
-        if(!bolded){
-          line = line.replace(/^([^—\-]{3,40})(—|-)/, '<strong>$1</strong>$2');
+          line = line.replace(new RegExp('^'+esc,'i'), '<strong>'+w+'</strong>');
         }
         return '<div class="dist-item">'+(/<[a-z][^>]*>/i.test(line)?line:mdToHtml(line))+'</div>';
       }).join('');
@@ -2900,14 +2728,16 @@ function revealAnswer(sel,card){
   }
   // CASO 2: d vazio mas e contém distractors misturados
   else if(wrongOpts.length > 0 && eRaw){
-    // Só tenta separar se os distractors aparecem em BOLD no texto
+    // Encontrar onde começam as explicações dos distractors no campo e
+    // Procurar pelo nome de qualquer opção errada em bold
     let splitIdx = -1;
     for(const w of wrongOpts){
       const esc = w.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
-      // APENAS procura com bold — não texto plano (evita falsos positivos)
+      // Procurar <b>Nome</b> ou <strong>Nome</strong> no texto
       const patterns = [
         new RegExp('<b>\\s*'+esc,'i'),
         new RegExp('<strong>\\s*'+esc,'i'),
+        new RegExp('\\b'+esc+'\\b(?!\\s+is\\s+the\\s+correct)','i')
       ];
       for(const pat of patterns){
         const m = eRaw.search(pat);
@@ -2951,14 +2781,9 @@ function revealAnswer(sel,card){
     } else {
       // Não conseguiu separar — explanation pura no e, gerar distractors genéricos
       expHtml = eRaw;
-      distHtml = wrongOpts.map(w=>{
-        const sentences = eRaw.replace(/<[^>]*>/g,'').split(/(?<=[.!?])\s+/);
-        const wWords = w.split(/\s+/).slice(0,2).join('.{0,10}');
-        const pat = new RegExp(wWords, 'i');
-        const match = sentences.find(s => pat.test(s)) || 
-                      sentences.find(s => new RegExp(w.split(/\s+/)[0], 'i').test(s));
-        return '<div class="dist-item"><strong>'+w+'</strong> — '+(match ? match.trim()+'.' : 'See explanation above.')+'</div>';
-      }).join('');
+      distHtml = wrongOpts.map(w=>
+        '<div class="dist-item"><strong>'+w+'</strong> — This option does not fit the clinical presentation described.</div>'
+      ).join('');
     }
   }
 
@@ -3005,7 +2830,6 @@ function revealAnswer(sel,card){
     'hy1':'HY Concepts S1','hy':'HY Concepts S2',
     'fa_step1':'Foundations S1','fa_s1':'Clinical Patterns',
     'arrows':'Trends Arrows','ethics':'HY Ethics',
-    'shelf_surgery':'BoardMD Shelf','shelf_em':'BoardMD Shelf EM',
   };
   const _deckLabel=(_deckNames[card.deck]||'').toLowerCase();
   const _isDeckDuplicate=_deckLabel&&_topicText.toLowerCase().includes(_deckLabel.split(' ')[0]);
@@ -3019,10 +2843,10 @@ function revealAnswer(sel,card){
   }
 
   // Imagem pós-resposta
-  const _iw=document.getElementById('c-img-wrap');
-  const _ie=document.getElementById('c-img');
-  const _ic=document.getElementById('c-img-credit');
-  const _il=document.getElementById('c-img-license');
+  const _iw=document.getElementById('card-img-wrap');
+  const _ie=document.getElementById('card-img-el');
+  const _ic=document.getElementById('card-img-credit');
+  const _il=document.getElementById('card-img-license');
   if(_iw&&_ie){
     if(card.img&&card.img.url){
       _ie.src=card.img.url;
@@ -3251,10 +3075,7 @@ function openSettings(){
 function closeSettings(){document.getElementById('settings-overlay').style.display='none';}
 function parseSteps(str){return str.split(/[\s,]+/).map(Number).filter(n=>n>0&&n<1440)||[10];}
 function saveSettingsModal(){
-  // Garante que currentDeck tem settings inicializados
-  const dk = currentDeck && currentDeck!=='_search' ? currentDeck : (currentStep==='s1'?'s1':'boardmd_s2');
-  if(!deckSettings[dk]) deckSettings[dk]={...DEFAULT_SETTINGS};
-  const c=deckSettings[dk];
+  const c=deckSettings[currentDeck];
   c.newPerDay=Math.max(0,parseInt(document.getElementById('cfg-newPerDay').value)||20);
   c.graduatingInt=Math.max(1,parseInt(document.getElementById('cfg-graduatingInt').value)||1);
   c.easyInt=Math.max(1,parseInt(document.getElementById('cfg-easyInt').value)||4);
@@ -3264,23 +3085,8 @@ function saveSettingsModal(){
   c.requestRetention=Math.min(0.99,Math.max(0.7,parseFloat(document.getElementById('cfg-requestRetention').value)||0.90));
   c.easyBonus=Math.min(3,Math.max(1,parseFloat(document.getElementById('cfg-easyBonus').value)||1.3));
   const hi=document.getElementById('cfg-hardInterval');if(hi) c.hardInterval=Math.min(2,Math.max(1,parseFloat(hi.value)||1.2));
-  // Aplica newPerDay em todos os decks do step atual e reseta newSeen
-  const today=dayStamp();
-  const stepDecksToReset = currentStep==='s1' ? STEP1_DECKS : STEP2_DECKS;
-  stepDecksToReset.forEach(d=>{
-    if(!deckSettings[d]) deckSettings[d]={...DEFAULT_SETTINGS};
-    deckSettings[d].newPerDay = c.newPerDay;
-    deckSettings[d].graduatingInt = c.graduatingInt;
-    deckSettings[d].easyInt = c.easyInt;
-    deckSettings[d].maxInterval = c.maxInterval;
-    deckSettings[d].requestRetention = c.requestRetention;
-    if(!todayData[d]) todayData[d]={date:today,newSeen:0};
-    todayData[d].newSeen=0;
-  });
-  saveTodayData();
-  saveSettings();
-  closeSettings();
-  showDeckHome();
+  saveSettings();closeSettings();
+  selectSystem(currentSystem);
 }
 
 // ── QID FILTER ────────────────────────────────────────────────────────
@@ -3306,25 +3112,25 @@ function searchQids(){
   if(statusEl) statusEl.textContent='Searching…';
 
   // Search all decks — match both numeric and string qid fields
-  const searchDecks=['s1_core','boardmd_s1','boardmd_s2','core','s1','s2','hy1','fa_s1','arrows','ethics','fa_step1','shelf_surgery','shelf_em'];
+  const searchDecks=['s1_core','boardmd_s1','boardmd_s2','core','s1','s2','hy','hy1','fa_s1','arrows','ethics','fa_step1'];
   const found=[],missing=[];
 
   qids.forEach(qid=>{
-    // Collect ALL cards with this QID across ALL decks
-    let matches=[];
+    let match=null;
     for(const dk of searchDecks){
       const cards=DECKS[dk]||[];
-      const hits=cards.filter(c=>
+      // Match numeric qid or string qid
+      match=cards.find(c=>
         String(c.qid)===qid ||
         c.qid===parseInt(qid)
       );
-      matches=matches.concat(hits);
+      if(match) break;
     }
-    if(matches.length) found.push({qid,cards:matches});
+    if(match) found.push({qid,card:match});
     else missing.push(qid);
   });
 
-  qidSessionCards=found.flatMap(f=>f.cards);
+  qidSessionCards=found.map(f=>f.card);
 
   // Update UI
   const wrap=document.getElementById('qid-results-wrap');
@@ -3334,18 +3140,16 @@ function searchQids(){
   const launchBtn=document.getElementById('qid-launch-btn');
 
   if(wrap) wrap.style.display='';
-  if(foundCount) foundCount.textContent=qidSessionCards.length;
+  if(foundCount) foundCount.textContent=found.length;
   if(missCount) missCount.textContent=missing.length>0?missing.length+' not found':'';
 
   if(resList){
     resList.innerHTML='';
-    found.forEach(({qid,cards})=>{
-      cards.forEach(card=>{
-        const row=document.createElement('div');
-        row.className='qid-result-row qid-result-found';
-        row.innerHTML=`<span class="qid-result-label">QID ${qid}</span><span class="qid-result-topic">${card.topic||card.system||'—'} <span style="opacity:.6;font-size:10px">[${card.deck}]</span></span><span style="color:var(--emerald)">✓</span>`;
-        resList.appendChild(row);
-      });
+    found.forEach(({qid,card})=>{
+      const row=document.createElement('div');
+      row.className='qid-result-row qid-result-found';
+      row.innerHTML=`<span class="qid-result-label">QID ${qid}</span><span class="qid-result-topic">${card.topic||card.system||'—'}</span><span style="color:var(--emerald)">✓</span>`;
+      resList.appendChild(row);
     });
     missing.forEach(qid=>{
       const row=document.createElement('div');
@@ -3355,10 +3159,10 @@ function searchQids(){
     });
   }
 
-  if(launchBtn) launchBtn.disabled=qidSessionCards.length===0;
+  if(launchBtn) launchBtn.disabled=found.length===0;
   if(statusEl){
-    if(qidSessionCards.length===0) statusEl.textContent='No cards found — check your QIDs';
-    else statusEl.textContent=qidSessionCards.length+' card'+(qidSessionCards.length!==1?'s':'')+' found across '+found.length+' QID'+(found.length!==1?'s':'');
+    if(found.length===0) statusEl.textContent='No cards found — check your QIDs';
+    else statusEl.textContent=found.length+' of '+qids.length+' card'+(found.length!==1?'s':'')+' found';
   }
 }
 function launchQidSession(){
@@ -3555,9 +3359,9 @@ applyFont();
         <div class="qid-modal-title">QID Filter</div>
         <div class="qid-modal-sub">Paste question IDs from your qbank test results, wrong answers list,<br>or any QID source. One per line or comma-separated.</div>
       </div>
-      <button class="qid-close" onclick="closeQidFilter()">&#x2715;</button>
+      <button class="qid-close" onclick="closeQidFilter()"></button>
     </div>
-    <textarea class="qid-textarea" id="qid-textarea" placeholder="e.g. 19068&#10;19241, 19395&#10;3054&#10;&#10;Paste any mix of QIDs — we'll find matching cards" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();searchQids();}"></textarea>
+    <textarea class="qid-textarea" id="qid-textarea" placeholder="e.g. 19068&#10;19241, 19395&#10;3054&#10;&#10;Paste any mix of QIDs — we'll find matching cards" onkeydown="if((e.ctrlKey||e.metaKey)&&e.key==='Enter'){e.preventDefault();searchQids();}"></textarea>
     <div class="qid-actions">
       <button class="qid-btn-search" onclick="searchQids()">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-1px;margin-right:5px"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>Find Cards
@@ -4399,8 +4203,8 @@ function _syncFC(nw,lrn,du,st){
   else if(st===2)d.classList.add('cfc-active');
 }
 
-var _sR=[],_sD='all',_s1=['boardmd_s1','s1_core','s1','s1core','fa_s1','arrows','hy1','ethics'],_s2=['boardmd_s2','s2','core','hy'],_shelf=['shelf_surgery','shelf_em'];
-var _dkL={boardmd_s1:'BoardMD Step 1',boardmd_s2:'BoardMD Step 2 CK',s1:'Step 1 · Rapid',s2:'Step 2 CK · Rapid',core:'Step 2 CK · Core',s1core:'Step 1 · Core',hy:'Step 2 CK · HY',hy1:'Step 1 · HY',fa_s1:'Clinical Patterns',ethics:'Ethics',arrows:'Arrows',shelf_surgery:'Surgery Shelf',shelf_em:'EM Shelf'};
+var _sR=[],_sD='all',_s1=['boardmd_s1','s1_core','s1','s1core','fa_s1','arrows','hy1','ethics'],_s2=['boardmd_s2','s2','core','hy'];
+var _dkL={boardmd_s1:'BoardMD Step 1',boardmd_s2:'BoardMD Step 2 CK',s1:'Step 1 · Rapid',s2:'Step 2 CK · Rapid',core:'Step 2 CK · Core',s1core:'Step 1 · Core',hy:'Step 2 CK · HY',hy1:'Step 1 · HY',fa_s1:'Clinical Patterns',ethics:'Ethics',arrows:'Arrows'};
 function openCardSearch(){document.getElementById('search-overlay').style.display='flex';setTimeout(function(){document.getElementById('search-input').focus();},80);document.getElementById('search-open-btn').classList.add('active');}
 function closeCardSearch(){document.getElementById('search-overlay').style.display='none';document.getElementById('search-open-btn').classList.remove('active');}
 function toggleSChip(b){document.querySelectorAll('.search-chip').forEach(function(x){x.classList.remove('active');});b.classList.add('active');_sD=b.dataset.deck;runCardSearch();}
@@ -4409,8 +4213,8 @@ function runCardSearch(){
   var re=document.getElementById('search-results'),ac=document.getElementById('search-actions');
   if(q.length<2){re.innerHTML='<div style="text-align:center;color:var(--text-faint);font-size:13px;padding:32px 0">Start typing…</div>';ac.style.display='none';_sR=[];return;}
   var terms=q.split(' ').filter(function(t){return t.length>1;});_sR=[];
-  ['boardmd_s1','boardmd_s2','s1','s2','core','s1core','hy','hy1','fa_s1','ethics','arrows','shelf_surgery'].forEach(function(dk){
-    if(_sD==='step1'&&_s1.indexOf(dk)<0)return;if(_sD==='step2'&&_s2.indexOf(dk)<0)return;if(_sD==='shelf'&&_shelf.indexOf(dk)<0)return;
+  ['boardmd_s1','boardmd_s2','s1','s2','core','s1core','hy','hy1','fa_s1','ethics','arrows'].forEach(function(dk){
+    if(_sD==='step1'&&_s1.indexOf(dk)<0)return;if(_sD==='step2'&&_s2.indexOf(dk)<0)return;
     if(_sD!=='all'&&_sD!=='step1'&&_sD!=='step2'&&_sD!==dk)return;
     (DECKS[dk]||[]).forEach(function(card){
       var h=[card.q||'',card.c||'',(card.w||[]).join(' '),card.system||'',card.topic||'',card.d||''].join(' ').toLowerCase();
@@ -4462,7 +4266,7 @@ function studySearchResults(){
   </div>
 </div>
 
-<div id="search-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:2000;align-items:center;justify-content:center;backdrop-filter:blur(6px)" onclick="if(event.target===this)closeCardSearch()"><div style="background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:28px;width:min(580px,95vw);max-height:88vh;overflow-y:auto;display:flex;flex-direction:column;gap:16px"><div style="display:flex;justify-content:space-between;align-items:flex-start"><div><div style="font-family:'Instrument Serif',serif;font-size:22px;color:var(--text)">Search Cards</div><div style="font-size:12px;color:var(--text-dim);margin-top:4px">Search by topic, keyword or system · Filter by Step 1 or Step 2 CK</div></div><button class="qid-close" onclick="closeCardSearch()">&#x2715;</button></div><input id="search-input" type="text" placeholder="e.g. aortic stenosis, iron deficiency…" oninput="runCardSearch()" onkeydown="if(event.key==='Enter'){var btn=document.getElementById('search-study-btn');if(btn&&!btn.disabled)studySearchResults();}" autocomplete="off" style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:11px 14px;color:var(--text);font-size:14px;font-family:'Lato',sans-serif;outline:none;width:100%"><div style="display:flex;gap:6px;flex-wrap:wrap"><button class="search-chip active" data-deck="all" onclick="toggleSChip(this)">All Decks</button><button class="search-chip" data-deck="step1" onclick="toggleSChip(this)">Step 1</button><button class="search-chip" data-deck="step2" onclick="toggleSChip(this)">Step 2 CK</button><button class="search-chip" data-deck="boardmd_s1" onclick="toggleSChip(this)">BoardMD S1</button><button class="search-chip" data-deck="boardmd_s2" onclick="toggleSChip(this)">BoardMD S2</button><button class="search-chip" data-deck="s1" onclick="toggleSChip(this)">Rapid S1</button><button class="search-chip" data-deck="fa_s1" onclick="toggleSChip(this)">Clinical Patterns</button><button class="search-chip" data-deck="arrows" onclick="toggleSChip(this)">Arrows</button><button class="search-chip" data-deck="s2" onclick="toggleSChip(this)">Rapid S2</button><button class="search-chip" data-deck="core" onclick="toggleSChip(this)">Core S2</button><button class="search-chip" data-deck="hy1" onclick="toggleSChip(this)">HY S1</button><button class="search-chip" data-deck="ethics" onclick="toggleSChip(this)">Ethics</button><button class="search-chip" data-deck="shelf_surgery" onclick="toggleSChip(this)">Surgery Shelf</button></div><div id="search-results"><div style="text-align:center;color:var(--text-faint);font-size:13px;padding:32px 0">Start typing to search…</div></div><div id="search-actions" style="display:none;gap:10px;align-items:center;padding-top:8px;border-top:1px solid var(--border)"><button id="search-study-btn" onclick="studySearchResults()" style="background:var(--accent);color:#fff;border:none;border-radius:9px;padding:11px 22px;font-family:'Lato',sans-serif;font-size:13px;font-weight:700;cursor:pointer">Study matched cards</button><span id="search-count-label" style="font-size:12px;color:var(--text-dim)"></span></div></div></div>
+<div id="search-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:2000;align-items:center;justify-content:center;backdrop-filter:blur(6px)" onclick="if(event.target===this)closeCardSearch()"><div style="background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:28px;width:min(580px,95vw);max-height:88vh;overflow-y:auto;display:flex;flex-direction:column;gap:16px"><div style="display:flex;justify-content:space-between;align-items:flex-start"><div><div style="font-family:'Instrument Serif',serif;font-size:22px;color:var(--text)">Search Cards</div><div style="font-size:12px;color:var(--text-dim);margin-top:4px">Search by topic, keyword or system · Filter by Step 1 or Step 2 CK</div></div><button class="qid-close" onclick="closeCardSearch()">&#x2715;</button></div><input id="search-input" type="text" placeholder="e.g. aortic stenosis, iron deficiency…" oninput="runCardSearch()" autocomplete="off" style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:11px 14px;color:var(--text);font-size:14px;font-family:'Lato',sans-serif;outline:none;width:100%"><div style="display:flex;gap:6px;flex-wrap:wrap"><button class="search-chip active" data-deck="all" onclick="toggleSChip(this)">All Decks</button><button class="search-chip" data-deck="step1" onclick="toggleSChip(this)">Step 1</button><button class="search-chip" data-deck="step2" onclick="toggleSChip(this)">Step 2 CK</button><button class="search-chip" data-deck="boardmd_s1" onclick="toggleSChip(this)">BoardMD S1</button><button class="search-chip" data-deck="boardmd_s2" onclick="toggleSChip(this)">BoardMD S2</button><button class="search-chip" data-deck="s1" onclick="toggleSChip(this)">Rapid S1</button><button class="search-chip" data-deck="fa_s1" onclick="toggleSChip(this)">Clinical Patterns</button><button class="search-chip" data-deck="arrows" onclick="toggleSChip(this)">Arrows</button><button class="search-chip" data-deck="s2" onclick="toggleSChip(this)">Rapid S2</button><button class="search-chip" data-deck="core" onclick="toggleSChip(this)">Core S2</button><button class="search-chip" data-deck="hy" onclick="toggleSChip(this)">HY S2</button><button class="search-chip" data-deck="hy1" onclick="toggleSChip(this)">HY S1</button><button class="search-chip" data-deck="ethics" onclick="toggleSChip(this)">Ethics</button></div><div id="search-results"><div style="text-align:center;color:var(--text-faint);font-size:13px;padding:32px 0">Start typing to search…</div></div><div id="search-actions" style="display:none;gap:10px;align-items:center;padding-top:8px;border-top:1px solid var(--border)"><button id="search-study-btn" onclick="studySearchResults()" style="background:var(--accent);color:#fff;border:none;border-radius:9px;padding:11px 22px;font-family:'Lato',sans-serif;font-size:13px;font-weight:700;cursor:pointer">Study matched cards</button><span id="search-count-label" style="font-size:12px;color:var(--text-dim)"></span></div></div></div>
   <footer style="
     text-align:center;
     padding:24px 20px;
@@ -4517,9 +4321,9 @@ function studySearchResults(){
         <div class="qid-modal-title" style="color:#8b5cf6;">BID Filter</div>
         <div class="qid-modal-sub">Enter BoardMD Card IDs to study specific cards.<br>Find the BID number on any BoardMD S1 or S2 card (top right, purple).</div>
       </div>
-      <button class="qid-close" onclick="closeBidFilter()">&#x2715;</button>
+      <button class="qid-close" onclick="closeBidFilter()"></button>
     </div>
-    <textarea class="qid-textarea" id="bid-textarea" placeholder="e.g. 1234&#10;5678, 9012&#10;&#10;Paste any BID numbers — one per line or comma-separated" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();searchBids();}"></textarea>
+    <textarea class="qid-textarea" id="bid-textarea" placeholder="e.g. 1234&#10;5678, 9012&#10;&#10;Paste any BID numbers — one per line or comma-separated" onkeydown="if((e.ctrlKey||e.metaKey)&&e.key==='Enter'){e.preventDefault();searchBids();}"></textarea>
     <div class="qid-actions">
       <button class="qid-btn-search" onclick="searchBids()" style="background:#8b5cf6;">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-1px;margin-right:5px"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>Find Cards
@@ -4575,8 +4379,6 @@ function studySearchResults(){
       <div>
         <label style="font-size:10px;font-weight:700;letter-spacing:.08em;color:var(--text-faint);font-family:'JetBrains Mono',monospace;text-transform:uppercase;display:block;margin-bottom:6px">Explanation</label>
         <textarea id="editor-exp" style="width:100%;min-height:110px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:'Lato',sans-serif;font-size:13px;padding:12px;resize:vertical;line-height:1.6;transition:border-color .15s;outline:none" onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border)'"></textarea>
-        <label style="font-size:10px;font-weight:700;letter-spacing:.08em;color:var(--text-faint);font-family:'JetBrains Mono',monospace;text-transform:uppercase;display:block;margin-top:12px;margin-bottom:6px">Why the Others Are Wrong</label>
-        <textarea id="editor-dist" placeholder="Distractor explanations (one per line: OptionText — reason)" style="width:100%;min-height:90px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:'Lato',sans-serif;font-size:13px;padding:12px;resize:vertical;line-height:1.6;transition:border-color .15s;outline:none" onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border)'"></textarea>
       </div>
 
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
@@ -4592,7 +4394,6 @@ function studySearchResults(){
     </div>
 
     <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding-top:8px;border-top:1px solid var(--border)">
-      <div id="editor-img-section" style="width:100%;margin-bottom:12px;padding:12px;background:var(--surface2);border-radius:10px;border:1px solid var(--border)"><div style="font-size:10px;font-weight:700;letter-spacing:.08em;color:var(--text-faint);font-family:JetBrains Mono,monospace;text-transform:uppercase;margin-bottom:8px">Image</div><div id="editor-img-current" style="display:none;align-items:center;gap:12px;margin-bottom:10px"><img id="editor-img-preview" src="" style="width:80px;height:60px;object-fit:cover;border-radius:6px;border:1px solid var(--border)"><button onclick="removeCardImage()" style="background:rgba(244,63,94,.1);border:1px solid rgba(244,63,94,.3);color:var(--rose);padding:7px 14px;border-radius:7px;cursor:pointer;font-size:12px;font-weight:700;font-family:Lato,sans-serif">Remove image</button></div><div style="font-size:10px;color:var(--text-faint);margin-bottom:6px;font-family:JetBrains Mono,monospace">New image URL (Wikimedia CC BY-SA)</div><div style="display:flex;gap:8px"><input id="editor-img-url" type="text" placeholder="https://upload.wikimedia.org/..." style="flex:1;background:var(--surface);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:Lato,sans-serif;font-size:12px;padding:7px 10px;outline:none"><button onclick="setCardImage()" style="background:rgba(59,127,255,.1);border:1px solid rgba(59,127,255,.3);color:var(--accent);padding:7px 14px;border-radius:7px;cursor:pointer;font-size:12px;font-weight:700;font-family:Lato,sans-serif">Set</button></div></div>
       <button onclick="saveCardEdit()" style="background:var(--accent);color:#fff;border:none;border-radius:9px;padding:11px 26px;font-family:'Lato',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:all .15s" onmouseover="this.style.background='#5a8fff'" onmouseout="this.style.background='var(--accent)'">Save Changes</button>
       <button onclick="resetCardEdit()" style="background:none;color:var(--rose);border:1px solid rgba(244,63,94,.3);border-radius:9px;padding:11px 18px;font-family:'Lato',sans-serif;font-size:13px;cursor:pointer;transition:all .15s" onmouseover="this.style.background='rgba(244,63,94,.08)'" onmouseout="this.style.background='none'">Reset</button>
       <button onclick="closeCardEditor();showEditsManager()" style="background:none;color:var(--text-faint);border:1px solid var(--border);border-radius:9px;padding:11px 18px;font-family:'Lato',sans-serif;font-size:13px;cursor:pointer;transition:all .15s;margin-left:auto" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text-faint)'">My Edits →</button>
@@ -4626,8 +4427,7 @@ function openCardEditor(){
 
   document.getElementById('editor-card-id').textContent = 'ID: ' + card.id + (card.qid ? '  ·  QID ' + card.qid : '');
   document.getElementById('editor-q').value = c.q || '';
-  document.getElementById('editor-exp').value = c.e || '';
-  document.getElementById('editor-dist').value = c.d || '';
+  document.getElementById('editor-exp').value = c.d || '';
   document.getElementById('editor-system').value = c.system || '';
   document.getElementById('editor-topic').value = c.topic || '';
 
@@ -4649,15 +4449,6 @@ function openCardEditor(){
 
   const overlay = document.getElementById('card-editor-overlay');
   overlay.style.display = 'flex';
-  const imgSection = document.getElementById('editor-img-section');
-  if(imgSection){
-    imgSection.style.display = 'block';
-    const hasImg = card.img && card.img.url;
-    const currentDiv = document.getElementById('editor-img-current');
-    const imgEl = document.getElementById('editor-img-preview');
-    if(hasImg){ if(imgEl) imgEl.src = card.img.url; if(currentDiv) currentDiv.style.display='flex'; }
-    else { if(currentDiv) currentDiv.style.display='none'; }
-  }
   document.getElementById('editor-saved-msg').style.opacity = '0';
 }
 
@@ -4673,7 +4464,6 @@ function saveCardEdit(){
 
   const newQ = document.getElementById('editor-q').value.trim();
   const newExp = document.getElementById('editor-exp').value.trim();
-  const newDist = document.getElementById('editor-dist').value.trim();
   const newSystem = document.getElementById('editor-system').value.trim();
   const newTopic = document.getElementById('editor-topic').value.trim();
 
@@ -4692,7 +4482,7 @@ function saveCardEdit(){
     q: newQ || card.q,
     c: correctText || card.c,
     w: wrongTexts.length ? wrongTexts : card.w,
-    d: newDist || card.d,
+    d: newExp || card.d,
     system: newSystem || card.system,
     topic: newTopic || card.topic,
     _edited: true,
@@ -4704,81 +4494,12 @@ function saveCardEdit(){
   // Aplicar ao card em memória imediatamente
   Object.assign(card, edits[card.id]);
 
-  // Salvar direto no Supabase
-  const supaUpdate = {
-    q: edits[card.id].q,
-    c: edits[card.id].c,
-    w: edits[card.id].w,
-    e: edits[card.id].d,
-    system: edits[card.id].system,
-    d: edits[card.id].d,
-    topic: edits[card.id].topic
-  };
-  fetch(SUPA_URL + '/rest/v1/cards?id=eq.' + card.id, {
-    method: 'PATCH',
-    headers: {
-      'apikey': SUPA_KEY,
-      'Authorization': 'Bearer ' + SUPA_KEY,
-      'Content-Type': 'application/json',
-      'Prefer': 'return=minimal'
-    },
-    body: JSON.stringify(supaUpdate)
-  }).then(r => {
-    if(r.ok){
-      console.log('Supabase updated:', card.id);
-      // Invalida cache IndexedDB para este card
-      try{
-        const req = indexedDB.open('boardmd_cache');
-        req.onsuccess = e => {
-          const db = e.target.result;
-          if(db.objectStoreNames.contains('cards')){
-            const tx = db.transaction('cards','readwrite');
-            tx.objectStore('cards').delete(card.id);
-          }
-        };
-      }catch(ex){}
-    }
-    else r.text().then(t => console.error('Supabase error:', t));
-  }).catch(e => console.error('Supabase fetch error:', e));
-
   // Feedback visual
   const msg = document.getElementById('editor-saved-msg');
   msg.style.opacity = '1';
   setTimeout(()=>{ msg.style.opacity='0'; closeCardEditor(); renderCard(); }, 1200);
 }
 
-async function setCardImage(){
-  if(!_editingCard) return;
-  const url = (document.getElementById('editor-img-url').value||'').trim();
-  if(!url){ alert('Paste an image URL first.'); return; }
-  const imgObj = {url:url, alt:_editingCard.c||'', credit:'Manual', license:'CC BY-SA', source:'Manual'};
-  const r = await fetch(SUPA_URL+'/rest/v1/cards?id=eq.'+_editingCard.id, {
-    method:'PATCH',
-    headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/json','Prefer':'return=minimal'},
-    body:JSON.stringify({img:imgObj})
-  });
-  if(r.ok){
-    _editingCard.img=imgObj;
-    document.getElementById('editor-img-preview').src=url;
-    document.getElementById('editor-img-current').style.display='flex';
-    document.getElementById('editor-img-url').value='';
-    renderCard();
-  }
-}
-async function removeCardImage(){
-  if(!_editingCard) return;
-  if(!confirm('Remove image from this card?')) return;
-  const r = await fetch(SUPA_URL+'/rest/v1/cards?id=eq.'+_editingCard.id, {
-    method:'PATCH',
-    headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/json','Prefer':'return=minimal'},
-    body:JSON.stringify({img:null})
-  });
-  if(r.ok){
-    _editingCard.img=null;
-    document.getElementById('editor-img-current').style.display='none';
-    renderCard();
-  }
-}
 function resetCardEdit(){
   if(!_editingCard) return;
   if(!confirm('Reset this card to its original content? Your edits will be lost.')) return;
@@ -4909,9 +4630,6 @@ window.renderCard = function(){
     const qEl = document.getElementById('c-q');
     if(qEl) qEl.textContent = card.q;
   }
-  // Restaura highlights salvos para este card
-  window._currentHlCardId = card.id;
-  setTimeout(() => applyHighlightsToCard(card.id), 50);
 };
 </script>
 <style>
@@ -5334,21 +5052,21 @@ function showAppAuthMenu(){
 <!-- BOARDMD ATTENDING — inline inside each card -->
 <style>
 /* ── BOARDMD ATTENDING inline ── */
-.att-inline{margin:0 0 20px;border:1.5px solid var(--border);border-radius:var(--radius);overflow:hidden;background:var(--surface);}
-html.light .att-inline{background:var(--surface);border-color:var(--border);}
-.att-inline-header{display:flex;align-items:center;justify-content:space-between;padding:12px 16px 10px;border-bottom:1px solid var(--border);}
-.att-inline-left{display:flex;align-items:center;gap:8px;}
-.att-inline-badge{width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,#6366f1,#8b5cf6);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
-.att-inline-badge svg{width:14px;height:14px;stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
-.att-inline-title{font-size:13px;font-weight:700;color:#8b5cf6;font-family:'Inter',sans-serif;letter-spacing:.02em;}
-.att-inline-btns{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:12px 14px;}
-.att-ibtn{background:var(--surface2);border:1px solid var(--border);border-radius:9px;padding:10px 6px;cursor:pointer;text-align:center;transition:all .15s;display:flex;flex-direction:column;align-items:center;gap:3px;font-family:'Inter',sans-serif;}
+.att-inline{margin:0 18px 20px;border:1px solid rgba(139,92,246,.2);border-radius:12px;overflow:hidden;background:rgba(99,102,241,.03);}
+html.light .att-inline{background:rgba(99,102,241,.04);border-color:rgba(139,92,246,.18);}
+.att-inline-header{display:flex;align-items:center;justify-content:space-between;padding:10px 14px 8px;border-bottom:1px solid rgba(139,92,246,.12);}
+.att-inline-left{display:flex;align-items:center;gap:7px;}
+.att-inline-badge{width:24px;height:24px;border-radius:6px;background:linear-gradient(135deg,#6366f1,#8b5cf6);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.att-inline-badge svg{width:12px;height:12px;stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+.att-inline-title{font-size:11px;font-weight:700;color:#8b5cf6;font-family:'Inter',sans-serif;letter-spacing:.03em;}
+.att-inline-btns{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;padding:8px 10px;}
+.att-ibtn{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:8px 4px;cursor:pointer;text-align:center;transition:all .15s;display:flex;flex-direction:column;align-items:center;gap:3px;font-family:'Inter',sans-serif;}
 .att-ibtn:hover{border-color:rgba(139,92,246,.5);background:rgba(99,102,241,.07);transform:translateY(-1px);}
 .att-ibtn:disabled{opacity:.38;cursor:not-allowed;transform:none;}
-.att-ibtn-emoji{display:none;}
-.att-ibtn-label{font-size:11px;font-weight:700;color:var(--text-dim);line-height:1.2;}
+.att-ibtn-emoji{font-size:15px;line-height:1;}
+.att-ibtn-label{font-size:9px;font-weight:700;color:var(--text-dim);line-height:1.2;}
 html.light .att-ibtn{background:var(--surface2);}
-.att-inline-response{padding:0 14px 14px;display:none;}
+.att-inline-response{padding:0 12px 12px;display:none;}
 .att-inline-response.visible{display:block;}
 .att-thinking{display:flex;align-items:center;gap:8px;padding:10px 2px;color:var(--text-faint);font-size:13px;font-family:'Inter',sans-serif;}
 .att-thinking-dots{display:flex;gap:3px;}
@@ -5368,7 +5086,7 @@ html.light .att-ibtn{background:var(--surface2);}
 
 <script>
 // ── BOARDMD ATTENDING — inline no card ────────────────────────────────
-const ATT_FREE_LIMIT = 9999; // Beta — unlimited
+const ATT_FREE_LIMIT = 3;
 const ATT_USES_KEY   = 'bmd_att_uses_v1';
 
 function getAttUses(){
@@ -5393,13 +5111,12 @@ function injectAttendingInline(card, sel){
   const dis = blocked ? 'disabled' : '';
 
   const usageLine = isPro
-    ? '<span style="font-size:10px;font-family:Inter,sans-serif;color:var(--emerald);">Beta — unlimited</span>'
-    : '<span style="font-size:10px;font-family:Inter,sans-serif;color:'+(left>0?'var(--text-faint)':'var(--rose)')+';">'+left+'/'+ATT_FREE_LIMIT+' free today</span>';
+    ? '<span style="font-size:10px;font-family:'JetBrains Mono',monospace;color:var(--emerald);">✓ Pro — unlimited</span>'
+    : `<span style="font-size:10px;font-family:'JetBrains Mono',monospace;color:${left>0?'var(--text-faint)':'var(--rose)'};">${left}/${ATT_FREE_LIMIT} free today</span>`;
 
   const wrap = document.createElement('div');
   wrap.id = 'att-inline-wrap';
   wrap.className = 'att-inline';
-  wrap.style.width = '100%';
   wrap.innerHTML = `
     <div class="att-inline-header">
       <div class="att-inline-left">
@@ -5408,42 +5125,32 @@ function injectAttendingInline(card, sel){
         </div>
         <span class="att-inline-title">BoardMD Attending</span>
       </div>
-      <span style="font-size:10px;font-family:Inter,sans-serif;color:var(--text-faint);">Free</span>
+      ${usageLine}
     </div>
     <div class="att-inline-btns">
       <button class="att-ibtn" ${dis} onclick="askAttendingInline('why',this)">
-        <span class="att-ibtn-label">Why this answer?</span>
+        <span class="att-ibtn-emoji">🤔</span>
+        <span class="att-ibtn-label">Why my answer?</span>
       </button>
       <button class="att-ibtn" ${dis} onclick="askAttendingInline('explain',this)">
+        <span class="att-ibtn-emoji">📖</span>
         <span class="att-ibtn-label">Explain better</span>
       </button>
       <button class="att-ibtn" ${dis} onclick="askAttendingInline('mcq',this)">
+        <span class="att-ibtn-emoji">📝</span>
         <span class="att-ibtn-label">More MCQs</span>
       </button>
       <button class="att-ibtn" ${dis} onclick="askAttendingInline('surprise',this)">
+        <span class="att-ibtn-emoji">⭐</span>
         <span class="att-ibtn-label">Surprise me</span>
       </button>
     </div>
-    <div style="display:flex;gap:8px;padding:0 14px 12px;align-items:center;position:relative;">
-      <input id="att-ask-input" type="text" placeholder="Ask anything about this topic…" style="flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:9px;color:var(--text);font-family:'Inter',sans-serif;font-size:13px;padding:9px 32px 9px 12px;outline:none;transition:border-color .15s;" onfocus="this.style.borderColor='rgba(139,92,246,.5)'" onblur="this.style.borderColor='var(--border)'" onkeydown="if(event.key==='Enter'){event.preventDefault();askAttendingInline('custom',null);}else if(event.key==='Escape'){this.value='';}" oninput="document.getElementById('att-ask-clear').style.display=this.value?'flex':'none'">
-      <button id="att-ask-clear" onclick="document.getElementById('att-ask-input').value='';this.style.display='none';document.getElementById('att-ask-input').focus();" style="display:none;position:absolute;right:80px;background:none;border:none;color:var(--text-faint);cursor:pointer;font-size:14px;padding:4px;line-height:1;">&#x2715;</button>
-      <button ${dis} onclick="askAttendingInline('custom',null)" style="background:rgba(99,102,241,.12);border:1px solid rgba(139,92,246,.3);border-radius:9px;color:#8b5cf6;font-family:'Inter',sans-serif;font-size:12px;font-weight:700;padding:9px 16px;cursor:pointer;white-space:nowrap;transition:all .15s;flex-shrink:0;" onmouseover="this.style.background='rgba(99,102,241,.22)'" onmouseout="this.style.background='rgba(99,102,241,.12)'">Ask</button>
-    </div>
-    <div style="padding:0 14px 10px;font-size:11px;color:var(--text-faint);font-family:'Inter',sans-serif;line-height:1.4;">For educational purposes only. Not medical advice.</div>
     <div class="att-inline-response" id="att-inline-response"></div>`;
 
-  // Insere no study-inner, entre o card e os botões FSRS
-  const studyInner = document.getElementById('study-inner');
-  if(studyInner){
-    // Procura o plain-nav ou fsrs-nav como referência
-    const plainNav = studyInner.querySelector('#plain-nav');
-    const fsrsNav  = studyInner.querySelector('#fsrs-nav');
-    const ref = plainNav || fsrsNav;
-    if(ref){
-      studyInner.insertBefore(wrap, ref);
-    } else {
-      studyInner.appendChild(wrap);
-    }
+  // Insere antes dos botões FSRS
+  const fsrsNav = document.getElementById('fsrs-nav');
+  if(fsrsNav && fsrsNav.parentNode){
+    fsrsNav.parentNode.insertBefore(wrap, fsrsNav);
   }
 
   // Guarda contexto do card
@@ -5461,7 +5168,6 @@ async function askAttendingInline(type, btnEl){
 
   const isPro = !!window._supaUser;
   const uses   = getAttUses();
-  // Translate is always free
   if(!isPro && uses.count >= ATT_FREE_LIMIT){
     showToast('Daily limit reached — sign in for Pro access.');
     return;
@@ -5502,18 +5208,15 @@ TOPIC: ${card.topic||''} | SYSTEM: ${card.system||''}
 EXPLANATION: ${(card.e||'').replace(/<[^>]+>/g,' ').slice(0,300)}`;
 
   const prompts = {
-    why: `You are a brilliant, warm attending physician. The student just answered this USMLE board question:\n\n${ctx}\n\nIn 2-3 paragraphs: acknowledge right/wrong (one sentence). Explain WHY this is the correct answer using core pathophysiology. Be direct, clinical — like a great attending, not a textbook. End with one punchy clinical pearl.`,
+    why: `You are a brilliant, warm attending physician. The student just answered this USMLE board question:\n\n${ctx}\n\nIn 2-3 paragraphs: acknowledge right/wrong (one sentence). Explain WHY using core pathophysiology. Be direct, clinical — like a great attending, not a textbook. End with one punchy clinical pearl.`,
     explain: `You are a brilliant attending. The student wants deeper understanding:\n\n${ctx}\n\nTeach this concept at the whiteboard. One vivid analogy. Cover: pathophysiology, clinical clues, board trap. 3 paragraphs max.`,
-    mcq: `You are a brilliant USMLE question writer. Based on this topic:\n\n${ctx}\n\nWrite 3 new USMLE-style MCQs on the SAME concept. Return ONLY valid JSON, no markdown, no extra text:\n{"questions":[{"stem":"[clinical vignette]","options":["A. text","B. text","C. text","D. text"],"correct":"A","explanation":"[2-3 sentences why A is correct]","distractors":{"B":"[why B is wrong]","C":"[why C is wrong]","D":"[why D is wrong]"},"keypoint":"[one punchy ≤15 word board pearl]"},{"stem":"[vignette]","options":["A. text","B. text","C. text","D. text"],"correct":"B","explanation":"[2-3 sentences]","distractors":{"A":"[why wrong]","C":"[why wrong]","D":"[why wrong]"},"keypoint":"[≤15 word pearl]"},{"stem":"[vignette]","options":["A. text","B. text","C. text","D. text"],"correct":"C","explanation":"[2-3 sentences]","distractors":{"A":"[why wrong]","B":"[why wrong]","D":"[why wrong]"},"keypoint":"[≤15 word pearl]"}]}`,
+    mcq: `You are a brilliant attending and board question writer:\n\n${ctx}\n\nWrite 2 new USMLE-style MCQs on the SAME concept. Format:\n**Q1:** [vignette]\nA. B. C. D.\n**Answer: X — [explanation]**\n\n**Q2:** [vignette]\nA. B. C. D.\n**Answer: X — [explanation]**`,
     surprise: `You are a brilliant attending. Give ONE unforgettable clinical pearl about:\n\n${ctx}\n\nSomething NOT in the explanation — a real-world connection, classic trick, or board trap. 2 paragraphs max. Be vivid.`,
-    custom: `You are a brilliant attending physician. The student has a question about this USMLE topic:\n\n${ctx}\n\nStudent question: "${document.getElementById('att-ask-input')?.value||''}"\n\nAnswer clearly and clinically in 2-3 paragraphs. Focus on what's relevant for USMLE boards.`,
-    translate: `Translate the following medical flashcard content to Brazilian Portuguese. Keep medical terms accurate. Return ONLY the translation in this exact format:\n\nQUESTÃO: [translated question]\nA. [option] B. [option] C. [option] D. [option]\nRESPOSTA CORRETA: [translated answer]\nEXPLICAÇÃO: [translated explanation]\nPONTO-CHAVE: [translated key point]\n\nContent to translate:\nQUESTION: ${card.q}\nOPTIONS: ${(card.w||[]).map((o,i)=>String.fromCharCode(65+i)+'. '+o).join(' ')}\nCORRECT ANSWER: ${card.c}\nEXPLANATION: ${(card.e||'').replace(/<[^>]+>/g,' ').slice(0,500)}\nKEY POINT: ${(card.kp||'')}`,
   };
 
   const typeLabels = {
-    why:'Why This Answer', explain:'Deeper Explanation',
-    mcq:'Practice Questions', surprise:'Clinical Pearl',
-    custom:'Your Question', translate:'Tradução PT-BR'
+    why:'🤔 Why Your Answer', explain:'📖 Deeper Explanation',
+    mcq:'📝 Practice Questions', surprise:'⭐ Clinical Pearl'
   };
 
   try {
@@ -5524,20 +5227,6 @@ EXPLANATION: ${(card.e||'').replace(/<[^>]+>/g,' ').slice(0,300)}`;
         : (response?.message?.content || response?.text || JSON.stringify(response));
     } else {
       responseText = '⚠️ AI Attending not available — check your connection and try again.';
-    }
-
-    // MCQ interativo — parse JSON e renderiza com botões
-    if(type === 'mcq'){
-      try {
-        const clean = responseText.replace(/```json|```/g,'').trim();
-        const data = JSON.parse(clean);
-        renderInteractiveMCQs(data.questions, respWrap);
-        setTimeout(()=>{ respWrap.scrollIntoView({ behavior:'smooth', block:'nearest' }); }, 80);
-        wrap.querySelectorAll('.att-ibtn').forEach(b=>{ b.disabled = false; });
-        return;
-      } catch(e) {
-        // fallback para texto se JSON falhar
-      }
     }
 
     const formatted = responseText
@@ -5552,7 +5241,7 @@ EXPLANATION: ${(card.e||'').replace(/<[^>]+>/g,' ').slice(0,300)}`;
         <div class="att-response-text"><p>${formatted}</p></div>
       </div>`;
 
-    // no counting during beta
+    if(!isPro){ uses.count++; saveAttUses(uses); }
 
   } catch(err) {
     respWrap.innerHTML = `<div class="att-response-msg" style="border-color:rgba(244,63,94,.2)">
@@ -5572,271 +5261,8 @@ EXPLANATION: ${(card.e||'').replace(/<[^>]+>/g,' ').slice(0,300)}`;
   setTimeout(()=>{ respWrap.scrollIntoView({ behavior:'smooth', block:'nearest' }); }, 80);
 }
 
-// ── HIGHLIGHT SYSTEM ─────────────────────────────────────────────────────
-const HL_KEY = 'bmd_highlights_v1';
-let _hlColor = null; // null = mode off
-let _hlData = {}; // {cardId: {q: [...ranges], e: [...ranges]}}
-
-function loadHlData(){
-  try{ _hlData = JSON.parse(localStorage.getItem(HL_KEY)||'{}'); }catch(e){ _hlData={}; }
-}
-function saveHlData(){
-  try{ localStorage.setItem(HL_KEY, JSON.stringify(_hlData)); }catch(e){}
-}
-loadHlData();
-
-function setHlColor(color){
-  if(_hlColor === color){
-    _hlColor = null;
-  } else {
-    _hlColor = color;
-  }
-  // Update button states
-  ['yellow','green','blue'].forEach(c=>{
-    const btn = document.getElementById('hl-btn-'+c);
-    if(btn) btn.classList.toggle('active', _hlColor===c);
-  });
-}
-
-function eraseAllHighlights(){
-  const card = getCurrentCard();
-  if(!card) return;
-  delete _hlData[card.id];
-  saveHlData();
-  applyHighlightsToCard(card.id);
-  _hlColor = null;
-  ['yellow','green','blue'].forEach(c=>{
-    const btn = document.getElementById('hl-btn-'+c);
-    if(btn) btn.classList.remove('active');
-  });
-}
-
-function getCurrentCard(){
-  const full = [...deck,...againQueue];
-  if(!full.length || idx >= full.length) return null;
-  return full[idx];
-}
-
-// Apply highlights from stored data to DOM
-function applyHighlights(cardId){
-  const zones = ['exp-txt','exp-dist'];
-  zones.forEach(zoneId=>{
-    const el = document.getElementById(zoneId);
-    if(!el) return;
-    // Remove existing marks
-    el.querySelectorAll('mark.hl-yellow,mark.hl-green,mark.hl-blue').forEach(m=>{
-      const parent = m.parentNode;
-      parent.replaceChild(document.createTextNode(m.textContent), m);
-      parent.normalize();
-    });
-  });
-  // Also clear q zone
-  ['c-q'].forEach(zoneId=>{
-    const el = document.getElementById(zoneId);
-    if(!el) return;
-    el.querySelectorAll('mark.hl-yellow,mark.hl-green,mark.hl-blue').forEach(m=>{
-      const parent = m.parentNode;
-      parent.replaceChild(document.createTextNode(m.textContent), m);
-      parent.normalize();
-    });
-  });
-}
-
-// Clear question-zone highlights (called when answer is revealed)
-function clearQHighlights(){
-  ['c-q','c-opts'].forEach(zoneId=>{
-    const el = document.getElementById(zoneId);
-    if(!el) return;
-    el.querySelectorAll('mark.hl-yellow,mark.hl-green,mark.hl-blue').forEach(m=>{
-      const parent = m.parentNode;
-      parent.replaceChild(document.createTextNode(m.textContent), m);
-      parent.normalize();
-    });
-  });
-  // Save updated state (q cleared, e preserved)
-  _saveCardHighlights();
-}
-
-// Handle text selection for highlighting
-document.addEventListener('mouseup', handleHlSelection);
-document.addEventListener('touchend', handleHlSelection);
-
-function handleHlSelection(e){
-  if(!_hlColor) return;
-  const sel = window.getSelection();
-  if(!sel || sel.isCollapsed || !sel.toString().trim()) return;
-  
-  const range = sel.getRangeAt(0);
-  const container = range.commonAncestorContainer;
-  
-  // Check if selection is within a highlight zone
-  const hlZones = document.querySelectorAll('.hl-zone, #exp-txt, #exp-dist, #c-q');
-  let inZone = false;
-  for(const zone of hlZones){
-    if(zone.contains(container)){ inZone = true; break; }
-  }
-  if(!inZone){ sel.removeAllRanges(); return; }
-  
-  // Apply highlight mark
-  try {
-    const mark = document.createElement('mark');
-    mark.className = 'hl-'+_hlColor;
-    mark.onclick = function(ev){
-      ev.stopPropagation();
-      // Click on highlight removes it
-      const parent = this.parentNode;
-      parent.replaceChild(document.createTextNode(this.textContent), this);
-      parent.normalize();
-    };
-    range.surroundContents(mark);
-    sel.removeAllRanges();
-    // Save highlights for current card
-    _saveCardHighlights();
-  } catch(err){
-    // surroundContents fails if selection crosses elements — ignore
-    sel.removeAllRanges();
-  }
-}
-
-function _saveCardHighlights(){
-  const card = getCurrentCard();
-  if(!card) return;
-  if(!_hlData[card.id]) _hlData[card.id] = {};
-  // Save innerHTML of each zone
-  ['c-q','exp-txt','exp-dist'].forEach(zoneId=>{
-    const el = document.getElementById(zoneId);
-    if(el) _hlData[card.id][zoneId] = el.innerHTML;
-  });
-  saveHlData();
-}
-
-function applyHighlightsToCard(cardId){
-  const saved = _hlData[cardId];
-  if(!saved) return;
-  ['c-q','exp-txt','exp-dist'].forEach(zoneId=>{
-    if(!saved[zoneId]) return;
-    const el = document.getElementById(zoneId);
-    if(!el) return;
-    el.innerHTML = saved[zoneId];
-    // Re-attach click handlers to marks
-    el.querySelectorAll('mark.hl-yellow,mark.hl-green,mark.hl-blue').forEach(m=>{
-      m.onclick = function(ev){
-        ev.stopPropagation();
-        const parent = this.parentNode;
-        parent.replaceChild(document.createTextNode(this.textContent), this);
-        parent.normalize();
-        _saveCardHighlights();
-      };
-    });
-  });
-}
-
 // Rastreia qual opção o aluno escolheu
 window.lastChosenIdx = undefined;
-
-function renderInteractiveMCQs(questions, container){
-  let html = '<div style="display:flex;flex-direction:column;gap:16px;padding:4px 0 8px;">';
-  questions.forEach((q, qi) => {
-    html += `
-      <div class="att-mcq-block" id="att-mcq-${qi}" style="border:1px solid var(--border);border-radius:10px;overflow:hidden;">
-        <div style="padding:12px 14px;background:var(--surface2);border-bottom:1px solid var(--border);">
-          <span style="font-size:9px;font-weight:800;letter-spacing:.1em;color:var(--text-faint);font-family:'JetBrains Mono',monospace;">Q${qi+1}</span>
-          <p style="margin:6px 0 0;font-size:13px;color:var(--text);line-height:1.55;font-family:'Inter',sans-serif;">${q.stem}</p>
-        </div>
-        <div style="padding:8px 10px;display:flex;flex-direction:column;gap:6px;" id="att-mcq-opts-${qi}" 
-          data-correct="${q.correct}" 
-          data-exp="${(q.explanation||'').replace(/"/g,'&quot;')}"
-          data-dist="${JSON.stringify(q.distractors||{}).replace(/"/g,'&quot;')}"
-          data-kp="${(q.keypoint||'').replace(/"/g,'&quot;')}">
-          ${q.options.map((opt, oi) => `
-            <button onclick="checkAttMCQ(${qi},'${String.fromCharCode(65+oi)}')" 
-              style="text-align:left;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:9px 12px;cursor:pointer;font-size:12px;font-family:'Inter',sans-serif;color:var(--text);transition:all .15s;display:flex;align-items:center;gap:8px;"
-              onmouseover="this.style.borderColor='rgba(139,92,246,.4)'"
-              onmouseout="this.style.borderColor='var(--border)'"
-              id="att-mcq-${qi}-opt-${oi}">
-              <span style="width:22px;height:22px;border-radius:50%;border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;">${String.fromCharCode(65+oi)}</span>
-              ${opt.replace(/^[A-D]\.\s*/,'')}
-            </button>`).join('')}
-        </div>
-        <div id="att-mcq-exp-${qi}" style="display:none;padding:10px 14px;background:rgba(34,197,94,.06);border-top:1px solid rgba(34,197,94,.2);">
-          <div style="font-size:11px;font-weight:700;color:var(--emerald);margin-bottom:4px;font-family:'Inter',sans-serif;">Explanation</div>
-          <div style="font-size:12px;color:var(--text);line-height:1.6;font-family:'Inter',sans-serif;">${q.explanation}</div>
-        </div>
-      </div>`;
-  });
-  html += '</div>';
-  container.innerHTML = `<div class="att-response-msg"><div class="att-response-label">Practice Questions</div>${html}</div>`;
-}
-
-function checkAttMCQ(qi, chosen){
-  const block = document.getElementById(`att-mcq-${qi}`);
-  if(!block || block.dataset.answered) return;
-  block.dataset.answered = '1';
-
-  const optsDiv = document.getElementById(`att-mcq-opts-${qi}`);
-  const correct = optsDiv.dataset.correct;
-  const explanation = optsDiv.dataset.exp;
-  const keypoint = optsDiv.dataset.kp;
-  let distractors = {};
-  try { distractors = JSON.parse(optsDiv.dataset.dist.replace(/&quot;/g,'"')); } catch(e){}
-
-  // Colore botões
-  const opts = optsDiv.querySelectorAll('button');
-  opts.forEach(btn => {
-    btn.style.cursor = 'default';
-    btn.disabled = true;
-    btn.onmouseover = null;
-    btn.onmouseout = null;
-    const oi = parseInt(btn.id.split('-').pop());
-    const optLetter = String.fromCharCode(65 + oi);
-    if(optLetter === correct){
-      btn.style.borderColor = '#22c55e';
-      btn.style.background = 'rgba(34,197,94,.1)';
-      btn.style.color = '#22c55e';
-      btn.querySelector('span').style.borderColor = '#22c55e';
-    } else if(optLetter === chosen && chosen !== correct){
-      btn.style.borderColor = '#f43f5e';
-      btn.style.background = 'rgba(244,63,94,.08)';
-      btn.style.color = '#f43f5e';
-      btn.querySelector('span').style.borderColor = '#f43f5e';
-    }
-  });
-
-  const isCorrect = chosen === correct;
-  const expDiv = document.getElementById(`att-mcq-exp-${qi}`);
-  expDiv.style.display = 'block';
-
-  // Distractors
-  let distractorHtml = '';
-  const wrongEntries = Object.entries(distractors);
-  if(wrongEntries.length){
-    distractorHtml = `<div style="margin-top:10px;display:flex;flex-direction:column;gap:5px;">
-      <div style="font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text-faint);font-family:'JetBrains Mono',monospace;margin-bottom:2px;">Why the others are wrong</div>
-      ${wrongEntries.map(([letter, reason]) => `
-        <div style="display:flex;gap:8px;font-size:12px;line-height:1.5;font-family:'Inter',sans-serif;">
-          <span style="font-weight:700;color:var(--rose);flex-shrink:0;">${letter}.</span>
-          <span style="color:var(--text-dim);">${reason}</span>
-        </div>`).join('')}
-    </div>`;
-  }
-
-  // Key point
-  const kpHtml = keypoint ? `
-    <div style="margin-top:10px;padding:8px 12px;background:rgba(59,127,255,.08);border-left:3px solid var(--accent);border-radius:0 6px 6px 0;">
-      <div style="font-size:9px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);font-family:'JetBrains Mono',monospace;">Key Point</div>
-      <div style="font-size:12px;color:var(--text);margin-top:3px;font-family:'Inter',sans-serif;font-weight:600;">${keypoint}</div>
-    </div>` : '';
-
-  expDiv.style.background = isCorrect ? 'rgba(34,197,94,.04)' : 'rgba(244,63,94,.04)';
-  expDiv.style.borderTopColor = isCorrect ? 'rgba(34,197,94,.2)' : 'rgba(244,63,94,.2)';
-  expDiv.innerHTML = `
-    <div style="font-size:11px;font-weight:700;color:${isCorrect?'var(--emerald)':'var(--rose)'};margin-bottom:6px;font-family:'Inter',sans-serif;">
-      ${isCorrect ? '✓ Correct' : '✗ Incorrect — correct answer: ' + correct}
-    </div>
-    <div style="font-size:12px;color:var(--text);line-height:1.6;font-family:'Inter',sans-serif;">${explanation}</div>
-    ${distractorHtml}
-    ${kpHtml}`;
-}
 document.addEventListener('click', function(e){
   const btn = e.target.closest('.opt-btn');
   if(btn && !btn.disabled){
@@ -5845,18 +5271,6 @@ document.addEventListener('click', function(e){
   }
 });
 </script>
-
-<style>
-/* ── HIGHLIGHT SYSTEM — cores calibradas estilo UWorld ── */
-mark.hl-yellow, .hl-yellow { background:#ffe066; color:inherit; border-radius:2px; cursor:pointer; }
-mark.hl-green,  .hl-green  { background:#86efac; color:inherit; border-radius:2px; cursor:pointer; }
-mark.hl-blue,   .hl-blue   { background:#7dd3fc; color:inherit; border-radius:2px; cursor:pointer; }
-html.dark mark.hl-yellow, html.dark .hl-yellow { background:none !important; color:#fde047 !important; }
-html.dark mark.hl-green,  html.dark .hl-green  { background:none !important; color:#86efac !important; }
-html.dark mark.hl-blue,   html.dark .hl-blue   { background:none !important; color:#7dd3fc !important; }
-.hl-btn-active { border-color:#374151!important; box-shadow:0 0 0 2px rgba(0,0,0,.3); transform:scale(1.15); }
-html.dark .hl-btn-active { border-color:#fff!important; }
-</style>
 
 </body>
 </html>
