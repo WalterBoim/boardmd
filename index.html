@@ -1585,7 +1585,7 @@ const DEFAULT_SETTINGS={
 let deckSettings={};
 (function(){
   try{deckSettings=JSON.parse(localStorage.getItem(SETTINGS_KEY)||'{}');}catch(e){}
-  const allDecks=['boardmd_s1','boardmd_s2','s1','s2','core','hy1','arrows','fa_s1','ethics','s1_core','fa_step1','shelf_surgery','shelf_em','shelf_fm','shelf_im','shelf_neuro','shelf_obgyn','shelf_peds','shelf_psych'];
+  const allDecks=['boardmd_s1','boardmd_s2','s1','s2','core','hy1','arrows','fa_s1','ethics','s1_core','fa_step1','shelf_surgery','shelf_em'];
   allDecks.forEach(dk=>{
     if(!deckSettings[dk]) deckSettings[dk]={...DEFAULT_SETTINGS};
     Object.keys(DEFAULT_SETTINGS).forEach(k=>{
@@ -1611,7 +1611,7 @@ let todayData={};
 (function(){
   try{todayData=JSON.parse(localStorage.getItem(TODAY_KEY)||'{}');}catch(e){}
   const today=dayStamp();
-  const allDecks=['boardmd_s1','boardmd_s2','s1','s2','core','hy1','arrows','fa_s1','ethics','s1_core','fa_step1','shelf_surgery','shelf_em','shelf_fm','shelf_im','shelf_neuro','shelf_obgyn','shelf_peds','shelf_psych'];
+  const allDecks=['boardmd_s1','boardmd_s2','s1','s2','core','hy1','arrows','fa_s1','ethics','s1_core','fa_step1','shelf_surgery','shelf_em'];
   allDecks.forEach(dk=>{
     if(!todayData[dk]||todayData[dk].date!==today) todayData[dk]={date:today,newSeen:0};
   });
@@ -1889,7 +1889,7 @@ function saveHiddenDecks(){try{localStorage.setItem('bmd_hidden_decks',JSON.stri
 
 function buildDeckManage(){
   const s1Ids=['boardmd_s1','s1_core','s1','hy1','fa_step1','fa_s1','arrows','ethics'];
-  const s2Ids=['boardmd_s2','core','s2','shelf_surgery','shelf_em','shelf_fm','shelf_im','shelf_neuro','shelf_obgyn','shelf_peds','shelf_psych'];
+  const s2Ids=['boardmd_s2','core','s2','shelf_surgery','shelf_em'];
   const s1Decks=[
     {id:'boardmd_s1',name:'BoardMD S1'},{id:'s1_core',name:'Core Review'},
     {id:'s1',name:'Rapid Review'},{id:'hy1',name:'HY Concepts'},
@@ -1940,7 +1940,7 @@ function toggleAllStep(ids){
   saveHiddenDecks();buildDeckHomeTable();buildDeckManage();
 }
 function toggleAllDecks(){
-  const allIds=['boardmd_s1','s1_core','s1','hy1','fa_step1','fa_s1','arrows','ethics','boardmd_s2','core','s2','shelf_surgery','shelf_em','shelf_fm','shelf_im','shelf_neuro','shelf_obgyn','shelf_peds','shelf_psych'];
+  const allIds=['boardmd_s1','s1_core','s1','hy1','fa_step1','fa_s1','arrows','ethics','boardmd_s2','core','s2','shelf_surgery','shelf_em'];
   const allActive=allIds.every(id=>!hiddenDecks.includes(id));
   hiddenDecks=allActive?[...allIds]:[];
   saveHiddenDecks();buildDeckHomeTable();buildDeckManage();
@@ -1969,12 +1969,6 @@ function buildDeckHomeTable(){
     {id:'boardmd_s2', name:'BoardMD · Step 2 CK',         sub:'Adaptive MCQs · 15,623 cards',    step:'s2'},
     {id:'s2',         name:'Step 2 CK · Rapid Review',    sub:'Clinical Essentials · 522 cards', step:'s2'},
     {id:'core',       name:'Step 2 CK · Core Review',     sub:'Board-Focused · 4,107 cards',     step:'s2'},
-    {id:'shelf_fm',    name:'BoardMD Shelf - Family Medicine', sub:'Shelf Exam - 0 cards', step:'s2'},
-    {id:'shelf_im',    name:'BoardMD Shelf - Internal Medicine',sub:'Shelf Exam - 0 cards', step:'s2'},
-    {id:'shelf_neuro', name:'BoardMD Shelf - Neurology',        sub:'Shelf Exam - 0 cards', step:'s2'},
-    {id:'shelf_obgyn', name:'BoardMD Shelf - OB/GYN',           sub:'Shelf Exam - 0 cards', step:'s2'},
-    {id:'shelf_peds',  name:'BoardMD Shelf - Pediatrics',       sub:'Shelf Exam - 0 cards', step:'s2'},
-    {id:'shelf_psych', name:'BoardMD Shelf - Psychiatry',       sub:'Shelf Exam - 0 cards', step:'s2'},
     {id:'shelf_surgery', name:'BoardMD Shelf',           sub:'Shelf Exams · 100 cards',         step:'s2'},
     {id:'shelf_em',      name:'BoardMD Shelf EM',         sub:'Shelf Exams · 96 cards',          step:'s2'},
   ];
@@ -2044,7 +2038,7 @@ function goHome(){
 // Track which step the user is studying
 let currentStep = localStorage.getItem('bmd_step') || 's1'; // 's1' or 's2'
 const STEP1_DECKS = ['boardmd_s1','s1_core','s1','hy1','fa_step1','fa_s1','arrows','ethics'];
-const STEP2_DECKS = ['boardmd_s2','core','s2','shelf_surgery','shelf_em','shelf_fm','shelf_im','shelf_neuro','shelf_obgyn','shelf_peds','shelf_psych'];
+const STEP2_DECKS = ['boardmd_s2','core','s2','shelf_surgery','shelf_em'];
 const SHELF_DECKS = ['shelf_surgery','shelf_em'];
 
 function openApp(dk){
