@@ -2845,7 +2845,6 @@ function revealAnswer(sel,card){
   if(card.d && card.d.trim()){
     let dClean = card.d.trim();
 
-    // Tenta parse JSON primeiro
     try {
       const dObj = JSON.parse(dClean);
       if(typeof dObj === 'object' && dObj !== null && !Array.isArray(dObj)){
