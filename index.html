@@ -2903,6 +2903,13 @@ function revealAnswer(sel,card){
   // CASO 1: campo d preenchido → usar diretamente
   if(card.d && card.d.trim()){
     let dClean = card.d.trim();
+    // Parse JSON format {"Option":"explanation",...}
+    if(dClean.startsWith('{')){
+      try{
+        const dObj=JSON.parse(dClean);
+        dClean=Object.entries(dObj).map(([k,v])=>'**'+k+'**: '+v).join('\n');
+      }catch(e){}
+    }
     dClean = dClean.replace(/<[^>]*>\s*Distractor(?:\s+Notes)?(?:\s*\([^)]*\))?:?\s*<\/[^>]*>/gi, '');
     dClean = dClean.replace(/<strong>\s*Distractor(?:\s+Notes)?(?:\s*\([^)]*\))?:?\s*<\/strong>/gi, '');
     dClean = dClean.replace(/^Distractor(?:\s+Notes)?(?:\s*\([^)]*\))?:?\s*/i, '');
