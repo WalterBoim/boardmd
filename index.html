@@ -8174,8 +8174,8 @@ function toggleTheme(){
   updateThemeIcons();
 })();
 
-document.getElementById('finc').onclick=()=>{if(fontSize<22){fontSize++;applyFont();}};
-document.getElementById('fdec').onclick=()=>{if(fontSize>12){fontSize--;applyFont();}};
+const _finc=document.getElementById('finc'); if(_finc)_finc.onclick=()=>{if(fontSize<22){fontSize++;applyFont();}};
+const _fdec=document.getElementById('fdec'); if(_fdec)_fdec.onclick=()=>{if(fontSize>12){fontSize--;applyFont();}};
 applyFont();
 
 
@@ -10761,7 +10761,7 @@ function togglePerfDeck(p,c){
 }
 
 /* PostStep vars and functions */
-if(typeof _psStep==='undefined'){var _psStep=null,_psPF=null,_psScore=null;}
+if(typeof _psStep==='undefined'){// _psStep already declared
 
 function showPostStep(){
   hideAllPanels();
