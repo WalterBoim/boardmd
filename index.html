@@ -6566,9 +6566,9 @@ function buildDeckHomeTable(){
       </td>`;
     tbody.appendChild(tr);
   });
-  document.getElementById('dh-total-new').textContent=totalNew;
-  document.getElementById('dh-total-lrn').textContent=totalLrn;
-  document.getElementById('dh-total-rev').textContent=totalRev;
+  const _tn=document.getElementById('dh-total-new'); if(_tn)_tn.textContent=totalNew;
+  const _tl=document.getElementById('dh-total-lrn'); if(_tl)_tl.textContent=totalLrn;
+  const _tr=document.getElementById('dh-total-rev'); if(_tr)_tr.textContent=totalRev;
   // Highlight active deck row
   document.querySelectorAll('#dh-tbody tr').forEach(tr=>{
     const onclick=tr.getAttribute('onclick')||tr.onclick?.toString()||'';
@@ -9922,7 +9922,7 @@ window.renderLeaderboard=async function(){
 /* ── GAMIFICATION ENGINE ── */
 const GAMI_KEY = 'boardmd_gami_v1';
 const STREAK_KEY = 'boardmd_streak_v1';
-const LB_ME_KEY = 'boardmd_lb_me_v1';
+// LB_ME_KEY already declared
 
 // Coin rewards
 const COINS = { again:0, hard:5, good:5, easy:5 }; // acerto=5, erro=0
