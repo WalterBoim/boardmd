@@ -4408,7 +4408,7 @@ mark.hb{background:rgba(79,142,247,.28);border-bottom:2px solid rgba(40,100,220,
   <!-- ═══════════════════════════════════════════════════
        DECK HOME — simple deck selector
        ═══════════════════════════════════════════════════ -->
-  <div id="deck-home" style="display:none;flex-direction:column;max-width:860px;margin:0 auto;width:100%;padding:20px;min-height:100vh;">
+  <div id="deck-home" class="deck-home" style="display:flex;flex-direction:column;max-width:860px;margin:0 auto;width:100%;padding:20px;min-height:100vh;">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;padding:14px 0;border-bottom:1px solid var(--border);">
       <div style="font-family:'Instrument Serif',serif;font-size:22px;">Board<span style="color:var(--accent)">MD</span></div>
       <div style="display:flex;gap:8px;align-items:center;">
@@ -4432,7 +4432,7 @@ mark.hb{background:rgba(79,142,247,.28);border-bottom:2px solid rgba(40,100,220,
       <button onclick="openSettings()" style="background:none;color:var(--muted);border:1px solid var(--border);padding:12px 18px;border-radius:var(--radius-xs);font-family:'Sora',sans-serif;font-size:13px;font-weight:700;cursor:pointer;">Settings</button>
     </div>
     <!-- Legacy IDs -->
-    <div id="deck-home" style="display:none"></div>
+    <!-- legacy placeholder -->
     <div id="app-layout-wrap" style="display:none"><div id="study-inner"></div></div>
     <div id="sidebar" style="display:none"></div>
     <div id="filter-bar-wrap" style="display:none"><div id="filter-inner"></div></div>
@@ -10904,4 +10904,4 @@ document.addEventListener('DOMContentLoaded',function(){
 </script>
 
 </body>
-</html><!-- redeploy -->
+</html><!-- redeploy --><!-- redeploy -->
