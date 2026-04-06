@@ -2031,7 +2031,7 @@ function buildDeckHomeTable(){
         </td>`;
       tbody.appendChild(hdr);
     }
-    const cards=DECKS[id]||[];
+    const cards=(window.DECKS||DECKS)[id]||[];
     // Re-read today from storage for cross-tab accuracy
     const today=dayStamp();
     try{
