@@ -6448,6 +6448,7 @@ function buildDeckHomeTable(){
   const now=Date.now(),c=cfg();
   let totalNew=0,totalLrn=0,totalRev=0;
   const tbody=document.getElementById('dh-tbody');
+  if(!tbody){ console.warn('BoardMD: dh-tbody not found'); return; }
   tbody.innerHTML='';
   const allDecksConfig=[
     {id:'s1_core',    name:'Step 1 · Core Review',       sub:'Board-Focused · 2,821 cards',     step:'s1'},
@@ -6598,6 +6599,8 @@ const SHELF_DECKS = ['shelf_surgery','shelf_em'];
 function openApp(dk){
   document.getElementById('landing').style.display='none';
   document.getElementById('app').classList.add('active');
+  const _dhw=document.getElementById('deck-home-wrap');
+  if(_dhw){_dhw.style.display='flex';_dhw.style.flexDirection='column';}
   applyFont();
   if(STEP2_DECKS.includes(dk)){
     currentStep='s2';
@@ -10123,6 +10126,7 @@ window.renderLeaderboard=async function(){
   const ur=document.getElementById('lb-uni-rows');
   if(ur){const unis={};entries.forEach(e=>{if(e.univ){if(!unis[e.univ])unis[e.univ]={score:0,count:0,country:e.country};unis[e.univ].score+=e.coins||0;unis[e.univ].count++;}});const us=Object.entries(unis).sort((a,b)=>b[1].score-a[1].score).slice(0,5);const pc2=['u1','u2','u3'];ur.innerHTML=us.length?us.map(([n,v],i)=>`<div class="uni-row"><div class="uni-pos ${pc2[i]||''}">${i+1}</div><div class="rank-avatar" style="border-radius:8px;font-size:9px;font-weight:800">${n.slice(0,3).toUpperCase()}</div><div class="uni-info"><div class="uni-name">${n}</div><div class="uni-country">${v.country||''} · ${v.count} student${v.count!==1?'s':''}</div></div><div class="uni-score">${Math.round(v.score/v.count).toLocaleString()}<span>avg coins</span></div></div>`).join(''):'<div style="padding:14px;color:var(--muted);font-size:13px;">Join to see university rankings</div>';}
 };
+</script>
 
 <script>
 /* ── GAMIFICATION ENGINE ── */
