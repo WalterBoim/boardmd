@@ -10222,8 +10222,6 @@ let _lastLevel = null;
 
 // showDeckHome override
 window.showDeckHome = function(){
-  const dhw=document.getElementById("deck-home-wrap");
-  if(dhw){dhw.style.display="flex";dhw.style.flexDirection="column";}
   // Hide all panels
   ['lb-panel','profile-panel','poststep-panel','study-view'].forEach(id=>{
     const el=document.getElementById(id);
@@ -10906,4 +10904,4 @@ document.addEventListener('DOMContentLoaded',function(){
 </script>
 
 </body>
-</html>
+</html><!-- redeploy -->
