@@ -1968,8 +1968,7 @@ function buildDeckHomeTable(){
     {id:'boardmd_s2', name:'BoardMD · Step 2 CK',         sub:'Adaptive MCQs · 15,623 cards',    step:'s2'},
     {id:'s2',         name:'Step 2 CK · Rapid Review',    sub:'Clinical Essentials · 522 cards', step:'s2'},
     {id:'core',       name:'Step 2 CK · Core Review',     sub:'Board-Focused · 4,107 cards',     step:'s2'},
-    {id:'shelf_em',      name:'BoardMD Shelf · Emergency Medicine', sub:'Shelf Exam · 96 cards',  step:'s2', shelf:true, filterPrefix:'shelf_em_'},
-    {id:'shelf_surgery', name:'BoardMD Shelf · Surgery',             sub:'Shelf Exam · 84 cards',  step:'s2', shelf:true, filterPrefix:'shelf_surg_'},
+    {id:'shelf',         name:'BoardMD Shelf · All Rotations',      sub:'Shelf Exams · 180 cards',          step:'s2', shelf:true},
 
     {id:'shelf_im',      name:'BoardMD Shelf · Internal Medicine',   sub:'Shelf Exam · Coming soon',         step:'s2', shelf:true, soon:true},
     {id:'shelf_fm',      name:'BoardMD Shelf · Family Medicine',     sub:'Shelf Exam · Coming soon',         step:'s2', shelf:true, soon:true},
@@ -1987,7 +1986,7 @@ function buildDeckHomeTable(){
     if(shelf && !shelfHeaderAdded){
       shelfHeaderAdded=true;
       // Count total shelf cards
-      const shelfIds=['shelf_em','shelf_surgery'];
+      const shelfIds=['shelf'];
       let shelfNew=0,shelfLrn=0,shelfRev=0;
       shelfIds.forEach(sid=>{
         const sc=(window.DECKS||DECKS)[sid]||[];
@@ -2032,11 +2031,7 @@ function buildDeckHomeTable(){
         </td>`;
       tbody.appendChild(hdr);
     }
-    let cards=(window.DECKS||DECKS)[id]||[];
-    // Se deck virtual (shelf_em/shelf_surgery), filtra do deck 'shelf' por prefixo do ID
-    if(!cards.length && filterPrefix){
-      cards=((window.DECKS||DECKS)['shelf']||[]).filter(c=>c.id.startsWith(filterPrefix));
-    }
+    const cards=(window.DECKS||DECKS)[id]||[];
     // Re-read today from storage for cross-tab accuracy
     const today=dayStamp();
     try{
@@ -2104,7 +2099,7 @@ function goHome(){
 // Track which step the user is studying
 let currentStep = localStorage.getItem('bmd_step') || 's1'; // 's1' or 's2'
 const STEP1_DECKS = ['boardmd_s1','s1_core','s1','hy1','fa_step1','fa_s1','arrows','ethics'];
-const STEP2_DECKS = ['boardmd_s2','core','s2','shelf','shelf_surgery','shelf_em','shelf_fm','shelf_im','shelf_neuro','shelf_obgyn','shelf_peds','shelf_psych'];  // shelf = all, shelf_em/surgery = virtual filtered
+const STEP2_DECKS = ['boardmd_s2','core','s2','shelf','shelf_surgery','shelf_em','shelf_fm','shelf_im','shelf_neuro','shelf_obgyn','shelf_peds','shelf_psych'];
 const SHELF_DECKS = ['shelf_surgery','shelf_em'];
 
 function openApp(dk){
