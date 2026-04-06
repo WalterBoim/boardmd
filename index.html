@@ -5571,16 +5571,16 @@ function toggleTheme() {
 /* ── RING ANIMATION ── */
 window.addEventListener('load', () => {
   const pct = 87;
-  const circle = document.getElementById('ring1');
+  const circle = document.getElementById('ring1')||document.getElementById('perf-ring1');
   const circ = 2 * Math.PI * 38;
   const offset = circ * (1 - pct/100);
   setTimeout(() => {
     circle.style.strokeDashoffset = offset;
-    document.getElementById('ringPct').textContent = pct + '%';
+    (document.getElementById('ringPct')||document.getElementById('perf-pct')||{textContent:''}).textContent = pct + '%';
   }, 300);
 
   // build heatmap
-  const grid = document.getElementById('heatmapGrid');
+  const grid = document.getElementById('heatmapGrid')||document.getElementById('perf-heatmap');
   const intensities = [0,0,1,0,2,1,3,2,4,3,4,2,3,4,3,4,2,3,2,4,3,2,1,3,4,3,4,4,3,4,2,3,4,4,3,4,4,4,3,2,4,4,3,4,4,3,4,4,3,4,4,4,3,4,4,4,3,4,4,4,3,4,4,4,3,4,4,4,3,4,4,4,3,4,4,4,3,4,4,4,3,4,4,4];
   const colors = ['var(--surface2)','rgba(0,212,170,.2)','rgba(0,212,170,.4)','rgba(0,212,170,.65)','#00d4aa'];
   intensities.slice(0,84).forEach(v => {
@@ -10330,8 +10330,11 @@ function showLeaderboard(){
   // If already showing, close it (toggle)
   const lb = document.getElementById('lb-panel');
   if(lb && lb.classList.contains('active')){
-
-</script>
+    lb.classList.remove('active');
+    showDeckHome(); return;
+  }
+  hideAllPanels();
+  if(lb){lb.classList.add('active');lb.style.display='flex';lb.style.flexDirection='column';}
 
 // Override showLeaderboard + showProfile to trigger renders
 const _origSLB=window.showLeaderboard;
@@ -10587,7 +10590,7 @@ function toggleDpExpandPerf(panelId, chevId) {
 
 /* ── 5. Heatmap build for reference performance panel ───────── */
 function buildRefHeatmap() {
-  const grid = document.getElementById('heatmapGrid');
+  const grid = document.getElementById('heatmapGrid')||document.getElementById('perf-heatmap');
   if(!grid || grid.children.length) return;
   const colors = ['var(--surface2)','rgba(0,212,170,.2)','rgba(0,212,170,.4)','rgba(0,212,170,.65)','#00d4aa'];
   const intensities = [0,0,1,0,2,1,3,2,4,3,4,2,3,4,3,4,2,3,2,4,3,2,1,3,4,3,4,4,3,4,2,3,4,4,3,4,4,4,3,2,4,4,3,4,4,3,4,4,3,4,4,4,3,4,4,4,3,4,4,4,3,4,4,4,3,4,4,4,3,4,4,4,3,4,4,4,3,4,4,4,3,4,4,4];
