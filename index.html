@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- BoardMD v31.4 - fixes: dh-tbody, script-tag, showDeckHome -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -4425,7 +4426,7 @@ mark.hb{background:rgba(79,142,247,.28);border-bottom:2px solid rgba(40,100,220,
       </div>
     </div>
     <div style="font-size:13px;color:var(--muted);margin-bottom:16px;">Select a deck to study — FSRS tracks your progress automatically</div>
-    <div id="deck-home-table" style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:20px;"></div>
+    <div id="deck-home-table" style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:20px;"><table style="width:100%;border-collapse:collapse;"><tbody id="dh-tbody"></tbody></table></div>
     <div style="display:flex;gap:10px;">
       <button onclick="startStudyFromHome()" style="background:var(--accent);color:#fff;border:none;padding:12px 28px;border-radius:var(--radius-xs);font-family:'Sora',sans-serif;font-size:13px;font-weight:700;cursor:pointer;">Study Now</button>
       <button onclick="openSettings()" style="background:none;color:var(--muted);border:1px solid var(--border);padding:12px 18px;border-radius:var(--radius-xs);font-family:'Sora',sans-serif;font-size:13px;font-weight:700;cursor:pointer;">Settings</button>
@@ -6448,7 +6449,7 @@ function buildDeckHomeTable(){
   const now=Date.now(),c=cfg();
   let totalNew=0,totalLrn=0,totalRev=0;
   const tbody=document.getElementById('dh-tbody');
-  if(!tbody){ console.warn('BoardMD: dh-tbody not found'); return; }
+  if(!tbody){ console.warn('dh-tbody not found'); return; }
   tbody.innerHTML='';
   const allDecksConfig=[
     {id:'s1_core',    name:'Step 1 · Core Review',       sub:'Board-Focused · 2,821 cards',     step:'s1'},
@@ -6599,12 +6600,9 @@ const SHELF_DECKS = ['shelf_surgery','shelf_em'];
 function openApp(dk){
   document.getElementById('landing').style.display='none';
   document.getElementById('app').classList.add('active');
-  const _dhw=document.getElementById('deck-home-wrap');
-  if(_dhw){_dhw.style.display='flex';_dhw.style.flexDirection='column';}
-  const _dhw2=document.getElementById('deck-home-wrap');
-  if(_dhw2){_dhw2.style.display='flex';_dhw2.style.flexDirection='column';}
-  const _dhw2=document.getElementById('deck-home-wrap');
-  if(_dhw2){_dhw2.style.display='flex';_dhw2.style.flexDirection='column';}
+  // Show deck home wrap (new design)
+  const dhw=document.getElementById('deck-home-wrap');
+  if(dhw){dhw.style.display='flex';dhw.style.flexDirection='column';}
   applyFont();
   if(STEP2_DECKS.includes(dk)){
     currentStep='s2';
@@ -10119,18 +10117,20 @@ function updateGamiUI(g){
 let lbTab = 'global';
 
 function showLeaderboard(){
-  // If already showing, close it (toggle)
   const lb = document.getElementById('lb-panel');
   if(lb && lb.classList.contains('active')){
-    lb.classList.remove('active');
+    lb.classList.remove('active'); lb.style.display='none';
     showDeckHome(); return;
   }
   hideAllPanels();
   if(lb){lb.classList.add('active');lb.style.display='flex';lb.style.flexDirection='column';}
+  _bNavSync && _bNavSync('rank');
+  setTimeout(()=>{if(typeof renderLeaderboard==='function')renderLeaderboard();},80);
+}
 
 // Override showLeaderboard + showProfile to trigger renders
 const _origSLB=window.showLeaderboard;
-window.showLeaderboard=function(){_origSLB();setTimeout(()=>renderLeaderboard(),100);};
+window.showLeaderboard=function(){_origSLB&&_origSLB();};
 const _origSP=window.showProfile;
 window.showProfile=function(){_origSP();setTimeout(()=>renderPerfOverview(),100);};
 
@@ -10222,18 +10222,22 @@ let _lastLevel = null;
 
 // showDeckHome override
 window.showDeckHome = function(){
-  const lb=document.getElementById('lb-panel');
-  const pp=document.getElementById('profile-panel');
-  const dh=document.getElementById('deck-home');
+  // Hide all panels
+  ['lb-panel','profile-panel','poststep-panel','study-view'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el){el.classList.remove('active');el.style.display='none';}
+  });
   const al=document.getElementById('app-layout-wrap');
+  if(al) al.style.display='none';
   const fb=document.getElementById('filter-bar-wrap');
-  if(lb) lb.classList.remove('active');
-  if(pp) pp.classList.remove('active');
+  if(fb) fb.style.display='none';
+  // Show deck home
+  const dh=document.getElementById('deck-home');
+  if(dh) dh.classList.add('active');
+  const dhw=document.getElementById('deck-home-wrap');
+  if(dhw){dhw.style.display='flex';dhw.style.flexDirection='column';}
   document.getElementById('lb-btn')?.classList.remove('active');
   document.getElementById('level-badge-btn')?.classList.remove('active');
-  if(dh) dh.classList.add('active');
-  if(al) al.style.display='none';
-  if(fb) fb.style.display='none';
   buildDeckHomeTable();
 };
 
@@ -10899,4 +10903,4 @@ document.addEventListener('DOMContentLoaded',function(){
 </script>
 
 </body>
-</html><!-- v31 -->
+</html>
