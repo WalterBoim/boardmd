@@ -1727,6 +1727,25 @@ function applyFont(){
   document.documentElement.style.setProperty('--font-size',fontSize+'px');
   const el=document.getElementById('fval');if(el) el.textContent=fontSize;
   try{localStorage.setItem('bmd_font',fontSize);}catch(e){}
+  // Inject dynamic style to override !important rules
+  let style = document.getElementById('bmd-font-override');
+  if(!style){
+    style = document.createElement('style');
+    style.id = 'bmd-font-override';
+    document.head.appendChild(style);
+  }
+  const px = fontSize+'px';
+  const sm = (fontSize-1)+'px';
+  style.textContent = `
+    .card-question { font-size: ${px} !important; }
+    .opt-btn { font-size: ${px} !important; }
+    .exp-text { font-size: ${px} !important; }
+    .exp-correct-inner { font-size: ${px} !important; }
+    .exp-dist { font-size: ${sm} !important; }
+    .dist-item { font-size: ${sm} !important; }
+    .key-point-line { font-size: ${sm} !important; }
+    .att-response-text { font-size: ${px} !important; }
+  `;
 }
 
 // ── SESSION STATE ────────────────────────────────────────────────────
@@ -2214,6 +2233,9 @@ function shuffleOpts(card){
 // ── RENDER CARD ───────────────────────────────────────────────────────
 function renderCard(){
   revealed=false;
+  // Remove Attending block from previous card
+  const oldAtt = document.getElementById('att-inline-wrap');
+  if(oldAtt) oldAtt.remove();
   // Hide FSRS buttons until answer revealed
   const _fsrs=document.getElementById('fsrs-nav');
   if(_fsrs) _fsrs.classList.remove('visible');
@@ -3085,7 +3107,14 @@ function saveSettingsModal(){
   c.requestRetention=Math.min(0.99,Math.max(0.7,parseFloat(document.getElementById('cfg-requestRetention').value)||0.90));
   c.easyBonus=Math.min(3,Math.max(1,parseFloat(document.getElementById('cfg-easyBonus').value)||1.3));
   const hi=document.getElementById('cfg-hardInterval');if(hi) c.hardInterval=Math.min(2,Math.max(1,parseFloat(hi.value)||1.2));
+  // Reset newSeen so new limit takes effect immediately
+  if(todayData[currentDeck]){
+    todayData[currentDeck].newSeen = 0;
+    saveTodayData();
+  }
   saveSettings();closeSettings();
+  // Rebuild queue with new settings
+  buildQueue();
   selectSystem(currentSystem);
 }
 
@@ -5063,7 +5092,7 @@ html.light .att-inline{background:rgba(99,102,241,.04);border-color:rgba(139,92,
 .att-ibtn{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:8px 4px;cursor:pointer;text-align:center;transition:all .15s;display:flex;flex-direction:column;align-items:center;gap:3px;font-family:'Inter',sans-serif;}
 .att-ibtn:hover{border-color:rgba(139,92,246,.5);background:rgba(99,102,241,.07);transform:translateY(-1px);}
 .att-ibtn:disabled{opacity:.38;cursor:not-allowed;transform:none;}
-.att-ibtn-emoji{font-size:15px;line-height:1;}
+.att-ibtn-emoji{display:none;}
 .att-ibtn-label{font-size:9px;font-weight:700;color:var(--text-dim);line-height:1.2;}
 html.light .att-ibtn{background:var(--surface2);}
 .att-inline-response{padding:0 12px 12px;display:none;}
@@ -5086,7 +5115,7 @@ html.light .att-ibtn{background:var(--surface2);}
 
 <script>
 // ── BOARDMD ATTENDING — inline no card ────────────────────────────────
-const ATT_FREE_LIMIT = 3;
+const ATT_FREE_LIMIT = 9999; // Beta — unlimited
 const ATT_USES_KEY   = 'bmd_att_uses_v1';
 
 function getAttUses(){
@@ -5111,8 +5140,8 @@ function injectAttendingInline(card, sel){
   const dis = blocked ? 'disabled' : '';
 
   const usageLine = isPro
-    ? '<span style="font-size:10px;font-family:'JetBrains Mono',monospace;color:var(--emerald);">✓ Pro — unlimited</span>'
-    : `<span style="font-size:10px;font-family:'JetBrains Mono',monospace;color:${left>0?'var(--text-faint)':'var(--rose)'};">${left}/${ATT_FREE_LIMIT} free today</span>`;
+    ? '<span style="font-size:10px;font-family:Inter,sans-serif;color:var(--emerald);">Beta — unlimited</span>'
+    : '<span style="font-size:10px;font-family:Inter,sans-serif;color:'+(left>0?'var(--text-faint)':'var(--rose)')+';">'+left+'/'+ATT_FREE_LIMIT+' free today</span>';
 
   const wrap = document.createElement('div');
   wrap.id = 'att-inline-wrap';
@@ -5129,28 +5158,32 @@ function injectAttendingInline(card, sel){
     </div>
     <div class="att-inline-btns">
       <button class="att-ibtn" ${dis} onclick="askAttendingInline('why',this)">
-        <span class="att-ibtn-emoji">🤔</span>
         <span class="att-ibtn-label">Why my answer?</span>
       </button>
       <button class="att-ibtn" ${dis} onclick="askAttendingInline('explain',this)">
-        <span class="att-ibtn-emoji">📖</span>
         <span class="att-ibtn-label">Explain better</span>
       </button>
       <button class="att-ibtn" ${dis} onclick="askAttendingInline('mcq',this)">
-        <span class="att-ibtn-emoji">📝</span>
         <span class="att-ibtn-label">More MCQs</span>
       </button>
       <button class="att-ibtn" ${dis} onclick="askAttendingInline('surprise',this)">
-        <span class="att-ibtn-emoji">⭐</span>
         <span class="att-ibtn-label">Surprise me</span>
       </button>
     </div>
     <div class="att-inline-response" id="att-inline-response"></div>`;
 
-  // Insere antes dos botões FSRS
-  const fsrsNav = document.getElementById('fsrs-nav');
-  if(fsrsNav && fsrsNav.parentNode){
-    fsrsNav.parentNode.insertBefore(wrap, fsrsNav);
+  // Insere no study-inner, entre o card e os botões FSRS
+  const studyInner = document.getElementById('study-inner');
+  if(studyInner){
+    // Procura o plain-nav ou fsrs-nav como referência
+    const plainNav = studyInner.querySelector('#plain-nav');
+    const fsrsNav  = studyInner.querySelector('#fsrs-nav');
+    const ref = plainNav || fsrsNav;
+    if(ref){
+      studyInner.insertBefore(wrap, ref);
+    } else {
+      studyInner.appendChild(wrap);
+    }
   }
 
   // Guarda contexto do card
@@ -5168,6 +5201,7 @@ async function askAttendingInline(type, btnEl){
 
   const isPro = !!window._supaUser;
   const uses   = getAttUses();
+  // Translate is always free
   if(!isPro && uses.count >= ATT_FREE_LIMIT){
     showToast('Daily limit reached — sign in for Pro access.');
     return;
@@ -5212,11 +5246,27 @@ EXPLANATION: ${(card.e||'').replace(/<[^>]+>/g,' ').slice(0,300)}`;
     explain: `You are a brilliant attending. The student wants deeper understanding:\n\n${ctx}\n\nTeach this concept at the whiteboard. One vivid analogy. Cover: pathophysiology, clinical clues, board trap. 3 paragraphs max.`,
     mcq: `You are a brilliant attending and board question writer:\n\n${ctx}\n\nWrite 2 new USMLE-style MCQs on the SAME concept. Format:\n**Q1:** [vignette]\nA. B. C. D.\n**Answer: X — [explanation]**\n\n**Q2:** [vignette]\nA. B. C. D.\n**Answer: X — [explanation]**`,
     surprise: `You are a brilliant attending. Give ONE unforgettable clinical pearl about:\n\n${ctx}\n\nSomething NOT in the explanation — a real-world connection, classic trick, or board trap. 2 paragraphs max. Be vivid.`,
+
+    translate: `Translate the following medical flashcard content to Brazilian Portuguese. Keep medical terms accurate. Return ONLY the translation in this exact format:
+
+QUESTÃO: [translated question]
+A. [option] B. [option] C. [option] D. [option]
+RESPOSTA CORRETA: [translated answer]
+EXPLICAÇÃO: [translated explanation]
+PONTO-CHAVE: [translated key point]
+
+Content to translate:
+QUESTION: \${card.q}
+OPTIONS: \${(card.w||[]).map((o,i)=>String.fromCharCode(65+i)+'. '+o).join(' ')}
+CORRECT ANSWER: \${card.c}
+EXPLANATION: \${(card.e||'').replace(/<[^>]+>/g,' ').slice(0,500)}
+KEY POINT: \${(card.kp||'')}`,
   };
 
   const typeLabels = {
-    why:'🤔 Why Your Answer', explain:'📖 Deeper Explanation',
-    mcq:'📝 Practice Questions', surprise:'⭐ Clinical Pearl'
+    why:'Why Your Answer', explain:'Deeper Explanation',
+    mcq:'Practice Questions', surprise:'Clinical Pearl',
+    translate:'Tradução PT-BR'
   };
 
   try {
@@ -5241,7 +5291,7 @@ EXPLANATION: ${(card.e||'').replace(/<[^>]+>/g,' ').slice(0,300)}`;
         <div class="att-response-text"><p>${formatted}</p></div>
       </div>`;
 
-    if(!isPro){ uses.count++; saveAttUses(uses); }
+    // no counting during beta
 
   } catch(err) {
     respWrap.innerHTML = `<div class="att-response-msg" style="border-color:rgba(244,63,94,.2)">
