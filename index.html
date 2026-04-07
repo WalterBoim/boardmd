@@ -8320,7 +8320,10 @@ function showLoadingOverlay(){
   if(!el){
     el = document.createElement('div');
     el.id = 'bmd-loading-overlay';
-    el.style.cssText = 'position:fixed;inset:0;z-index:99999;background:rgba(10,12,20,.92);font-family:"Sora",sans-serif;transition:opacity .5s ease;opacity:0;overflow:hidden;';
+    // Always dark overlay regardless of light/dark theme
+    const isDarkTheme = document.documentElement.classList.contains('light') ? false : true;
+    const overlayBg = 'rgba(8,10,18,.95)';
+    el.style.cssText = 'position:fixed;inset:0;z-index:99999;background:' + overlayBg + ';font-family:"Sora",sans-serif;transition:opacity .5s ease;opacity:0;overflow:hidden;';
 
     // Pre-inject score report blocks
     const scoreS1 = '<div style="background:var(--surface);border:1px solid var(--border2);border-radius:14px;padding:16px;opacity:0;transition:opacity .6s;">  <div style="font-size:8px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;color:var(--accent);margin-bottom:10px;">USMLE STEP 1</div>  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">    <div><div style="font-size:9px;color:var(--muted);">Test Result</div><div style="font-size:22px;font-weight:800;color:#22c55e;letter-spacing:-1px;">PASS</div></div>  </div>  <div style="font-size:9px;color:var(--muted);margin-bottom:6px;">Performance by System</div>  <div style="display:flex;flex-direction:column;gap:4px;">    <div style="display:flex;align-items:center;gap:6px;"><span style="font-size:8px;color:var(--muted);width:80px;">Pathology</span><div style="flex:1;height:5px;background:var(--border2);border-radius:3px;overflow:hidden;"><div style="width:82%;height:100%;background:var(--accent);border-radius:3px;"></div></div><span style="font-size:8px;color:var(--muted);">82%</span></div>    <div style="display:flex;align-items:center;gap:6px;"><span style="font-size:8px;color:var(--muted);width:80px;">Pharmacology</span><div style="flex:1;height:5px;background:var(--border2);border-radius:3px;overflow:hidden;"><div style="width:75%;height:100%;background:var(--accent);border-radius:3px;"></div></div><span style="font-size:8px;color:var(--muted);">75%</span></div>    <div style="display:flex;align-items:center;gap:6px;"><span style="font-size:8px;color:var(--muted);width:80px;">Microbiology</span><div style="flex:1;height:5px;background:var(--border2);border-radius:3px;overflow:hidden;"><div style="width:79%;height:100%;background:var(--accent);border-radius:3px;"></div></div><span style="font-size:8px;color:var(--muted);">79%</span></div>    <div style="display:flex;align-items:center;gap:6px;"><span style="font-size:8px;color:var(--muted);width:80px;">Physiology</span><div style="flex:1;height:5px;background:var(--border2);border-radius:3px;overflow:hidden;"><div style="width:88%;height:100%;background:#22c55e;border-radius:3px;"></div></div><span style="font-size:8px;color:var(--muted);">88%</span></div>  </div></div>';
@@ -8328,10 +8331,10 @@ function showLoadingOverlay(){
 
     el.innerHTML = `
       <!-- Background grid — cards + score reports -->
-      <div id="bmd-card-bg-grid" style="position:absolute;inset:0;display:grid;grid-template-columns:repeat(2,1fr);gap:10px;padding:10px;filter:blur(1.5px);opacity:0.6;pointer-events:none;"></div>
+      <div id="bmd-card-bg-grid" style="position:absolute;inset:0;display:grid;grid-template-columns:repeat(2,1fr);gap:10px;padding:10px;filter:blur(1.5px);opacity:0.65;pointer-events:none;"></div>
 
-      <!-- Frosted gradient -->
-      <div style="position:absolute;inset:0;background:linear-gradient(to bottom, rgba(10,12,20,.85) 0%, rgba(10,12,20,.3) 30%, rgba(10,12,20,.3) 70%, rgba(10,12,20,.85) 100%);pointer-events:none;"></div>
+      <!-- Frosted gradient — always dark -->
+      <div style="position:absolute;inset:0;background:linear-gradient(to bottom, rgba(8,10,18,.9) 0%, rgba(8,10,18,.25) 30%, rgba(8,10,18,.25) 70%, rgba(8,10,18,.9) 100%);pointer-events:none;"></div>
 
       <!-- Foreground: logo + progress -->
       <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;pointer-events:none;">
