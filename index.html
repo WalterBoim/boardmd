@@ -6481,8 +6481,13 @@ function saveSettingsModal(){
   const hi=document.getElementById('cfg-hardInterval');if(hi) c.hardInterval=Math.min(2,Math.max(1,parseFloat(hi.value)||1.2));
   // Aplica newPerDay em todos os decks do step atual e reseta newSeen
   const today=dayStamp();
-  const stepDecksToReset = currentStep==='s1' ? STEP1_DECKS : STEP2_DECKS;
-  stepDecksToReset.forEach(d=>{
+  let stepDecksToReset;
+  if(currentStep==='s1') stepDecksToReset = STEP1_DECKS;
+  else if(currentStep==='shelf') stepDecksToReset = SHELF_DECKS;
+  else stepDecksToReset = STEP2_DECKS;
+  // Always include the current deck itself
+  const allDecksToReset = [...new Set([...stepDecksToReset, dk])];
+  allDecksToReset.forEach(d=>{
     if(!deckSettings[d]) deckSettings[d]={...DEFAULT_SETTINGS};
     deckSettings[d].newPerDay = c.newPerDay;
     deckSettings[d].graduatingInt = c.graduatingInt;
