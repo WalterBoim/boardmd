@@ -7241,7 +7241,7 @@ async function renderLeaderboard(){
 
   const myGami = getGami();
   if(me){
-    const myEntry = { id:me.id, name:me.name, univ:me.univ, country:me.country, coins:myGami.coins, streak:myGami.streak, level:getLevel(myGami.coins).name };
+    const myEntry = { id:me.id, name:me.name, univ:me.univ, country:me.country, step:me.step||currentStep||'s1', coins:myGami.coins, streak:myGami.streak, level:getLevel(myGami.coins).name };
     entries = entries.filter(e=>e.id !== me.id);
     entries.push(myEntry);
     try{ await window.storage.set('lb:'+me.id, JSON.stringify(myEntry), true); }catch(e){}
@@ -7387,10 +7387,10 @@ async function joinLeaderboard(){
   const country = (document.getElementById('lb-inp-country')?.value||'').trim();
   if(!name){ alert('Please enter a display name'); return; }
   const id = 'u_'+Math.random().toString(36).slice(2,10)+Date.now().toString(36);
-  const me = { id, name, univ, country };
+  const me = { id, name, univ, country, step: currentStep||'s1' };
   localStorage.setItem(LB_ME_KEY, JSON.stringify(me));
   const g = getGami();
-  const entry = { id, name, univ, country, coins: g.coins, streak: g.streak, level: getLevel(g.coins).name };
+  const entry = { id, name, univ, country, step: currentStep||'s1', coins: g.coins, streak: g.streak, level: getLevel(g.coins).name };
   try{ await window.storage.set('lb:'+id, JSON.stringify(entry), true); }catch(e){}
   renderLeaderboard();
   showXpToast('Welcome!', 'You joined the global ranking ', '', '', null);
@@ -9189,6 +9189,18 @@ function switchTab(tab) {
   const contentEl = document.getElementById('content-' + tab);
   if(tabEl) tabEl.classList.add('active');
   if(contentEl) contentEl.classList.add('active');
+  // Auto-update step in leaderboard profile
+  try {
+    const me = JSON.parse(localStorage.getItem(LB_ME_KEY)||'{}');
+    if(me && me.id) {
+      me.step = tab;
+      localStorage.setItem(LB_ME_KEY, JSON.stringify(me));
+      // Update in global storage silently
+      const g = getGami();
+      const entry = { ...me, coins: g.coins, streak: g.streak, level: getLevel(g.coins).name };
+      window.storage.set('lb:'+me.id, JSON.stringify(entry), true).catch(()=>{});
+    }
+  } catch(e){}
 }
 
 function toggleExpand(id) {
@@ -9742,9 +9754,9 @@ async function renderGlobalRankFiltered(scope) {
   } else if(scope === 'Brazil'){
     filtered = entries.filter(e => (e.country||'').toLowerCase().includes('brazil'));
   } else if(scope === 'Step 1'){
-    filtered = entries.filter(e => e.step === 'step1' || !e.step); // default to step1
+    filtered = entries.filter(e => !e.step || e.step === 's1' || e.step === 'step1');
   } else if(scope === 'Step 2 CK'){
-    filtered = entries.filter(e => e.step === 'step2');
+    filtered = entries.filter(e => e.step === 's2' || e.step === 'step2');
   } else if(scope === 'Shelf'){
     filtered = entries.filter(e => e.step === 'shelf');
   }
