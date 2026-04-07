@@ -4372,20 +4372,30 @@ html.light .qs-val { color: inherit; }
 
         <div class="card" id="card-el">
           <div class="card-header">
-            <div class="card-meta-left">
-              <span id="c-deck-label" style="display:none;"></span>
-              <span class="card-system" id="c-sys">—</span>
-              <span class="card-topic" id="c-top">—</span>
-            </div>
-            <div class="card-right">
+            <!-- Line 1: actions — right aligned -->
+            <div class="card-right" style="width:100%;justify-content:flex-end;margin-bottom:6px;">
               <span class="card-state" id="c-state" style="display:none"></span>
               <span class="card-interval" id="c-int" style="display:none"></span>
               <span id="c-deck-badge" style="font-size:9px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;font-family:'JetBrains Mono',monospace;padding:3px 8px;border-radius:20px;background:var(--accent-dim,rgba(59,127,255,.1));color:var(--accent,#3b7fff);border:1px solid rgba(59,127,255,.2);white-space:nowrap;"></span>
-              <!-- Font size controls -->
               <button onclick="if(fontSize>11){fontSize--;applyFont();}" title="Smaller text" style="background:none;border:1px solid var(--border);border-radius:6px;padding:2px 7px;cursor:pointer;font-size:11px;font-weight:700;color:var(--text-faint);font-family:'Sora',sans-serif;line-height:1.4;transition:all .15s;" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text-faint)'">A-</button>
               <button onclick="if(fontSize<22){fontSize++;applyFont();}" title="Larger text" style="background:none;border:1px solid var(--border);border-radius:6px;padding:2px 7px;cursor:pointer;font-size:13px;font-weight:700;color:var(--text-faint);font-family:'Sora',sans-serif;line-height:1.4;transition:all .15s;" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text-faint)'">A+</button>
-              <button id="edit-card-btn" onclick="openCardEditor()" title="Edit this card" style="background:none;border:1px solid var(--border);border-radius:6px;padding:3px 9px;cursor:pointer;font-size:10px;font-weight:700;color:var(--text-faint);font-family:'JetBrains Mono',monospace;transition:all .15s;display:inline-block;" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text-faint)'">Edit</button>
+              <!-- Highlight pencil moved here -->
+              <button class="hl-btn" id="hl-toggle-btn" onclick="toggleHlToolbar()" title="Highlight text" style="background:none;border:1px solid var(--border);border-radius:6px;padding:3px 7px;cursor:pointer;display:flex;align-items:center;transition:all .15s;" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">
+                <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="var(--text-faint)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+              </button>
+              <div class="hl-swatches" id="hl-swatches-wrap">
+                <div class="sw y" onclick="setHlColor('yellow')" id="sw-y" title="Yellow"></div>
+                <div class="sw g" onclick="setHlColor('green')"  id="sw-g" title="Green"></div>
+                <div class="sw b" onclick="setHlColor('blue')"   id="sw-b" title="Blue"></div>
+              </div>
+              <button id="edit-card-btn" onclick="openCardEditor()" title="Edit this card" style="background:none;border:1px solid var(--border);border-radius:6px;padding:3px 9px;cursor:pointer;font-size:10px;font-weight:700;color:var(--text-faint);font-family:'JetBrains Mono',monospace;transition:all .15s;" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text-faint)'">Edit</button>
               <span class="card-qid" id="c-qid">—</span>
+            </div>
+            <!-- Line 2: context — left aligned -->
+            <div class="card-meta-left" style="width:100%;">
+              <span id="c-deck-label" style="display:none;"></span>
+              <span class="card-system" id="c-sys">—</span>
+              <span class="card-topic" id="c-top">—</span>
             </div>
           </div>
           <div class="card-body">
@@ -4419,18 +4429,7 @@ html.light .qs-val { color: inherit; }
             </div>
           </div>
           <div id="key-point-wrap" style="display:none;padding:0 18px 14px;"></div>
-          <div style="padding:0 18px 8px;display:flex;justify-content:space-between;align-items:center;">
-            <!-- Highlight toolbar -->
-            <div style="display:flex;align-items:center;gap:4px;">
-              <button class="hl-btn" id="hl-toggle-btn" onclick="toggleHlToolbar()" title="Highlight text">
-                <svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
-              </button>
-              <div class="hl-swatches" id="hl-swatches-wrap">
-                <div class="sw y" onclick="setHlColor('yellow')" id="sw-y" title="Yellow"></div>
-                <div class="sw g" onclick="setHlColor('green')"  id="sw-g" title="Green"></div>
-                <div class="sw b" onclick="setHlColor('blue')"   id="sw-b" title="Blue"></div>
-              </div>
-            </div>
+          <div style="padding:0 18px 8px;display:flex;justify-content:flex-end;align-items:center;">
             <button id="report-issue-btn" onclick="openReportIssue()" style="background:none;border:none;cursor:pointer;font-size:10px;font-weight:600;color:var(--text-faint);font-family:'JetBrains Mono',monospace;padding:2px 0;opacity:.5;transition:opacity .15s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='.5'">⚑ Report Issue</button>
           </div>
           <div class="card-footer-counter">
