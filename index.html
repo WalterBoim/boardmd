@@ -4968,9 +4968,9 @@ let _cardState=0;
 // 5. Cross-tab safety via localStorage atomic read before newSeen increment
 
 function buildSessionQueue(){
-  if(!DECKS[currentDeck]){
-    // Deck not loaded yet — cards may still be loading from Supabase
-    console.warn('BoardMD: deck not found:', currentDeck, '— available:', Object.keys(DECKS||{}));
+  const D = window.DECKS || DECKS || {};
+  if(!D[currentDeck] || D[currentDeck].length === 0){
+    console.warn('BoardMD: deck empty or not found:', currentDeck, '— available:', Object.keys(D));
     deck=[]; return 0;
   }
   const now=Date.now();
@@ -5281,16 +5281,17 @@ function startStudyFromHome(){switchDeckAndStudy(currentDeck);}
 function switchDeckAndStudy(dk){
   hideDeckHome();
   if(SHELF_DECKS.includes(dk) || dk === 'shelf'){
-    // Shelf: combine all shelf decks and use buildSessionQueue
+    // Shelf: combine all shelf decks using window.DECKS
+    const D = window.DECKS || {};
     const combined = SHELF_DECKS.reduce((acc, d) => {
-      if(DECKS[d]) acc = acc.concat(DECKS[d]);
+      if(D[d] && D[d].length > 0) acc = acc.concat(D[d]);
       return acc;
     }, []);
+    console.log('BoardMD shelf: combined', combined.length, 'cards from', SHELF_DECKS);
     currentStep = 'shelf';
     currentDeck = '_shelf_combined';
-    if(!DECKS['_shelf_combined'] || DECKS['_shelf_combined'].length === 0){
-      DECKS['_shelf_combined'] = combined;
-    }
+    // Always rebuild — never use stale cache
+    window.DECKS['_shelf_combined'] = combined;
     againQueue = []; idx = 0; revealed = false; sessionRatings = {};
     ensureStudyUI();
     buildSessionQueue();
@@ -5392,7 +5393,7 @@ function switchDeckTab(dk){
   switchDeck(dk);
 }
 
-function getCards(){return DECKS[currentDeck]||[];}
+function getCards(){return (window.DECKS||DECKS)[currentDeck]||[];}
 function getSystems(){
   const m={};
   getCards().forEach(c=>{m[c.system]=(m[c.system]||0)+1;});
