@@ -165,7 +165,7 @@ body{font-family:'Lato','Helvetica Neue',Arial,sans-serif;background:var(--bg);c
 .app-logo em{font-size:12px;font-style:normal;color:var(--text-faint);font-family:'Lato',sans-serif;margin-left:8px;}
 
 /* ── DECK HOME DASHBOARD (Anki-style) ── */
-.deck-home{display:none;flex:1;flex-direction:column;padding:0;max-width:100%;margin:0;width:100%;gap:0;}
+.deck-home{display:none;flex:1;flex-direction:column;padding:32px 40px;max-width:900px;margin:0 auto;width:100%;gap:24px;}
 .deck-home.active{display:flex;}
 .deck-home-title{font-family:'Instrument Serif',serif;font-size:28px;color:var(--text);margin-bottom:4px;}
 .deck-home-sub{font-size:13px;color:var(--text-faint);font-family:'Lato',sans-serif;}
@@ -963,7 +963,7 @@ html.light { --uw-hover:#f0f7ff; --uw-correct:#e8f5e9; --uw-wrong:#fdecea; --uw-
 .hl-btn{width:22px;height:22px;border-radius:50%;border:2px solid transparent;cursor:pointer;transition:all .15s;flex-shrink:0;outline:none;}
 .hl-btn:hover{transform:scale(1.15);}
 .hl-btn.hl-active,.hl-btn.active{border-color:var(--text);transform:scale(1.15);}
-.hl-btn-y{background:#f5c800;}mark.hl-yellow{background:#f5c800;color:#000!important;}mark.hl-green{background:#22c55e;color:#000!important;}mark.hl-blue{background:#38bdf8;color:#000!important;}
+.hl-btn-y{background:#f5c800;}
 .hl-btn-g{background:#22c55e;}
 .hl-btn-b{background:#38bdf8;}
 .hl-toolbar{display:flex;align-items:center;gap:6px;padding:0 4px;}
@@ -1057,8 +1057,8 @@ html.light .att-btn{background:var(--surface2);}
       <button class="btn-hs" onclick="scrollTo({top:document.getElementById('decks').offsetTop-80,behavior:'smooth'})">Explore decks</button>
     </div>
     <div class="stats-row" style="display:grid;grid-template-columns:repeat(3,1fr);">
-      <div class="stat-item"><span class="stat-num">34,471</span><span class="stat-label">Total Cards</span></div>
-      <div class="stat-item"><span class="stat-num">13</span><span class="stat-label">Decks</span></div>
+      <div class="stat-item"><span class="stat-num">31,814</span><span class="stat-label">Total Cards</span></div>
+      <div class="stat-item"><span class="stat-num">8</span><span class="stat-label">Decks</span></div>
       <div class="stat-item"><span class="stat-num">Free</span><span class="stat-label">To Start</span></div>
       <div class="stat-item"><span class="stat-num">FSRS-5</span><span class="stat-label">Algorithm</span></div>
       <div class="stat-item"><span class="stat-num">MDCoins</span><span class="stat-label">Rewards</span></div>
@@ -1071,7 +1071,7 @@ html.light .att-btn{background:var(--surface2);}
   <div class="section" id="decks">
     <div class="section-label">Our Decks</div>
     <div class="section-title">Everything you need.<br>Step 1 &amp; Step 2 CK.</div>
-    <p class="section-sub">From rapid review to high-yield concept mastery — organized by exam, built for performance.</p>
+    <p class="section-sub">From rapid review to complete qbank companions — organized by exam, built for performance.</p>
     <div class="decks-step-label">
       <div class="decks-step-badge step1-badge">Step 1</div>
       <div class="decks-step-line"></div>
@@ -1116,8 +1116,8 @@ html.light .att-btn{background:var(--surface2);}
       <div class="deck-card s1" onclick="openApp('boardmd_s1')">
         <div class="deck-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="color:#3b7fff"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg></div>
         <div class="deck-name">BoardMD · Step 1</div><div class="deck-title">Adaptive MCQ System</div>
-        <div class="deck-desc">Comprehensive USMLE Step 1 MCQs with spaced repetition — objective-tagged for targeted review.</div>
-        <div class="deck-tags"><span class="deck-tag">Adaptive</span><span class="deck-tag">Objective-Tagged</span><span class="deck-tag">4,056 cards</span></div>
+        <div class="deck-desc">Comprehensive USMLE Step 1 MCQs with spaced repetition — QID-tagged for targeted review.</div>
+        <div class="deck-tags"><span class="deck-tag">Adaptive</span><span class="deck-tag">QID Tagged</span><span class="deck-tag">4,056 cards</span></div>
         <div class="deck-footer"><div class="deck-count"><strong>4,056</strong> <span>cards</span></div><button class="btn-deck" onclick="event.stopPropagation();this.closest('[onclick]').onclick()">Study now →</button></div>
       </div>
     </div>
@@ -1135,9 +1135,9 @@ html.light .att-btn{background:var(--surface2);}
       </div>
       <div class="deck-card s2" onclick="openApp('core')">
         <div class="deck-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="color:#e8a836"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M12 11h4M12 16h4M8 11h.01M8 16h.01"/></svg></div>
-        <div class="deck-name">Step 2 CK · Core Review</div><div class="deck-title">Learning Objectives</div>
-        <div class="deck-desc">One MCQ per Step 2 CK learning objective — objective-tagged for seamless integration with your study workflow.</div>
-        <div class="deck-tags"><span class="deck-tag">Objective-Tagged</span><span class="deck-tag">4,107 cards</span><span class="deck-tag">All Systems</span></div>
+        <div class="deck-name">Step 2 CK · Core Review</div><div class="deck-title">Qbank Companion</div>
+        <div class="deck-desc">One MCQ per Step 2 CK learning objective — QID-tagged for seamless integration with your qbank workflow.</div>
+        <div class="deck-tags"><span class="deck-tag">QID Tagged</span><span class="deck-tag">4,107 cards</span><span class="deck-tag">All Systems</span></div>
         <div class="deck-footer"><div class="deck-count"><strong>4,107</strong> <span>cards</span></div><button class="btn-deck" onclick="event.stopPropagation();this.closest('[onclick]').onclick()">Study now →</button></div>
       </div>
       <div class="deck-card s2" onclick="openApp('hy')">
@@ -1152,15 +1152,15 @@ html.light .att-btn{background:var(--surface2);}
       <div class="deck-card s2" onclick="openApp('boardmd_s2')">
         <div class="deck-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="color:#e8a836"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg></div>
         <div class="deck-name">BoardMD · Step 2 CK</div><div class="deck-title">Adaptive MCQ System</div>
-        <div class="deck-desc">Comprehensive USMLE Step 2 CK MCQs with spaced repetition — objective-tagged for targeted review.</div>
-        <div class="deck-tags"><span class="deck-tag">Adaptive</span><span class="deck-tag">Objective-Tagged</span><span class="deck-tag">949 cards</span></div>
+        <div class="deck-desc">Comprehensive USMLE Step 2 CK MCQs with spaced repetition — QID-tagged for targeted review.</div>
+        <div class="deck-tags"><span class="deck-tag">Adaptive</span><span class="deck-tag">QID Tagged</span><span class="deck-tag">949 cards</span></div>
         <div class="deck-footer"><div class="deck-count"><strong>949</strong> <span>cards</span></div><button class="btn-deck" onclick="event.stopPropagation();this.closest('[onclick]').onclick()">Study now →</button></div>
       </div>
       <div class="deck-card s2" onclick="switchDeckTab('shelf_em')">
         <div class="deck-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="color:#f57314"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg></div>
         <div class="deck-name">BoardMD Shelf</div><div class="deck-title">All Rotations</div>
-        <div class="deck-desc">High-yield Shelf Exam MCQs covering core rotation objectives — Surgery and Emergency Medicine live now.</div>
-        <div class="deck-tags"><span class="deck-tag">Shelf Exams</span><span class="deck-tag">196 cards</span></div>
+        <div class="deck-desc">High-yield Shelf Exam MCQs covering all CMS objectives — two questions per EO. Surgery and Emergency Medicine live now.</div>
+        <div class="deck-tags"><span class="deck-tag">Shelf Exams</span><span class="deck-tag">CMS Based</span><span class="deck-tag">196 cards</span></div>
         <div class="deck-footer"><div class="deck-count"><strong>196</strong> <span>cards</span></div><button class="btn-deck" onclick="event.stopPropagation();switchDeckTab('shelf_em')">Study now →</button></div>
       </div>
     </div>
@@ -1291,6 +1291,7 @@ html.light .att-btn{background:var(--surface2);}
       <button class="deck-tab" id="tab-boardmd_s2" onclick="switchDeckTab('boardmd_s2')">BoardMD S2</button>
       <button class="deck-tab" id="tab-s2"         onclick="switchDeckTab('s2')">Rapid Review</button>
       <button class="deck-tab" id="tab-core"       onclick="switchDeckTab('core')">Core Review</button>
+      <button class="deck-tab" id="tab-hy"         onclick="switchDeckTab('hy')">HY Concepts</button>
       <button class="deck-tab" id="tab-shelf"      onclick="switchDeckTab('shelf_em')">BoardMD Shelf</button>
     </div>
   </header>
@@ -1401,123 +1402,41 @@ html.light .att-btn{background:var(--surface2);}
 
   <!-- DECK HOME DASHBOARD -->
   <div class="deck-home" id="deck-home">
-    <div style="display:none">
-      <div id="dh-total-new"></div><div id="dh-total-lrn"></div><div id="dh-total-rev"></div>
-      <div id="deck-manage-chips"></div><tbody id="dh-tbody"></tbody><button id="dh-study-btn"></button>
+    <div>
+      <div class="deck-home-title">Your Decks</div>
+      <div class="deck-home-sub">Select a deck to start studying — FSRS tracks your progress automatically</div>
     </div>
-    <div id="bmd-dashboard" style="font-family:'Sora',sans-serif;background:#f2f4fb;max-width:100%;margin:0 auto;width:100%;border-radius:0;overflow:hidden;border:none;">
-      <div style="padding:13px 16px;background:#fff;border-bottom:1px solid rgba(0,0,0,.07);display:flex;align-items:center;justify-content:space-between;">
-        <div style="font-size:18px;font-weight:800;letter-spacing:-.5px;color:#0d1021;">Board<span style="color:#4f8ef7">MD</span></div>
-        <div style="display:flex;align-items:center;gap:8px;">
-          <div onclick="openSettings()" style="width:32px;height:32px;border-radius:50%;border:1px solid rgba(0,0,0,.08);background:#f2f4fb;display:flex;align-items:center;justify-content:center;cursor:pointer;" title="Settings"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#8892b0" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg></div>
-          <div id="app-user-pill" style="display:none;align-items:center;gap:7px;background:#f2f4fb;border:1px solid rgba(0,0,0,.08);border-radius:999px;padding:4px 10px 4px 4px;cursor:pointer;" onclick="showAppAuthMenu()">
-            <div id="app-user-avatar" style="width:26px;height:26px;border-radius:50%;background:rgba(79,142,247,.15);border:1.5px solid rgba(79,142,247,.3);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#4f8ef7;font-family:'JetBrains Mono',monospace;">?</div>
-            <div id="app-user-label" style="font-size:12px;font-weight:700;color:#3a4060;font-family:'Sora',sans-serif;"></div>
-          </div>
-          <button id="app-login-btn" onclick="signInWithGoogle()" style="display:none;background:#4f8ef7;border:none;border-radius:8px;padding:6px 14px;font-family:'Sora',sans-serif;font-size:12px;font-weight:700;color:#fff;cursor:pointer;">Sign in</button>
-        </div>
-      </div>
-      <div style="padding:8px 16px;background:#fff;border-bottom:1px solid rgba(0,0,0,.07);display:flex;align-items:center;gap:16px;">
-        <div style="display:flex;align-items:center;gap:5px;"><span id="dash-streak-val" style="font-size:13px;font-weight:800;font-family:'JetBrains Mono',monospace;color:#f59e0b;">0</span><span style="font-size:10px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;color:#8892b0;">day streak</span></div>
-        <div style="width:1px;height:14px;background:rgba(0,0,0,.08);"></div>
-        <div style="display:flex;align-items:center;gap:5px;"><span id="dash-coins-val" style="font-size:13px;font-weight:800;font-family:'JetBrains Mono',monospace;color:#4f8ef7;">0</span><span style="font-size:10px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;color:#8892b0;">MDCoins</span></div>
-        <div style="width:1px;height:14px;background:rgba(0,0,0,.08);"></div>
-        <div style="display:flex;align-items:center;gap:5px;"><span id="dash-ret-val" style="font-size:13px;font-weight:800;font-family:'JetBrains Mono',monospace;color:#00d4aa;">—</span><span style="font-size:10px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;color:#8892b0;">retention</span></div>
-      </div>
-      <div style="display:flex;background:#fff;border-bottom:1px solid rgba(0,0,0,.07);">
-        <div id="dsh-tab-s1" onclick="dashTab('s1')" style="flex:1;padding:11px 0;font-size:12px;font-weight:700;text-align:center;color:#4f8ef7;cursor:pointer;border-bottom:2px solid #4f8ef7;font-family:'Sora',sans-serif;">Step 1</div>
-        <div id="dsh-tab-s2" onclick="dashTab('s2')" style="flex:1;padding:11px 0;font-size:12px;font-weight:700;text-align:center;color:#8892b0;cursor:pointer;border-bottom:2px solid transparent;font-family:'Sora',sans-serif;">Step 2 CK</div>
-        <div id="dsh-tab-shelf" onclick="dashTab('shelf')" style="flex:1;padding:11px 0;font-size:12px;font-weight:700;text-align:center;color:#8892b0;cursor:pointer;border-bottom:2px solid transparent;font-family:'Sora',sans-serif;">Shelf</div>
-      </div>
-      <div style="padding:12px 12px 20px;">
-        <div id="dsh-content-s1">
-          <div style="background:#fff;border:1px solid rgba(0,0,0,.08);border-radius:12px;padding:12px 14px;margin-bottom:8px;display:flex;align-items:center;gap:12px;">
-            <div style="width:38px;height:38px;border-radius:10px;background:rgba(79,142,247,.1);display:flex;align-items:center;justify-content:center;flex-shrink:0;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4f8ef7" stroke-width="1.8" stroke-linecap="round"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg></div>
-            <div style="flex:1;"><div style="font-size:13px;font-weight:700;color:#0d1021;margin-bottom:2px;font-family:'Sora',sans-serif;">BoardMD S1</div><div style="font-size:10px;color:#8892b0;font-family:'Sora',sans-serif;">Adaptive MCQs · Step 1</div></div>
-            <div style="display:flex;align-items:center;gap:5px;"><span id="dnew-boardmd_s1" style="font-size:10px;font-weight:700;padding:3px 8px;border-radius:999px;font-family:'JetBrains Mono',monospace;color:#4f8ef7;background:rgba(79,142,247,.1);border:1px solid rgba(79,142,247,.25);">—</span><span id="ddue-boardmd_s1" style="font-size:10px;font-weight:700;padding:3px 8px;border-radius:999px;font-family:'JetBrains Mono',monospace;color:#f59e0b;background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.25);">—</span></div>
-            <button onclick="launchDeck('boardmd_s1')" style="padding:7px 14px;background:#4f8ef7;border:none;border-radius:8px;font-family:'Sora',sans-serif;font-size:12px;font-weight:700;color:#fff;cursor:pointer;margin-left:6px;white-space:nowrap;">Study</button>
-          </div>
-          <div style="background:#fff;border:1px solid rgba(0,0,0,.08);border-radius:12px;padding:12px 14px;margin-bottom:8px;display:flex;align-items:center;gap:12px;">
-            <div style="width:38px;height:38px;border-radius:10px;background:rgba(79,142,247,.1);display:flex;align-items:center;justify-content:center;flex-shrink:0;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4f8ef7" stroke-width="1.8" stroke-linecap="round"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg></div>
-            <div style="flex:1;"><div style="font-size:13px;font-weight:700;color:#0d1021;margin-bottom:2px;font-family:'Sora',sans-serif;">Core Review</div><div style="font-size:10px;color:#8892b0;font-family:'Sora',sans-serif;">Board-focused clinical vignettes</div></div>
-            <div style="display:flex;align-items:center;gap:5px;"><span id="dnew-s1_core" style="font-size:10px;font-weight:700;padding:3px 8px;border-radius:999px;font-family:'JetBrains Mono',monospace;color:#4f8ef7;background:rgba(79,142,247,.1);border:1px solid rgba(79,142,247,.25);">—</span><span id="ddue-s1_core" style="font-size:10px;font-weight:700;padding:3px 8px;border-radius:999px;font-family:'JetBrains Mono',monospace;color:#f59e0b;background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.25);">—</span></div>
-            <button onclick="launchDeck('s1_core')" style="padding:7px 14px;background:#4f8ef7;border:none;border-radius:8px;font-family:'Sora',sans-serif;font-size:12px;font-weight:700;color:#fff;cursor:pointer;margin-left:6px;white-space:nowrap;">Study</button>
-          </div>
-          <div style="background:#fff;border:1px solid rgba(0,0,0,.08);border-radius:12px;margin-bottom:8px;overflow:hidden;">
-            <div onclick="dashToggle('exp-s1','chev-s1')" style="padding:12px 14px;display:flex;align-items:center;gap:12px;cursor:pointer;">
-              <div style="width:38px;height:38px;border-radius:10px;background:rgba(0,212,170,.1);display:flex;align-items:center;justify-content:center;flex-shrink:0;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#00d4aa" stroke-width="1.8" stroke-linecap="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div>
-              <div style="flex:1;"><div style="font-size:13px;font-weight:700;color:#0d1021;margin-bottom:2px;font-family:'Sora',sans-serif;">Rapid Review</div><div style="font-size:10px;color:#8892b0;font-family:'Sora',sans-serif;">6 subdecks by system</div></div>
-              <div style="display:flex;align-items:center;gap:5px;"><span id="dnew-s1" style="font-size:10px;font-weight:700;padding:3px 8px;border-radius:999px;font-family:'JetBrains Mono',monospace;color:#4f8ef7;background:rgba(79,142,247,.1);border:1px solid rgba(79,142,247,.25);">—</span><span id="ddue-s1" style="font-size:10px;font-weight:700;padding:3px 8px;border-radius:999px;font-family:'JetBrains Mono',monospace;color:#f59e0b;background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.25);">—</span></div>
-              <svg id="chev-s1" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8892b0" stroke-width="2" stroke-linecap="round" style="flex-shrink:0;transition:transform .2s;margin-left:4px;"><polyline points="6 9 12 15 18 9"/></svg>
-            </div>
-            <div id="exp-s1" style="display:none;border-top:1px solid rgba(0,0,0,.07);"><div onclick="launchDeck('s1')" style="padding:10px 14px 10px 56px;display:flex;align-items:center;gap:8px;border-bottom:1px solid rgba(0,0,0,.05);cursor:pointer;" onmouseover="this.style.background='#f8f9fd'" onmouseout="this.style.background='transparent'"><div style="flex:1;font-size:12px;font-weight:600;color:#3a4060;font-family:'Sora',sans-serif;">Full Rapid Review</div><span id="dnew-s1" style="font-size:10px;font-weight:700;padding:2px 7px;border-radius:999px;font-family:'JetBrains Mono',monospace;color:#4f8ef7;background:rgba(79,142,247,.1);border:1px solid rgba(79,142,247,.2);">—</span></div><div onclick="launchDeck('hy1')" style="padding:10px 14px 10px 56px;display:flex;align-items:center;gap:8px;border-bottom:1px solid rgba(0,0,0,.05);cursor:pointer;" onmouseover="this.style.background='#f8f9fd'" onmouseout="this.style.background='transparent'"><div style="flex:1;font-size:12px;font-weight:600;color:#3a4060;font-family:'Sora',sans-serif;">HY Concepts</div><span id="dnew-hy1" style="font-size:10px;font-weight:700;padding:2px 7px;border-radius:999px;font-family:'JetBrains Mono',monospace;color:#4f8ef7;background:rgba(79,142,247,.1);border:1px solid rgba(79,142,247,.2);">—</span></div><div onclick="launchDeck('fa_s1')" style="padding:10px 14px 10px 56px;display:flex;align-items:center;gap:8px;border-bottom:1px solid rgba(0,0,0,.05);cursor:pointer;" onmouseover="this.style.background='#f8f9fd'" onmouseout="this.style.background='transparent'"><div style="flex:1;font-size:12px;font-weight:600;color:#3a4060;font-family:'Sora',sans-serif;">Clinical Patterns</div><span id="dnew-fa_s1" style="font-size:10px;font-weight:700;padding:2px 7px;border-radius:999px;font-family:'JetBrains Mono',monospace;color:#4f8ef7;background:rgba(79,142,247,.1);border:1px solid rgba(79,142,247,.2);">—</span></div><div onclick="launchDeck('arrows')" style="padding:10px 14px 10px 56px;display:flex;align-items:center;gap:8px;border-bottom:1px solid rgba(0,0,0,.05);cursor:pointer;" onmouseover="this.style.background='#f8f9fd'" onmouseout="this.style.background='transparent'"><div style="flex:1;font-size:12px;font-weight:600;color:#3a4060;font-family:'Sora',sans-serif;">Trends & Arrows</div><span id="dnew-arrows" style="font-size:10px;font-weight:700;padding:2px 7px;border-radius:999px;font-family:'JetBrains Mono',monospace;color:#4f8ef7;background:rgba(79,142,247,.1);border:1px solid rgba(79,142,247,.2);">—</span></div><div onclick="launchDeck('ethics')" style="padding:10px 14px 10px 56px;display:flex;align-items:center;gap:8px;border-bottom:1px solid rgba(0,0,0,.05);cursor:pointer;" onmouseover="this.style.background='#f8f9fd'" onmouseout="this.style.background='transparent'"><div style="flex:1;font-size:12px;font-weight:600;color:#3a4060;font-family:'Sora',sans-serif;">HY Ethics</div><span id="dnew-ethics" style="font-size:10px;font-weight:700;padding:2px 7px;border-radius:999px;font-family:'JetBrains Mono',monospace;color:#4f8ef7;background:rgba(79,142,247,.1);border:1px solid rgba(79,142,247,.2);">—</span></div><div onclick="launchDeck('fa_step1')" style="padding:10px 14px 10px 56px;display:flex;align-items:center;gap:8px;border-bottom:1px solid rgba(0,0,0,.05);cursor:pointer;" onmouseover="this.style.background='#f8f9fd'" onmouseout="this.style.background='transparent'"><div style="flex:1;font-size:12px;font-weight:600;color:#3a4060;font-family:'Sora',sans-serif;">Foundations</div><span id="dnew-fa_step1" style="font-size:10px;font-weight:700;padding:2px 7px;border-radius:999px;font-family:'JetBrains Mono',monospace;color:#4f8ef7;background:rgba(79,142,247,.1);border:1px solid rgba(79,142,247,.2);">—</span></div></div>
-          </div>        </div>
-        <div id="dsh-content-s2" style="display:none;">
-          <div style="background:#fff;border:1px solid rgba(0,0,0,.08);border-radius:12px;padding:12px 14px;margin-bottom:8px;display:flex;align-items:center;gap:12px;">
-            <div style="width:38px;height:38px;border-radius:10px;background:rgba(245,158,11,.1);display:flex;align-items:center;justify-content:center;flex-shrink:0;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="1.8" stroke-linecap="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></div>
-            <div style="flex:1;"><div style="font-size:13px;font-weight:700;color:#0d1021;margin-bottom:2px;font-family:'Sora',sans-serif;">BoardMD S2 CK</div><div style="font-size:10px;color:#8892b0;font-family:'Sora',sans-serif;">Adaptive MCQs · Step 2 CK</div></div>
-            <div style="display:flex;align-items:center;gap:5px;"><span id="dnew-boardmd_s2" style="font-size:10px;font-weight:700;padding:3px 8px;border-radius:999px;font-family:'JetBrains Mono',monospace;color:#4f8ef7;background:rgba(79,142,247,.1);border:1px solid rgba(79,142,247,.25);">—</span><span id="ddue-boardmd_s2" style="font-size:10px;font-weight:700;padding:3px 8px;border-radius:999px;font-family:'JetBrains Mono',monospace;color:#f59e0b;background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.25);">—</span></div>
-            <button onclick="launchDeck('boardmd_s2')" style="padding:7px 14px;background:#4f8ef7;border:none;border-radius:8px;font-family:'Sora',sans-serif;font-size:12px;font-weight:700;color:#fff;cursor:pointer;margin-left:6px;white-space:nowrap;">Study</button>
-          </div>
-          <div style="background:#fff;border:1px solid rgba(0,0,0,.08);border-radius:12px;padding:12px 14px;margin-bottom:8px;display:flex;align-items:center;gap:12px;">
-            <div style="width:38px;height:38px;border-radius:10px;background:rgba(79,142,247,.1);display:flex;align-items:center;justify-content:center;flex-shrink:0;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4f8ef7" stroke-width="1.8" stroke-linecap="round"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg></div>
-            <div style="flex:1;"><div style="font-size:13px;font-weight:700;color:#0d1021;margin-bottom:2px;font-family:'Sora',sans-serif;">Core Review</div><div style="font-size:10px;color:#8892b0;font-family:'Sora',sans-serif;">Clinical scenarios Step 2 CK</div></div>
-            <div style="display:flex;align-items:center;gap:5px;"><span id="dnew-core" style="font-size:10px;font-weight:700;padding:3px 8px;border-radius:999px;font-family:'JetBrains Mono',monospace;color:#4f8ef7;background:rgba(79,142,247,.1);border:1px solid rgba(79,142,247,.25);">—</span><span id="ddue-core" style="font-size:10px;font-weight:700;padding:3px 8px;border-radius:999px;font-family:'JetBrains Mono',monospace;color:#f59e0b;background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.25);">—</span></div>
-            <button onclick="launchDeck('core')" style="padding:7px 14px;background:#4f8ef7;border:none;border-radius:8px;font-family:'Sora',sans-serif;font-size:12px;font-weight:700;color:#fff;cursor:pointer;margin-left:6px;white-space:nowrap;">Study</button>
-          </div>
-          <div style="background:#fff;border:1px solid rgba(0,0,0,.08);border-radius:12px;margin-bottom:8px;overflow:hidden;">
-            <div onclick="dashToggle('exp-s2','chev-s2')" style="padding:12px 14px;display:flex;align-items:center;gap:12px;cursor:pointer;">
-              <div style="width:38px;height:38px;border-radius:10px;background:rgba(0,212,170,.1);display:flex;align-items:center;justify-content:center;flex-shrink:0;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#00d4aa" stroke-width="1.8" stroke-linecap="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div>
-              <div style="flex:1;"><div style="font-size:13px;font-weight:700;color:#0d1021;margin-bottom:2px;font-family:'Sora',sans-serif;">Rapid Review</div><div style="font-size:10px;color:#8892b0;font-family:'Sora',sans-serif;">Classic subdeck included</div></div>
-              <div style="display:flex;align-items:center;gap:5px;"><span id="dnew-s2" style="font-size:10px;font-weight:700;padding:3px 8px;border-radius:999px;font-family:'JetBrains Mono',monospace;color:#4f8ef7;background:rgba(79,142,247,.1);border:1px solid rgba(79,142,247,.25);">—</span><span id="ddue-s2" style="font-size:10px;font-weight:700;padding:3px 8px;border-radius:999px;font-family:'JetBrains Mono',monospace;color:#f59e0b;background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.25);">—</span></div>
-              <svg id="chev-s2" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8892b0" stroke-width="2" stroke-linecap="round" style="flex-shrink:0;transition:transform .2s;margin-left:4px;"><polyline points="6 9 12 15 18 9"/></svg>
-            </div>
-            <div id="exp-s2" style="display:none;border-top:1px solid rgba(0,0,0,.07);"><div onclick="launchDeck('s2')" style="padding:10px 14px 10px 56px;display:flex;align-items:center;gap:8px;border-bottom:1px solid rgba(0,0,0,.05);cursor:pointer;" onmouseover="this.style.background='#f8f9fd'" onmouseout="this.style.background='transparent'"><div style="flex:1;font-size:12px;font-weight:600;color:#3a4060;font-family:'Sora',sans-serif;">Classic</div><span id="dnew-s2" style="font-size:10px;font-weight:700;padding:2px 7px;border-radius:999px;font-family:'JetBrains Mono',monospace;color:#4f8ef7;background:rgba(79,142,247,.1);border:1px solid rgba(79,142,247,.2);">—</span></div></div>
-          </div>        </div>
-        <div id="dsh-content-shelf" style="display:none;">
-          <div style="background:#fff;border:1px solid rgba(0,0,0,.08);border-radius:12px;padding:12px 14px;margin-bottom:8px;display:flex;align-items:center;gap:12px;">
-            <div style="width:38px;height:38px;border-radius:10px;background:rgba(255,83,112,.1);display:flex;align-items:center;justify-content:center;flex-shrink:0;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ff5370" stroke-width="1.8" stroke-linecap="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
-            <div style="flex:1;"><div style="font-size:13px;font-weight:700;color:#0d1021;margin-bottom:2px;font-family:'Sora',sans-serif;">Emergency Medicine</div><div style="font-size:10px;color:#8892b0;font-family:'Sora',sans-serif;">BoardMD Shelf</div></div>
-            <div style="display:flex;align-items:center;gap:5px;"><span id="dnew-shelf_em" style="font-size:10px;font-weight:700;padding:3px 8px;border-radius:999px;font-family:'JetBrains Mono',monospace;color:#4f8ef7;background:rgba(79,142,247,.1);border:1px solid rgba(79,142,247,.25);">—</span><span id="ddue-shelf_em" style="font-size:10px;font-weight:700;padding:3px 8px;border-radius:999px;font-family:'JetBrains Mono',monospace;color:#f59e0b;background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.25);">—</span></div>
-            <button onclick="launchDeck('shelf_em')" style="padding:7px 14px;background:#4f8ef7;border:none;border-radius:8px;font-family:'Sora',sans-serif;font-size:12px;font-weight:700;color:#fff;cursor:pointer;margin-left:6px;white-space:nowrap;">Study</button>
-          </div>
-          <div style="background:#fff;border:1px solid rgba(0,0,0,.08);border-radius:12px;padding:12px 14px;margin-bottom:8px;display:flex;align-items:center;gap:12px;">
-            <div style="width:38px;height:38px;border-radius:10px;background:rgba(255,83,112,.1);display:flex;align-items:center;justify-content:center;flex-shrink:0;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ff5370" stroke-width="1.8" stroke-linecap="round"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div>
-            <div style="flex:1;"><div style="font-size:13px;font-weight:700;color:#0d1021;margin-bottom:2px;font-family:'Sora',sans-serif;">Surgery</div><div style="font-size:10px;color:#8892b0;font-family:'Sora',sans-serif;">BoardMD Shelf</div></div>
-            <div style="display:flex;align-items:center;gap:5px;"><span id="dnew-shelf_surgery" style="font-size:10px;font-weight:700;padding:3px 8px;border-radius:999px;font-family:'JetBrains Mono',monospace;color:#4f8ef7;background:rgba(79,142,247,.1);border:1px solid rgba(79,142,247,.25);">—</span><span id="ddue-shelf_surgery" style="font-size:10px;font-weight:700;padding:3px 8px;border-radius:999px;font-family:'JetBrains Mono',monospace;color:#f59e0b;background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.25);">—</span></div>
-            <button onclick="launchDeck('shelf_surgery')" style="padding:7px 14px;background:#4f8ef7;border:none;border-radius:8px;font-family:'Sora',sans-serif;font-size:12px;font-weight:700;color:#fff;cursor:pointer;margin-left:6px;white-space:nowrap;">Study</button>
-          </div>
-          <div style="background:#fff;border:1px solid rgba(0,0,0,.08);border-radius:12px;padding:12px 14px;margin-bottom:8px;display:flex;align-items:center;gap:12px;opacity:.45;">
-            <div style="width:38px;height:38px;border-radius:10px;background:rgba(136,146,176,.1);display:flex;align-items:center;justify-content:center;flex-shrink:0;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8892b0" stroke-width="1.8" stroke-linecap="round"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg></div>
-            <div style="flex:1;"><div style="font-size:13px;font-weight:700;color:#0d1021;margin-bottom:2px;font-family:'Sora',sans-serif;">Family Medicine</div><div style="font-size:10px;color:#8892b0;font-family:'Sora',sans-serif;">BoardMD Shelf</div></div>
-            <span style="font-size:10px;font-weight:700;padding:3px 8px;border-radius:999px;font-family:'JetBrains Mono',monospace;color:#8892b0;background:rgba(136,146,176,.1);border:1px solid rgba(136,146,176,.2);">Soon</span>
-          </div>
-          <div style="background:#fff;border:1px solid rgba(0,0,0,.08);border-radius:12px;padding:12px 14px;margin-bottom:8px;display:flex;align-items:center;gap:12px;opacity:.45;">
-            <div style="width:38px;height:38px;border-radius:10px;background:rgba(136,146,176,.1);display:flex;align-items:center;justify-content:center;flex-shrink:0;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8892b0" stroke-width="1.8" stroke-linecap="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></div>
-            <div style="flex:1;"><div style="font-size:13px;font-weight:700;color:#0d1021;margin-bottom:2px;font-family:'Sora',sans-serif;">Internal Medicine</div><div style="font-size:10px;color:#8892b0;font-family:'Sora',sans-serif;">BoardMD Shelf</div></div>
-            <span style="font-size:10px;font-weight:700;padding:3px 8px;border-radius:999px;font-family:'JetBrains Mono',monospace;color:#8892b0;background:rgba(136,146,176,.1);border:1px solid rgba(136,146,176,.2);">Soon</span>
-          </div>
-          <div style="background:#fff;border:1px solid rgba(0,0,0,.08);border-radius:12px;padding:12px 14px;margin-bottom:8px;display:flex;align-items:center;gap:12px;opacity:.45;">
-            <div style="width:38px;height:38px;border-radius:10px;background:rgba(136,146,176,.1);display:flex;align-items:center;justify-content:center;flex-shrink:0;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8892b0" stroke-width="1.8" stroke-linecap="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div>
-            <div style="flex:1;"><div style="font-size:13px;font-weight:700;color:#0d1021;margin-bottom:2px;font-family:'Sora',sans-serif;">Neurology</div><div style="font-size:10px;color:#8892b0;font-family:'Sora',sans-serif;">BoardMD Shelf</div></div>
-            <span style="font-size:10px;font-weight:700;padding:3px 8px;border-radius:999px;font-family:'JetBrains Mono',monospace;color:#8892b0;background:rgba(136,146,176,.1);border:1px solid rgba(136,146,176,.2);">Soon</span>
-          </div>
-          <div style="background:#fff;border:1px solid rgba(0,0,0,.08);border-radius:12px;padding:12px 14px;margin-bottom:8px;display:flex;align-items:center;gap:12px;opacity:.45;">
-            <div style="width:38px;height:38px;border-radius:10px;background:rgba(136,146,176,.1);display:flex;align-items:center;justify-content:center;flex-shrink:0;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8892b0" stroke-width="1.8" stroke-linecap="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div>
-            <div style="flex:1;"><div style="font-size:13px;font-weight:700;color:#0d1021;margin-bottom:2px;font-family:'Sora',sans-serif;">OB-GYN</div><div style="font-size:10px;color:#8892b0;font-family:'Sora',sans-serif;">BoardMD Shelf</div></div>
-            <span style="font-size:10px;font-weight:700;padding:3px 8px;border-radius:999px;font-family:'JetBrains Mono',monospace;color:#8892b0;background:rgba(136,146,176,.1);border:1px solid rgba(136,146,176,.2);">Soon</span>
-          </div>
-          <div style="background:#fff;border:1px solid rgba(0,0,0,.08);border-radius:12px;padding:12px 14px;margin-bottom:8px;display:flex;align-items:center;gap:12px;opacity:.45;">
-            <div style="width:38px;height:38px;border-radius:10px;background:rgba(136,146,176,.1);display:flex;align-items:center;justify-content:center;flex-shrink:0;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8892b0" stroke-width="1.8" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
-            <div style="flex:1;"><div style="font-size:13px;font-weight:700;color:#0d1021;margin-bottom:2px;font-family:'Sora',sans-serif;">Pediatrics</div><div style="font-size:10px;color:#8892b0;font-family:'Sora',sans-serif;">BoardMD Shelf</div></div>
-            <span style="font-size:10px;font-weight:700;padding:3px 8px;border-radius:999px;font-family:'JetBrains Mono',monospace;color:#8892b0;background:rgba(136,146,176,.1);border:1px solid rgba(136,146,176,.2);">Soon</span>
-          </div>
-          <div style="background:#fff;border:1px solid rgba(0,0,0,.08);border-radius:12px;padding:12px 14px;margin-bottom:8px;display:flex;align-items:center;gap:12px;opacity:.45;">
-            <div style="width:38px;height:38px;border-radius:10px;background:rgba(136,146,176,.1);display:flex;align-items:center;justify-content:center;flex-shrink:0;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8892b0" stroke-width="1.8" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg></div>
-            <div style="flex:1;"><div style="font-size:13px;font-weight:700;color:#0d1021;margin-bottom:2px;font-family:'Sora',sans-serif;">Psychiatry</div><div style="font-size:10px;color:#8892b0;font-family:'Sora',sans-serif;">BoardMD Shelf</div></div>
-            <span style="font-size:10px;font-weight:700;padding:3px 8px;border-radius:999px;font-family:'JetBrains Mono',monospace;color:#8892b0;background:rgba(136,146,176,.1);border:1px solid rgba(136,146,176,.2);">Soon</span>
-          </div>        </div>
-      </div>
+    <div class="deck-stats-row" id="dh-stats-row">
+      <div class="ds-pill"><span class="ds-pill-num dt-new" id="dh-total-new">—</span><span class="ds-pill-label">New</span></div>
+      <div class="ds-pill"><span class="ds-pill-num dt-lrn" id="dh-total-lrn">—</span><span class="ds-pill-label">Learning</span></div>
+      <div class="ds-pill"><span class="ds-pill-num dt-rev" id="dh-total-rev">—</span><span class="ds-pill-label">To Review</span></div>
+    </div>
+    <div class="deck-manage-wrap" id="deck-manage-wrap">
+      <div class="deck-manage-title">My Decks — select which to show</div>
+      <div class="deck-manage-chips" id="deck-manage-chips"></div>
+    </div>
+    <table class="deck-table">
+      <thead>
+        <tr>
+          <th>Deck</th>
+          <th>New</th>
+          <th>Learning</th>
+          <th>Review</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="dh-tbody">
+      </tbody>
+    </table>
+    <div class="deck-home-actions">
+      <button class="dh-btn-study" id="dh-study-btn" onclick="startStudyFromHome()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:6px"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        Start Studying
+      </button>
+      <button class="dh-btn-settings" onclick="openSettings()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        Settings
+      </button>
     </div>
   </div>
 
@@ -1667,7 +1586,7 @@ const DEFAULT_SETTINGS={
 let deckSettings={};
 (function(){
   try{deckSettings=JSON.parse(localStorage.getItem(SETTINGS_KEY)||'{}');}catch(e){}
-  const allDecks=['boardmd_s1','boardmd_s2','s1','s2','core','hy1','arrows','fa_s1','ethics','s1_core','fa_step1','shelf_surgery','shelf_em','shelf_fm','shelf_im','shelf_neuro','shelf_obgyn','shelf_peds','shelf_psych'];
+  const allDecks=['boardmd_s1','boardmd_s2','s1','s2','core','hy','hy1','arrows','fa_s1','ethics','s1_core','fa_step1','shelf_surgery','shelf_em'];
   allDecks.forEach(dk=>{
     if(!deckSettings[dk]) deckSettings[dk]={...DEFAULT_SETTINGS};
     Object.keys(DEFAULT_SETTINGS).forEach(k=>{
@@ -1693,7 +1612,7 @@ let todayData={};
 (function(){
   try{todayData=JSON.parse(localStorage.getItem(TODAY_KEY)||'{}');}catch(e){}
   const today=dayStamp();
-  const allDecks=['boardmd_s1','boardmd_s2','s1','s2','core','hy1','arrows','fa_s1','ethics','s1_core','fa_step1','shelf_surgery','shelf_em','shelf_fm','shelf_im','shelf_neuro','shelf_obgyn','shelf_peds','shelf_psych'];
+  const allDecks=['boardmd_s1','boardmd_s2','s1','s2','core','hy','hy1','arrows','fa_s1','ethics','s1_core','fa_step1','shelf_surgery','shelf_em'];
   allDecks.forEach(dk=>{
     if(!todayData[dk]||todayData[dk].date!==today) todayData[dk]={date:today,newSeen:0};
   });
@@ -1971,7 +1890,7 @@ function saveHiddenDecks(){try{localStorage.setItem('bmd_hidden_decks',JSON.stri
 
 function buildDeckManage(){
   const s1Ids=['boardmd_s1','s1_core','s1','hy1','fa_step1','fa_s1','arrows','ethics'];
-  const s2Ids=['boardmd_s2','core','s2','shelf_surgery','shelf_em','shelf_fm','shelf_im','shelf_neuro','shelf_obgyn','shelf_peds','shelf_psych'];
+  const s2Ids=['boardmd_s2','core','s2','hy','shelf_surgery','shelf_em'];
   const s1Decks=[
     {id:'boardmd_s1',name:'BoardMD S1'},{id:'s1_core',name:'Core Review'},
     {id:'s1',name:'Rapid Review'},{id:'hy1',name:'HY Concepts'},
@@ -1980,8 +1899,9 @@ function buildDeckManage(){
   ];
   const s2Decks=[
     {id:'boardmd_s2',name:'BoardMD S2'},{id:'core',name:'Core Review'},
-    {id:'s2',name:'Rapid Review'},
-    {id:'shelf',name:'BoardMD Shelf'},
+    {id:'s2',name:'Rapid Review'},{id:'hy',name:'HY Concepts'},
+    {id:'shelf_surgery',name:'BoardMD Shelf'},
+    {id:'shelf_em',name:'BoardMD Shelf EM'},
   ];
   const stepIds   = currentStep==='s1' ? s1Ids   : s2Ids;
   const stepDecks = currentStep==='s1' ? s1Decks : s2Decks;
@@ -2021,7 +1941,7 @@ function toggleAllStep(ids){
   saveHiddenDecks();buildDeckHomeTable();buildDeckManage();
 }
 function toggleAllDecks(){
-  const allIds=['boardmd_s1','s1_core','s1','hy1','fa_step1','fa_s1','arrows','ethics','boardmd_s2','core','s2','shelf_surgery','shelf_em','shelf_fm','shelf_im','shelf_neuro','shelf_obgyn','shelf_peds','shelf_psych'];
+  const allIds=['boardmd_s1','s1_core','s1','hy1','fa_step1','fa_s1','arrows','ethics','boardmd_s2','core','s2','hy','shelf_surgery','shelf_em'];
   const allActive=allIds.every(id=>!hiddenDecks.includes(id));
   hiddenDecks=allActive?[...allIds]:[];
   saveHiddenDecks();buildDeckHomeTable();buildDeckManage();
@@ -2050,70 +1970,15 @@ function buildDeckHomeTable(){
     {id:'boardmd_s2', name:'BoardMD · Step 2 CK',         sub:'Adaptive MCQs · 15,623 cards',    step:'s2'},
     {id:'s2',         name:'Step 2 CK · Rapid Review',    sub:'Clinical Essentials · 522 cards', step:'s2'},
     {id:'core',       name:'Step 2 CK · Core Review',     sub:'Board-Focused · 4,107 cards',     step:'s2'},
-    {id:'shelf',         name:'BoardMD Shelf · All Rotations',      sub:'Shelf Exams · 180 cards',          step:'s2', shelf:true},
-
-    {id:'shelf_im',      name:'BoardMD Shelf · Internal Medicine',   sub:'Shelf Exam · Coming soon',         step:'s2', shelf:true, soon:true},
-    {id:'shelf_fm',      name:'BoardMD Shelf · Family Medicine',     sub:'Shelf Exam · Coming soon',         step:'s2', shelf:true, soon:true},
-    {id:'shelf_obgyn',   name:'BoardMD Shelf · OB/GYN',              sub:'Shelf Exam · Coming soon',         step:'s2', shelf:true, soon:true},
-    {id:'shelf_peds',    name:'BoardMD Shelf · Pediatrics',          sub:'Shelf Exam · Coming soon',         step:'s2', shelf:true, soon:true},
-    {id:'shelf_psych',   name:'BoardMD Shelf · Psychiatry',          sub:'Shelf Exam · Coming soon',         step:'s2', shelf:true, soon:true},
-    {id:'shelf_neuro',   name:'BoardMD Shelf · Neurology',           sub:'Shelf Exam · Coming soon',         step:'s2', shelf:true, soon:true},
+    {id:'hy',         name:'Step 2 CK · HY Concepts',     sub:'Highest Yield · 144 cards',       step:'s2'},
+    {id:'shelf_surgery', name:'BoardMD Shelf',           sub:'Shelf Exams · 100 cards',         step:'s2'},
+    {id:'shelf_em',      name:'BoardMD Shelf EM',         sub:'Shelf Exams · 96 cards',          step:'s2'},
   ];
   // Filter by current step
   const decks = allDecksConfig.filter(d => d.step === currentStep);
   buildDeckManage();
-  let shelfHeaderAdded=false;
-  decks.filter(({id})=>!hiddenDecks.includes(id)).forEach(({id,name,sub,shelf,soon})=>{
-    // Add BoardMD Shelf group header before first shelf deck
-    if(shelf && !shelfHeaderAdded){
-      shelfHeaderAdded=true;
-      // Count total shelf cards
-      const shelfIds=['shelf'];
-      let shelfNew=0,shelfLrn=0,shelfRev=0;
-      shelfIds.forEach(sid=>{
-        const sc=(window.DECKS||DECKS)[sid]||[];
-        const sNewSeen=todayData[sid]?.newSeen||0;
-        const sNewLeft=Math.max(0,c.newPerDay-sNewSeen);
-        let sc2=0;
-        sc.forEach(card=>{
-          const s=getState(card.id);
-          if(s.state===ST_NEW&&sc2<sNewLeft){shelfNew++;sc2++;}
-          else if((s.state===ST_LRN||s.state===ST_RLN)&&s.due<=now+1200000)shelfLrn++;
-          else if(s.state===ST_REV&&s.due<=now+86400000)shelfRev++;
-        });
-      });
-      const hdr=document.createElement('tr');
-      hdr.style.cssText='cursor:pointer;border-top:1px solid var(--border);';
-      hdr.id='shelf-accordion-row';
-      hdr.onclick=()=>{
-        const open=hdr.dataset.open==='1';
-        hdr.dataset.open=open?'0':'1';
-        const arrow=hdr.querySelector('.shelf-arrow');
-        if(arrow) arrow.style.transform=open?'rotate(0deg)':'rotate(90deg)';
-        document.querySelectorAll('.shelf-sub-row').forEach(r=>{r.style.display=open?'none':'';});
-      };
-      hdr.dataset.open='0';
-      hdr.innerHTML=`
-        <td style="padding:14px 12px;">
-          <div style="display:flex;align-items:center;gap:8px;">
-            <span class="shelf-arrow" style="color:var(--accent);font-size:12px;transition:transform .2s;transform:rotate(0deg)">▶</span>
-            <div>
-              <div class="dt-name" style="color:var(--accent)">BoardMD Shelf</div>
-              <div class="dt-sub">Shelf Exams · 8 rotations</div>
-            </div>
-          </div>
-        </td>
-        <td class="dt-num ${shelfNew>0?'dt-new':'dt-zero'}">${shelfNew}</td>
-        <td class="dt-num ${shelfLrn>0?'dt-lrn':'dt-zero'}">${shelfLrn}</td>
-        <td class="dt-num ${shelfRev>0?'dt-rev':'dt-zero'}">${shelfRev}</td>
-        <td style="text-align:center;padding:0 12px;">
-          <button onclick="event.stopPropagation();switchDeck('shelf_surgery');openSettings();" title="Settings" style="background:none;border:none;color:var(--text-faint);cursor:pointer;padding:4px 6px;border-radius:6px;display:inline-flex;align-items:center;opacity:.5;transition:opacity .15s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='.5'">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-          </button>
-        </td>`;
-      tbody.appendChild(hdr);
-    }
-    const cards=(window.DECKS||DECKS)[id]||[];
+  decks.filter(({id})=>!hiddenDecks.includes(id)).forEach(({id,name,sub})=>{
+    const cards=DECKS[id]||[];
     // Re-read today from storage for cross-tab accuracy
     const today=dayStamp();
     try{
@@ -2131,17 +1996,11 @@ function buildDeckHomeTable(){
     });
     totalNew+=nw;totalLrn+=lrn;totalRev+=rev;
     const tr=document.createElement('tr');
-    if(shelf) { tr.classList.add('shelf-sub-row'); tr.style.display='none'; }
     if(id===currentDeck) tr.classList.add('dt-active');
-    tr.onclick=()=>{ if(!soon) switchDeckAndStudy(id); };
+    tr.onclick=()=>{switchDeckAndStudy(id);};
     tr.innerHTML=`
       <td>
-        <div style="display:flex;align-items:center;gap:8px;${shelf?'padding-left:12px':''}">
-          <div>
-            <div class="dt-name">${shelf?name.replace('BoardMD Shelf · ',''):name}${soon?'<span style="margin-left:6px;font-size:9px;font-weight:700;color:var(--text-faint);background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:1px 5px;vertical-align:middle">SOON</span>':''}</div>
-            <div class="dt-sub">${sub}</div>
-          </div>
-        </div>
+        <div><div class="dt-name">${name}</div><div class="dt-sub">${sub}</div></div>
       </td>
       <td class="dt-num ${nw>0?'dt-new':'dt-zero'}">${nw}</td>
       <td class="dt-num ${lrn>0?'dt-lrn':'dt-zero'}">${lrn}</td>
@@ -2181,7 +2040,7 @@ function goHome(){
 // Track which step the user is studying
 let currentStep = localStorage.getItem('bmd_step') || 's1'; // 's1' or 's2'
 const STEP1_DECKS = ['boardmd_s1','s1_core','s1','hy1','fa_step1','fa_s1','arrows','ethics'];
-const STEP2_DECKS = ['boardmd_s2','core','s2','shelf','shelf_surgery','shelf_em','shelf_fm','shelf_im','shelf_neuro','shelf_obgyn','shelf_peds','shelf_psych'];
+const STEP2_DECKS = ['boardmd_s2','core','s2','hy','shelf_surgery','shelf_em'];
 const SHELF_DECKS = ['shelf_surgery','shelf_em'];
 
 function openApp(dk){
@@ -2898,7 +2757,7 @@ function searchBids(){
   bids.forEach(bid=>{
     let match=null;
     for(const dk of boardmdDecks){
-      const cards=(window.DECKS||DECKS)[dk]||[];
+      const cards=DECKS[dk]||[];
       match=cards.find(c=>(c.id||'').replace(/^boardmd_s[12]_/,'')===bid);
       if(match) break;
     }
@@ -2985,13 +2844,6 @@ function revealAnswer(sel,card){
   // CASO 1: campo d preenchido → usar diretamente
   if(card.d && card.d.trim()){
     let dClean = card.d.trim();
-    // Parse JSON format {"Option":"explanation",...}
-    if(dClean.startsWith('{')){
-      try{
-        const dObj=JSON.parse(dClean);
-        dClean=Object.entries(dObj).map(([k,v])=>'**'+k+'**: '+v).join('\n');
-      }catch(e){}
-    }
     dClean = dClean.replace(/<[^>]*>\s*Distractor(?:\s+Notes)?(?:\s*\([^)]*\))?:?\s*<\/[^>]*>/gi, '');
     dClean = dClean.replace(/<strong>\s*Distractor(?:\s+Notes)?(?:\s*\([^)]*\))?:?\s*<\/strong>/gi, '');
     dClean = dClean.replace(/^Distractor(?:\s+Notes)?(?:\s*\([^)]*\))?:?\s*/i, '');
@@ -3454,25 +3306,25 @@ function searchQids(){
   if(statusEl) statusEl.textContent='Searching…';
 
   // Search all decks — match both numeric and string qid fields
-  const searchDecks=['s1_core','boardmd_s1','boardmd_s2','core','s1','s2','hy1','fa_s1','arrows','ethics','fa_step1','shelf_surgery','shelf_em'];
+  const searchDecks=['s1_core','boardmd_s1','boardmd_s2','core','s1','s2','hy','hy1','fa_s1','arrows','ethics','fa_step1','shelf_surgery','shelf_em'];
   const found=[],missing=[];
 
   qids.forEach(qid=>{
-    // Collect ALL cards with this QID across ALL decks
-    let matches=[];
+    let match=null;
     for(const dk of searchDecks){
-      const cards=(window.DECKS||DECKS)[dk]||[];
-      const hits=cards.filter(c=>
+      const cards=DECKS[dk]||[];
+      // Match numeric qid or string qid
+      match=cards.find(c=>
         String(c.qid)===qid ||
         c.qid===parseInt(qid)
       );
-      matches=matches.concat(hits);
+      if(match) break;
     }
-    if(matches.length) found.push({qid,cards:matches});
+    if(match) found.push({qid,card:match});
     else missing.push(qid);
   });
 
-  qidSessionCards=found.flatMap(f=>f.cards);
+  qidSessionCards=found.map(f=>f.card);
 
   // Update UI
   const wrap=document.getElementById('qid-results-wrap');
@@ -3482,18 +3334,16 @@ function searchQids(){
   const launchBtn=document.getElementById('qid-launch-btn');
 
   if(wrap) wrap.style.display='';
-  if(foundCount) foundCount.textContent=qidSessionCards.length;
+  if(foundCount) foundCount.textContent=found.length;
   if(missCount) missCount.textContent=missing.length>0?missing.length+' not found':'';
 
   if(resList){
     resList.innerHTML='';
-    found.forEach(({qid,cards})=>{
-      cards.forEach(card=>{
-        const row=document.createElement('div');
-        row.className='qid-result-row qid-result-found';
-        row.innerHTML=`<span class="qid-result-label">QID ${qid}</span><span class="qid-result-topic">${card.topic||card.system||'—'} <span style="opacity:.6;font-size:10px">[${card.deck}]</span></span><span style="color:var(--emerald)">✓</span>`;
-        resList.appendChild(row);
-      });
+    found.forEach(({qid,card})=>{
+      const row=document.createElement('div');
+      row.className='qid-result-row qid-result-found';
+      row.innerHTML=`<span class="qid-result-label">QID ${qid}</span><span class="qid-result-topic">${card.topic||card.system||'—'}</span><span style="color:var(--emerald)">✓</span>`;
+      resList.appendChild(row);
     });
     missing.forEach(qid=>{
       const row=document.createElement('div');
@@ -3503,10 +3353,10 @@ function searchQids(){
     });
   }
 
-  if(launchBtn) launchBtn.disabled=qidSessionCards.length===0;
+  if(launchBtn) launchBtn.disabled=found.length===0;
   if(statusEl){
-    if(qidSessionCards.length===0) statusEl.textContent='No cards found — check your QIDs';
-    else statusEl.textContent=qidSessionCards.length+' card'+(qidSessionCards.length!==1?'s':'')+' found across '+found.length+' QID'+(found.length!==1?'s':'');
+    if(found.length===0) statusEl.textContent='No cards found — check your QIDs';
+    else statusEl.textContent=found.length+' of '+qids.length+' card'+(found.length!==1?'s':'')+' found';
   }
 }
 function launchQidSession(){
@@ -4610,7 +4460,7 @@ function studySearchResults(){
   </div>
 </div>
 
-<div id="search-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:2000;align-items:center;justify-content:center;backdrop-filter:blur(6px)" onclick="if(event.target===this)closeCardSearch()"><div style="background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:28px;width:min(580px,95vw);max-height:88vh;overflow-y:auto;display:flex;flex-direction:column;gap:16px"><div style="display:flex;justify-content:space-between;align-items:flex-start"><div><div style="font-family:'Instrument Serif',serif;font-size:22px;color:var(--text)">Search Cards</div><div style="font-size:12px;color:var(--text-dim);margin-top:4px">Search by topic, keyword or system · Filter by Step 1 or Step 2 CK</div></div><button class="qid-close" onclick="closeCardSearch()">&#x2715;</button></div><input id="search-input" type="text" placeholder="e.g. aortic stenosis, iron deficiency…" oninput="runCardSearch()" onkeydown="if(event.key==='Enter'){var btn=document.getElementById('search-study-btn');if(btn&&!btn.disabled)studySearchResults();}" autocomplete="off" style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:11px 14px;color:var(--text);font-size:14px;font-family:'Lato',sans-serif;outline:none;width:100%"><div style="display:flex;gap:6px;flex-wrap:wrap"><button class="search-chip active" data-deck="all" onclick="toggleSChip(this)">All Decks</button><button class="search-chip" data-deck="step1" onclick="toggleSChip(this)">Step 1</button><button class="search-chip" data-deck="step2" onclick="toggleSChip(this)">Step 2 CK</button><button class="search-chip" data-deck="boardmd_s1" onclick="toggleSChip(this)">BoardMD S1</button><button class="search-chip" data-deck="boardmd_s2" onclick="toggleSChip(this)">BoardMD S2</button><button class="search-chip" data-deck="s1" onclick="toggleSChip(this)">Rapid S1</button><button class="search-chip" data-deck="fa_s1" onclick="toggleSChip(this)">Clinical Patterns</button><button class="search-chip" data-deck="arrows" onclick="toggleSChip(this)">Arrows</button><button class="search-chip" data-deck="s2" onclick="toggleSChip(this)">Rapid S2</button><button class="search-chip" data-deck="core" onclick="toggleSChip(this)">Core S2</button><button class="search-chip" data-deck="hy1" onclick="toggleSChip(this)">HY S1</button><button class="search-chip" data-deck="ethics" onclick="toggleSChip(this)">Ethics</button><button class="search-chip" data-deck="shelf_surgery" onclick="toggleSChip(this)">Surgery Shelf</button></div><div id="search-results"><div style="text-align:center;color:var(--text-faint);font-size:13px;padding:32px 0">Start typing to search…</div></div><div id="search-actions" style="display:none;gap:10px;align-items:center;padding-top:8px;border-top:1px solid var(--border)"><button id="search-study-btn" onclick="studySearchResults()" style="background:var(--accent);color:#fff;border:none;border-radius:9px;padding:11px 22px;font-family:'Lato',sans-serif;font-size:13px;font-weight:700;cursor:pointer">Study matched cards</button><span id="search-count-label" style="font-size:12px;color:var(--text-dim)"></span></div></div></div>
+<div id="search-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:2000;align-items:center;justify-content:center;backdrop-filter:blur(6px)" onclick="if(event.target===this)closeCardSearch()"><div style="background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:28px;width:min(580px,95vw);max-height:88vh;overflow-y:auto;display:flex;flex-direction:column;gap:16px"><div style="display:flex;justify-content:space-between;align-items:flex-start"><div><div style="font-family:'Instrument Serif',serif;font-size:22px;color:var(--text)">Search Cards</div><div style="font-size:12px;color:var(--text-dim);margin-top:4px">Search by topic, keyword or system · Filter by Step 1 or Step 2 CK</div></div><button class="qid-close" onclick="closeCardSearch()">&#x2715;</button></div><input id="search-input" type="text" placeholder="e.g. aortic stenosis, iron deficiency…" oninput="runCardSearch()" onkeydown="if(event.key==='Enter'){var btn=document.getElementById('search-study-btn');if(btn&&!btn.disabled)studySearchResults();}" autocomplete="off" style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:11px 14px;color:var(--text);font-size:14px;font-family:'Lato',sans-serif;outline:none;width:100%"><div style="display:flex;gap:6px;flex-wrap:wrap"><button class="search-chip active" data-deck="all" onclick="toggleSChip(this)">All Decks</button><button class="search-chip" data-deck="step1" onclick="toggleSChip(this)">Step 1</button><button class="search-chip" data-deck="step2" onclick="toggleSChip(this)">Step 2 CK</button><button class="search-chip" data-deck="boardmd_s1" onclick="toggleSChip(this)">BoardMD S1</button><button class="search-chip" data-deck="boardmd_s2" onclick="toggleSChip(this)">BoardMD S2</button><button class="search-chip" data-deck="s1" onclick="toggleSChip(this)">Rapid S1</button><button class="search-chip" data-deck="fa_s1" onclick="toggleSChip(this)">Clinical Patterns</button><button class="search-chip" data-deck="arrows" onclick="toggleSChip(this)">Arrows</button><button class="search-chip" data-deck="s2" onclick="toggleSChip(this)">Rapid S2</button><button class="search-chip" data-deck="core" onclick="toggleSChip(this)">Core S2</button><button class="search-chip" data-deck="hy" onclick="toggleSChip(this)">HY S2</button><button class="search-chip" data-deck="hy1" onclick="toggleSChip(this)">HY S1</button><button class="search-chip" data-deck="ethics" onclick="toggleSChip(this)">Ethics</button><button class="search-chip" data-deck="shelf_surgery" onclick="toggleSChip(this)">Surgery Shelf</button></div><div id="search-results"><div style="text-align:center;color:var(--text-faint);font-size:13px;padding:32px 0">Start typing to search…</div></div><div id="search-actions" style="display:none;gap:10px;align-items:center;padding-top:8px;border-top:1px solid var(--border)"><button id="search-study-btn" onclick="studySearchResults()" style="background:var(--accent);color:#fff;border:none;border-radius:9px;padding:11px 22px;font-family:'Lato',sans-serif;font-size:13px;font-weight:700;cursor:pointer">Study matched cards</button><span id="search-count-label" style="font-size:12px;color:var(--text-dim)"></span></div></div></div>
   <footer style="
     text-align:center;
     padding:24px 20px;
@@ -4723,8 +4573,6 @@ function studySearchResults(){
       <div>
         <label style="font-size:10px;font-weight:700;letter-spacing:.08em;color:var(--text-faint);font-family:'JetBrains Mono',monospace;text-transform:uppercase;display:block;margin-bottom:6px">Explanation</label>
         <textarea id="editor-exp" style="width:100%;min-height:110px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:'Lato',sans-serif;font-size:13px;padding:12px;resize:vertical;line-height:1.6;transition:border-color .15s;outline:none" onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border)'"></textarea>
-        <label style="font-size:10px;font-weight:700;letter-spacing:.08em;color:var(--text-faint);font-family:'JetBrains Mono',monospace;text-transform:uppercase;display:block;margin-top:12px;margin-bottom:6px">Why the Others Are Wrong</label>
-        <textarea id="editor-dist" placeholder="Distractor explanations (one per line: OptionText — reason)" style="width:100%;min-height:90px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:'Lato',sans-serif;font-size:13px;padding:12px;resize:vertical;line-height:1.6;transition:border-color .15s;outline:none" onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border)'"></textarea>
       </div>
 
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
@@ -4740,7 +4588,6 @@ function studySearchResults(){
     </div>
 
     <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding-top:8px;border-top:1px solid var(--border)">
-      <div id="editor-img-section" style="width:100%;margin-bottom:12px;padding:12px;background:var(--surface2);border-radius:10px;border:1px solid var(--border)"><div style="font-size:10px;font-weight:700;letter-spacing:.08em;color:var(--text-faint);font-family:JetBrains Mono,monospace;text-transform:uppercase;margin-bottom:8px">Image</div><div id="editor-img-current" style="display:none;align-items:center;gap:12px;margin-bottom:10px"><img id="editor-img-preview" src="" style="width:80px;height:60px;object-fit:cover;border-radius:6px;border:1px solid var(--border)"><button onclick="removeCardImage()" style="background:rgba(244,63,94,.1);border:1px solid rgba(244,63,94,.3);color:var(--rose);padding:7px 14px;border-radius:7px;cursor:pointer;font-size:12px;font-weight:700;font-family:Lato,sans-serif">Remove image</button></div><div style="font-size:10px;color:var(--text-faint);margin-bottom:6px;font-family:JetBrains Mono,monospace">New image URL (Wikimedia CC BY-SA)</div><div style="display:flex;gap:8px"><input id="editor-img-url" type="text" placeholder="https://upload.wikimedia.org/..." style="flex:1;background:var(--surface);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:Lato,sans-serif;font-size:12px;padding:7px 10px;outline:none"><button onclick="setCardImage()" style="background:rgba(59,127,255,.1);border:1px solid rgba(59,127,255,.3);color:var(--accent);padding:7px 14px;border-radius:7px;cursor:pointer;font-size:12px;font-weight:700;font-family:Lato,sans-serif">Set</button></div></div>
       <button onclick="saveCardEdit()" style="background:var(--accent);color:#fff;border:none;border-radius:9px;padding:11px 26px;font-family:'Lato',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:all .15s" onmouseover="this.style.background='#5a8fff'" onmouseout="this.style.background='var(--accent)'">Save Changes</button>
       <button onclick="resetCardEdit()" style="background:none;color:var(--rose);border:1px solid rgba(244,63,94,.3);border-radius:9px;padding:11px 18px;font-family:'Lato',sans-serif;font-size:13px;cursor:pointer;transition:all .15s" onmouseover="this.style.background='rgba(244,63,94,.08)'" onmouseout="this.style.background='none'">Reset</button>
       <button onclick="closeCardEditor();showEditsManager()" style="background:none;color:var(--text-faint);border:1px solid var(--border);border-radius:9px;padding:11px 18px;font-family:'Lato',sans-serif;font-size:13px;cursor:pointer;transition:all .15s;margin-left:auto" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text-faint)'">My Edits →</button>
@@ -4775,7 +4622,6 @@ function openCardEditor(){
   document.getElementById('editor-card-id').textContent = 'ID: ' + card.id + (card.qid ? '  ·  QID ' + card.qid : '');
   document.getElementById('editor-q').value = c.q || '';
   document.getElementById('editor-exp').value = c.e || '';
-  document.getElementById('editor-dist').value = c.d || '';
   document.getElementById('editor-system').value = c.system || '';
   document.getElementById('editor-topic').value = c.topic || '';
 
@@ -4797,15 +4643,6 @@ function openCardEditor(){
 
   const overlay = document.getElementById('card-editor-overlay');
   overlay.style.display = 'flex';
-  const imgSection = document.getElementById('editor-img-section');
-  if(imgSection){
-    imgSection.style.display = 'block';
-    const hasImg = card.img && card.img.url;
-    const currentDiv = document.getElementById('editor-img-current');
-    const imgEl = document.getElementById('editor-img-preview');
-    if(hasImg){ if(imgEl) imgEl.src = card.img.url; if(currentDiv) currentDiv.style.display='flex'; }
-    else { if(currentDiv) currentDiv.style.display='none'; }
-  }
   document.getElementById('editor-saved-msg').style.opacity = '0';
 }
 
@@ -4821,7 +4658,6 @@ function saveCardEdit(){
 
   const newQ = document.getElementById('editor-q').value.trim();
   const newExp = document.getElementById('editor-exp').value.trim();
-  const newDist = document.getElementById('editor-dist').value.trim();
   const newSystem = document.getElementById('editor-system').value.trim();
   const newTopic = document.getElementById('editor-topic').value.trim();
 
@@ -4840,7 +4676,7 @@ function saveCardEdit(){
     q: newQ || card.q,
     c: correctText || card.c,
     w: wrongTexts.length ? wrongTexts : card.w,
-    d: newDist || card.d,
+    d: newExp || card.d,
     system: newSystem || card.system,
     topic: newTopic || card.topic,
     _edited: true,
@@ -4852,81 +4688,12 @@ function saveCardEdit(){
   // Aplicar ao card em memória imediatamente
   Object.assign(card, edits[card.id]);
 
-  // Salvar direto no Supabase
-  const supaUpdate = {
-    q: edits[card.id].q,
-    c: edits[card.id].c,
-    w: edits[card.id].w,
-    e: edits[card.id].d,
-    system: edits[card.id].system,
-    d: edits[card.id].d,
-    topic: edits[card.id].topic
-  };
-  fetch(SUPA_URL + '/rest/v1/cards?id=eq.' + card.id, {
-    method: 'PATCH',
-    headers: {
-      'apikey': SUPA_KEY,
-      'Authorization': 'Bearer ' + SUPA_KEY,
-      'Content-Type': 'application/json',
-      'Prefer': 'return=minimal'
-    },
-    body: JSON.stringify(supaUpdate)
-  }).then(r => {
-    if(r.ok){
-      console.log('Supabase updated:', card.id);
-      // Invalida cache IndexedDB para este card
-      try{
-        const req = indexedDB.open('boardmd_cache');
-        req.onsuccess = e => {
-          const db = e.target.result;
-          if(db.objectStoreNames.contains('cards')){
-            const tx = db.transaction('cards','readwrite');
-            tx.objectStore('cards').delete(card.id);
-          }
-        };
-      }catch(ex){}
-    }
-    else r.text().then(t => console.error('Supabase error:', t));
-  }).catch(e => console.error('Supabase fetch error:', e));
-
   // Feedback visual
   const msg = document.getElementById('editor-saved-msg');
   msg.style.opacity = '1';
   setTimeout(()=>{ msg.style.opacity='0'; closeCardEditor(); renderCard(); }, 1200);
 }
 
-async function setCardImage(){
-  if(!_editingCard) return;
-  const url = (document.getElementById('editor-img-url').value||'').trim();
-  if(!url){ alert('Paste an image URL first.'); return; }
-  const imgObj = {url:url, alt:_editingCard.c||'', credit:'Manual', license:'CC BY-SA', source:'Manual'};
-  const r = await fetch(SUPA_URL+'/rest/v1/cards?id=eq.'+_editingCard.id, {
-    method:'PATCH',
-    headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/json','Prefer':'return=minimal'},
-    body:JSON.stringify({img:imgObj})
-  });
-  if(r.ok){
-    _editingCard.img=imgObj;
-    document.getElementById('editor-img-preview').src=url;
-    document.getElementById('editor-img-current').style.display='flex';
-    document.getElementById('editor-img-url').value='';
-    renderCard();
-  }
-}
-async function removeCardImage(){
-  if(!_editingCard) return;
-  if(!confirm('Remove image from this card?')) return;
-  const r = await fetch(SUPA_URL+'/rest/v1/cards?id=eq.'+_editingCard.id, {
-    method:'PATCH',
-    headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/json','Prefer':'return=minimal'},
-    body:JSON.stringify({img:null})
-  });
-  if(r.ok){
-    _editingCard.img=null;
-    document.getElementById('editor-img-current').style.display='none';
-    renderCard();
-  }
-}
 function resetCardEdit(){
   if(!_editingCard) return;
   if(!confirm('Reset this card to its original content? Your edits will be lost.')) return;
@@ -6006,14 +5773,5 @@ html.dark mark.hl-blue,   html.dark .hl-blue   { background:none !important; col
 html.dark .hl-btn-active { border-color:#fff!important; }
 </style>
 
-<script>
-function dashTab(tab){['s1','s2','shelf'].forEach(t=>{const te=document.getElementById('dsh-tab-'+t);const ce=document.getElementById('dsh-content-'+t);if(te){te.style.color=t===tab?'#4f8ef7':'#8892b0';te.style.borderBottom=t===tab?'2px solid #4f8ef7':'2px solid transparent';}if(ce)ce.style.display=t===tab?'block':'none';});}
-function dashToggle(bid,cid){const b=document.getElementById(bid);const c=document.getElementById(cid);if(!b)return;const open=b.style.display==='none';b.style.display=open?'block':'none';if(c)c.style.transform=open?'rotate(180deg)':'rotate(0deg)';}
-function launchDeck(dk){if(typeof openApp==='function')openApp(dk);}
-function dashUpdateCounters(){const now=Date.now();const c=typeof cfg==='function'?cfg():{newPerDay:20};const ids=['boardmd_s1','s1_core','s1','hy1','fa_s1','fa_step1','arrows','ethics','boardmd_s2','core','s2','shelf_em','shelf_surgery'];ids.forEach(dk=>{const cards=(window.DECKS||{})[dk]||[];if(!cards.length)return;let nc=0,dc=0,ctr=0;const ns=(typeof todayData!=='undefined'&&todayData[dk]?.newSeen)||0;const na=Math.max(0,c.newPerDay-ns);cards.forEach(card=>{const s=typeof getState==='function'?getState(card.id):{state:0,due:0};if(s.state===0){if(ctr<na){nc++;ctr++;}}else if(s.state===1||s.state===3){if(s.due<=now+1200000)dc++;}else if(s.state===2){if(s.due<=now+86400000)dc++;}});const ne=document.getElementById('dnew-'+dk);const de=document.getElementById('ddue-'+dk);if(ne)ne.textContent=nc>0?nc+' new':dc>0?'0 new':'Done';if(de)de.textContent=dc>0?dc+' due':'';});const g=typeof getGami==='function'?getGami():{};const se=document.getElementById('dash-streak-val');const ce2=document.getElementById('dash-coins-val');const re=document.getElementById('dash-ret-val');if(se)se.textContent=g.streak||0;if(ce2)ce2.textContent=(g.coins||0).toLocaleString();if(re){let tc=0,ti=0;Object.values(g.deckStats||{}).forEach(ds=>{tc+=ds.correct||0;ti+=ds.incorrect||0;});re.textContent=(tc+ti)>0?Math.round(tc/(tc+ti)*100)+'%':'—';}}
-const _oDSH=window.showDeckHome;window.showDeckHome=function(){if(_oDSH)_oDSH();setTimeout(dashUpdateCounters,200);};
-const _oBD=window.buildDecks;if(typeof _oBD==='function'){window.buildDecks=function(a){_oBD(a);setTimeout(dashUpdateCounters,300);};}
-if(!document.querySelector('link[href*="Sora"]')){const l=document.createElement('link');l.rel='stylesheet';l.href='https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&display=swap';document.head.appendChild(l);}
-</script>
 </body>
 </html>
