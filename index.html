@@ -3583,14 +3583,14 @@ async function sbFetch(path,opts={}){
 }
 
 /* AUTH */
-function fetchWithTimeout(url,opts,ms=5000){const ctrl=new AbortController();const t=setTimeout(()=>ctrl.abort(),ms);return fetch(url,{...opts,signal:ctrl.signal}).finally(()=>clearTimeout(t));}nasync function initAuth(){
+async function initAuth(){
   const hash=window.location.hash;
   if(hash.includes('access_token')){
     const p=new URLSearchParams(hash.substring(1));
     const token=p.get('access_token');
     if(token){
       try{
-        const res=await fetchWithTimeout(SUPA_URL+'/auth/v1/user',{headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+token}});
+        const res=await fetch(SUPA_URL+'/auth/v1/user',{headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+token}});
         if(res.ok){currentUser=await res.json();currentUser._token=token;localStorage.setItem('bmd_session',JSON.stringify({token,user:currentUser}));history.replaceState({},'',window.location.pathname);hideEl('loadingOverlay');await initApp();return;}
       }catch{}
     }
@@ -3598,7 +3598,7 @@ function fetchWithTimeout(url,opts,ms=5000){const ctrl=new AbortController();con
   try{
     const stored=JSON.parse(localStorage.getItem('bmd_session')||'null');
     if(stored?.token){
-      const res=await fetchWithTimeout(SUPA_URL+'/auth/v1/user',{headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+stored.token}});
+      const res=await fetch(SUPA_URL+'/auth/v1/user',{headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+stored.token}});
       if(res.ok){currentUser=await res.json();currentUser._token=stored.token;hideEl('loadingOverlay');await initApp();return;}
     }
   }catch{}
