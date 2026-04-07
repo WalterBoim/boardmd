@@ -3965,10 +3965,7 @@ html.light .qs-val { color: inherit; }
               <div style="text-align:center;flex:2"><div style="font-size:9px;font-weight:700;color:var(--green)">High performance</div><div style="font-size:9px;color:var(--muted);font-family:'JetBrains Mono',monospace">230+</div></div>
             </div>
           </div>
-          <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:rgba(0,212,170,.07);border-radius:var(--radius-sm);border:1px solid rgba(0,212,170,.2);margin-bottom:10px">
-            <div style="width:10px;height:10px;border-radius:50%;background:var(--green);flex-shrink:0"></div>
-            <div><div style="font-size:13px;font-weight:700;color:var(--green)">High Performance Zone</div><div style="font-size:11px;color:var(--muted);margin-top:1px">Your accuracy and speed profile matches students who scored 230+</div></div>
-          </div>
+          <div id="perf-readiness-zone" style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:rgba(128,128,128,.07);border-radius:var(--radius-sm);border:1px solid rgba(128,128,128,.2);margin-bottom:10px"><div style="width:10px;height:10px;border-radius:50%;background:var(--muted);flex-shrink:0"></div><div><div style="font-size:13px;font-weight:700;color:var(--muted)">Calculating...</div><div style="font-size:11px;color:var(--muted);margin-top:1px">Answer more cards to see your readiness zone.</div></div></div>
           <div class="pred-note" style="border-top:1px solid var(--border);padding-top:10px">
             Based on accuracy by system, response speed, and FSRS retention. <strong>Predictive accuracy improves as you answer more cards.</strong>
             <div style="margin-top:8px;display:flex;align-items:center;gap:6px;cursor:pointer" onclick="openPoststep()">
@@ -4868,6 +4865,7 @@ function applyFont(){
 // ── SESSION STATE ────────────────────────────────────────────────────
 let currentDeck='s1', currentSystem='all';
 let deck=[], againQueue=[], idx=0, revealed=false, sessionRatings={};
+let _cardStartTime = 0; // timestamp when card was shown
 let _cardState=0;
 
 // ── ANKI-FAITHFUL SESSION QUEUE ──────────────────────────────────────
@@ -5491,6 +5489,7 @@ function shuffleOpts(card){
 // ── RENDER CARD ───────────────────────────────────────────────────────
 function renderCard(){
   revealed=false;
+  _cardStartTime = Date.now(); // track response time
   // Remove Attending block from previous card
   const oldAtt = document.getElementById('att-inline-wrap');
   if(oldAtt) oldAtt.remove();
@@ -5966,6 +5965,21 @@ function revealAnswer(sel,card){
   if(revealed) return;
   revealed=true;
 
+  // Track response time
+  if(_cardStartTime > 0){
+    const responseMs = Date.now() - _cardStartTime;
+    if(responseMs > 500 && responseMs < 300000){ // 0.5s–5min = valid
+      const g0 = getGami();
+      const prev = g0.avgResponseMs || 0;
+      const cnt  = g0.responseCount || 0;
+      // Rolling average
+      g0.avgResponseMs = Math.round((prev * cnt + responseMs) / (cnt + 1));
+      g0.responseCount = cnt + 1;
+      saveGami(g0);
+    }
+    _cardStartTime = 0;
+  }
+
   // Limpa grifos da pergunta ao revelar — mantém só os da explicação
   clearQHighlights();
   const answeredCorrectly=(sel===card.c);
@@ -6266,6 +6280,14 @@ function rate(r){
   g2.deckStats[card.deck].seen++;
   if(r===0) g2.deckStats[card.deck].incorrect++;
   else      g2.deckStats[card.deck].correct++;
+  // Track system-level stats
+  if(card.system){
+    if(!g2.systemStats) g2.systemStats={};
+    const sys = card.system;
+    if(!g2.systemStats[sys]) g2.systemStats[sys]={correct:0,incorrect:0};
+    if(r===0) g2.systemStats[sys].incorrect++;
+    else      g2.systemStats[sys].correct++;
+  }
   saveGami(g2);
 
   // ── Anki-faithful Again re-queue with step timing ─────────────────
@@ -6278,6 +6300,15 @@ function rate(r){
     if(existIdx>=0) againQueue.splice(existIdx,1);
     againQueue.push(card);
   }
+
+  // Track study history for heatmap
+  try {
+    const histKey = 'bmd_study_history';
+    const hist = JSON.parse(localStorage.getItem(histKey)||'{}');
+    const today3 = new Date().toISOString().slice(0,10);
+    hist[today3] = (hist[today3]||0) + 1;
+    localStorage.setItem(histKey, JSON.stringify(hist));
+  } catch(e){}
 
   idx++;
   revealed=false;
@@ -6812,7 +6843,7 @@ function loadGami(){
 function saveGami(g){ localStorage.setItem(GAMI_KEY, JSON.stringify(g)); }
 
 function defaultGami(){
-  return { coins:0, totalCards:0, sessionCards:0, streak:0, lastStudyDate:'', perfectDays:0, deckComplete:false, badges:[], todayFirstCard:false, totalCorrect:0, totalIncorrect:0, totalHard:0, deckStats:{} };
+  return { coins:0, totalCards:0, sessionCards:0, streak:0, lastStudyDate:'', perfectDays:0, deckComplete:false, badges:[], todayFirstCard:false, totalCorrect:0, totalIncorrect:0, totalHard:0, deckStats:{}, systemStats:{}, avgResponseMs:0, responseCount:0, globalRank:null };
 }
 
 function getGami(){
@@ -9207,49 +9238,228 @@ function _perfTheme_noop() {
 // Build perf heatmap on showProfile
 function buildPerfHeatmap() {
   const grid = document.getElementById('perfHeatmap');
-  if (!grid || grid.childElementCount > 0) return;
-  const intensities = [0,0,1,0,2,1,3,2,4,3,4,2,3,4,3,4,2,3,2,4,3,2,1,3,4,3,4,4,3,4,2,3,4,4,3,4,4,4,3,2,4,4,3,4,4,3,4,4,3,4,4,4,3,4,4,4,3,4,4,4,3,4,4,4,3,4,4,4,3,4,4,4,3,4,4,4,3,4,4,4,3,4,4,4];
+  if (!grid) return;
+  grid.innerHTML = ''; // always rebuild with fresh data
   const colors = ['var(--surface2)','rgba(0,212,170,.2)','rgba(0,212,170,.4)','rgba(0,212,170,.65)','#00d4aa'];
-  intensities.slice(0,84).forEach(v => {
-    const c = document.createElement('div');
-    c.className = 'hm-cell';
-    c.style.background = colors[v];
-    grid.appendChild(c);
-  });
+
+  // Build 84 cells = 12 weeks x 7 days
+  // Read study history from localStorage
+  let studyDays = {};
+  try {
+    const hist = JSON.parse(localStorage.getItem('bmd_study_history')||'{}');
+    studyDays = hist;
+  } catch(e){}
+
+  const today = new Date();
+  for(let i = 83; i >= 0; i--){
+    const d = new Date(today);
+    d.setDate(today.getDate() - i);
+    const key = d.toISOString().slice(0,10);
+    const count = studyDays[key] || 0;
+    const intensity = count === 0 ? 0 : count < 10 ? 1 : count < 30 ? 2 : count < 60 ? 3 : 4;
+    const cell = document.createElement('div');
+    cell.className = 'hm-cell';
+    cell.style.background = colors[intensity];
+    cell.title = key + ': ' + count + ' cards';
+    grid.appendChild(cell);
+  }
 }
 
-// Sync quick stats into new performance panel
+// Sync real stats into Performance panel
 function syncPerfQuickStats() {
   try {
-    const g = getGami ? getGami() : null;
-    if (g) {
-      const el = document.getElementById('perf-qs-streak');
-      if (el) el.textContent = g.streak || 0;
-      const ec = document.getElementById('perf-qs-coins');
-      if (ec) ec.textContent = (g.coins || 0).toLocaleString();
-    }
-    // Retention
-    let correct = 0, total = 0;
+    const g = getGami();
+
+    // ── Quick stats row ──
+    const streakEl = document.getElementById('perf-qs-streak');
+    if(streakEl) streakEl.textContent = g.streak || 0;
+    const coinsEl = document.getElementById('perf-qs-coins');
+    if(coinsEl) coinsEl.textContent = (g.coins || 0).toLocaleString();
+
+    // ── FSRS Retention: avg retrievability of non-new cards ──
+    let retSum = 0, retCnt = 0;
     Object.values(window.DECKS || {}).forEach(cards => {
       (cards||[]).forEach(card => {
         const s = getState(card.id);
-        if (s.state !== ST_NEW) { total++; if (s.ease >= 2) correct++; }
+        if(s.state !== ST_NEW && s.stability > 0) {
+          // R(t) = (1 + t/(9*S*r))^(-1) ≈ e^(-t/S) for FSRS
+          const daysSince = Math.max(0, (Date.now() - (s.due - s.interval*86400000)) / 86400000);
+          const R = Math.exp(-daysSince / Math.max(s.stability, 0.1));
+          retSum += Math.max(0, Math.min(1, R));
+          retCnt++;
+        }
       });
     });
+    const retPct = retCnt > 0 ? Math.round(retSum/retCnt*100) : null;
     const retEl = document.getElementById('perf-qs-ret');
-    if (retEl && total > 0) retEl.textContent = Math.round(correct/total*100) + '%';
-    // Speed
-    const speedEl = document.getElementById('perf-speed-num');
+    if(retEl) retEl.textContent = retPct !== null ? retPct + '%' : '—%';
+
+    // ── Response Speed ──
+    const avgMs = g.avgResponseMs || 0;
+    const speedEl  = document.getElementById('perf-speed-num');
+    const speedTxt = document.getElementById('perf-speed-txt');
     const speedBar = document.getElementById('perf-speed-bar');
     const speedYou = document.getElementById('perf-speed-you');
-    // avgResponseMs stored globally
-    if (typeof avgResponseMs !== 'undefined' && avgResponseMs > 0) {
-      const secs = Math.round(avgResponseMs / 1000);
-      if (speedEl) speedEl.textContent = secs + 's';
-      if (speedYou) { speedYou.textContent = secs + 's'; speedYou.style.color = secs < 47 ? 'var(--green)' : 'var(--amber)'; }
-      if (speedBar) { speedBar.style.width = Math.min(100, (secs/72)*100) + '%'; speedBar.style.background = secs < 47 ? 'var(--green)' : 'var(--amber)'; }
+    const speedQs  = document.getElementById('perf-speed-you');
+    if(avgMs > 0){
+      const secs = Math.round(avgMs / 1000);
+      const color = secs <= 30 ? 'var(--green)' : secs <= 50 ? 'var(--amber)' : 'var(--red)';
+      if(speedEl) { speedEl.textContent = secs + 's'; speedEl.style.color = color; }
+      if(speedYou) { speedYou.textContent = secs + 's'; speedYou.style.color = color; }
+      if(speedBar) { speedBar.style.width = Math.min(100, Math.round(secs/72*100)) + '%'; speedBar.style.background = color; }
+      const ratio = Math.round(72/Math.max(secs,1)*10)/10;
+      if(speedTxt && secs < 66) speedTxt.innerHTML = 'USMLE allows ~72s per question. You are <strong style="color:'+color+'">' + ratio + 'x faster than exam pace</strong> — a real advantage.';
+      else if(speedTxt) speedTxt.textContent = 'USMLE allows ~72s per question. Keep working on your speed.';
+    } else {
+      if(speedEl) speedEl.textContent = '—';
+      if(speedTxt) speedTxt.textContent = 'Answer more cards to see your response speed.';
     }
-  } catch(e) {}
+
+    // ── USMLE Readiness Zone (real calculation) ──
+    const totalAnswered = (g.totalCorrect||0) + (g.totalIncorrect||0);
+    const accuracy = totalAnswered > 0 ? (g.totalCorrect||0)/totalAnswered : 0;
+    const retention = retPct !== null ? retPct/100 : 0;
+    const speedScore = avgMs > 0 ? Math.min(1, 72000/avgMs) : 0.5;
+    // Weighted: 60% accuracy, 25% retention, 15% speed
+    const readinessScore = totalAnswered >= 10
+      ? (accuracy * 0.60) + (retention * 0.25) + (speedScore * 0.15)
+      : 0;
+
+    const zoneEl = document.getElementById('perf-readiness-zone');
+    if(zoneEl){
+      let zoneName, zoneColor, zoneBg, zoneBorder, zoneDesc;
+      if(totalAnswered < 10){
+        zoneName = 'Insufficient Data';
+        zoneColor = 'var(--muted)';
+        zoneBg = 'rgba(128,128,128,.07)';
+        zoneBorder = 'rgba(128,128,128,.2)';
+        zoneDesc = 'Answer at least 10 cards to see your readiness zone.';
+      } else if(readinessScore >= 0.82){
+        zoneName = 'High Performance Zone';
+        zoneColor = 'var(--green)';
+        zoneBg = 'rgba(0,212,170,.07)';
+        zoneBorder = 'rgba(0,212,170,.2)';
+        zoneDesc = 'Your profile matches students who scored 230+ on Step exams.';
+      } else if(readinessScore >= 0.68){
+        zoneName = 'Pass Zone';
+        zoneColor = 'var(--amber)';
+        zoneBg = 'rgba(245,158,11,.07)';
+        zoneBorder = 'rgba(245,158,11,.2)';
+        zoneDesc = 'Your profile is in passing range. Focus on weak systems to improve.';
+      } else {
+        zoneName = 'Below Target';
+        zoneColor = 'var(--red)';
+        zoneBg = 'rgba(255,83,112,.07)';
+        zoneBorder = 'rgba(255,83,112,.2)';
+        zoneDesc = 'Review your weak areas and increase daily card volume.';
+      }
+      zoneEl.style.cssText = 'display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:var(--radius-sm);border:1px solid '+zoneBorder+';background:'+zoneBg+';margin-bottom:10px';
+      zoneEl.innerHTML = '<div style="width:10px;height:10px;border-radius:50%;background:'+zoneColor+';flex-shrink:0"></div>' +
+        '<div><div style="font-size:13px;font-weight:700;color:'+zoneColor+'">'+zoneName+'</div>' +
+        '<div style="font-size:11px;color:var(--muted);margin-top:1px">'+zoneDesc+'</div></div>';
+    }
+
+    // Update needle position on readiness bar
+    const needleEl = document.getElementById('perf-readiness-needle');
+    if(needleEl && totalAnswered >= 10){
+      const needlePct = Math.round(readinessScore * 100);
+      needleEl.style.left = Math.min(98, Math.max(2, needlePct)) + '%';
+    }
+
+    // ── By System tab — real data ──
+    const g2 = getGami();
+    const sysList = document.getElementById('perf-systems-list');
+    if(sysList && g2.systemStats && Object.keys(g2.systemStats).length > 0){
+      const sysEntries = Object.entries(g2.systemStats)
+        .map(([sys, st]) => {
+          const tot = (st.correct||0) + (st.incorrect||0);
+          const pct = tot > 0 ? Math.round(st.correct/tot*100) : 0;
+          return {sys, correct: st.correct||0, incorrect: st.incorrect||0, tot, pct};
+        })
+        .filter(e => e.tot >= 1)
+        .sort((a,b) => b.tot - a.tot);
+
+      if(sysEntries.length > 0){
+        const avgPct = Math.round(sysEntries.reduce((s,e)=>s+e.pct,0)/sysEntries.length);
+        sysList.innerHTML = sysEntries.map(e => {
+          const color = e.pct >= 80 ? 'var(--green)' : e.pct >= 60 ? 'var(--amber)' : 'var(--red)';
+          const abbr = e.sys.split(/[\s\/&]+/).map(w=>w[0]||'').join('').toUpperCase().slice(0,2);
+          return `<div class="system-card">
+            <div class="sys-top">
+              <div class="sys-icon" style="background:${e.pct>=80?'rgba(0,212,170,.1)':e.pct>=60?'rgba(245,158,11,.1)':'rgba(255,83,112,.1)'};color:${color}">${abbr}</div>
+              <div class="sys-info"><div class="sys-name">${e.sys}</div><div class="sys-cards">${e.tot} answered</div></div>
+              <div class="sys-pct" style="color:${color}">${e.pct}%</div>
+            </div>
+            <div class="sys-bar-row">
+              <div class="sys-bar">
+                <div class="sys-bar-fill" style="width:${e.pct}%;background:${color}"></div>
+                <div class="sys-bar-avg" style="left:${avgPct}%"></div>
+              </div>
+              <div class="sys-avg-lbl">avg ${avgPct}%</div>
+            </div>
+            <div class="sys-detail">
+              <div class="sys-d"><div class="dot" style="background:var(--green)"></div><span style="color:var(--green)">${e.correct} correct</span></div>
+              <div class="sys-d"><div class="dot" style="background:var(--red)"></div><span style="color:var(--red)">${e.incorrect} incorrect</span></div>
+            </div>
+          </div>`;
+        }).join('');
+      }
+    } else if(sysList && (!g2.systemStats || Object.keys(g2.systemStats||{}).length === 0)){
+      sysList.innerHTML = '<div style="padding:24px;text-align:center;color:var(--muted);font-size:13px">Answer cards to see performance by system.</div>';
+    }
+
+    // ── Weak Areas tab — real data ──
+    const g3 = getGami();
+    const weakList = document.getElementById('perf-weak-list');
+    if(weakList && g3.systemStats){
+      const all = Object.entries(g3.systemStats)
+        .map(([sys,st])=>{
+          const tot=(st.correct||0)+(st.incorrect||0);
+          const pct=tot>0?Math.round(st.correct/tot*100):0;
+          return {sys,pct,tot,correct:st.correct||0,incorrect:st.incorrect||0};
+        })
+        .filter(e=>e.tot>=3);
+
+      const weak = all.filter(e=>e.pct<70).sort((a,b)=>a.pct-b.pct).slice(0,5);
+      const strong = all.filter(e=>e.pct>=80).sort((a,b)=>b.pct-a.pct).slice(0,3);
+
+      if(weak.length > 0 || strong.length > 0){
+        let html = '';
+        if(weak.length>0){
+          html += weak.map((e,i)=>{
+            const color = e.pct<50?'var(--red)':'var(--amber)';
+            const bg = e.pct<50?'rgba(255,83,112,.15)':'rgba(245,158,11,.12)';
+            return `<div class="weak-row">
+              <div class="weak-num" style="background:${bg};color:${color}">${i+1}</div>
+              <div class="weak-info"><div class="weak-topic">${e.sys}</div><div class="weak-sub">${e.tot} questions answered</div></div>
+              <div class="weak-right"><div class="weak-pct" style="color:${color}">${e.pct}%</div></div>
+            </div>`;
+          }).join('');
+        }
+        if(strong.length>0){
+          // Add a divider
+          html += `<div style="padding:8px 16px;background:var(--surface2);font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--muted)">Strong Areas</div>`;
+          html += strong.map((e,i)=>`<div class="weak-row">
+              <div class="weak-num" style="background:rgba(0,212,170,.1);color:var(--green)">${i+1}</div>
+              <div class="weak-info"><div class="weak-topic">${e.sys}</div><div class="weak-sub">${e.tot} questions answered</div></div>
+              <div class="weak-right"><div class="weak-pct" style="color:var(--green)">${e.pct}%</div></div>
+            </div>`).join('');
+        }
+        weakList.innerHTML = html;
+      } else {
+        weakList.innerHTML = '<div style="padding:24px;text-align:center;color:var(--muted);font-size:13px">Answer at least 3 cards per system to see weak areas.</div>';
+      }
+    }
+
+    // ── Global rank #14 — update with real ranking ──
+    const rankEl = document.getElementById('perf-qs-rank');
+    if(rankEl){
+      // Rank is from leaderboard — use stored rank if available
+      const storedRank = g.globalRank;
+      rankEl.textContent = storedRank ? '#'+storedRank : '#—';
+    }
+
+  } catch(e) { console.warn('syncPerfQuickStats', e); }
 }
 
 
