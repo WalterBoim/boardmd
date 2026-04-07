@@ -3793,6 +3793,160 @@ mark.hb{background:rgba(79,142,247,.28);border-bottom:2px solid rgba(40,100,220,
   </div>
 
 
+  <!-- PROFILE / PERFORMANCE PANEL -->
+  <div class="profile-panel" id="profile-panel">
+
+    <!-- TAB NAV -->
+    <div class="tab-nav" id="perf-tab-nav">
+      <div class="tab-btn active" onclick="switchPerfTab(0,this)">Overview</div>
+      <div class="tab-btn"        onclick="switchPerfTab(1,this)">By System</div>
+      <div class="tab-btn"        onclick="switchPerfTab(2,this)">Weak Areas</div>
+      <div class="tab-btn"        onclick="switchPerfTab(3,this)">Graphs</div>
+      <div class="tab-btn"        onclick="switchPerfTab(4,this)">By Deck</div>
+    </div>
+
+    <!-- TAB 0 — OVERVIEW -->
+    <div class="tab-panel active" id="perf-tab0">
+
+      <div class="overview-hero">
+        <div class="hero-top">
+          <!-- Accuracy ring — populated by showProfile() -->
+          <div class="ring-wrap">
+            <svg viewBox="0 0 96 96">
+              <circle class="ring-bg" cx="48" cy="48" r="38"/>
+              <circle class="ring-fill" id="perf-donut-correct" cx="48" cy="48" r="38"
+                stroke="var(--green)" stroke-dasharray="238.76" stroke-dashoffset="238.76"/>
+              <circle class="ring-fill" id="perf-donut-incorrect" cx="48" cy="48" r="38"
+                stroke="var(--red)" stroke-dasharray="238.76" stroke-dashoffset="238.76" style="display:none"/>
+            </svg>
+            <div class="ring-label">
+              <div class="ring-pct" id="perf-pct" style="color:var(--green)">&#8212;</div>
+              <div class="ring-sub">Correct</div>
+            </div>
+          </div>
+          <!-- Stats populated by showProfile() -->
+          <div class="hero-stats" id="perf-score-stats"></div>
+        </div>
+
+        <!-- USMLE Readiness -->
+        <div class="usmle-pred">
+          <div class="pred-row">
+            <div class="pred-title">USMLE Step 1 Readiness</div>
+            <div style="font-size:10px;font-weight:600;color:var(--muted)">Experimental</div>
+          </div>
+          <div style="margin-bottom:10px">
+            <div style="display:flex;gap:4px;height:10px;border-radius:999px;overflow:hidden;margin-bottom:6px">
+              <div style="flex:1;background:rgba(255,83,112,.35)"></div>
+              <div style="flex:1;background:rgba(245,158,11,.45)"></div>
+              <div style="flex:2;background:rgba(0,212,170,.45)"></div>
+            </div>
+            <div style="display:flex;justify-content:space-between;margin-top:4px">
+              <div style="text-align:center;flex:1"><div style="font-size:9px;font-weight:700;color:var(--red)">Below target</div><div style="font-size:9px;color:var(--muted);font-family:'JetBrains Mono',monospace">&lt;196</div></div>
+              <div style="text-align:center;flex:1"><div style="font-size:9px;font-weight:700;color:var(--amber)">Pass zone</div><div style="font-size:9px;color:var(--muted);font-family:'JetBrains Mono',monospace">196&#8211;230</div></div>
+              <div style="text-align:center;flex:2"><div style="font-size:9px;font-weight:700;color:var(--green)">High performance</div><div style="font-size:9px;color:var(--muted);font-family:'JetBrains Mono',monospace">230+</div></div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:rgba(0,212,170,.07);border-radius:var(--radius-sm);border:1px solid rgba(0,212,170,.2);margin-bottom:10px">
+            <div style="width:10px;height:10px;border-radius:50%;background:var(--green);flex-shrink:0"></div>
+            <div><div style="font-size:13px;font-weight:700;color:var(--green)">High Performance Zone</div><div style="font-size:11px;color:var(--muted);margin-top:1px">Your accuracy and speed profile matches students who scored 230+</div></div>
+          </div>
+          <div class="pred-note" style="border-top:1px solid var(--border);padding-top:10px">
+            Based on accuracy by system, response speed, and FSRS retention. <strong>Predictive accuracy improves as you answer more cards.</strong>
+            <div style="margin-top:8px;display:flex;align-items:center;gap:6px;cursor:pointer" onclick="openPoststep()">
+              <div style="font-size:11px;font-weight:700;color:var(--accent)">Did you already take the Step? Report your score</div>
+              <svg viewBox="0 0 24 24" style="width:12px;height:12px;stroke:var(--accent);fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Speed card -->
+      <div class="speed-card">
+        <div class="speed-top">
+          <div class="speed-title">Response Speed</div>
+          <div class="speed-val"><span class="speed-num" id="perf-speed-num">&#8212;</span><span class="speed-unit">avg / question</span></div>
+        </div>
+        <div class="speed-compare"><strong id="perf-speed-txt">Answer more cards to see your speed.</strong></div>
+        <div class="speed-bar-wrap">
+          <div class="speed-bar-row"><div class="speed-bar-lbl">You</div><div class="speed-bar"><div class="speed-bar-fill" id="perf-speed-bar" style="width:0%;background:var(--green)"></div></div><div class="speed-bar-num" id="perf-speed-you" style="color:var(--green)">&#8212;</div></div>
+          <div class="speed-bar-row"><div class="speed-bar-lbl">BoardMD avg</div><div class="speed-bar"><div class="speed-bar-fill" style="width:65%;background:var(--amber)"></div></div><div class="speed-bar-num" style="color:var(--amber)">47s</div></div>
+          <div class="speed-bar-row"><div class="speed-bar-lbl">USMLE limit</div><div class="speed-bar"><div class="speed-bar-fill" style="width:100%;background:var(--muted);opacity:.4"></div></div><div class="speed-bar-num">72s</div></div>
+        </div>
+      </div>
+
+      <!-- Quick stats -->
+      <div class="quick-stats">
+        <div class="qs-card"><div class="qs-val" style="color:var(--amber)" id="perf-qs-streak">&#8212;</div><div class="qs-lbl">Day Streak</div></div>
+        <div class="qs-card"><div class="qs-val" style="color:var(--accent)" id="perf-qs-coins">&#8212;</div><div class="qs-lbl">MDCoins</div></div>
+        <div class="qs-card"><div class="qs-val" style="color:var(--green)" id="perf-qs-ret">&#8212;</div><div class="qs-lbl">Retention</div></div>
+        <div class="qs-card"><div class="qs-val" style="color:var(--muted);font-size:16px" id="perf-qs-rank">#&#8212;</div><div class="qs-lbl">Global Rank</div></div>
+      </div>
+
+      <!-- Card activity — populated by showProfile() -->
+      <div style="margin:10px 14px 0;background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius);padding:16px 18px;">
+        <div class="speed-title" style="margin-bottom:12px">Card Activity</div>
+        <div id="perf-card-stats" style="display:flex;flex-direction:column;gap:6px;font-family:'Sora',sans-serif;font-size:13px;"></div>
+      </div>
+
+      <!-- Deck breakdown — populated by showProfile() -->
+      <div style="margin:10px 14px 0;background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius);padding:16px 18px;">
+        <div class="speed-title" style="margin-bottom:12px">Performance by Deck</div>
+        <div id="perf-deck-breakdown" style="display:flex;flex-direction:column;gap:8px;"></div>
+      </div>
+
+      <!-- Level progress — populated by showProfile() -->
+      <div style="margin:10px 14px 0;background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius);padding:16px 18px;">
+        <div class="speed-title" style="margin-bottom:10px">Level Progress</div>
+        <div id="lvl-progress-block"></div>
+      </div>
+
+      <!-- Achievements — populated by showProfile() -->
+      <div style="margin:10px 14px 20px;background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius);padding:16px 18px;">
+        <div class="speed-title" style="margin-bottom:12px">Achievements</div>
+        <div class="badges-grid" id="badges-block"></div>
+      </div>
+
+    </div><!-- /tab0 -->
+
+    <!-- TAB 1 — BY SYSTEM -->
+    <div class="tab-panel" id="perf-tab1">
+      <div class="systems-list" id="perf-systems-list" style="padding:12px 14px;display:flex;flex-direction:column;gap:8px;">
+        <div style="padding:20px;font-size:13px;color:var(--muted);text-align:center">Answer cards to see performance by system.</div>
+      </div>
+    </div>
+
+    <!-- TAB 2 — WEAK AREAS -->
+    <div class="tab-panel" id="perf-tab2">
+      <div class="sec-lbl">Priority &#8212; Study These First</div>
+      <div class="weak-card" id="perf-weak-list">
+        <div style="padding:20px;font-size:13px;color:var(--muted);text-align:center">Answer more cards to identify weak areas.</div>
+      </div>
+    </div>
+
+    <!-- TAB 3 — GRAPHS -->
+    <div class="tab-panel" id="perf-tab3">
+      <div class="graph-card" style="margin-top:14px">
+        <div class="graph-title">Study Activity &#8212; Last 12 Weeks</div>
+        <div class="heatmap-grid" id="perfHeatmap"></div>
+        <div style="display:flex;align-items:center;gap:6px;margin-top:8px;font-size:10px;color:var(--muted)">
+          <span>Less</span>
+          <div style="width:10px;height:10px;border-radius:2px;background:var(--surface2)"></div>
+          <div style="width:10px;height:10px;border-radius:2px;background:rgba(0,212,170,.5)"></div>
+          <div style="width:10px;height:10px;border-radius:2px;background:#00d4aa"></div>
+          <span>More</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 4 — BY DECK -->
+    <div class="tab-panel" id="perf-tab4">
+      <div class="deck-perf-list" id="perf-deck-breakdown2">
+        <div style="padding:20px;font-size:13px;color:var(--muted);text-align:center">Answer more cards to see breakdown by deck.</div>
+      </div>
+    </div>
+
+  </div><!-- /profile-panel -->
+
   <!-- XP TOAST -->
   <div class="xp-toast" id="xp-toast"></div>
 
