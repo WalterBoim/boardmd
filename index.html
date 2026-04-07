@@ -3811,27 +3811,40 @@ html.light .qs-val { color: inherit; }
 <div class="section-lbl">Challenges</div>
 <div id="challenges-wrap" style="display:flex;flex-direction:column;gap:12px;">
 
-  <!-- Create challenge -->
-  <div style="background:var(--surface);border:1px solid var(--border2);border-radius:16px;padding:18px 20px;">
-    <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:4px;font-family:'Sora',sans-serif;">Start a Challenge</div>
-    <div style="font-size:12px;color:var(--muted);margin-bottom:14px;font-family:'Sora',sans-serif;">Compete 1v1 or with a group. Share a code, study together, see who wins.</div>
-    <div style="display:flex;gap:8px;flex-wrap:wrap;">
-      <button onclick="createChallenge('1v1')" style="flex:1;min-width:120px;padding:10px 14px;background:rgba(79,142,247,.1);border:1.5px solid rgba(79,142,247,.3);border-radius:10px;color:var(--accent);font-size:12px;font-weight:700;font-family:'Sora',sans-serif;cursor:pointer;transition:all .15s;" onmouseover="this.style.background='rgba(79,142,247,.2)'" onmouseout="this.style.background='rgba(79,142,247,.1)'">
-        <div style="font-size:18px;margin-bottom:4px;">⚔️</div>1v1 Duel
-      </button>
-      <button onclick="createChallenge('group')" style="flex:1;min-width:120px;padding:10px 14px;background:rgba(245,158,11,.1);border:1.5px solid rgba(245,158,11,.3);border-radius:10px;color:var(--amber);font-size:12px;font-weight:700;font-family:'Sora',sans-serif;cursor:pointer;transition:all .15s;" onmouseover="this.style.background='rgba(245,158,11,.2)'" onmouseout="this.style.background='rgba(245,158,11,.1)'">
-        <div style="font-size:18px;margin-bottom:4px;">👥</div>Group
-      </button>
-      <button onclick="joinChallenge()" style="flex:1;min-width:120px;padding:10px 14px;background:rgba(0,212,170,.1);border:1.5px solid rgba(0,212,170,.3);border-radius:10px;color:var(--green);font-size:12px;font-weight:700;font-family:'Sora',sans-serif;cursor:pointer;transition:all .15s;" onmouseover="this.style.background='rgba(0,212,170,.2)'" onmouseout="this.style.background='rgba(0,212,170,.1)'">
-        <div style="font-size:18px;margin-bottom:4px;">🔗</div>Join by Code
-      </button>
+  <!-- How it works — always visible -->
+  <div style="background:linear-gradient(135deg,rgba(79,142,247,.08),rgba(0,212,170,.06));border:1px solid rgba(79,142,247,.15);border-radius:14px;padding:14px 16px;display:flex;align-items:center;gap:12px;">
+    <div style="font-size:28px;flex-shrink:0;">🏆</div>
+    <div>
+      <div style="font-size:13px;font-weight:700;color:var(--text);font-family:'Sora',sans-serif;margin-bottom:2px;">Compete with friends</div>
+      <div style="font-size:12px;color:var(--muted);font-family:'Sora',sans-serif;line-height:1.5;">Create a challenge, share the code, and see who earns the most MDCoins in 7 days. Works 1v1 or in groups.</div>
     </div>
   </div>
 
-  <!-- Active challenges list -->
-  <div id="challenges-list">
-    <div style="text-align:center;padding:20px;color:var(--muted);font-size:13px;font-family:'Sora',sans-serif;">No active challenges yet. Start one above!</div>
+  <!-- 3 action cards -->
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;">
+
+    <button onclick="createChallenge('1v1')" style="padding:14px 8px;background:var(--surface);border:1.5px solid var(--border2);border-radius:14px;cursor:pointer;transition:all .15s;text-align:center;" onmouseover="this.style.borderColor='var(--accent)';this.style.background='rgba(79,142,247,.05)'" onmouseout="this.style.borderColor='var(--border2)';this.style.background='var(--surface)'">
+      <div style="font-size:24px;margin-bottom:6px;">⚔️</div>
+      <div style="font-size:12px;font-weight:800;color:var(--text);font-family:'Sora',sans-serif;">1v1 Duel</div>
+      <div style="font-size:10px;color:var(--muted);font-family:'Sora',sans-serif;margin-top:3px;line-height:1.4;">You vs one friend</div>
+    </button>
+
+    <button onclick="createChallenge('group')" style="padding:14px 8px;background:var(--surface);border:1.5px solid var(--border2);border-radius:14px;cursor:pointer;transition:all .15s;text-align:center;" onmouseover="this.style.borderColor='var(--amber)';this.style.background='rgba(245,158,11,.05)'" onmouseout="this.style.borderColor='var(--border2)';this.style.background='var(--surface)'">
+      <div style="font-size:24px;margin-bottom:6px;">👥</div>
+      <div style="font-size:12px;font-weight:800;color:var(--text);font-family:'Sora',sans-serif;">Group</div>
+      <div style="font-size:10px;color:var(--muted);font-family:'Sora',sans-serif;margin-top:3px;line-height:1.4;">Up to 20 people</div>
+    </button>
+
+    <button onclick="joinChallenge()" style="padding:14px 8px;background:var(--surface);border:1.5px solid var(--border2);border-radius:14px;cursor:pointer;transition:all .15s;text-align:center;" onmouseover="this.style.borderColor='var(--green)';this.style.background='rgba(0,212,170,.05)'" onmouseout="this.style.borderColor='var(--border2)';this.style.background='var(--surface)'">
+      <div style="font-size:24px;margin-bottom:6px;">🔗</div>
+      <div style="font-size:12px;font-weight:800;color:var(--text);font-family:'Sora',sans-serif;">Join</div>
+      <div style="font-size:10px;color:var(--muted);font-family:'Sora',sans-serif;margin-top:3px;line-height:1.4;">Enter a friend's code</div>
+    </button>
+
   </div>
+
+  <!-- Active challenges list -->
+  <div id="challenges-list"></div>
 
 </div>
 
@@ -10829,19 +10842,41 @@ function createChallenge(type) {
 
   const icon = type === '1v1' ? '⚔️' : '👥';
   const label = type === '1v1' ? '1v1 Duel' : 'Group Challenge';
+  const instruction = type === '1v1'
+    ? 'Send this code to your opponent. When they enter it in "Join", the duel starts automatically.'
+    : 'Share this code with your group. Everyone enters it in "Join". Up to 20 people can join.';
 
   openChallengeModal(`
-    <div style="text-align:center;margin-bottom:20px;">
+    <div style="text-align:center;margin-bottom:16px;">
       <div style="font-size:40px;margin-bottom:8px;">${icon}</div>
       <div style="font-size:17px;font-weight:800;color:var(--text);font-family:'Sora',sans-serif;">${label} Created!</div>
-      <div style="font-size:12px;color:var(--muted);margin-top:4px;font-family:'Sora',sans-serif;">Share this code with ${type === '1v1' ? 'your opponent' : 'your group'}</div>
     </div>
-    <div style="background:var(--surface2);border:2px dashed var(--accent);border-radius:14px;padding:20px;text-align:center;margin-bottom:16px;">
-      <div style="font-size:32px;font-weight:800;letter-spacing:6px;color:var(--accent);font-family:'JetBrains Mono',monospace;">${code}</div>
-      <div style="font-size:11px;color:var(--muted);margin-top:6px;font-family:'Sora',sans-serif;">Challenge code · valid for 7 days</div>
+
+    <!-- Step 1 -->
+    <div style="display:flex;gap:10px;align-items:flex-start;margin-bottom:12px;">
+      <div style="width:22px;height:22px;background:var(--accent);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff;flex-shrink:0;margin-top:1px;">1</div>
+      <div style="font-size:12px;color:var(--muted);font-family:'Sora',sans-serif;line-height:1.5;">Copy your challenge code below</div>
     </div>
-    <button onclick="navigator.clipboard.writeText('${code}').then(()=>showXpToast('Copied!','Code ${code} copied to clipboard','','',null))" style="width:100%;padding:12px;background:var(--surface2);border:1px solid var(--border2);border-radius:12px;color:var(--text);font-size:14px;font-weight:600;cursor:pointer;font-family:'Sora',sans-serif;margin-bottom:8px;">Copy Code</button>
-    <button onclick="closeChallengeModal();renderChallengesList()" style="width:100%;padding:12px;background:var(--accent);border:none;border-radius:12px;color:#fff;font-size:14px;font-weight:700;cursor:pointer;font-family:'Sora',sans-serif;">View My Challenges</button>`);
+
+    <div style="background:var(--surface2);border:2px dashed var(--accent);border-radius:14px;padding:18px;text-align:center;margin-bottom:12px;">
+      <div style="font-size:34px;font-weight:800;letter-spacing:8px;color:var(--accent);font-family:'JetBrains Mono',monospace;">${code}</div>
+      <div style="font-size:11px;color:var(--muted);margin-top:6px;font-family:'Sora',sans-serif;">Valid for 7 days</div>
+    </div>
+    <button onclick="navigator.clipboard.writeText('${code}').then(()=>{showXpToast('Copied!','Now send the code to your friend','','',null)})" style="width:100%;padding:12px;background:var(--surface2);border:1px solid var(--border2);border-radius:12px;color:var(--text);font-size:14px;font-weight:600;cursor:pointer;font-family:'Sora',sans-serif;margin-bottom:16px;">Copy Code</button>
+
+    <!-- Step 2 -->
+    <div style="display:flex;gap:10px;align-items:flex-start;margin-bottom:12px;">
+      <div style="width:22px;height:22px;background:var(--accent);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff;flex-shrink:0;margin-top:1px;">2</div>
+      <div style="font-size:12px;color:var(--muted);font-family:'Sora',sans-serif;line-height:1.5;">${instruction}</div>
+    </div>
+
+    <!-- Step 3 -->
+    <div style="display:flex;gap:10px;align-items:flex-start;margin-bottom:20px;">
+      <div style="width:22px;height:22px;background:var(--accent);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff;flex-shrink:0;margin-top:1px;">3</div>
+      <div style="font-size:12px;color:var(--muted);font-family:'Sora',sans-serif;line-height:1.5;">Study cards and earn MDCoins. The leaderboard updates live. Most coins after 7 days wins.</div>
+    </div>
+
+    <button onclick="closeChallengeModal();renderChallengesList()" style="width:100%;padding:13px;background:var(--accent);border:none;border-radius:12px;color:#fff;font-size:14px;font-weight:700;cursor:pointer;font-family:'Sora',sans-serif;">Got it — Start Studying</button>`);
 
   renderChallengesList();
 }
@@ -10938,7 +10973,11 @@ async function renderChallengesList() {
   const local = getChallenges();
 
   if(local.length === 0) {
-    list.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted);font-size:13px;font-family:\'Sora\',sans-serif;">No active challenges yet. Start one above!</div>';
+    list.innerHTML = `<div style="background:var(--surface2);border:1px dashed var(--border2);border-radius:14px;padding:24px 20px;text-align:center;">
+      <div style="font-size:32px;margin-bottom:8px;opacity:.4;">⚔️</div>
+      <div style="font-size:13px;font-weight:700;color:var(--muted);font-family:'Sora',sans-serif;margin-bottom:4px;">No challenges yet</div>
+      <div style="font-size:12px;color:var(--muted);font-family:'Sora',sans-serif;line-height:1.5;">Create a 1v1 or group above.<br>You'll get a code to share with friends.</div>
+    </div>`;
     return;
   }
 
