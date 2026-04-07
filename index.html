@@ -3830,111 +3830,10 @@ html.light .qs-val { color: inherit; }
     <div class="rch-label">Coins</div>
     <div class="rch-label">Streak</div>
   </div>
-
-  <div class="rank-row">
-    <div class="rank-pos rp1">1</div>
-    <div class="rank-avatar">AK</div>
-    <div class="rank-info">
-      <div class="rank-name"><span class="speed-dot sd-green"></span>Ahmed K.<div class="tier-badge tier-chief" style="font-size:8px;padding:1px 6px">Chief</div></div>
-      <div class="rank-school"><span style="font-size:14px;line-height:1;vertical-align:middle;margin-right:2px;">🇺🇸</span>Harvard Medical School</div>
-    </div>
-    <div class="rank-nums">
-      <div class="rank-coins">8,420</div>
-      <div class="rank-streak">180d</div>
-    </div>
+  <!-- Dynamic rank rows — populated by renderGlobalRankFiltered() -->
+  <div id="global-rank-rows">
+    <div style="padding:24px;text-align:center;color:var(--muted);font-size:13px">Loading ranking...</div>
   </div>
-
-  <div class="rank-row">
-    <div class="rank-pos rp2">2</div>
-    <div class="rank-avatar">ML</div>
-    <div class="rank-info">
-      <div class="rank-name"><span class="speed-dot sd-green"></span>Maria L.<div class="tier-badge tier-fellow" style="font-size:8px;padding:1px 6px">Fellow</div></div>
-      <div class="rank-school"><span style="font-size:14px;line-height:1;vertical-align:middle;margin-right:2px;">🇧🇷</span>UFRJ &middot; Brazil</div>
-    </div>
-    <div class="rank-nums">
-      <div class="rank-coins">7,890</div>
-      <div class="rank-streak">92d</div>
-    </div>
-  </div>
-
-  <div class="rank-row">
-    <div class="rank-pos rp3">3</div>
-    <div class="rank-avatar">RN</div>
-    <div class="rank-info">
-      <div class="rank-name"><span class="speed-dot sd-amber"></span>Raj N.<div class="tier-badge tier-fellow" style="font-size:8px;padding:1px 6px">Fellow</div></div>
-      <div class="rank-school"><span style="font-size:14px;line-height:1;vertical-align:middle;margin-right:2px;">🇮🇳</span>AIIMS Delhi</div>
-    </div>
-    <div class="rank-nums">
-      <div class="rank-coins">7,110</div>
-      <div class="rank-streak">78d</div>
-    </div>
-  </div>
-
-  <div class="rank-row">
-    <div class="rank-pos">4</div>
-    <div class="rank-avatar">SL</div>
-    <div class="rank-info">
-      <div class="rank-name"><span class="speed-dot sd-green"></span>Sofia L.<div class="tier-badge tier-attending" style="font-size:8px;padding:1px 6px">Attending</div></div>
-      <div class="rank-school"><span style="font-size:14px;line-height:1;vertical-align:middle;margin-right:2px;">🇩🇪</span>Charité Berlin</div>
-    </div>
-    <div class="rank-nums">
-      <div class="rank-coins">6,440</div>
-      <div class="rank-streak">61d</div>
-    </div>
-  </div>
-
-  <div class="rank-row">
-    <div class="rank-pos">5</div>
-    <div class="rank-avatar">JS</div>
-    <div class="rank-info">
-      <div class="rank-name"><span class="speed-dot sd-amber"></span>James S.<div class="tier-badge tier-attending" style="font-size:8px;padding:1px 6px">Attending</div></div>
-      <div class="rank-school"><span style="font-size:14px;line-height:1;vertical-align:middle;margin-right:2px;">🇺🇸</span>Mayo Clinic</div>
-    </div>
-    <div class="rank-nums">
-      <div class="rank-coins">5,980</div>
-      <div class="rank-streak">55d</div>
-    </div>
-  </div>
-
-  <!-- locked rows 6-13 -->
-  <div class="rank-row locked">
-    <div class="rank-pos">6</div>
-    <div class="rank-avatar" style="font-size:9px">??</div>
-    <div class="lock-overlay">
-      <div class="lock-name">&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;</div>
-      <svg class="lock-icon" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
-    </div>
-    <div class="rank-nums"><div class="rank-coins">5,210</div></div>
-  </div>
-  <div class="rank-row locked">
-    <div class="rank-pos">7</div>
-    <div class="rank-avatar" style="font-size:9px">??</div>
-    <div class="lock-overlay">
-      <div class="lock-name">&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;</div>
-      <svg class="lock-icon" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
-    </div>
-    <div class="rank-nums"><div class="rank-coins">4,890</div></div>
-  </div>
-
-  <!-- divider before your row -->
-  <div style="padding:5px 18px;background:var(--surface2);border-top:1px solid var(--border);border-bottom:1px solid var(--border)">
-    <div style="font-size:10px;color:var(--muted)">&#183; &#183; &#183;</div>
-  </div>
-
-  <!-- YOUR ROW — always visible -->
-  <div class="rank-row you-row">
-    <div class="rank-pos rpy">14</div>
-    <div class="rank-avatar">W</div>
-    <div class="rank-info">
-      <div class="rank-name" style="color:var(--accent)"><span class="speed-dot sd-green"></span>You<div class="tier-badge tier-attending" style="font-size:8px;padding:1px 6px">Attending</div></div>
-      <div class="rank-school"><span style="font-size:14px;line-height:1;vertical-align:middle;margin-right:2px;">🇧🇷</span>Your University &middot; Brazil</div>
-    </div>
-    <div class="rank-nums">
-      <div class="rank-coins" style="color:var(--accent)">1,240</div>
-      <div class="rank-streak">14d</div>
-    </div>
-  </div>
-
   <div class="pro-gate">
     <div class="pro-gate-text">
       <strong>Unlock full ranking</strong>
@@ -7108,6 +7007,8 @@ function showLeaderboard(){
   if(lbb) lbb.classList.add('active');
   setTimeout(syncYourCard, 50);
   renderLeaderboard();
+  // Also render global rank with real data
+  setTimeout(() => renderGlobalRankFiltered('Global'), 200);
 }
 
 function switchLbTab(tab, el){
@@ -9799,6 +9700,118 @@ try { setInterval(updateTimer, 60000); } catch(e) {};
 function setScope(el) {
   document.querySelectorAll('.scope-chip').forEach(c => c.classList.remove('active'));
   el.classList.add('active');
+  const scope = el.textContent.trim();
+  renderGlobalRankFiltered(scope);
+}
+
+async function renderGlobalRankFiltered(scope) {
+  const table = document.getElementById('global-rank-rows');
+  if(!table) return;
+
+  // Load all leaderboard entries
+  let entries = [];
+  try {
+    const result = await window.storage.list('lb:');
+    if(result && result.keys){
+      for(const key of result.keys){
+        try{
+          const r = await window.storage.get(key, true);
+          if(r && r.value) entries.push(JSON.parse(r.value));
+        }catch(e){}
+      }
+    }
+  } catch(e){}
+
+  // Add current user
+  const me = JSON.parse(localStorage.getItem(LB_ME_KEY)||'{}');
+  const myGami = getGami();
+  if(me && me.id){
+    entries = entries.filter(e=>e.id !== me.id);
+    entries.push({id:me.id, name:me.name||'You', univ:me.univ||'', country:me.country||'', coins:myGami.coins, streak:myGami.streak, level:getLevel(myGami.coins).name, isMe:true});
+  }
+
+  // Filter by scope
+  let filtered = [...entries];
+  if(scope === 'United States'){
+    filtered = entries.filter(e => (e.country||'').toLowerCase().includes('united states'));
+  } else if(scope === 'Brazil'){
+    filtered = entries.filter(e => (e.country||'').toLowerCase().includes('brazil'));
+  } else if(scope === 'Step 1'){
+    filtered = entries.filter(e => e.step === 'step1' || !e.step); // default to step1
+  } else if(scope === 'Step 2 CK'){
+    filtered = entries.filter(e => e.step === 'step2');
+  } else if(scope === 'Shelf'){
+    filtered = entries.filter(e => e.step === 'shelf');
+  }
+
+  // Sort by coins
+  filtered.sort((a,b) => (b.coins||0) - (a.coins||0));
+
+  if(filtered.length === 0){
+    table.innerHTML = '<div style="padding:24px;text-align:center;color:var(--muted);font-size:13px">No students found for this filter yet.</div>';
+    return;
+  }
+
+  // Find my position
+  const myPos = filtered.findIndex(e => e.isMe || e.id === me?.id);
+
+  // Render rows
+  const colors=['#3b7fff','#8b5cf6','#06b6d4','#10b981','#f59e0b','#ef4444','#ec4899','#6366f1'];
+  function avatarColor(name){ let h=0; for(let i=0;i<(name||'').length;i++) h=(name||'').charCodeAt(i)+((h<<5)-h); return colors[Math.abs(h)%colors.length]; }
+  function initials(name){ if(!name) return '?'; const p=(name||'').trim().split(/\s+/); return p.length>=2?(p[0][0]+p[p.length-1][0]).toUpperCase():(name[0]||'?').toUpperCase(); }
+  const countryFlag = (country) => {
+    const map = {'United States':'🇺🇸','Brazil':'🇧🇷','India':'🇮🇳','Germany':'🇩🇪','United Kingdom':'🇬🇧','Canada':'🇨🇦','Australia':'🇦🇺','France':'🇫🇷','Japan':'🇯🇵','China':'🇨🇳','South Korea':'🇰🇷','Spain':'🇪🇸','Italy':'🇮🇹','Portugal':'🇵🇹','Pakistan':'🇵🇰','Philippines':'🇵🇭','Mexico':'🇲🇽','Colombia':'🇨🇴','Argentina':'🇦🇷','Saudi Arabia':'🇸🇦','Egypt':'🇪🇬','Lebanon':'🇱🇧','Nigeria':'🇳🇬'};
+    return map[country] || '🌍';
+  };
+
+  let html = '';
+  const showMax = 7;
+  const showRows = filtered.slice(0, showMax);
+
+  showRows.forEach((entry, i) => {
+    const pos = i + 1;
+    const isMe = entry.isMe || entry.id === me?.id;
+    const posClass = pos === 1 ? 'rp1' : pos === 2 ? 'rp2' : pos === 3 ? 'rp3' : isMe ? 'rpy' : '';
+    const dotColor = (entry.streak||0) > 7 ? 'sd-green' : 'sd-amber';
+    const flag = countryFlag(entry.country||'');
+    const lvl = getLevel(entry.coins||0);
+    const tierClass = lvl.name === 'Chief' ? 'tier-chief' : lvl.name === 'Fellow' ? 'tier-fellow' : lvl.name === 'Attending' ? 'tier-attending' : 'tier-intern';
+    html += `<div class="rank-row${isMe?' you-row':''}">
+      <div class="rank-pos ${posClass}">${pos}</div>
+      <div class="rank-avatar" style="background:${isMe?'rgba(79,142,247,.15)':avatarColor(entry.name)+'22'};color:${isMe?'var(--accent)':avatarColor(entry.name)}">${initials(entry.name)}</div>
+      <div class="rank-info">
+        <div class="rank-name"><span class="speed-dot ${dotColor}"></span>${entry.name}<div class="tier-badge ${tierClass}" style="font-size:8px;padding:1px 6px">${lvl.name}</div></div>
+        <div class="rank-school"><span style="font-size:14px;line-height:1;vertical-align:middle;margin-right:2px;">${flag}</span>${entry.univ||entry.country||'—'}</div>
+      </div>
+      <div class="rank-nums">
+        <div class="rank-coins" style="${isMe?'color:var(--accent)':''}">${(entry.coins||0).toLocaleString()}</div>
+        <div class="rank-streak">${entry.streak||0}d</div>
+      </div>
+    </div>`;
+  });
+
+  // If user not in top rows, add separator + their row
+  if(myPos >= showMax && me && me.id){
+    const myEntry = filtered[myPos];
+    if(myEntry){
+      html += `<div style="padding:5px 18px;background:var(--surface2);border-top:1px solid var(--border);border-bottom:1px solid var(--border)"><div style="font-size:10px;color:var(--muted)">&#183; &#183; &#183;</div></div>`;
+      html += `<div class="rank-row you-row">
+        <div class="rank-pos rpy">${myPos+1}</div>
+        <div class="rank-avatar" style="background:rgba(79,142,247,.15);color:var(--accent)">${initials(myEntry.name)}</div>
+        <div class="rank-info">
+          <div class="rank-name" style="color:var(--accent)"><span class="speed-dot sd-green"></span>${myEntry.name}</div>
+          <div class="rank-school"><span style="font-size:14px;line-height:1;vertical-align:middle;margin-right:2px;">${countryFlag(myEntry.country)}</span>${myEntry.univ||myEntry.country||'—'}</div>
+        </div>
+        <div class="rank-nums"><div class="rank-coins" style="color:var(--accent)">${(myEntry.coins||0).toLocaleString()}</div><div class="rank-streak">${myEntry.streak||0}d</div></div>
+      </div>`;
+    }
+  }
+
+  table.innerHTML = html;
+
+  // Update title
+  const titleEl = document.querySelector('.global-title');
+  if(titleEl) titleEl.textContent = 'All time · ' + scope;
 }
 
 function bmdSetNav(el) {
