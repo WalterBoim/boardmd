@@ -457,7 +457,7 @@ html.light .qid-textarea{background:var(--surface2);}
 .badge-modal button{background:var(--accent);color:#fff;border:none;padding:11px 30px;border-radius:9px;font-family:'Lato',sans-serif;font-size:13px;font-weight:700;cursor:pointer;}
 
 /* Leaderboard panel */
-.lb-panel{display:none;flex:1;flex-direction:column;padding:32px 36px;gap:24px;max-width:800px;margin:0 auto;width:100%;}
+.lb-panel{display:none;flex:1;flex-direction:column;padding:32px 36px;gap:24px;max-width:100%;margin:0 auto;width:100%;}
 .lb-panel.active{display:flex;}
 
 /* Header */
@@ -3319,13 +3319,17 @@ html.light .qs-val { color: inherit; }
   .expand-header { padding: 18px 24px !important; }
   .subdeck { padding: 12px 24px !important; font-size: 14px !important; }
 
-  /* Ranking/Profile panels */
-  #profile-panel, #lb-panel { max-width: 100% !important; padding-bottom: 0 !important; }
-  .your-card, .league-card, .global-card, .uni-card, .scope-wrap, .section-lbl {
-    max-width: 860px !important; margin-left: auto !important; margin-right: auto !important;
+  /* Ranking/Profile panels — full width on desktop */
+  #profile-panel, #lb-panel {
+    max-width: 100% !important;
+    padding-bottom: 80px !important;
   }
+  .your-card, .league-card, .global-card,
+  .uni-card, .scope-wrap, .section-lbl,
   .overview-hero, .speed-card, .quick-stats {
-    max-width: 860px !important; margin-left: auto !important; margin-right: auto !important;
+    max-width: 860px !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
   }
 
   /* Font control visible on desktop */
