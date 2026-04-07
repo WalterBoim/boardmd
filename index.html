@@ -1079,7 +1079,7 @@ html.light .att-btn{background:var(--surface2);}
 .expand-header{padding:12px 14px;display:flex;align-items:center;gap:12px;cursor:pointer;}
 .expand-chevron{width:16px;height:16px;stroke:#8892b0;fill:none;stroke-width:2;stroke-linecap:round;flex-shrink:0;transition:transform .2s;margin-left:4px;}
 .expand-/* removed stray body rule */
-.expand-body.open{display:block;}
+.expand-body{display:none;}.expand-body.open{display:block;}
 .expand-chevron.open{transform:rotate(180deg);}
 .subdeck{padding:10px 14px 10px 56px;display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .12s;}
 .subdeck:last-child{border-bottom:none;}
@@ -3190,81 +3190,101 @@ mark.hb{background:rgba(79,142,247,.28);border-bottom:2px solid rgba(40,100,220,
 #app.active #profile-panel { padding-bottom: 100px !important; }
 </style>
 <style id="bmd-light-card-fix">
-/* ── Light mode card text fixes ── */
-html.light #card-el .card-question,
-html.light #card-el #c-q {
-  color: #0d1021 !important;
-}
-html.light .opt-btn .opt-text {
-  color: #0d1021 !important;
-}
-html.light .opt-btn .opt-letter {
-  color: #3a4060 !important;
-  background: #e8edf8 !important;
-}
-html.light .card-system,
-html.light .card-topic,
-html.light #c-deck-label,
+/* ── Light mode: all card text dark and legible ── */
+html.light #c-q,
+html.light .card-question { color: #0d1021 !important; }
+html.light .opt-btn { color: #0d1021 !important; }
+html.light .opt-btn .opt-text { color: #0d1021 !important; }
+html.light .opt-btn .opt-letter { color: #3a4060 !important; background: #e8edf8 !important; }
+html.light .opt-btn:not([disabled]):hover { background: rgba(79,142,247,.06) !important; border-color: rgba(79,142,247,.35) !important; }
+html.light #exp-txt,
+html.light .exp-text { color: #3a4060 !important; }
+html.light .dist-item { color: #3a4060 !important; }
+html.light .dist-item strong { color: #e53e5a !important; }
+html.light .exp-correct-inner,
+html.light #exp-ans { color: #00b894 !important; }
 html.light #c-sys,
-html.light #c-top {
-  color: #556080 !important;
-}
-html.light .exp-text,
-html.light #exp-txt {
-  color: #3a4060 !important;
-}
-html.light .dist-item {
-  color: #3a4060 !important;
-}
-html.light .kp-text {
-  color: #0d1021 !important;
-}
-html.light .vignette-text {
-  color: #3a4060 !important;
-}
+html.light #c-top,
+html.light .card-system,
+html.light .card-topic { color: #556080 !important; }
+html.light .exp-label { color: #556080 !important; }
+html.light .key-point-line { background: rgba(79,142,247,.08) !important; }
+html.light .kp-text,
+html.light .key-point-line * { color: #0d1021 !important; }
+html.light .att-response-text { color: #3a4060 !important; }
+html.light .speed-num { color: #00b894 !important; }
+html.light .qs-val { color: inherit; }
 </style>
 
+
 <style id="bmd-desktop-fix">
-/* ── Desktop: app panels use full width ── */
-/* CRITICAL: never use display:block!important on .app-layout — JS controls it */
+/* ── Desktop: full layout, no 430px constraints ── */
 @media(min-width: 601px) {
-  /* Bottom nav hidden on desktop — top header handles navigation */
+  /* Hide mobile-only bottom nav */
   .bmd-bottom-nav { display: none !important; }
-  
-  /* Panels: let the existing desktop layout handle sizing */
+
+  /* Dashboard: use full desktop width */
+  .nv2-deck-home {
+    max-width: 100% !important;
+    padding: 0 !important;
+  }
+
+  /* Streak bar: left-aligned with padding */
+  .streak-bar {
+    padding: 10px 32px !important;
+    justify-content: flex-start !important;
+    gap: 28px !important;
+    max-width: 100% !important;
+  }
+
+  /* Step pills: left-aligned */
+  .bmd-step-pills {
+    padding: 10px 32px 14px !important;
+    justify-content: flex-start !important;
+  }
+
+  /* Deck section: full width with padding */
+  .deck-section {
+    padding: 0 32px !important;
+    max-width: 860px !important;
+    margin: 0 auto !important;
+  }
+
+  /* Deck rows: wider on desktop */
+  .deck-row, .expand-row {
+    padding: 14px 20px !important;
+  }
+
+  /* Profile and ranking panels: full width */
   #profile-panel,
   #lb-panel {
     max-width: 100% !important;
     padding-bottom: 0 !important;
   }
-  
-  /* Dashboard deck list: constrain content width but center it */
-  .nv2-deck-home {
-    max-width: 100% !important;
-    padding: 20px 40px !important;
-  }
-  
-  /* Deck rows: nicer on desktop */
-  .deck-row, .expand-row {
-    max-width: 700px;
-    margin-left: auto;
-    margin-right: auto;
+
+  /* Your card / global card: max readable width */
+  .your-card,
+  .league-card,
+  .global-card,
+  .uni-card,
+  .scope-wrap,
+  .section-lbl {
+    max-width: 860px !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
   }
 
-  /* Step pills centered */
-  .bmd-step-pills {
-    justify-content: flex-start;
-    padding: 12px 40px 14px;
-  }
-
-  /* Streak bar */
-  .streak-bar {
-    padding: 8px 40px;
-    justify-content: flex-start;
-    gap: 24px;
+  /* Overview hero */
+  .overview-hero,
+  .speed-card,
+  .quick-stats {
+    max-width: 860px !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
   }
 }
 </style>
+
 </head>
 <body>
 
@@ -4843,7 +4863,11 @@ let _cardState=0;
 // 5. Cross-tab safety via localStorage atomic read before newSeen increment
 
 function buildSessionQueue(){
-  if(!DECKS[currentDeck]) return;
+  if(!DECKS[currentDeck]){
+    // Deck not loaded yet — cards may still be loading from Supabase
+    console.warn('BoardMD: deck not found:', currentDeck, '— available:', Object.keys(DECKS||{}));
+    deck=[]; return 0;
+  }
   const now=Date.now();
   const c=cfg();
   const sys=currentSystem;
@@ -6400,6 +6424,10 @@ function saveSettingsModal(){
   saveTodayData();
   saveSettings();
   closeSettings();
+  // Rebuild session queue with new settings
+  if(currentDeck && DECKS[currentDeck]){
+    buildSessionQueue();
+  }
   showDeckHome();
 }
 
@@ -8179,7 +8207,7 @@ function hideLoadingOverlay(){
 }
 
 // ── CACHE CONFIG ─────────────────────────────────────────────────────
-const CACHE_KEY     = 'bmd_cards_cache_v1';
+const CACHE_KEY     = 'bmd_cards_cache_v2';
 const CACHE_TS_KEY  = 'bmd_cards_cache_ts_v1';
 const CACHE_TTL_MS  = 24 * 60 * 60 * 1000; // 24 horas
 
