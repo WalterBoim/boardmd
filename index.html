@@ -8238,100 +8238,61 @@ function showLoadingOverlay(){
   if(!el){
     el = document.createElement('div');
     el.id = 'bmd-loading-overlay';
-    el.style.cssText = 'position:fixed;inset:0;z-index:99999;background:var(--bg);display:flex;flex-direction:column;font-family:"Sora",sans-serif;transition:opacity .5s ease;opacity:0;overflow:hidden;';
+    el.style.cssText = 'position:fixed;inset:0;z-index:99999;background:var(--bg);font-family:"Sora",sans-serif;transition:opacity .5s ease;opacity:0;overflow:hidden;';
     el.innerHTML = `
-      <!-- Header -->
-      <div style="padding:28px 20px 20px;text-align:center;flex-shrink:0;">
-        <div style="display:flex;align-items:baseline;justify-content:center;gap:2px;margin-bottom:8px;">
-          <span style="font-size:28px;font-weight:800;color:var(--text);letter-spacing:-1px;">Board</span>
-          <span style="font-size:28px;font-weight:800;color:var(--accent);letter-spacing:-1px;">MD</span>
+      <!-- Background card grid — blurred, decorative -->
+      <div id="bmd-card-bg-grid" style="position:absolute;inset:0;display:grid;grid-template-columns:repeat(2,1fr);gap:10px;padding:10px;filter:blur(3px);opacity:0.18;pointer-events:none;"></div>
+
+      <!-- Frosted overlay -->
+      <div style="position:absolute;inset:0;background:linear-gradient(to bottom, var(--bg) 0%, transparent 35%, transparent 65%, var(--bg) 100%);pointer-events:none;"></div>
+
+      <!-- Foreground: logo + progress -->
+      <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;">
+        <div style="display:flex;align-items:baseline;gap:2px;margin-bottom:12px;">
+          <span style="font-size:42px;font-weight:800;color:var(--text);letter-spacing:-1.5px;text-shadow:0 2px 20px rgba(0,0,0,.08);">Board</span>
+          <span style="font-size:42px;font-weight:800;color:var(--accent);letter-spacing:-1.5px;text-shadow:0 2px 20px rgba(79,142,247,.2);">MD</span>
         </div>
-        <div style="font-size:13px;color:var(--muted);margin-bottom:18px;">The smarter way to pass the boards</div>
-        <!-- Progress bar -->
-        <div style="width:140px;height:2px;background:var(--border);border-radius:2px;overflow:hidden;margin:0 auto 8px;">
-          <div id="bmd-loading-bar" style="height:100%;background:var(--accent);border-radius:2px;transition:width .4s ease;width:0%;box-shadow:0 0 6px rgba(79,142,247,.5);"></div>
+        <div style="font-size:14px;color:var(--muted);margin-bottom:44px;letter-spacing:.3px;">
+          The smarter way to pass the boards
         </div>
-        <div id="bmd-loading-count" style="font-size:10px;color:var(--muted);font-family:'JetBrains Mono',monospace;opacity:.6;min-height:14px;"></div>
-      </div>
-      <!-- Card preview grid -->
-      <div style="flex:1;overflow:hidden;padding:0 12px 12px;">
-        <div style="font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:10px;text-align:center;opacity:.5;">Loading your cards</div>
-        <div id="bmd-card-preview-grid" style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;max-height:calc(100vh - 200px);overflow:hidden;"></div>
+        <div style="width:160px;height:2px;background:var(--border);border-radius:2px;overflow:hidden;margin-bottom:12px;">
+          <div id="bmd-loading-bar" style="height:100%;background:var(--accent);border-radius:2px;transition:width .4s ease;width:0%;box-shadow:0 0 8px rgba(79,142,247,.6);"></div>
+        </div>
+        <div id="bmd-loading-count" style="font-size:11px;color:var(--muted);font-family:'JetBrains Mono',monospace;opacity:.7;min-height:16px;letter-spacing:.3px;"></div>
       </div>`;
     document.body.appendChild(el);
     requestAnimationFrame(() => { el.style.opacity = '1'; });
-    // Start skeleton animation
-    _startSkeletonCards();
   }
 }
 
-// Skeleton cards that pulse and get replaced by real content
-let _skeletonInterval = null;
-let _previewCards = [];
-
-function _startSkeletonCards(){
-  const grid = document.getElementById('bmd-card-preview-grid');
-  if(!grid) return;
-  // Build 6 skeleton cards
-  for(let i = 0; i < 6; i++){
-    const card = document.createElement('div');
-    card.style.cssText = 'background:var(--surface);border:1px solid var(--border2);border-radius:12px;padding:12px;opacity:0;transition:opacity .3s;';
-    card.innerHTML = `
-      <div style="height:7px;background:var(--border2);border-radius:4px;margin-bottom:8px;width:60%;animation:bmd-pulse 1.5s ease infinite;"></div>
-      <div style="height:6px;background:var(--border2);border-radius:4px;margin-bottom:5px;width:90%;animation:bmd-pulse 1.5s ease infinite .1s;"></div>
-      <div style="height:6px;background:var(--border2);border-radius:4px;margin-bottom:5px;width:75%;animation:bmd-pulse 1.5s ease infinite .2s;"></div>
-      <div style="height:6px;background:var(--border2);border-radius:4px;width:50%;animation:bmd-pulse 1.5s ease infinite .3s;"></div>
-      <div style="margin-top:10px;display:flex;gap:5px;">
-        <div style="height:22px;flex:1;background:var(--border2);border-radius:5px;animation:bmd-pulse 1.5s ease infinite;"></div>
-        <div style="height:22px;flex:1;background:var(--border2);border-radius:5px;animation:bmd-pulse 1.5s ease infinite .15s;"></div>
-      </div>`;
-    grid.appendChild(card);
-    setTimeout(() => { card.style.opacity = '1'; }, i * 80);
-  }
-  // Add pulse keyframe if not exists
-  if(!document.getElementById('bmd-pulse-style')){
-    const st = document.createElement('style');
-    st.id = 'bmd-pulse-style';
-    st.textContent = '@keyframes bmd-pulse{0%,100%{opacity:.4}50%{opacity:.9}}';
-    document.head.appendChild(st);
-  }
-}
-
-function _addRealCardPreview(card){
-  // Replace a skeleton with real card content
-  const grid = document.getElementById('bmd-card-preview-grid');
-  if(!grid) return;
-  const skeletons = grid.querySelectorAll('div[style*="opacity:0"], div[style*="opacity: 0"]');
-  const target = grid.children[_previewCards.length % 6];
-  if(!target) return;
-  _previewCards.push(card);
-  // Briefly flash then show real content
-  target.style.opacity = '0';
-  setTimeout(() => {
-    const sys = card.system ? '<div style="font-size:9px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--accent);margin-bottom:6px;opacity:.8">' + card.system.slice(0,28) + '</div>' : '';
-    const q = card.q ? card.q.slice(0, 80) + (card.q.length > 80 ? '…' : '') : '';
-    target.innerHTML = sys +
-      '<div style="font-size:11px;color:var(--text2);line-height:1.4;filter:blur(2.5px);user-select:none;">' + q + '</div>' +
-      '<div style="margin-top:8px;display:flex;gap:4px;">' +
-        '<div style="height:18px;flex:1;background:var(--surface2);border-radius:4px;font-size:9px;display:flex;align-items:center;justify-content:center;color:var(--muted);">A</div>' +
-        '<div style="height:18px;flex:1;background:var(--surface2);border-radius:4px;font-size:9px;display:flex;align-items:center;justify-content:center;color:var(--muted);">B</div>' +
-        '<div style="height:18px;flex:1;background:var(--surface2);border-radius:4px;font-size:9px;display:flex;align-items:center;justify-content:center;color:var(--muted);">C</div>' +
-        '<div style="height:18px;flex:1;background:var(--surface2);border-radius:4px;font-size:9px;display:flex;align-items:center;justify-content:center;color:var(--muted);">D</div>' +
-      '</div>';
-    target.style.borderColor = 'rgba(79,142,247,.15)';
-    target.style.opacity = '1';
-  }, 150);
-}
-
-function updateLoadingProgress(pct, count, latestCards){
+let _bgCards = [];
+function updateLoadingProgress(pct, count, latestBatch){
   const bar = document.getElementById('bmd-loading-bar');
   const cnt = document.getElementById('bmd-loading-count');
   if(bar) bar.style.width = pct + '%';
   if(cnt) cnt.textContent = count.toLocaleString() + ' cards loaded';
-  // Show random real cards from latest batch
-  if(latestCards && latestCards.length > 0 && _previewCards.length < 60){
-    const sample = latestCards.filter((_,i) => i % 7 === 0).slice(0, 2);
-    sample.forEach(c => _addRealCardPreview(c));
+
+  // Add cards to background grid
+  if(latestBatch && latestBatch.length > 0){
+    const grid = document.getElementById('bmd-card-bg-grid');
+    if(grid && _bgCards.length < 20){
+      const sample = latestBatch.filter((_,i) => i % 5 === 0).slice(0, 2);
+      sample.forEach(card => {
+        if(_bgCards.length >= 20) return;
+        _bgCards.push(card);
+        const div = document.createElement('div');
+        div.style.cssText = 'background:var(--surface);border:1px solid var(--border2);border-radius:14px;padding:14px;opacity:0;transition:opacity .4s;';
+        const sys = card.system ? '<div style="font-size:9px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--accent);margin-bottom:8px;">' + card.system.slice(0,24) + '</div>' : '';
+        const q = (card.q||'').slice(0,100) + ((card.q||'').length > 100 ? '…' : '');
+        div.innerHTML = sys +
+          '<div style="font-size:11px;color:var(--text2);line-height:1.5;margin-bottom:10px;">' + q + '</div>' +
+          '<div style="display:flex;gap:5px;">' +
+            ['A','B','C','D'].map(l => '<div style="flex:1;height:20px;background:var(--surface2);border-radius:5px;font-size:9px;display:flex;align-items:center;justify-content:center;color:var(--muted);">' + l + '</div>').join('') +
+          '</div>';
+        grid.appendChild(div);
+        setTimeout(() => { div.style.opacity = '1'; }, 50);
+      });
+    }
   }
 }
 function hideLoadingOverlay(){
