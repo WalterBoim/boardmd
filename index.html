@@ -4021,9 +4021,17 @@ html.light .qs-val { color: inherit; }
           <div id="perf-readiness-zone" style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:rgba(128,128,128,.07);border-radius:var(--radius-sm);border:1px solid rgba(128,128,128,.2);margin-bottom:10px"><div style="width:10px;height:10px;border-radius:50%;background:var(--muted);flex-shrink:0"></div><div><div style="font-size:13px;font-weight:700;color:var(--muted)">Calculating...</div><div style="font-size:11px;color:var(--muted);margin-top:1px">Answer more cards to see your readiness zone.</div></div></div>
           <div class="pred-note" style="border-top:1px solid var(--border);padding-top:10px">
             Based on accuracy by system, response speed, and FSRS retention. <strong>Predictive accuracy improves as you answer more cards.</strong>
-            <div style="margin-top:8px;display:flex;align-items:center;gap:6px;cursor:pointer" onclick="openPoststep()">
-              <div style="font-size:11px;font-weight:700;color:var(--accent)">Did you already take the Step? Report your score</div>
-              <svg viewBox="0 0 24 24" style="width:12px;height:12px;stroke:var(--accent);fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            <div style="margin-top:12px;">
+              <button onclick="openPoststep()" style="width:100%;padding:11px 14px;background:rgba(79,142,247,.08);border:1.5px solid rgba(79,142,247,.2);border-radius:10px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;transition:all .15s;" onmouseover="this.style.background='rgba(79,142,247,.15)'" onmouseout="this.style.background='rgba(79,142,247,.08)'">
+                <div style="display:flex;align-items:center;gap:8px;">
+                  <span style="font-size:18px;">🎓</span>
+                  <div style="text-align:left;">
+                    <div style="font-size:12px;font-weight:700;color:var(--accent);font-family:'Sora',sans-serif;">Already took the Step?</div>
+                    <div style="font-size:11px;color:var(--muted);font-family:'Sora',sans-serif;">Report your score — help calibrate predictions</div>
+                  </div>
+                </div>
+                <svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:var(--accent);fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+              </button>
             </div>
           </div>
         </div>
@@ -5264,7 +5272,27 @@ function buildDeckHomeTable(){
 }
 
 function startStudyFromHome(){switchDeckAndStudy(currentDeck);}
-function switchDeckAndStudy(dk){hideDeckHome();switchDeck(dk);}
+function switchDeckAndStudy(dk){
+  hideDeckHome();
+  if(SHELF_DECKS.includes(dk) || dk === 'shelf'){
+    // Shelf: combine all shelf decks and use buildSessionQueue
+    const combined = SHELF_DECKS.reduce((acc, d) => {
+      if(DECKS[d]) acc = acc.concat(DECKS[d]);
+      return acc;
+    }, []);
+    currentStep = 'shelf';
+    currentDeck = '_shelf_combined';
+    if(!DECKS['_shelf_combined'] || DECKS['_shelf_combined'].length === 0){
+      DECKS['_shelf_combined'] = combined;
+    }
+    againQueue = []; idx = 0; revealed = false; sessionRatings = {};
+    ensureStudyUI();
+    buildSessionQueue();
+    renderCard(); updateStats();
+  } else {
+    switchDeck(dk);
+  }
+}
 
 function goHome(){
   document.getElementById('landing').style.display='';
@@ -10147,6 +10175,10 @@ function openProfileEditor() {
   document.getElementById('pe-name').value = me.name || '';
   document.getElementById('pe-univ').value = me.univ || '';
   document.getElementById('pe-country').value = me.country || '';
+  // Step selector
+  const savedStep = me.step || currentStep || 's1';
+  document.getElementById('pe-step').value = savedStep;
+  setTimeout(() => selectProfileStep(savedStep), 50);
   // Populate search fields with current values
   const univSearch = document.getElementById('pe-univ-search');
   const countrySearch = document.getElementById('pe-country-search');
@@ -10174,6 +10206,7 @@ function closeProfileEditor() {
 
 async function saveProfileEditor() {
   const name    = (document.getElementById('pe-name')?.value||'').trim();
+  const step    = document.getElementById('pe-step')?.value || currentStep || 's1';
   const univHidden = (document.getElementById('pe-univ')?.value||'').trim();
   const univSearch = (document.getElementById('pe-univ-search')?.value||'').trim();
   const univ    = univHidden || univSearch;
@@ -11056,6 +11089,23 @@ window.showLeaderboard = function() {
   _origShowLb && _origShowLb();
   setTimeout(renderChallengesList, 300);
 };
+
+function selectProfileStep(step) {
+  document.getElementById('pe-step').value = step;
+  ['s1','s2','shelf'].forEach(s => {
+    const btn = document.getElementById('pe-step-'+s);
+    if(!btn) return;
+    if(s === step) {
+      btn.style.borderColor = 'var(--accent)';
+      btn.style.background = 'rgba(79,142,247,.1)';
+      btn.style.color = 'var(--accent)';
+    } else {
+      btn.style.borderColor = 'var(--border2)';
+      btn.style.background = 'var(--surface2)';
+      btn.style.color = 'var(--muted)';
+    }
+  });
+}
 </script>
 
 <style>
@@ -11136,6 +11186,15 @@ html.dark .hl-btn-active { border-color:#fff!important; }
           <div id="pe-univ-suggestions" style="display:none;position:absolute;left:0;right:0;top:100%;margin-top:4px;background:var(--surface);border:1.5px solid var(--accent);border-radius:10px;z-index:999;max-height:200px;overflow-y:auto;box-shadow:0 8px 24px rgba(0,0,0,.15);"></div>
         </div>
         <div id="pe-univ-selected" style="font-size:13px;color:var(--muted);font-family:'Sora',sans-serif;min-height:18px;"></div>
+      </div>
+      <div style="margin-bottom:14px;">
+        <div style="font-size:11px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--muted);margin-bottom:8px;font-family:'Sora',sans-serif;">I am studying for</div>
+        <div style="display:flex;gap:8px;">
+          <button id="pe-step-s1" onclick="selectProfileStep('s1')" style="flex:1;padding:10px 8px;border-radius:10px;border:1.5px solid var(--border2);background:var(--surface2);font-size:12px;font-weight:700;color:var(--muted);font-family:'Sora',sans-serif;cursor:pointer;transition:all .15s;">USMLE Step 1</button>
+          <button id="pe-step-s2" onclick="selectProfileStep('s2')" style="flex:1;padding:10px 8px;border-radius:10px;border:1.5px solid var(--border2);background:var(--surface2);font-size:12px;font-weight:700;color:var(--muted);font-family:'Sora',sans-serif;cursor:pointer;transition:all .15s;">Step 2 CK</button>
+          <button id="pe-step-shelf" onclick="selectProfileStep('shelf')" style="flex:1;padding:10px 8px;border-radius:10px;border:1.5px solid var(--border2);background:var(--surface2);font-size:12px;font-weight:700;color:var(--muted);font-family:'Sora',sans-serif;cursor:pointer;transition:all .15s;">Shelf</button>
+        </div>
+        <input id="pe-step" type="hidden" value="">
       </div>
       <div>
         <div style="font-size:11px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--muted);margin-bottom:8px;font-family:'Sora',sans-serif;">Country</div>
