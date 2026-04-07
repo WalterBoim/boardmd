@@ -1742,6 +1742,8 @@ updateLeagueTimer();setInterval(updateLeagueTimer,60000);
 async function initApp(){showEl('bottomNav');loadUserState();showScreen('home');updateHomeUI();await openDB();loadAllDecks().then(()=>{buildDeckList();updateHomeUI();});}
 (async()=>{await initAuth();})();
 
+const SUPA_URL='https://hwdcgbcnphkmxaasties.supabase.co';
+const SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh3ZGNnYmNucGhrbXhhYXN0aWVzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDQyMjU3NTAsImV4cCI6MjA1OTgwMTc1MH0.ygLiMpNVtW2fhRRTCKOaIGEuBCuTnBvpA5T98fQMCy0';
 /* AUTH */
 async function initAuth(){
   const hash=window.location.hash;
