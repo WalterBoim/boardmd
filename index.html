@@ -961,6 +961,8 @@ html.light { --uw-hover:#f0f7ff; --uw-correct:#e8f5e9; --uw-wrong:#fdecea; --uw-
 
 /* ── HIGHLIGHT BUTTONS ── */
 .hl-btn{width:22px;height:22px;border-radius:50%;border:2px solid transparent;cursor:pointer;transition:all .15s;flex-shrink:0;outline:none;}
+/* Card header pencil — not circular */
+#hl-toggle-btn{width:auto;height:auto;border-radius:6px;border:1px solid var(--border);padding:2px 7px;}
 .hl-btn:hover{transform:scale(1.15);}
 .hl-btn.hl-active,.hl-btn.active{border-color:var(--text);transform:scale(1.15);}
 .hl-btn-y{background:#f5c800;}mark.hl-yellow{background:#f5c800;color:#000!important;}mark.hl-green{background:#22c55e;color:#000!important;}mark.hl-blue{background:#38bdf8;color:#000!important;}
@@ -4387,8 +4389,8 @@ html.light .qs-val { color: inherit; }
                 <span id="c-deck-badge" style="font-size:9px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;font-family:'JetBrains Mono',monospace;padding:2px 7px;border-radius:20px;background:var(--accent-dim,rgba(59,127,255,.1));color:var(--accent,#3b7fff);border:1px solid rgba(59,127,255,.2);white-space:nowrap;flex-shrink:0;"></span>
                 <button onclick="if(fontSize>11){fontSize--;applyFont();}" title="Smaller text" style="background:none;border:1px solid var(--border);border-radius:6px;padding:1px 6px;cursor:pointer;font-size:11px;font-weight:700;color:var(--text-faint);font-family:'Sora',sans-serif;line-height:1.4;transition:all .15s;" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text-faint)'">A-</button>
                 <button onclick="if(fontSize<22){fontSize++;applyFont();}" title="Larger text" style="background:none;border:1px solid var(--border);border-radius:6px;padding:1px 6px;cursor:pointer;font-size:13px;font-weight:700;color:var(--text-faint);font-family:'Sora',sans-serif;line-height:1.4;transition:all .15s;" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text-faint)'">A+</button>
-                <button class="hl-btn" id="hl-toggle-btn" onclick="toggleHlToolbar()" title="Highlight" style="background:none;border:1px solid var(--border);border-radius:6px;padding:2px 6px;cursor:pointer;display:flex;align-items:center;transition:all .15s;" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">
-                  <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="var(--text-faint)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+                <button class="hl-btn" id="hl-toggle-btn" onclick="toggleHlToolbar()" title="Highlight" style="background:none;border:1px solid var(--border);border-radius:6px;padding:2px 7px;cursor:pointer;display:flex;align-items:center;justify-content:center;width:auto;height:auto;transition:all .15s;" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">
+                  <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="var(--text-faint)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
                 </button>
                 <div class="hl-swatches" id="hl-swatches-wrap">
                   <div class="sw y" onclick="setHlColor('yellow')" id="sw-y" title="Yellow"></div>
