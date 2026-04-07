@@ -5280,17 +5280,31 @@ function buildDeckHomeTable(){
 function startStudyFromHome(){switchDeckAndStudy(currentDeck);}
 function switchDeckAndStudy(dk){
   hideDeckHome();
-  if(SHELF_DECKS.includes(dk) || dk === 'shelf'){
-    // Shelf: combine all shelf decks using window.DECKS
+  if(SHELF_DECKS.includes(dk) || dk === 'shelf' || dk === 'shelf_em' || dk === 'shelf_surgery'){
     const D = window.DECKS || {};
-    const combined = SHELF_DECKS.reduce((acc, d) => {
-      if(D[d] && D[d].length > 0) acc = acc.concat(D[d]);
+    // Find ALL deck keys that contain 'shelf' in the loaded cards
+    const allDeckKeys = Object.keys(D);
+    const shelfKeys = allDeckKeys.filter(k => k.includes('shelf') || k === 'shelf');
+    console.log('BoardMD shelf: available deck keys with shelf:', shelfKeys);
+    console.log('BoardMD shelf: SHELF_DECKS constant:', SHELF_DECKS);
+    // Combine cards from all shelf-related decks found
+    const keysToUse = shelfKeys.length > 0 ? shelfKeys : SHELF_DECKS;
+    const combined = keysToUse.reduce((acc, d) => {
+      if(D[d] && D[d].length > 0){
+        console.log('BoardMD shelf: adding', D[d].length, 'cards from deck:', d);
+        acc = acc.concat(D[d]);
+      }
       return acc;
     }, []);
-    console.log('BoardMD shelf: combined', combined.length, 'cards from', SHELF_DECKS);
+    console.log('BoardMD shelf: total combined cards:', combined.length);
+    if(combined.length === 0){
+      console.warn('BoardMD shelf: NO CARDS FOUND. All deck keys:', allDeckKeys);
+      showXpToast('Shelf deck','No cards found. Check console for deck names.','','',null);
+      showDeckHome();
+      return;
+    }
     currentStep = 'shelf';
     currentDeck = '_shelf_combined';
-    // Always rebuild — never use stale cache
     window.DECKS['_shelf_combined'] = combined;
     againQueue = []; idx = 0; revealed = false; sessionRatings = {};
     ensureStudyUI();
@@ -5312,7 +5326,7 @@ function goHome(){
 let currentStep = localStorage.getItem('bmd_step') || 's1'; // 's1' or 's2'
 const STEP1_DECKS = ['boardmd_s1','s1_core','s1','hy1','fa_step1','fa_s1','arrows','ethics'];
 const STEP2_DECKS = ['boardmd_s2','core','s2','shelf','shelf_surgery','shelf_em','shelf_fm','shelf_im','shelf_neuro','shelf_obgyn','shelf_peds','shelf_psych'];
-const SHELF_DECKS = ['shelf_surgery','shelf_em'];
+const SHELF_DECKS = ['shelf_surgery','shelf_em','shelf'];
 
 function openApp(dk){
   document.getElementById('landing').style.display='none';
