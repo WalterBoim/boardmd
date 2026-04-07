@@ -1079,8 +1079,8 @@ html.light .att-btn{background:var(--surface2);}
 .expand-header{padding:12px 14px;display:flex;align-items:center;gap:12px;cursor:pointer;}
 .expand-chevron{width:16px;height:16px;stroke:#8892b0;fill:none;stroke-width:2;stroke-linecap:round;flex-shrink:0;transition:transform .2s;margin-left:4px;}
 .expand-/* removed stray body rule */
-.expand-body{display:none;}.expand-body.open{display:block;}
-.expand-chevron.open{transform:rotate(180deg);}
+.expand-body.open{display:block;}
+.expand-chevron.open{transform:rotate(180deg);}.expand-body{display:none !important;}.expand-body.open{display:block !important;}
 .subdeck{padding:10px 14px 10px 56px;display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .12s;}
 .subdeck:last-child{border-bottom:none;}
 .subdeck:hover{background:#f8f9fd;}
@@ -3288,6 +3288,24 @@ html.light .qs-val { color: inherit; }
 <style id="search-picker-css">
 @keyframes slideUp { from{opacity:0;transform:translateY(40px)} to{opacity:1;transform:translateY(0)} }
 </style>
+<style id="bmd-deck-stats-css">
+.deck-stats-line {
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 4px;
+  font-family: 'Sora', sans-serif;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+.ds-total { color: var(--muted); }
+.ds-div { opacity: .35; }
+.ds-new { color: #4f8ef7; font-weight: 700; }
+.ds-lrn { color: #f59e0b; font-weight: 700; }
+.ds-due { color: #00d4aa; font-weight: 700; }
+.ds-label { color: var(--muted); font-weight: 400; }
+</style>
 </head>
 <body>
 
@@ -3457,9 +3475,11 @@ html.light .qs-val { color: inherit; }
   <div class="hdr">
     <div class="logo">Board<span>MD</span></div>
     <div class="hdr-right">
-      <!-- Theme toggle — only button in header -->
       <button class="hdr-action-btn" id="theme-btn" onclick="toggleTheme()" title="Toggle theme">
         <svg id="theme-icon" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+      </button>
+      <button class="hdr-action-btn" onclick="openSettings()" title="Settings">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
       </button>
       <!-- lb-btn and level-badge-btn kept hidden — JS references them -->
       <button id="lb-btn" style="display:none" onclick="showLeaderboard()"></button>
@@ -3504,7 +3524,7 @@ html.light .qs-val { color: inherit; }
     <div class="your-info">
       <div class="your-name">Walter B.</div>
       <div class="your-school">
-        <span class="flag flag-br"></span>
+        <span style="font-size:14px;line-height:1;vertical-align:middle;margin-right:2px;">🇧🇷</span>
         Your University &middot; Brazil
       </div>
     </div>
@@ -3561,7 +3581,7 @@ html.light .qs-val { color: inherit; }
     <div class="lr-avatar">AK</div>
     <div class="lr-info">
       <div class="lr-name"><span class="speed-dot sd-green"></span>Ahmed K. <span class="tier-badge tier-fellow" style="font-size:8px;padding:1px 6px">Fellow</span></div>
-      <div class="lr-school"><span class="flag flag-us"></span> Harvard Med</div>
+      <div class="lr-school"><span style="font-size:14px;line-height:1;vertical-align:middle;margin-right:2px;">🇺🇸</span> Harvard Med</div>
     </div>
     <div style="display:flex;flex-direction:column;align-items:flex-end">
       <div class="lr-coins">2,840</div>
@@ -3575,7 +3595,7 @@ html.light .qs-val { color: inherit; }
     <div class="lr-avatar">SL</div>
     <div class="lr-info">
       <div class="lr-name"><span class="speed-dot sd-green"></span>Sofia L.</div>
-      <div class="lr-school"><span class="flag flag-de"></span> Charité Berlin</div>
+      <div class="lr-school"><span style="font-size:14px;line-height:1;vertical-align:middle;margin-right:2px;">🇩🇪</span> Charité Berlin</div>
     </div>
     <div style="display:flex;flex-direction:column;align-items:flex-end">
       <div class="lr-coins">2,510</div>
@@ -3589,7 +3609,7 @@ html.light .qs-val { color: inherit; }
     <div class="lr-avatar">RN</div>
     <div class="lr-info">
       <div class="lr-name"><span class="speed-dot sd-amber"></span>Raj N.</div>
-      <div class="lr-school"><span class="flag flag-in"></span> AIIMS Delhi</div>
+      <div class="lr-school"><span style="font-size:14px;line-height:1;vertical-align:middle;margin-right:2px;">🇮🇳</span> AIIMS Delhi</div>
     </div>
     <div style="display:flex;flex-direction:column;align-items:flex-end">
       <div class="lr-coins">2,190</div>
@@ -3603,7 +3623,7 @@ html.light .qs-val { color: inherit; }
     <div class="lr-avatar">ML</div>
     <div class="lr-info">
       <div class="lr-name"><span class="speed-dot sd-green"></span>Maria L.</div>
-      <div class="lr-school"><span class="flag flag-br"></span> UFRJ</div>
+      <div class="lr-school"><span style="font-size:14px;line-height:1;vertical-align:middle;margin-right:2px;">🇧🇷</span> UFRJ</div>
     </div>
     <div style="display:flex;flex-direction:column;align-items:flex-end">
       <div class="lr-coins">1,980</div>
@@ -3617,7 +3637,7 @@ html.light .qs-val { color: inherit; }
     <div class="lr-avatar">JS</div>
     <div class="lr-info">
       <div class="lr-name"><span class="speed-dot sd-amber"></span>James S.</div>
-      <div class="lr-school"><span class="flag flag-us"></span> Mayo Clinic</div>
+      <div class="lr-school"><span style="font-size:14px;line-height:1;vertical-align:middle;margin-right:2px;">🇺🇸</span> Mayo Clinic</div>
     </div>
     <div style="display:flex;flex-direction:column;align-items:flex-end">
       <div class="lr-coins">1,600</div>
@@ -3637,7 +3657,7 @@ html.light .qs-val { color: inherit; }
     <div class="lr-avatar">W</div>
     <div class="lr-info">
       <div class="lr-name" style="color:var(--accent)"><span class="speed-dot sd-green"></span>You</div>
-      <div class="lr-school"><span class="flag flag-br"></span> Your University</div>
+      <div class="lr-school"><span style="font-size:14px;line-height:1;vertical-align:middle;margin-right:2px;">🇧🇷</span> Your University</div>
     </div>
     <div style="display:flex;flex-direction:column;align-items:flex-end">
       <div class="lr-coins" style="color:var(--accent)">1,260</div>
@@ -3717,7 +3737,7 @@ html.light .qs-val { color: inherit; }
     <div class="rank-avatar">AK</div>
     <div class="rank-info">
       <div class="rank-name"><span class="speed-dot sd-green"></span>Ahmed K.<div class="tier-badge tier-chief" style="font-size:8px;padding:1px 6px">Chief</div></div>
-      <div class="rank-school"><span class="flag flag-us"></span>Harvard Medical School</div>
+      <div class="rank-school"><span style="font-size:14px;line-height:1;vertical-align:middle;margin-right:2px;">🇺🇸</span>Harvard Medical School</div>
     </div>
     <div class="rank-nums">
       <div class="rank-coins">8,420</div>
@@ -3730,7 +3750,7 @@ html.light .qs-val { color: inherit; }
     <div class="rank-avatar">ML</div>
     <div class="rank-info">
       <div class="rank-name"><span class="speed-dot sd-green"></span>Maria L.<div class="tier-badge tier-fellow" style="font-size:8px;padding:1px 6px">Fellow</div></div>
-      <div class="rank-school"><span class="flag flag-br"></span>UFRJ &middot; Brazil</div>
+      <div class="rank-school"><span style="font-size:14px;line-height:1;vertical-align:middle;margin-right:2px;">🇧🇷</span>UFRJ &middot; Brazil</div>
     </div>
     <div class="rank-nums">
       <div class="rank-coins">7,890</div>
@@ -3743,7 +3763,7 @@ html.light .qs-val { color: inherit; }
     <div class="rank-avatar">RN</div>
     <div class="rank-info">
       <div class="rank-name"><span class="speed-dot sd-amber"></span>Raj N.<div class="tier-badge tier-fellow" style="font-size:8px;padding:1px 6px">Fellow</div></div>
-      <div class="rank-school"><span class="flag flag-in"></span>AIIMS Delhi</div>
+      <div class="rank-school"><span style="font-size:14px;line-height:1;vertical-align:middle;margin-right:2px;">🇮🇳</span>AIIMS Delhi</div>
     </div>
     <div class="rank-nums">
       <div class="rank-coins">7,110</div>
@@ -3756,7 +3776,7 @@ html.light .qs-val { color: inherit; }
     <div class="rank-avatar">SL</div>
     <div class="rank-info">
       <div class="rank-name"><span class="speed-dot sd-green"></span>Sofia L.<div class="tier-badge tier-attending" style="font-size:8px;padding:1px 6px">Attending</div></div>
-      <div class="rank-school"><span class="flag flag-de"></span>Charité Berlin</div>
+      <div class="rank-school"><span style="font-size:14px;line-height:1;vertical-align:middle;margin-right:2px;">🇩🇪</span>Charité Berlin</div>
     </div>
     <div class="rank-nums">
       <div class="rank-coins">6,440</div>
@@ -3769,7 +3789,7 @@ html.light .qs-val { color: inherit; }
     <div class="rank-avatar">JS</div>
     <div class="rank-info">
       <div class="rank-name"><span class="speed-dot sd-amber"></span>James S.<div class="tier-badge tier-attending" style="font-size:8px;padding:1px 6px">Attending</div></div>
-      <div class="rank-school"><span class="flag flag-us"></span>Mayo Clinic</div>
+      <div class="rank-school"><span style="font-size:14px;line-height:1;vertical-align:middle;margin-right:2px;">🇺🇸</span>Mayo Clinic</div>
     </div>
     <div class="rank-nums">
       <div class="rank-coins">5,980</div>
@@ -3808,7 +3828,7 @@ html.light .qs-val { color: inherit; }
     <div class="rank-avatar">W</div>
     <div class="rank-info">
       <div class="rank-name" style="color:var(--accent)"><span class="speed-dot sd-green"></span>You<div class="tier-badge tier-attending" style="font-size:8px;padding:1px 6px">Attending</div></div>
-      <div class="rank-school"><span class="flag flag-br"></span>Your University &middot; Brazil</div>
+      <div class="rank-school"><span style="font-size:14px;line-height:1;vertical-align:middle;margin-right:2px;">🇧🇷</span>Your University &middot; Brazil</div>
     </div>
     <div class="rank-nums">
       <div class="rank-coins" style="color:var(--accent)">1,240</div>
@@ -3837,7 +3857,7 @@ html.light .qs-val { color: inherit; }
     <div class="uni-pos u1">1</div>
     <div class="rank-avatar" style="border-radius:8px;font-size:9px;font-weight:800">HVD</div>
     <div class="uni-info">
-      <div class="uni-name"><span class="flag flag-us"></span>Harvard Medical School</div>
+      <div class="uni-name"><span style="font-size:14px;line-height:1;vertical-align:middle;margin-right:2px;">🇺🇸</span>Harvard Medical School</div>
       <div class="uni-country">Cambridge, United States &middot; 24 active students</div>
     </div>
     <div class="uni-score">94.2<span>score</span></div>
@@ -3847,7 +3867,7 @@ html.light .qs-val { color: inherit; }
     <div class="uni-pos u2">2</div>
     <div class="rank-avatar" style="border-radius:8px;font-size:9px;font-weight:800">AIM</div>
     <div class="uni-info">
-      <div class="uni-name"><span class="flag flag-in"></span>AIIMS Delhi</div>
+      <div class="uni-name"><span style="font-size:14px;line-height:1;vertical-align:middle;margin-right:2px;">🇮🇳</span>AIIMS Delhi</div>
       <div class="uni-country">New Delhi, India &middot; 18 active students</div>
     </div>
     <div class="uni-score">91.7<span>score</span></div>
@@ -3857,7 +3877,7 @@ html.light .qs-val { color: inherit; }
     <div class="uni-pos u3">3</div>
     <div class="rank-avatar" style="border-radius:8px;font-size:9px;font-weight:800">CHR</div>
     <div class="uni-info">
-      <div class="uni-name"><span class="flag flag-de"></span>Charité Berlin</div>
+      <div class="uni-name"><span style="font-size:14px;line-height:1;vertical-align:middle;margin-right:2px;">🇩🇪</span>Charité Berlin</div>
       <div class="uni-country">Berlin, Germany &middot; 11 active students</div>
     </div>
     <div class="uni-score">88.4<span>score</span></div>
@@ -3867,7 +3887,7 @@ html.light .qs-val { color: inherit; }
     <div class="uni-pos" style="color:var(--accent)">9</div>
     <div class="rank-avatar" style="border-radius:8px;font-size:9px;font-weight:800;background:rgba(79,142,247,.15);border-color:rgba(79,142,247,.3);color:var(--accent)">YOU</div>
     <div class="uni-info">
-      <div class="uni-name"><span class="flag flag-br"></span>Your University</div>
+      <div class="uni-name"><span style="font-size:14px;line-height:1;vertical-align:middle;margin-right:2px;">🇧🇷</span>Your University</div>
       <div class="uni-country">Brazil &middot; 3 active students</div>
     </div>
     <div class="uni-score" style="color:var(--accent)">71.2<span>score</span></div>
@@ -4082,7 +4102,7 @@ html.light .qs-val { color: inherit; }
           <div class="deck-icon" style="background:rgba(79,142,247,.1);">
             <svg viewBox="0 0 24 24" stroke="#4f8ef7"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg>
           </div>
-          <div class="deck-info"><div class="deck-title">BoardMD S1</div><div class="deck-sub">Adaptive MCQs · Step 1</div></div>
+          <div class="deck-info"><div class="deck-title">BoardMD S1</div><div class="deck-sub">Adaptive MCQs · Step 1</div><div class="deck-stats-line" id="stats-boardmd_s1"><span class="ds-total">— cards</span></div></div>
           <div class="deck-badges"><span class="badge badge-new">20 new</span><span class="badge badge-due">5 due</span></div>
           <button class="study-btn" onclick="event.stopPropagation();switchDeckAndStudy('boardmd_s1')">Study</button>
         </div>
@@ -4091,7 +4111,7 @@ html.light .qs-val { color: inherit; }
           <div class="deck-icon" style="background:rgba(79,142,247,.1);">
             <svg viewBox="0 0 24 24" stroke="#4f8ef7"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg>
           </div>
-          <div class="deck-info"><div class="deck-title">Core Review</div><div class="deck-sub">Board-focused clinical vignettes</div></div>
+          <div class="deck-info"><div class="deck-title">Core Review</div><div class="deck-sub">Board-focused clinical vignettes</div><div class="deck-stats-line" id="stats-s1_core"><span class="ds-total">— cards</span></div></div>
           <div class="deck-badges"><span class="badge badge-new">12 new</span><span class="badge badge-due">3 due</span></div>
           <button class="study-btn" onclick="event.stopPropagation();switchDeckAndStudy('s1_core')">Study</button>
         </div>
@@ -4124,7 +4144,7 @@ html.light .qs-val { color: inherit; }
           <div class="deck-icon" style="background:rgba(245,158,11,.1);">
             <svg viewBox="0 0 24 24" stroke="#f59e0b"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
           </div>
-          <div class="deck-info"><div class="deck-title">BoardMD S2 CK</div><div class="deck-sub">Adaptive MCQs · Step 2 CK</div></div>
+          <div class="deck-info"><div class="deck-title">BoardMD S2 CK</div><div class="deck-sub">Adaptive MCQs · Step 2 CK</div><div class="deck-stats-line" id="stats-boardmd_s2"><span class="ds-total">— cards</span></div></div>
           <div class="deck-badges"><span class="badge badge-new">20 new</span><span class="badge badge-due">7 due</span></div>
           <button class="study-btn" onclick="event.stopPropagation();switchDeckAndStudy('boardmd_s2')">Study</button>
         </div>
@@ -4133,7 +4153,7 @@ html.light .qs-val { color: inherit; }
           <div class="deck-icon" style="background:rgba(79,142,247,.1);">
             <svg viewBox="0 0 24 24" stroke="#4f8ef7"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg>
           </div>
-          <div class="deck-info"><div class="deck-title">Core Review</div><div class="deck-sub">Clinical scenarios Step 2 CK</div></div>
+          <div class="deck-info"><div class="deck-title">Core Review</div><div class="deck-sub">Clinical scenarios Step 2 CK</div><div class="deck-stats-line" id="stats-core"><span class="ds-total">— cards</span></div></div>
           <div class="deck-badges"><span class="badge badge-due">7 due</span></div>
           <button class="study-btn" onclick="event.stopPropagation();switchDeckAndStudy('core')">Study</button>
         </div>
@@ -4161,7 +4181,7 @@ html.light .qs-val { color: inherit; }
           <div class="deck-icon" style="background:rgba(255,83,112,.1);">
             <svg viewBox="0 0 24 24" stroke="#ff5370"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
           </div>
-          <div class="deck-info"><div class="deck-title">Emergency Medicine</div><div class="deck-sub">BoardMD Shelf</div></div>
+          <div class="deck-info"><div class="deck-title">Emergency Medicine</div><div class="deck-sub">BoardMD Shelf</div><div class="deck-stats-line" id="stats-shelf_em"><span class="ds-total">— cards</span></div></div>
           <div class="deck-badges"><span class="badge badge-new">14 new</span><span class="badge badge-due">6 due</span></div>
           <button class="study-btn" onclick="event.stopPropagation();switchDeckAndStudy('shelf_em')">Study</button>
         </div>
@@ -4170,7 +4190,7 @@ html.light .qs-val { color: inherit; }
           <div class="deck-icon" style="background:rgba(255,83,112,.1);">
             <svg viewBox="0 0 24 24" stroke="#ff5370"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
           </div>
-          <div class="deck-info"><div class="deck-title">Surgery</div><div class="deck-sub">BoardMD Shelf</div></div>
+          <div class="deck-info"><div class="deck-title">Surgery</div><div class="deck-sub">BoardMD Shelf</div><div class="deck-stats-line" id="stats-shelf_surgery"><span class="ds-total">— cards</span></div></div>
           <div class="deck-badges"><span class="badge badge-new">8 new</span><span class="badge badge-due">2 due</span></div>
           <button class="study-btn" onclick="event.stopPropagation();switchDeckAndStudy('shelf_surgery')">Study</button>
         </div>
@@ -5816,34 +5836,34 @@ function renderResponseDist(card, selectedAnswer){
     const pctColor = isCorrect ? 'var(--emerald)' :
                      isSelected ? 'var(--rose)' : 'var(--text-faint)';
 
-    // Update button layout for distribution
-    btn.style.flexDirection = 'column';
-    btn.style.alignItems = 'stretch';
+    // Update button layout for distribution — column with !important to override CSS
+    btn.style.setProperty('flex-direction','column','important');
+    btn.style.setProperty('align-items','stretch','important');
     btn.style.padding = '10px 14px 8px';
-    btn.style.gap = '6px';
+    btn.style.gap = '5px';
 
-    // Fix top row
+    // Top row: letter | text(flex:1) | pct at end
     const topRow = document.createElement('div');
-    topRow.style.cssText = 'display:flex;align-items:center;gap:10px;';
+    topRow.style.cssText = 'display:flex;align-items:center;gap:10px;width:100%;';
     const letterEl = btn.querySelector('.opt-letter');
-    const textEl = btn.querySelector('.opt-text');
+    const textEl   = btn.querySelector('.opt-text');
     if(letterEl && textEl){
-      topRow.appendChild(letterEl.cloneNode(true));
-      // Add pct to text row
+      const lClone = letterEl.cloneNode(true);
+      const tClone = textEl.cloneNode(true);
+      tClone.style.cssText = 'flex:1;font-size:14px;font-weight:500;line-height:1.4;';
       const pctSpan = document.createElement('span');
-      pctSpan.style.cssText = 'font-family:\'JetBrains Mono\',monospace;font-size:12px;font-weight:700;color:'+pctColor+';margin-left:auto;flex-shrink:0;';
+      pctSpan.style.cssText = 'font-family:\'JetBrains Mono\',monospace;font-size:12px;font-weight:700;color:'+pctColor+';flex-shrink:0;';
       pctSpan.textContent = pct + '%';
-      const textClone = textEl.cloneNode(true);
-      textClone.style.flex = '1';
-      topRow.appendChild(textClone);
+      topRow.appendChild(lClone);
+      topRow.appendChild(tClone);
       topRow.appendChild(pctSpan);
     }
 
-    // Bar row
+    // Bar row — below text
     const barRow = document.createElement('div');
-    barRow.style.cssText = 'width:100%;height:5px;background:var(--surface2);border-radius:3px;overflow:hidden;';
+    barRow.style.cssText = 'width:100%;height:4px;background:rgba(128,128,128,.15);border-radius:3px;overflow:hidden;';
     const barFill = document.createElement('div');
-    barFill.style.cssText = 'height:100%;width:0%;background:'+barColor+';border-radius:3px;transition:width .5s ease;';
+    barFill.style.cssText = 'height:100%;width:0%;background:'+barColor+';border-radius:3px;transition:width .55s cubic-bezier(.4,0,.2,1);';
     barRow.appendChild(barFill);
 
     btn.innerHTML = '';
@@ -9050,6 +9070,38 @@ function bmdDashSync() {
       if(lrn>0) html += `<span class="badge badge-due">${lrn} lrn</span>`;
       if(rev>0) html += `<span class="badge badge-due">${rev} due</span>`;
       if(html) el.innerHTML = html;
+    });
+    // Deck stats: total cards + accuracy
+    const statDecks = ['boardmd_s1','s1_core','boardmd_s2','core','shelf_em','shelf_surgery'];
+    statDecks.forEach(id => {
+      const el = document.getElementById('stats-' + id);
+      if(!el) return;
+      const cards = (window.DECKS||{})[id]||[];
+      if(!cards.length) return;
+      const total = cards.length;
+      if(!total) return;
+      // Count new/lrn/due same way as badges
+      const today2 = dayStamp();
+      try { const f=JSON.parse(localStorage.getItem(TODAY_KEY)||'{}'); if(f[id]&&f[id].date===today2) todayData[id]=f[id]; } catch(e){}
+      const newSeen2 = todayData[id]?.newSeen||0;
+      const newLeft2 = Math.max(0, c.newPerDay - newSeen2);
+      let nw2=0, lrn2=0, rev2=0, cnt2=0;
+      cards.forEach(card => {
+        const s = getState(card.id);
+        if(s.state===ST_NEW && cnt2<newLeft2){ nw2++; cnt2++; }
+        else if((s.state===ST_LRN||s.state===ST_RLN)&&s.due<=now+1200000) lrn2++;
+        else if(s.state===ST_REV&&s.due<=now+86400000) rev2++;
+      });
+      let html = '<span class="ds-total">' + total.toLocaleString() + ' cards</span>';
+      if(nw2>0||lrn2>0||rev2>0){
+        html += '<span class="ds-div">·</span>';
+        if(nw2>0)  html += '<span class="ds-new">' + nw2 + '</span>';
+        if(nw2>0 && (lrn2>0||rev2>0)) html += '<span class="ds-label">+</span>';
+        if(lrn2>0) html += '<span class="ds-lrn">' + lrn2 + '</span>';
+        if(lrn2>0 && rev2>0) html += '<span class="ds-label">+</span>';
+        if(rev2>0) html += '<span class="ds-due">' + rev2 + '</span>';
+      }
+      el.innerHTML = html;
     });
     // coins
     const cv = document.getElementById('coin-val');
