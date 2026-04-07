@@ -3802,7 +3802,7 @@ html.light .qs-val { color: inherit; }
 
   <div class="upgrade-row">
     <div class="upgrade-text"><strong>See all 25 competitors</strong><br>Unlock with Pro</div>
-    <button class="upgrade-btn">Go Pro</button>
+    <button class="upgrade-btn" onclick="showXpToast('BoardMD Pro','Coming soon — founding member pricing available at launch. Join our waitlist at boardmd.app','','',null)">Go Pro</button>
   </div>
 </div>
 
@@ -3940,7 +3940,7 @@ html.light .qs-val { color: inherit; }
       <strong>Unlock full ranking</strong>
       See all competitors, filters, and history
     </div>
-    <button class="upgrade-btn">Go Pro</button>
+    <button class="upgrade-btn" onclick="showXpToast('BoardMD Pro','Coming soon — founding member pricing available at launch. Join our waitlist at boardmd.app','','',null)">Go Pro</button>
   </div>
 </div>
 
@@ -3997,7 +3997,7 @@ html.light .qs-val { color: inherit; }
       <strong>Full university ranking</strong>
       All countries, filters, and history
     </div>
-    <button class="upgrade-btn">Go Pro</button>
+    <button class="upgrade-btn" onclick="showXpToast('BoardMD Pro','Coming soon — founding member pricing available at launch. Join our waitlist at boardmd.app','','',null)">Go Pro</button>
   </div>
 </div>
 
@@ -9984,20 +9984,21 @@ function openProfileEditor() {
   document.getElementById('pe-name').value = me.name || '';
   document.getElementById('pe-univ').value = me.univ || '';
   document.getElementById('pe-country').value = me.country || '';
-  // Build country picker
-  buildCountryPicker(me.country || 'United States');
-  const c = COUNTRIES.find(x => x.name === (me.country||'United States'));
-  const sel = document.getElementById('pe-country-selected');
-  if(sel && c) sel.innerHTML = '<span style="font-size:16px">'+c.flag+'</span> <strong>'+c.name+'</strong> selected';
-  // Build university picker
-  buildUnivPicker(me.univ || '');
-  const univOther = document.getElementById('pe-univ-other');
+  // Populate search fields with current values
+  const univSearch = document.getElementById('pe-univ-search');
+  const countrySearch = document.getElementById('pe-country-search');
+  if(univSearch) univSearch.value = me.univ || '';
+  if(countrySearch) countrySearch.value = me.country || '';
+  // Show selected
   const univSel = document.getElementById('pe-univ-selected');
-  const isListed = UNIVERSITIES.some(u => u.name === me.univ);
-  if(univOther) univOther.value = (!isListed && me.univ) ? me.univ : '';
-  if(univSel && isListed){
+  if(univSel && me.univ) {
     const u = UNIVERSITIES.find(x => x.name === me.univ);
-    if(u) univSel.innerHTML = u.country + ' <strong>' + u.name + '</strong> selected';
+    univSel.innerHTML = (u ? u.country + ' ' : '') + '<strong style="color:var(--accent)">' + me.univ + '</strong>';
+  }
+  const countrySel = document.getElementById('pe-country-selected');
+  if(countrySel && me.country) {
+    const c = COUNTRIES.find(x => x.name === me.country);
+    if(c) countrySel.innerHTML = c.flag + ' <strong style="color:var(--accent)">' + c.name + '</strong> selected';
   }
   el.style.display = 'flex';
   setTimeout(() => document.getElementById('pe-name').focus(), 100);
@@ -10011,9 +10012,11 @@ function closeProfileEditor() {
 async function saveProfileEditor() {
   const name    = (document.getElementById('pe-name')?.value||'').trim();
   const univHidden = (document.getElementById('pe-univ')?.value||'').trim();
-  const univOther  = (document.getElementById('pe-univ-other')?.value||'').trim();
-  const univ    = univHidden || univOther;
-  const country = (document.getElementById('pe-country')?.value||'').trim();
+  const univSearch = (document.getElementById('pe-univ-search')?.value||'').trim();
+  const univ    = univHidden || univSearch;
+  const countryHidden = (document.getElementById('pe-country')?.value||'').trim();
+  const countrySearch = (document.getElementById('pe-country-search')?.value||'').trim();
+  const country = countryHidden || countrySearch;
   if(!name){ alert('Please enter a display name.'); return; }
 
   const existing = JSON.parse(localStorage.getItem(LB_ME_KEY)||'{}');
@@ -10401,6 +10404,172 @@ function toggleHlToolbar(){
     btn.classList.add('active');
   }
 }
+
+// ── UNIVERSITY AUTOCOMPLETE ──────────────────────────────────────────
+function showUnivSuggestions(query) {
+  const box = document.getElementById('pe-univ-suggestions');
+  if(!box) return;
+  const q = (query||'').trim().toLowerCase();
+  const matches = q.length < 1
+    ? UNIVERSITIES.slice(0, 8)
+    : UNIVERSITIES.filter(u => u.name.toLowerCase().includes(q) || u.abbr.toLowerCase().includes(q)).slice(0, 8);
+  if(!matches.length){ box.style.display='none'; return; }
+  box.innerHTML = matches.map(u => `
+    <div onclick="selectUnivSearch('${u.name.replace(/'/g,"\'")}','${u.country}')"
+      style="display:flex;align-items:center;gap:10px;padding:10px 14px;cursor:pointer;transition:background .1s;border-radius:8px;"
+      onmouseover="this.style.background='var(--surface2)'" onmouseout="this.style.background='transparent'">
+      <span style="font-size:18px">${u.country}</span>
+      <div>
+        <div style="font-size:13px;font-weight:600;color:var(--text);font-family:'Sora',sans-serif">${u.name}</div>
+        <div style="font-size:10px;color:var(--muted);font-family:'JetBrains Mono',monospace">${u.abbr}</div>
+      </div>
+    </div>`).join('');
+  box.style.display = 'block';
+}
+function hideUnivSuggestions() {
+  const box = document.getElementById('pe-univ-suggestions');
+  if(box) box.style.display = 'none';
+}
+function selectUnivSearch(name, flag) {
+  document.getElementById('pe-univ').value = name;
+  const searchEl = document.getElementById('pe-univ-search');
+  if(searchEl) searchEl.value = name;
+  hideUnivSuggestions();
+  const sel = document.getElementById('pe-univ-selected');
+  if(sel) sel.innerHTML = flag + ' <strong style="color:var(--accent)">' + name + '</strong>';
+}
+
+// ── COUNTRY AUTOCOMPLETE ─────────────────────────────────────────────
+function showCountrySuggestions(query) {
+  const box = document.getElementById('pe-country-suggestions');
+  if(!box) return;
+  const q = (query||'').trim().toLowerCase();
+  const matches = q.length < 1
+    ? COUNTRIES.slice(0, 8)
+    : COUNTRIES.filter(c => c.name.toLowerCase().includes(q)).slice(0, 8);
+  if(!matches.length){ box.style.display='none'; return; }
+  box.innerHTML = matches.map(c => `
+    <div onclick="selectCountrySearch('${c.name.replace(/'/g,"\'")}','${c.flag}')"
+      style="display:flex;align-items:center;gap:10px;padding:10px 14px;cursor:pointer;transition:background .1s;border-radius:8px;"
+      onmouseover="this.style.background='var(--surface2)'" onmouseout="this.style.background='transparent'">
+      <span style="font-size:22px">${c.flag}</span>
+      <span style="font-size:13px;font-weight:600;color:var(--text);font-family:'Sora',sans-serif">${c.name}</span>
+    </div>`).join('');
+  box.style.display = 'block';
+}
+function hideCountrySuggestions() {
+  const box = document.getElementById('pe-country-suggestions');
+  if(box) box.style.display = 'none';
+}
+function selectCountrySearch(name, flag) {
+  document.getElementById('pe-country').value = name;
+  const searchEl = document.getElementById('pe-country-search');
+  if(searchEl) searchEl.value = name;
+  hideCountrySuggestions();
+  const sel = document.getElementById('pe-country-selected');
+  if(sel) sel.innerHTML = flag + ' <strong style="color:var(--accent)">' + name + '</strong> selected';
+}
+
+// ── AUTOCOMPLETE — University ────────────────────────────────────
+function showUnivDropdown(query) {
+  const dropdown = document.getElementById('pe-univ-dropdown');
+  if(!dropdown) return;
+  const q = (query||'').toLowerCase().trim();
+  const matches = q.length === 0
+    ? UNIVERSITIES.slice(0, 8)
+    : UNIVERSITIES.filter(u => u.name.toLowerCase().includes(q) || u.abbr.toLowerCase().includes(q)).slice(0, 10);
+  if(!matches.length){ dropdown.style.display='none'; return; }
+  dropdown.innerHTML = matches.map(u =>
+    `<div onclick="pickUniv('${u.name.replace(/'/g,"\'")}','${u.country}')" style="display:flex;align-items:center;gap:10px;padding:10px 14px;cursor:pointer;border-bottom:1px solid var(--border);font-family:'Sora',sans-serif;transition:background .1s;" onmouseover="this.style.background='var(--surface2)'" onmouseout="this.style.background=''">`+
+    `<span style="font-size:18px">${u.country}</span>`+
+    `<div><div style="font-size:13px;font-weight:600;color:var(--text)">${u.name}</div><div style="font-size:11px;color:var(--muted)">${u.abbr}</div></div></div>`
+  ).join('');
+  dropdown.style.display = 'block';
+}
+function hideUnivDropdown(){ const d=document.getElementById('pe-univ-dropdown'); if(d) d.style.display='none'; }
+function pickUniv(name, flag){
+  document.getElementById('pe-univ').value = name;
+  const search = document.getElementById('pe-univ-search');
+  if(search) search.value = name;
+  const sel = document.getElementById('pe-univ-selected');
+  if(sel) sel.innerHTML = flag + ' <strong>' + name + '</strong>';
+  hideUnivDropdown();
+}
+
+// ── AUTOCOMPLETE — Country ────────────────────────────────────────
+function showCountryDropdown(query) {
+  const dropdown = document.getElementById('pe-country-dropdown');
+  if(!dropdown) return;
+  const q = (query||'').toLowerCase().trim();
+  const matches = q.length === 0
+    ? COUNTRIES.slice(0, 8)
+    : COUNTRIES.filter(c => c.name.toLowerCase().includes(q)).slice(0, 10);
+  if(!matches.length){ dropdown.style.display='none'; return; }
+  dropdown.innerHTML = matches.map(c =>
+    `<div onclick="pickCountry('${c.name.replace(/'/g,"\'")}','${c.flag}')" style="display:flex;align-items:center;gap:10px;padding:10px 14px;cursor:pointer;border-bottom:1px solid var(--border);font-family:'Sora',sans-serif;transition:background .1s;" onmouseover="this.style.background='var(--surface2)'" onmouseout="this.style.background=''">`+
+    `<span style="font-size:20px">${c.flag}</span>`+
+    `<span style="font-size:13px;font-weight:600;color:var(--text)">${c.name}</span></div>`
+  ).join('');
+  dropdown.style.display = 'block';
+}
+function hideCountryDropdown(){ const d=document.getElementById('pe-country-dropdown'); if(d) d.style.display='none'; }
+function pickCountry(name, flag){
+  document.getElementById('pe-country').value = name;
+  const search = document.getElementById('pe-country-search');
+  if(search) search.value = name;
+  const sel = document.getElementById('pe-country-selected');
+  if(sel) sel.innerHTML = flag + ' <strong>' + name + '</strong> selected';
+  hideCountryDropdown();
+}
+
+// ── AUTOCOMPLETE aliases (HTML uses these names) ──────────────────
+function showUnivSuggestions(q){
+  const dropdown = document.getElementById('pe-univ-suggestions');
+  if(!dropdown) return;
+  const query = (q||'').toLowerCase().trim();
+  const matches = query.length === 0
+    ? UNIVERSITIES.slice(0,8)
+    : UNIVERSITIES.filter(u=>u.name.toLowerCase().includes(query)||u.abbr.toLowerCase().includes(query)).slice(0,10);
+  if(!matches.length){dropdown.style.display='none';return;}
+  dropdown.innerHTML = matches.map(u=>
+    `<div onmousedown="pickUnivSuggestion('${u.name.replace(/'/g,"\'")}','${u.country}')" style="display:flex;align-items:center;gap:10px;padding:10px 14px;cursor:pointer;border-bottom:1px solid var(--border);font-family:'Sora',sans-serif;" onmouseover="this.style.background='var(--surface2)'" onmouseout="this.style.background=''">`+
+    `<span style="font-size:18px">${u.country}</span>`+
+    `<div><div style="font-size:13px;font-weight:600;color:var(--text)">${u.name}</div><div style="font-size:11px;color:var(--muted)">${u.abbr}</div></div></div>`
+  ).join('');
+  dropdown.style.display='block';
+}
+function hideUnivSuggestions(){const d=document.getElementById('pe-univ-suggestions');if(d)d.style.display='none';}
+function pickUnivSuggestion(name,flag){
+  document.getElementById('pe-univ').value=name;
+  const s=document.getElementById('pe-univ-search');if(s)s.value=name;
+  const sel=document.getElementById('pe-univ-selected');
+  if(sel)sel.innerHTML=flag+' <strong>'+name+'</strong>';
+  hideUnivSuggestions();
+}
+
+function showCountrySuggestions(q){
+  const dropdown=document.getElementById('pe-country-suggestions');
+  if(!dropdown)return;
+  const query=(q||'').toLowerCase().trim();
+  const matches=query.length===0
+    ?COUNTRIES.slice(0,8)
+    :COUNTRIES.filter(c=>c.name.toLowerCase().includes(query)).slice(0,10);
+  if(!matches.length){dropdown.style.display='none';return;}
+  dropdown.innerHTML=matches.map(c=>
+    `<div onmousedown="pickCountrySuggestion('${c.name.replace(/'/g,"\'")}','${c.flag}')" style="display:flex;align-items:center;gap:10px;padding:10px 14px;cursor:pointer;border-bottom:1px solid var(--border);font-family:'Sora',sans-serif;" onmouseover="this.style.background='var(--surface2)'" onmouseout="this.style.background=''">`+
+    `<span style="font-size:20px">${c.flag}</span>`+
+    `<span style="font-size:13px;font-weight:600;color:var(--text)">${c.name}</span></div>`
+  ).join('');
+  dropdown.style.display='block';
+}
+function hideCountrySuggestions(){const d=document.getElementById('pe-country-suggestions');if(d)d.style.display='none';}
+function pickCountrySuggestion(name,flag){
+  document.getElementById('pe-country').value=name;
+  const s=document.getElementById('pe-country-search');if(s)s.value=name;
+  const sel=document.getElementById('pe-country-selected');
+  if(sel)sel.innerHTML=flag+' <strong>'+name+'</strong> selected';
+  hideCountrySuggestions();
+}
 </script>
 
 <style>
@@ -10471,22 +10640,30 @@ html.dark .hl-btn-active { border-color:#fff!important; }
       <div>
         <div style="font-size:11px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--muted);margin-bottom:8px;font-family:'Sora',sans-serif;">Medical School</div>
         <input id="pe-univ" type="hidden" value="">
-        <div id="pe-univ-picker" style="display:flex;gap:8px;overflow-x:auto;padding:4px 0 8px;scrollbar-width:none;-webkit-overflow-scrolling:touch;"></div>
-        <div id="pe-univ-selected" style="font-size:13px;color:var(--muted);margin-bottom:8px;font-family:'Sora',sans-serif;min-height:18px;"></div>
-        <input id="pe-univ-other" type="text" maxlength="60" placeholder="Not listed? Type your school..."
-          style="width:100%;padding:11px 14px;background:var(--surface2);border:1.5px solid var(--border2);border-radius:10px;font-family:'Sora',sans-serif;font-size:13px;color:var(--text);outline:none;transition:border-color .15s;"
-          onfocus="this.style.borderColor='var(--accent)';document.getElementById('pe-univ').value=this.value;selectUniv('');" 
-          oninput="document.getElementById('pe-univ').value=this.value;buildUnivPicker('');">
+        <div style="position:relative;margin-bottom:8px;">
+          <input id="pe-univ-search" type="text" maxlength="60" placeholder="Search your school..."
+            autocomplete="off"
+            style="width:100%;padding:12px 14px;background:var(--surface2);border:1.5px solid var(--border2);border-radius:10px;font-family:'Sora',sans-serif;font-size:14px;color:var(--text);outline:none;transition:border-color .15s;box-sizing:border-box;"
+            onfocus="this.style.borderColor='var(--accent)';showUnivSuggestions(this.value)"
+            onblur="setTimeout(()=>hideUnivSuggestions(),150)"
+            oninput="showUnivSuggestions(this.value)">
+          <div id="pe-univ-suggestions" style="display:none;position:absolute;left:0;right:0;top:100%;margin-top:4px;background:var(--surface);border:1.5px solid var(--accent);border-radius:10px;z-index:999;max-height:200px;overflow-y:auto;box-shadow:0 8px 24px rgba(0,0,0,.15);"></div>
+        </div>
+        <div id="pe-univ-selected" style="font-size:13px;color:var(--muted);font-family:'Sora',sans-serif;min-height:18px;"></div>
       </div>
       <div>
         <div style="font-size:11px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--muted);margin-bottom:8px;font-family:'Sora',sans-serif;">Country</div>
-        <!-- Hidden input for value -->
         <input id="pe-country" type="hidden" value="">
-        <!-- Scrollable country picker -->
-        <div id="pe-country-picker" style="display:flex;gap:8px;overflow-x:auto;padding:4px 0 8px;scrollbar-width:none;-webkit-overflow-scrolling:touch;">
+        <div style="position:relative;margin-bottom:8px;">
+          <input id="pe-country-search" type="text" maxlength="30" placeholder="Search your country..."
+            autocomplete="off"
+            style="width:100%;padding:12px 14px;background:var(--surface2);border:1.5px solid var(--border2);border-radius:10px;font-family:'Sora',sans-serif;font-size:14px;color:var(--text);outline:none;transition:border-color .15s;box-sizing:border-box;"
+            onfocus="this.style.borderColor='var(--accent)';showCountrySuggestions(this.value)"
+            onblur="setTimeout(()=>hideCountrySuggestions(),150)"
+            oninput="showCountrySuggestions(this.value)">
+          <div id="pe-country-suggestions" style="display:none;position:absolute;left:0;right:0;top:100%;margin-top:4px;background:var(--surface);border:1.5px solid var(--accent);border-radius:10px;z-index:999;max-height:200px;overflow-y:auto;box-shadow:0 8px 24px rgba(0,0,0,.15);"></div>
         </div>
-        <!-- Selected display -->
-        <div id="pe-country-selected" style="font-size:13px;color:var(--muted);margin-top:4px;font-family:'Sora',sans-serif;min-height:18px;"></div>
+        <div id="pe-country-selected" style="font-size:13px;color:var(--muted);font-family:'Sora',sans-serif;min-height:18px;"></div>
       </div>
     </div>
 
