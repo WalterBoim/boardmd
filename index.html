@@ -3808,13 +3808,19 @@ html.light .qs-val { color: inherit; }
 
 <!-- SCOPE FILTERS -->
 <div class="section-lbl">Global Ranking</div>
-<div class="scope-wrap">
-  <div class="scope-chip active" onclick="setScope(this)">Global</div>
-  <div class="scope-chip" onclick="setScope(this)">United States</div>
-  <div class="scope-chip" onclick="setScope(this)">Brazil</div>
-  <div class="scope-chip" onclick="setScope(this)">Step 1</div>
-  <div class="scope-chip" onclick="setScope(this)">Step 2 CK</div>
-  <div class="scope-chip" onclick="setScope(this)">Shelf</div>
+<div style="display:flex;flex-direction:column;gap:8px;">
+  <!-- Row 1: Global + USA fixed + Step filters -->
+  <div class="scope-wrap">
+    <div class="scope-chip active" onclick="setScope(this)" data-scope="Global">Global</div>
+    <div class="scope-chip" onclick="setScope(this)" data-scope="United States">🇺🇸 United States</div>
+    <div style="width:1px;background:var(--border);flex-shrink:0;margin:0 2px;"></div>
+    <div class="scope-chip" onclick="setScope(this)" data-scope="Step 1">Step 1</div>
+    <div class="scope-chip" onclick="setScope(this)" data-scope="Step 2 CK">Step 2 CK</div>
+    <div class="scope-chip" onclick="setScope(this)" data-scope="Shelf">Shelf</div>
+  </div>
+  <!-- Row 2: Scrollable country flags -->
+  <div id="scope-countries" style="display:flex;gap:6px;overflow-x:auto;padding:2px 0 6px;scrollbar-width:none;-webkit-overflow-scrolling:touch;">
+  </div>
 </div>
 
 <!-- GLOBAL RANKING TABLE -->
@@ -7012,8 +7018,8 @@ function showLeaderboard(){
   if(lbb) lbb.classList.add('active');
   setTimeout(syncYourCard, 50);
   renderLeaderboard();
-  // Also render global rank with real data
-  setTimeout(() => renderGlobalRankFiltered('Global'), 200);
+  // Build country flag chips and render global rank
+  setTimeout(() => { buildCountryScopes(); renderGlobalRankFiltered('Global'); }, 200);
 }
 
 function switchLbTab(tab, el){
@@ -9717,8 +9723,51 @@ try { setInterval(updateTimer, 60000); } catch(e) {};
 function setScope(el) {
   document.querySelectorAll('.scope-chip').forEach(c => c.classList.remove('active'));
   el.classList.add('active');
-  const scope = el.textContent.trim();
+  const scope = el.dataset.scope || el.textContent.trim();
   renderGlobalRankFiltered(scope);
+}
+
+function setScopeCountry(el, country) {
+  document.querySelectorAll('.scope-chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  renderGlobalRankFiltered(country);
+}
+
+function buildCountryScopes() {
+  const wrap = document.getElementById('scope-countries');
+  if(!wrap || wrap.children.length > 0) return;
+  const countries = [
+    {name:'Brazil',         flag:'🇧🇷'},
+    {name:'India',          flag:'🇮🇳'},
+    {name:'Canada',         flag:'🇨🇦'},
+    {name:'United Kingdom', flag:'🇬🇧'},
+    {name:'Germany',        flag:'🇩🇪'},
+    {name:'Australia',      flag:'🇦🇺'},
+    {name:'Pakistan',       flag:'🇵🇰'},
+    {name:'Philippines',    flag:'🇵🇭'},
+    {name:'Nigeria',        flag:'🇳🇬'},
+    {name:'Egypt',          flag:'🇪🇬'},
+    {name:'Lebanon',        flag:'🇱🇧'},
+    {name:'Mexico',         flag:'🇲🇽'},
+    {name:'Colombia',       flag:'🇨🇴'},
+    {name:'Argentina',      flag:'🇦🇷'},
+    {name:'South Korea',    flag:'🇰🇷'},
+    {name:'Japan',          flag:'🇯🇵'},
+    {name:'France',         flag:'🇫🇷'},
+    {name:'Spain',          flag:'🇪🇸'},
+    {name:'Saudi Arabia',   flag:'🇸🇦'},
+    {name:'Iran',           flag:'🇮🇷'},
+    {name:'Turkey',         flag:'🇹🇷'},
+    {name:'Israel',         flag:'🇮🇱'},
+    {name:'Sweden',         flag:'🇸🇪'},
+    {name:'Netherlands',    flag:'🇳🇱'},
+  ];
+  wrap.innerHTML = countries.map(c =>
+    `<button class="scope-chip" onclick="setScopeCountry(this,'${c.name}')" style="flex-shrink:0;display:flex;align-items:center;gap:5px;padding:5px 10px;white-space:nowrap;">
+      <span style="font-size:15px;line-height:1">${c.flag}</span>
+      <span style="font-size:11px">${c.name}</span>
+    </button>`
+  ).join('');
 }
 
 async function renderGlobalRankFiltered(scope) {
