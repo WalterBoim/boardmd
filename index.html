@@ -1741,6 +1741,41 @@ updateLeagueTimer();setInterval(updateLeagueTimer,60000);
 /* BOOT */
 async function initApp(){showEl('bottomNav');loadUserState();showScreen('home');updateHomeUI();await openDB();loadAllDecks().then(()=>{buildDeckList();updateHomeUI();});}
 (async()=>{await initAuth();})();
+
+/* AUTH */
+async function initAuth(){
+  const hash=window.location.hash;
+  if(hash.includes('access_token')){
+    const p=new URLSearchParams(hash.substring(1));
+    const token=p.get('access_token');
+    if(token){
+      try{
+        const res=await fetch(SUPA_URL+'/auth/v1/user',{headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+token},signal:AbortSignal.timeout(5000)});
+        if(res.ok){currentUser=await res.json();currentUser._token=token;localStorage.setItem('bmd_session',JSON.stringify({token,user:currentUser}));history.replaceState({},'',window.location.pathname);hideEl('loadingOverlay');await initApp();return;}
+      }catch{}
+    }
+  }
+  try{
+    const stored=JSON.parse(localStorage.getItem('bmd_session')||'null');
+    if(stored?.token){
+      const res=await fetch(SUPA_URL+'/auth/v1/user',{headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+stored.token},signal:AbortSignal.timeout(5000)});
+      if(res.ok){currentUser=await res.json();currentUser._token=stored.token;hideEl('loadingOverlay');await initApp();return;}
+    }
+  }catch{}
+  hideEl('loadingOverlay');
+  const a=document.getElementById('authOverlay');if(a)a.style.display='flex';
+}
+function signInGoogle(){window.location.href=SUPA_URL+'/auth/v1/authorize?provider=google&redirect_to='+encodeURIComponent(window.location.origin+window.location.pathname);}
+function signOut(){localStorage.removeItem('bmd_session');location.reload();}
+
+(async()=>{
+  try{
+    await Promise.race([initAuth(),new Promise((_,rej)=>setTimeout(()=>rej('timeout'),5000))]);
+  }catch(e){
+    hideEl('loadingOverlay');
+    const a=document.getElementById('authOverlay');if(a)a.style.display='flex';
+  }
+})();
 </script>
 </body>
 </html>
