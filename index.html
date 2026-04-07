@@ -3200,7 +3200,6 @@ mark.hb{background:rgba(79,142,247,.28);border-bottom:2px solid rgba(40,100,220,
 .bmd-bottom-nav {
   position: fixed;
   bottom: 0; left: 0; right: 0;
-  max-width: 430px; margin: 0 auto;
   background: var(--bg);
   border-top: 1px solid var(--border);
   padding: 10px 0 26px;
@@ -3210,7 +3209,26 @@ mark.hb{background:rgba(79,142,247,.28);border-bottom:2px solid rgba(40,100,220,
   z-index: 200;
   backdrop-filter: blur(20px);
 }
-@media(max-width:600px){ #app.active .bmd-bottom-nav { display: flex; } }
+/* Mobile: show at full width */
+@media(max-width:600px){
+  #app.active .bmd-bottom-nav { display: flex; max-width: 100%; margin: 0 auto; }
+}
+/* Desktop: show centered at 760px, always when app is active */
+@media(min-width:601px){
+  #app.active .bmd-bottom-nav,
+  #app.active .deck-home ~ .bmd-bottom-nav,
+  .bmd-bottom-nav {
+    display: flex !important;
+    max-width: 760px;
+    left: 50%;
+    right: auto;
+    margin-left: -380px;
+    padding: 12px 0 20px;
+    border-radius: 16px 16px 0 0;
+    border-left: 1px solid var(--border);
+    border-right: 1px solid var(--border);
+  }
+}
 .bmd-bottom-nav .nav-item { display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;padding:4px 14px; }
 .bmd-bottom-nav .nav-item svg { width:21px;height:21px;stroke:var(--muted);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;transition:all .2s; }
 .bmd-bottom-nav .nav-item.active svg { stroke:var(--accent);transform:scale(1.1); }
@@ -3256,7 +3274,8 @@ html.light .qs-val { color: inherit; }
 <style id="bmd-desktop-fix">
 /* ── Desktop: full layout ── */
 @media(min-width: 601px) {
-  .bmd-bottom-nav { display: none !important; }
+  /* Bottom nav — show on desktop too */
+  /* bottom nav shows on all screens */
 
   /* Streak bar + pills — centered */
   .streak-bar {
