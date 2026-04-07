@@ -2023,42 +2023,24 @@ mark.hb{background:rgba(79,142,247,.28);border-bottom:2px solid rgba(40,100,220,
 }
 
 /* ── FSRS buttons — bottom bar ── */
+/* FSRS nav — inline after card content, not fixed */
 .fsrs-nav {
-  position: fixed !important;
-  bottom: 0 !important;
-  left: 0 !important;
-  right: 0 !important;
-  z-index: 400 !important;
-  background: var(--bg) !important;
-  border-top: 1px solid var(--border) !important;
-  padding: 8px 16px 16px !important;
+  display: none;
+  width: 100%;
+  padding: 12px 0 24px !important;
+  background: transparent !important;
+  border: none !important;
+  position: static !important;
 }
-/* Mobile: push above bottom nav */
+.fsrs-nav.visible {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+}
+/* Mobile: extra bottom padding for bottom nav */
 @media(max-width: 600px){
   .fsrs-nav {
-    bottom: 74px !important;
-    padding-bottom: 10px !important;
-  }
-  .study-inner {
-    padding-bottom: 220px !important;
-  }
-}
-/* Desktop: centered 760px wide */
-@media(min-width: 601px){
-  .fsrs-nav {
-    left: 50% !important;
-    right: auto !important;
-    width: 760px !important;
-    margin-left: -380px !important;
-    border-radius: 16px 16px 0 0 !important;
-    border-left: 1px solid var(--border) !important;
-    border-right: 1px solid var(--border) !important;
-    padding: 14px 24px 24px !important;
-  }
-  .fsrs-row { gap: 12px !important; }
-  .fsrs-btn { min-height: 64px !important; font-size: 15px !important; }
-  .study-inner {
-    padding-bottom: 150px !important;
+    padding-bottom: 90px !important;
   }
 }
 .fsrs-row {
@@ -4460,19 +4442,19 @@ html.light .qs-val { color: inherit; }
           <button class="nav-plain-btn" onclick="skipFwd()">Skip →</button>
         </div>
 
+        <!-- FSRS nav — inline after card, scrolls with content -->
+        <div class="fsrs-nav" id="fsrs-nav">
+          <div class="fsrs-row">
+            <button class="fsrs-btn again" onclick="rate(0)"><span class="fsrs-lbl">Again</span><span class="fsrs-int" id="int0">&lt;1d</span></button>
+            <button class="fsrs-btn hard"  onclick="rate(1)"><span class="fsrs-lbl">Hard</span><span class="fsrs-int" id="int1">1d</span></button>
+            <button class="fsrs-btn good"  onclick="rate(2)"><span class="fsrs-lbl">Good</span><span class="fsrs-int" id="int2">3d</span></button>
+            <button class="fsrs-btn easy"  onclick="rate(3)"><span class="fsrs-lbl">Easy</span><span class="fsrs-int" id="int3">7d</span></button>
+          </div>
+        </div>
+
         <div style="display:none" id="pre-hint"></div>
 
       </div>
-    </div>
-  </div>
-
-  <!-- FSRS nav — fixed outside scroll, always visible -->
-  <div class="fsrs-nav" id="fsrs-nav">
-    <div class="fsrs-row">
-      <button class="fsrs-btn again" onclick="rate(0)"><span class="fsrs-lbl">Again</span><span class="fsrs-int" id="int0">&lt;1d</span></button>
-      <button class="fsrs-btn hard"  onclick="rate(1)"><span class="fsrs-lbl">Hard</span><span class="fsrs-int" id="int1">1d</span></button>
-      <button class="fsrs-btn good"  onclick="rate(2)"><span class="fsrs-lbl">Good</span><span class="fsrs-int" id="int2">3d</span></button>
-      <button class="fsrs-btn easy"  onclick="rate(3)"><span class="fsrs-lbl">Easy</span><span class="fsrs-int" id="int3">7d</span></button>
     </div>
   </div>
 
