@@ -3329,9 +3329,13 @@ html.light .qs-val { color: inherit; }
   .uni-card, .scope-wrap, .section-lbl,
   .overview-hero, .speed-card, .quick-stats,
   .lb-inner, .perf-inner {
-    max-width: 900px !important;
-    margin-left: auto !important;
-    margin-right: auto !important;
+    max-width: 100% !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+  }
+  /* Inner content items within ranking — readable width */
+  .lr-row, .rank-row, .league-entry {
+    max-width: 100% !important;
   }
 
   /* Font control visible on desktop */
@@ -3339,6 +3343,16 @@ html.light .qs-val { color: inherit; }
 
   /* Rank + Stats buttons visible on desktop */
   .hdr-desktop-only { display: flex !important; }
+
+  /* Ranking cards — no side margin on desktop, full panel width */
+  .your-card, .league-card, .global-card, .uni-card {
+    margin: 0 0 16px 0 !important;
+    border-radius: 16px !important;
+  }
+  .scope-wrap { margin: 0 !important; }
+  .section-lbl { margin: 8px 0 !important; }
+  /* Live insight full width */
+  .live-insight { margin: 0 !important; }
 
   /* Card study area — max width on desktop */
   .study-main {
