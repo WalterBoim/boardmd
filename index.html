@@ -5631,8 +5631,49 @@ function renderCard(){
   if(_fsrs2) _fsrs2.classList.remove('visible');
   const full=[...deck,...againQueue];
   if(!full.length||idx>=full.length){showDone();return;}
+
+  // Skip again cards that aren't due yet — show a waiting message instead
   const card=full[idx];
   const state=getState(card.id);
+  const isAgain = againQueue.includes(card);
+  if(isAgain && state.due > Date.now()){
+    // Card not due yet — check if there are other cards to show
+    const nextDue = full.slice(idx).find(c => {
+      if(!againQueue.includes(c)) return true; // deck card always show
+      return getState(c.id).due <= Date.now(); // again card only if due
+    });
+    if(!nextDue){
+      // All remaining are again cards not yet due — show waiting screen
+      const waitMs = state.due - Date.now();
+      const waitMin = Math.ceil(waitMs / 60000);
+      const waitEl = document.getElementById('c-q');
+      if(waitEl){
+        document.getElementById('app-layout-wrap').style.display='flex';
+        document.getElementById('deck-home').classList.remove('active');
+        const _fsrs3=document.getElementById('fsrs-nav');
+        const _fsrs4=document.getElementById('fsrs-nav-2');
+        if(_fsrs3) _fsrs3.classList.remove('visible');
+        if(_fsrs4) _fsrs4.classList.remove('visible');
+        document.getElementById('c-sys').textContent = '';
+        document.getElementById('c-top').textContent = '';
+        document.getElementById('c-deck-badge').textContent = '';
+        document.getElementById('c-qid').textContent = '';
+        waitEl.innerHTML = `<div style="text-align:center;padding:32px 16px;color:var(--muted);">
+          <div style="font-size:32px;margin-bottom:12px;">⏱</div>
+          <div style="font-size:16px;font-weight:700;color:var(--text);margin-bottom:8px;">Learning cards pending</div>
+          <div style="font-size:13px;">Come back in <strong style="color:var(--amber)">${waitMin} min</strong> to review your Again cards.</div>
+          <div style="font-size:12px;margin-top:16px;color:var(--muted);">Great work finishing today's new cards!</div>
+        </div>`;
+        document.getElementById('c-opts').innerHTML = '';
+      }
+      return;
+    }
+    // Skip to next available card
+    idx++;
+    revealed=false;
+    renderCard();
+    return;
+  }
   _cardState=state.state;
   const ivs=getIntervals(state);
   // Reset explanation and distractors for new card
