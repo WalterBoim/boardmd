@@ -2093,10 +2093,8 @@ mark.hb{background:rgba(79,142,247,.28);border-bottom:2px solid rgba(40,100,220,
 <style id="bmd-study-layout">
 /* ── Study area layout — mobile-first, full width ── */
 .app-layout {
-  display: block !important;
   width: 100% !important;
-  max-width: 480px !important;
-  margin: 0 auto !important;
+  max-width: 100% !important;
 }
 .sidebar { display: none !important; }
 .study-main {
@@ -2466,13 +2464,13 @@ mark.hb{background:rgba(79,142,247,.28);border-bottom:2px solid rgba(40,100,220,
   font-family:'Sora',sans-serif !important;
   padding:0 !important;
   gap:0 !important;
-  max-width:430px !important;
-  margin:0 auto !important;
   background:var(--bg) !important;
   overflow-y:auto;
-  padding-bottom:100px !important;
 }
 #profile-panel.active { display:flex !important; }
+@media(max-width:600px){
+  #profile-panel { max-width:430px !important; margin:0 auto !important; padding-bottom:100px !important; }
+}
 </style>
 
 <style id="bmd-rank-v2">
@@ -2860,8 +2858,6 @@ mark.hb{background:rgba(79,142,247,.28);border-bottom:2px solid rgba(40,100,220,
 /* Ranking panel wrapper */
 #lb-panel {
   padding: 0 !important;
-  max-width: 430px !important;
-  margin: 0 auto !important;
   font-family: 'Sora', sans-serif !important;
   overflow-y: auto !important;
   padding-bottom: 100px !important;
@@ -3155,6 +3151,11 @@ mark.hb{background:rgba(79,142,247,.28);border-bottom:2px solid rgba(40,100,220,
   background: var(--bg);
   overflow-y: auto;
   font-family: 'Sora', sans-serif;
+  max-width: 430px;
+  margin: 0 auto;
+  left: 50%;
+  transform: translateX(-50%);
+  box-shadow: 0 0 80px rgba(0,0,0,.3);
 }
 #poststep-panel.active { display: flex; }
 </style>
@@ -3173,7 +3174,7 @@ mark.hb{background:rgba(79,142,247,.28);border-bottom:2px solid rgba(40,100,220,
   z-index: 200;
   backdrop-filter: blur(20px);
 }
-#app.active .bmd-bottom-nav { display: flex; }
+@media(max-width:600px){ #app.active .bmd-bottom-nav { display: flex; } }
 .bmd-bottom-nav .nav-item { display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;padding:4px 14px; }
 .bmd-bottom-nav .nav-item svg { width:21px;height:21px;stroke:var(--muted);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;transition:all .2s; }
 .bmd-bottom-nav .nav-item.active svg { stroke:var(--accent);transform:scale(1.1); }
@@ -3187,6 +3188,82 @@ mark.hb{background:rgba(79,142,247,.28);border-bottom:2px solid rgba(40,100,220,
 #app.active .deck-home,
 #app.active .lb-panel,
 #app.active #profile-panel { padding-bottom: 100px !important; }
+</style>
+<style id="bmd-light-card-fix">
+/* ── Light mode card text fixes ── */
+html.light #card-el .card-question,
+html.light #card-el #c-q {
+  color: #0d1021 !important;
+}
+html.light .opt-btn .opt-text {
+  color: #0d1021 !important;
+}
+html.light .opt-btn .opt-letter {
+  color: #3a4060 !important;
+  background: #e8edf8 !important;
+}
+html.light .card-system,
+html.light .card-topic,
+html.light #c-deck-label,
+html.light #c-sys,
+html.light #c-top {
+  color: #556080 !important;
+}
+html.light .exp-text,
+html.light #exp-txt {
+  color: #3a4060 !important;
+}
+html.light .dist-item {
+  color: #3a4060 !important;
+}
+html.light .kp-text {
+  color: #0d1021 !important;
+}
+html.light .vignette-text {
+  color: #3a4060 !important;
+}
+</style>
+
+<style id="bmd-desktop-fix">
+/* ── Desktop: app panels use full width ── */
+/* CRITICAL: never use display:block!important on .app-layout — JS controls it */
+@media(min-width: 601px) {
+  /* Bottom nav hidden on desktop — top header handles navigation */
+  .bmd-bottom-nav { display: none !important; }
+  
+  /* Panels: let the existing desktop layout handle sizing */
+  #profile-panel,
+  #lb-panel {
+    max-width: 100% !important;
+    padding-bottom: 0 !important;
+  }
+  
+  /* Dashboard deck list: constrain content width but center it */
+  .nv2-deck-home {
+    max-width: 100% !important;
+    padding: 20px 40px !important;
+  }
+  
+  /* Deck rows: nicer on desktop */
+  .deck-row, .expand-row {
+    max-width: 700px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  /* Step pills centered */
+  .bmd-step-pills {
+    justify-content: flex-start;
+    padding: 12px 40px 14px;
+  }
+
+  /* Streak bar */
+  .streak-bar {
+    padding: 8px 40px;
+    justify-content: flex-start;
+    gap: 24px;
+  }
+}
 </style>
 </head>
 <body>
@@ -3363,6 +3440,14 @@ mark.hb{background:rgba(79,142,247,.28);border-bottom:2px solid rgba(40,100,220,
       <button class="hdr-action-btn" onclick="openSettings()" title="Settings">
         <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
       </button>
+      <!-- Rank button -->
+      <button class="hdr-action-btn" onclick="showLeaderboard()" title="Ranking" id="lb-btn">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+      </button>
+      <!-- Stats button -->
+      <button class="hdr-action-btn" onclick="showProfile()" title="Stats" id="level-badge-btn">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+      </button>
       <div class="user-pill" id="app-user-pill" onclick="showAppAuthMenu()" style="display:flex"><div class="avatar" id="app-user-avatar">W</div><div class="user-name" id="app-user-label">Walter B.</div></div>
     </div>
   </div>
@@ -3387,8 +3472,6 @@ mark.hb{background:rgba(79,142,247,.28);border-bottom:2px solid rgba(40,100,220,
     <div id="hl-btns"></div>
     <button id="theme-toggle-app" onclick="toggleTheme()"><svg id="theme-icon-app" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg></button>
     <div id="streak-bar"><span id="streak-val-leg">0</span></div>
-    <button id="level-badge-btn" onclick="showProfile()"></button>
-    <button id="lb-btn" onclick="showLeaderboard()"></button>
     <div class="font-ctrl"><button id="fdec">-</button><span id="fval">15</span><button id="finc">+</button></div>
     <span id="coin-val">0</span>
     <button id="app-login-btn" onclick="signInWithGoogle()" style="display:none"></button>
@@ -7380,17 +7463,7 @@ function hideAllPanels(){
   if(lvb) lvb.classList.remove('active');
 }
 
-// Override showDeckHome and switchDeckAndStudy to work with panels
-const _origShowDeckHome = window.showDeckHome;
-window.showDeckHome = function(){
-  document.getElementById('lb-panel').classList.remove('active');
-  document.getElementById('profile-panel').classList.remove('active');
-  document.getElementById('lb-btn').classList.remove('active');
-  document.getElementById('deck-home').classList.add('active');
-  document.getElementById('filter-bar-wrap').style.display='none';
-  document.getElementById('app-layout-wrap').style.display='none';
-  buildDeckHomeTable();
-};
+// showDeckHome consolidated into final override below — see line ~9048
 
 // Patch goToHome
 window.goToHome = function(){
@@ -8987,6 +9060,7 @@ function bmdDashSync() {
     if(tabs) tabs.style.display= 'flex';
     if(legTabs) legTabs.style.display = 'none';
     setTimeout(bmdDashSync, 100);
+    setTimeout(() => bmdSetActiveNav('bnav-home'), 50);
   };
 })();
 
@@ -9144,14 +9218,7 @@ function bmdSetActiveNav(id) {
   } catch(e) {}
 }
 
-// Hook showDeckHome → home active
-(function() {
-  const _prev = window.showDeckHome;
-  window.showDeckHome = function() {
-    if (_prev) _prev.call(this);
-    setTimeout(() => bmdSetActiveNav('bnav-home'), 50);
-  };
-})();
+// showDeckHome nav hook — merged into main override at bmdDashSync section
 
 // Hook showLeaderboard → rank active
 (function() {
