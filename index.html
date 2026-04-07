@@ -2032,8 +2032,23 @@ mark.hb{background:rgba(79,142,247,.28);border-bottom:2px solid rgba(40,100,220,
   background: var(--bg) !important;
   border-top: 1px solid var(--border) !important;
   padding: 8px 12px 18px !important;
-  max-width: 480px !important;
+  max-width: 100% !important;
   margin: 0 auto !important;
+}
+/* Desktop: constrain width and center */
+@media(min-width: 601px){
+  .fsrs-nav {
+    max-width: 760px !important;
+    left: 50% !important;
+    right: auto !important;
+    transform: translateX(-50%) !important;
+    border-radius: 16px 16px 0 0 !important;
+    border-left: 1px solid var(--border) !important;
+    border-right: 1px solid var(--border) !important;
+    padding-bottom: 20px !important;
+  }
+  .fsrs-row { gap: 12px !important; }
+  .fsrs-btn { min-height: 60px !important; font-size: 14px !important; }
 }
 /* On mobile: bottom nav sits above FSRS bar */
 @media(max-width:600px){
@@ -2042,7 +2057,6 @@ mark.hb{background:rgba(79,142,247,.28);border-bottom:2px solid rgba(40,100,220,
     border-radius: 16px 16px 0 0 !important;
     padding-bottom: 12px !important;
   }
-  /* Extra scroll padding so content isn't hidden behind both bars */
   .study-inner {
     padding-bottom: calc(74px + 90px + 20px) !important;
   }
@@ -8644,6 +8658,10 @@ function showAppAuthMenu(){
     <button onclick="showProfile();document.getElementById('app-auth-menu')?.remove()">
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
       Performance
+    </button>
+    <button onclick="showLeaderboard();document.getElementById('app-auth-menu')?.remove()">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+      Ranking
     </button>
     <button class="aam-signout" onclick="signOut()">
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
