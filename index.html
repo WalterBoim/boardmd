@@ -3807,6 +3807,42 @@ html.light .qs-val { color: inherit; }
 </div>
 
 <!-- SCOPE FILTERS -->
+<!-- CHALLENGES -->
+<div class="section-lbl">Challenges</div>
+<div id="challenges-wrap" style="display:flex;flex-direction:column;gap:12px;">
+
+  <!-- Create challenge -->
+  <div style="background:var(--surface);border:1px solid var(--border2);border-radius:16px;padding:18px 20px;">
+    <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:4px;font-family:'Sora',sans-serif;">Start a Challenge</div>
+    <div style="font-size:12px;color:var(--muted);margin-bottom:14px;font-family:'Sora',sans-serif;">Compete 1v1 or with a group. Share a code, study together, see who wins.</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;">
+      <button onclick="createChallenge('1v1')" style="flex:1;min-width:120px;padding:10px 14px;background:rgba(79,142,247,.1);border:1.5px solid rgba(79,142,247,.3);border-radius:10px;color:var(--accent);font-size:12px;font-weight:700;font-family:'Sora',sans-serif;cursor:pointer;transition:all .15s;" onmouseover="this.style.background='rgba(79,142,247,.2)'" onmouseout="this.style.background='rgba(79,142,247,.1)'">
+        <div style="font-size:18px;margin-bottom:4px;">⚔️</div>1v1 Duel
+      </button>
+      <button onclick="createChallenge('group')" style="flex:1;min-width:120px;padding:10px 14px;background:rgba(245,158,11,.1);border:1.5px solid rgba(245,158,11,.3);border-radius:10px;color:var(--amber);font-size:12px;font-weight:700;font-family:'Sora',sans-serif;cursor:pointer;transition:all .15s;" onmouseover="this.style.background='rgba(245,158,11,.2)'" onmouseout="this.style.background='rgba(245,158,11,.1)'">
+        <div style="font-size:18px;margin-bottom:4px;">👥</div>Group
+      </button>
+      <button onclick="joinChallenge()" style="flex:1;min-width:120px;padding:10px 14px;background:rgba(0,212,170,.1);border:1.5px solid rgba(0,212,170,.3);border-radius:10px;color:var(--green);font-size:12px;font-weight:700;font-family:'Sora',sans-serif;cursor:pointer;transition:all .15s;" onmouseover="this.style.background='rgba(0,212,170,.2)'" onmouseout="this.style.background='rgba(0,212,170,.1)'">
+        <div style="font-size:18px;margin-bottom:4px;">🔗</div>Join by Code
+      </button>
+    </div>
+  </div>
+
+  <!-- Active challenges list -->
+  <div id="challenges-list">
+    <div style="text-align:center;padding:20px;color:var(--muted);font-size:13px;font-family:'Sora',sans-serif;">No active challenges yet. Start one above!</div>
+  </div>
+
+</div>
+
+<!-- CHALLENGE MODAL -->
+<div id="challenge-modal" style="display:none;position:fixed;inset:0;z-index:4000;background:rgba(0,0,0,.6);backdrop-filter:blur(6px);align-items:flex-end;justify-content:center;" onclick="if(event.target===this)closeChallengeModal()">
+  <div id="challenge-modal-inner" style="background:var(--surface);border-radius:20px 20px 0 0;padding:24px 20px 40px;width:100%;max-width:480px;animation:slideUp .22s cubic-bezier(.34,1.2,.64,1);">
+    <div style="width:36px;height:4px;background:var(--border2);border-radius:2px;margin:0 auto 20px;"></div>
+    <div id="challenge-modal-content"></div>
+  </div>
+</div>
+
 <div class="section-lbl">Global Ranking</div>
 <div style="display:flex;flex-direction:column;gap:8px;">
   <!-- Row 1: Global + USA fixed + Step filters -->
@@ -10732,6 +10768,239 @@ function pickCountrySuggestion(name,flag){
   if(sel)sel.innerHTML=flag+' <strong>'+name+'</strong> selected';
   hideCountrySuggestions();
 }
+
+// ══════════════════════════════════════════════════════════════
+// BOARDMD CHALLENGES — 1v1, Group, Join by Code
+// ══════════════════════════════════════════════════════════════
+
+const CHALLENGE_KEY = 'bmd_challenges_v1';
+
+function getChallenges() {
+  try { return JSON.parse(localStorage.getItem(CHALLENGE_KEY)||'[]'); } catch(e){ return []; }
+}
+function saveChallenges(arr) {
+  try { localStorage.setItem(CHALLENGE_KEY, JSON.stringify(arr)); } catch(e){}
+}
+function genCode() {
+  return Math.random().toString(36).slice(2,8).toUpperCase();
+}
+
+function openChallengeModal(html) {
+  document.getElementById('challenge-modal-content').innerHTML = html;
+  document.getElementById('challenge-modal').style.display = 'flex';
+}
+function closeChallengeModal() {
+  document.getElementById('challenge-modal').style.display = 'none';
+}
+
+function createChallenge(type) {
+  const me = JSON.parse(localStorage.getItem(LB_ME_KEY)||'{}');
+  if(!me || !me.name) {
+    openChallengeModal(`
+      <div style="font-size:17px;font-weight:800;color:var(--text);margin-bottom:8px;font-family:'Sora',sans-serif;">Set your name first</div>
+      <div style="font-size:13px;color:var(--muted);margin-bottom:20px;font-family:'Sora',sans-serif;">You need a display name to create challenges.</div>
+      <button onclick="closeChallengeModal();openProfileEditor()" style="width:100%;padding:13px;background:var(--accent);border:none;border-radius:12px;color:#fff;font-size:14px;font-weight:700;cursor:pointer;font-family:'Sora',sans-serif;">Set Display Name</button>`);
+    return;
+  }
+
+  const code = genCode();
+  const g = getGami();
+  const challenge = {
+    id: 'ch_' + Date.now(),
+    code,
+    type,  // '1v1' or 'group'
+    name: type === '1v1' ? me.name + ' vs ???' : me.name + "'s Group",
+    creator: { id: me.id, name: me.name, coins: g.coins },
+    participants: [{ id: me.id, name: me.name, coins: g.coins, joinedAt: Date.now() }],
+    startCoins: g.coins,
+    createdAt: Date.now(),
+    duration: 7 * 24 * 3600 * 1000, // 7 days
+    status: 'waiting', // waiting, active, ended
+    maxParticipants: type === '1v1' ? 2 : 20,
+  };
+
+  // Save locally
+  const challenges = getChallenges();
+  challenges.push(challenge);
+  saveChallenges(challenges);
+
+  // Save to shared storage so others can join
+  try { window.storage.set('challenge:'+code, JSON.stringify(challenge), true); } catch(e){}
+
+  const icon = type === '1v1' ? '⚔️' : '👥';
+  const label = type === '1v1' ? '1v1 Duel' : 'Group Challenge';
+
+  openChallengeModal(`
+    <div style="text-align:center;margin-bottom:20px;">
+      <div style="font-size:40px;margin-bottom:8px;">${icon}</div>
+      <div style="font-size:17px;font-weight:800;color:var(--text);font-family:'Sora',sans-serif;">${label} Created!</div>
+      <div style="font-size:12px;color:var(--muted);margin-top:4px;font-family:'Sora',sans-serif;">Share this code with ${type === '1v1' ? 'your opponent' : 'your group'}</div>
+    </div>
+    <div style="background:var(--surface2);border:2px dashed var(--accent);border-radius:14px;padding:20px;text-align:center;margin-bottom:16px;">
+      <div style="font-size:32px;font-weight:800;letter-spacing:6px;color:var(--accent);font-family:'JetBrains Mono',monospace;">${code}</div>
+      <div style="font-size:11px;color:var(--muted);margin-top:6px;font-family:'Sora',sans-serif;">Challenge code · valid for 7 days</div>
+    </div>
+    <button onclick="navigator.clipboard.writeText('${code}').then(()=>showXpToast('Copied!','Code ${code} copied to clipboard','','',null))" style="width:100%;padding:12px;background:var(--surface2);border:1px solid var(--border2);border-radius:12px;color:var(--text);font-size:14px;font-weight:600;cursor:pointer;font-family:'Sora',sans-serif;margin-bottom:8px;">Copy Code</button>
+    <button onclick="closeChallengeModal();renderChallengesList()" style="width:100%;padding:12px;background:var(--accent);border:none;border-radius:12px;color:#fff;font-size:14px;font-weight:700;cursor:pointer;font-family:'Sora',sans-serif;">View My Challenges</button>`);
+
+  renderChallengesList();
+}
+
+function joinChallenge(prefilledCode) {
+  openChallengeModal(`
+    <div style="font-size:17px;font-weight:800;color:var(--text);margin-bottom:4px;font-family:'Sora',sans-serif;">Join a Challenge</div>
+    <div style="font-size:12px;color:var(--muted);margin-bottom:20px;font-family:'Sora',sans-serif;">Enter the 6-character code your friend shared.</div>
+    <input id="join-code-input" type="text" maxlength="6" placeholder="XXXXXX"
+      value="${prefilledCode||''}"
+      style="width:100%;padding:14px;background:var(--surface2);border:1.5px solid var(--border2);border-radius:10px;font-size:22px;font-weight:800;letter-spacing:6px;text-transform:uppercase;text-align:center;color:var(--accent);font-family:'JetBrains Mono',monospace;outline:none;box-sizing:border-box;"
+      oninput="this.value=this.value.toUpperCase()"
+      onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border2)'">
+    <div id="join-error" style="font-size:12px;color:var(--red);margin-top:8px;min-height:16px;font-family:'Sora',sans-serif;"></div>
+    <button onclick="submitJoinChallenge()" style="width:100%;padding:13px;background:var(--accent);border:none;border-radius:12px;color:#fff;font-size:14px;font-weight:700;cursor:pointer;font-family:'Sora',sans-serif;margin-top:12px;">Join Challenge</button>`);
+  setTimeout(() => document.getElementById('join-code-input')?.focus(), 100);
+}
+
+async function submitJoinChallenge() {
+  const code = (document.getElementById('join-code-input')?.value||'').trim().toUpperCase();
+  if(code.length < 4) {
+    document.getElementById('join-error').textContent = 'Please enter a valid code.';
+    return;
+  }
+
+  const me = JSON.parse(localStorage.getItem(LB_ME_KEY)||'{}');
+  if(!me || !me.name) {
+    document.getElementById('join-error').textContent = 'Set your display name first.';
+    return;
+  }
+
+  document.getElementById('join-error').textContent = 'Looking up challenge...';
+
+  try {
+    const result = await window.storage.get('challenge:'+code, true);
+    if(!result || !result.value) {
+      document.getElementById('join-error').textContent = 'Challenge not found. Check the code and try again.';
+      return;
+    }
+
+    const challenge = JSON.parse(result.value);
+    if(challenge.status === 'ended') {
+      document.getElementById('join-error').textContent = 'This challenge has already ended.';
+      return;
+    }
+    if(challenge.participants.length >= challenge.maxParticipants) {
+      document.getElementById('join-error').textContent = challenge.type === '1v1' ? 'This 1v1 is already full.' : 'This group is full.';
+      return;
+    }
+    if(challenge.participants.find(p => p.id === me.id)) {
+      document.getElementById('join-error').textContent = 'You are already in this challenge.';
+      return;
+    }
+
+    // Add me to participants
+    const g = getGami();
+    challenge.participants.push({ id: me.id, name: me.name, coins: g.coins, startCoins: g.coins, joinedAt: Date.now() });
+    if(challenge.type === '1v1') {
+      challenge.name = challenge.creator.name + ' vs ' + me.name;
+      challenge.status = 'active';
+    }
+
+    // Save updated challenge
+    await window.storage.set('challenge:'+code, JSON.stringify(challenge), true);
+
+    // Save locally
+    const challenges = getChallenges().filter(c => c.code !== code);
+    challenges.push(challenge);
+    saveChallenges(challenges);
+
+    const icon = challenge.type === '1v1' ? '⚔️' : '👥';
+    openChallengeModal(`
+      <div style="text-align:center;margin-bottom:20px;">
+        <div style="font-size:40px;margin-bottom:8px;">${icon}</div>
+        <div style="font-size:17px;font-weight:800;color:var(--green);font-family:'Sora',sans-serif;">You joined!</div>
+        <div style="font-size:13px;color:var(--muted);margin-top:4px;font-family:'Sora',sans-serif;">${challenge.name}</div>
+      </div>
+      <div style="background:rgba(0,212,170,.08);border:1px solid rgba(0,212,170,.2);border-radius:12px;padding:14px;text-align:center;margin-bottom:16px;">
+        <div style="font-size:12px;color:var(--muted);font-family:'Sora',sans-serif;">Study more cards than your opponent to win MDCoins.</div>
+      </div>
+      <button onclick="closeChallengeModal();renderChallengesList()" style="width:100%;padding:13px;background:var(--accent);border:none;border-radius:12px;color:#fff;font-size:14px;font-weight:700;cursor:pointer;font-family:'Sora',sans-serif;">View Challenge</button>`);
+
+    renderChallengesList();
+  } catch(e) {
+    document.getElementById('join-error').textContent = 'Error joining. Try again.';
+  }
+}
+
+async function renderChallengesList() {
+  const list = document.getElementById('challenges-list');
+  if(!list) return;
+
+  const me = JSON.parse(localStorage.getItem(LB_ME_KEY)||'{}');
+  const local = getChallenges();
+
+  if(local.length === 0) {
+    list.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted);font-size:13px;font-family:\'Sora\',sans-serif;">No active challenges yet. Start one above!</div>';
+    return;
+  }
+
+  // Refresh from shared storage
+  const refreshed = [];
+  for(const ch of local) {
+    try {
+      const r = await window.storage.get('challenge:'+ch.code, true);
+      if(r && r.value) refreshed.push(JSON.parse(r.value));
+      else refreshed.push(ch);
+    } catch(e) { refreshed.push(ch); }
+  }
+  saveChallenges(refreshed);
+
+  const g = getGami();
+  list.innerHTML = refreshed.map(ch => {
+    const isCreator = ch.creator.id === me.id;
+    const myParticipant = ch.participants.find(p => p.id === me.id);
+    const myProgress = myParticipant ? (g.coins - (myParticipant.startCoins||myParticipant.coins||0)) : 0;
+    const others = ch.participants.filter(p => p.id !== me.id);
+    const icon = ch.type === '1v1' ? '⚔️' : '👥';
+    const statusColor = ch.status === 'active' ? 'var(--green)' : ch.status === 'waiting' ? 'var(--amber)' : 'var(--muted)';
+    const statusLabel = ch.status === 'active' ? 'Active' : ch.status === 'waiting' ? 'Waiting for opponent' : 'Ended';
+
+    const daysLeft = Math.max(0, Math.ceil((ch.createdAt + ch.duration - Date.now()) / 86400000));
+
+    return `<div style="background:var(--surface);border:1px solid var(--border2);border-radius:14px;padding:16px 18px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span style="font-size:20px;">${icon}</span>
+          <div>
+            <div style="font-size:13px;font-weight:700;color:var(--text);font-family:'Sora',sans-serif;">${ch.name}</div>
+            <div style="font-size:10px;color:var(--muted);font-family:'JetBrains Mono',monospace;">CODE: ${ch.code} · ${daysLeft}d left</div>
+          </div>
+        </div>
+        <div style="font-size:10px;font-weight:700;color:${statusColor};font-family:'Sora',sans-serif;padding:3px 8px;background:${statusColor}18;border-radius:20px;">${statusLabel}</div>
+      </div>
+      ${ch.status === 'active' ? `
+      <div style="display:flex;gap:8px;">
+        ${ch.participants.map(p => {
+          const isMe = p.id === me.id;
+          const earned = isMe ? Math.max(0, g.coins - (p.startCoins||p.coins||0)) : (p.earned||0);
+          return `<div style="flex:1;background:${isMe?'rgba(79,142,247,.08)':'var(--surface2)'};border:1px solid ${isMe?'rgba(79,142,247,.2)':'var(--border)'};border-radius:10px;padding:10px;text-align:center;">
+            <div style="font-size:11px;font-weight:700;color:${isMe?'var(--accent)':'var(--text)'};font-family:'Sora',sans-serif;">${isMe?'You':p.name}</div>
+            <div style="font-size:18px;font-weight:800;color:${isMe?'var(--accent)':'var(--text)'};font-family:'JetBrains Mono',monospace;margin:2px 0;">+${earned}</div>
+            <div style="font-size:9px;color:var(--muted);font-family:'Sora',sans-serif;">MDCoins</div>
+          </div>`;
+        }).join('')}
+      </div>` : ch.status === 'waiting' ? `
+      <div style="font-size:12px;color:var(--muted);font-family:'Sora',sans-serif;margin-bottom:8px;">Share code <strong style="color:var(--accent);font-family:'JetBrains Mono',monospace;">${ch.code}</strong> to invite someone.</div>
+      <button onclick="navigator.clipboard.writeText('${ch.code}').then(()=>showXpToast('Copied!','Share code ${ch.code} with your opponent','','',null))" style="width:100%;padding:9px;background:transparent;border:1px solid var(--border2);border-radius:9px;color:var(--muted);font-size:12px;cursor:pointer;font-family:'Sora',sans-serif;">Copy Invite Code</button>
+      ` : ''}
+    </div>`;
+  }).join('');
+}
+
+// Load challenges when leaderboard opens
+const _origShowLb = window.showLeaderboard;
+window.showLeaderboard = function() {
+  _origShowLb && _origShowLb();
+  setTimeout(renderChallengesList, 300);
+};
 </script>
 
 <style>
