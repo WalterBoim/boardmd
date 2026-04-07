@@ -2031,34 +2031,41 @@ mark.hb{background:rgba(79,142,247,.28);border-bottom:2px solid rgba(40,100,220,
   z-index: 300 !important;
   background: var(--bg) !important;
   border-top: 1px solid var(--border) !important;
-  padding: 8px 12px 18px !important;
+  padding: 8px 16px 20px !important;
   max-width: 100% !important;
-  margin: 0 auto !important;
 }
-/* Desktop: constrain width and center */
+/* Mobile: sit above the bottom nav (74px height) */
+@media(max-width:600px){
+  .fsrs-nav {
+    bottom: 74px !important;
+    padding-bottom: 12px !important;
+    border-radius: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    transform: none !important;
+  }
+  .study-inner {
+    padding-bottom: calc(74px + 100px + 20px) !important;
+  }
+}
+/* Desktop: centered, constrained width */
 @media(min-width: 601px){
   .fsrs-nav {
-    max-width: 760px !important;
     left: 50% !important;
     right: auto !important;
+    width: 760px !important;
+    max-width: 760px !important;
     transform: translateX(-50%) !important;
     border-radius: 16px 16px 0 0 !important;
     border-left: 1px solid var(--border) !important;
     border-right: 1px solid var(--border) !important;
-    padding-bottom: 20px !important;
+    padding: 12px 20px 24px !important;
+    bottom: 0 !important;
   }
   .fsrs-row { gap: 12px !important; }
-  .fsrs-btn { min-height: 60px !important; font-size: 14px !important; }
-}
-/* On mobile: bottom nav sits above FSRS bar */
-@media(max-width:600px){
-  .fsrs-nav {
-    bottom: 74px !important;
-    border-radius: 16px 16px 0 0 !important;
-    padding-bottom: 12px !important;
-  }
+  .fsrs-btn { min-height: 60px !important; }
   .study-inner {
-    padding-bottom: calc(74px + 90px + 20px) !important;
+    padding-bottom: 140px !important;
   }
 }
 .fsrs-row {
@@ -5556,12 +5563,12 @@ function ensureStudyUI(){
       </div>
     </div>
     <div id="pre-hint" class="kbd-hint" style="margin-top:4px">Press <span class="kbd">A</span><span class="kbd">B</span><span class="kbd">C</span><span class="kbd">D</span> to answer</div>
-    <div class="fsrs-nav" id="fsrs-nav">
+    <div class="fsrs-nav" id="fsrs-nav-2">
       <div class="fsrs-row">
-        <button class="fsrs-btn again" onclick="rate(0)"><span class="fsrs-lbl">Again</span><span class="fsrs-int" id="int0">—</span></button>
-        <button class="fsrs-btn hard"  onclick="rate(1)"><span class="fsrs-lbl">Hard</span><span class="fsrs-int"  id="int1">—</span></button>
-        <button class="fsrs-btn good"  onclick="rate(2)"><span class="fsrs-lbl">Good</span><span class="fsrs-int"  id="int2">—</span></button>
-        <button class="fsrs-btn easy"  onclick="rate(3)"><span class="fsrs-lbl">Easy</span><span class="fsrs-int"  id="int3">—</span></button>
+        <button class="fsrs-btn again" onclick="rate(0)"><span class="fsrs-lbl">Again</span><span class="fsrs-int" id="int0-b">—</span></button>
+        <button class="fsrs-btn hard"  onclick="rate(1)"><span class="fsrs-lbl">Hard</span><span class="fsrs-int"  id="int1-b">—</span></button>
+        <button class="fsrs-btn good"  onclick="rate(2)"><span class="fsrs-lbl">Good</span><span class="fsrs-int"  id="int2-b">—</span></button>
+        <button class="fsrs-btn easy"  onclick="rate(3)"><span class="fsrs-lbl">Easy</span><span class="fsrs-int"  id="int3-b">—</span></button>
       </div>
     </div>
     <div class="plain-nav" id="plain-nav">
@@ -5590,7 +5597,9 @@ function renderCard(){
   if(oldAtt) oldAtt.remove();
   // Hide FSRS buttons until answer revealed
   const _fsrs=document.getElementById('fsrs-nav');
+  const _fsrs2=document.getElementById('fsrs-nav-2');
   if(_fsrs) _fsrs.classList.remove('visible');
+  if(_fsrs2) _fsrs2.classList.remove('visible');
   const full=[...deck,...againQueue];
   if(!full.length||idx>=full.length){showDone();return;}
   const card=full[idx];
@@ -5802,7 +5811,9 @@ function renderCard(){
   const plainNav=document.getElementById('plain-nav');
   if(plainNav) plainNav.style.display='';
   const fsrsNav=document.getElementById('fsrs-nav');
+  const fsrsNav2=document.getElementById('fsrs-nav-2');
   if(fsrsNav) fsrsNav.classList.remove('visible');
+  if(fsrsNav2) fsrsNav2.classList.remove('visible');
   const preHint=document.getElementById('pre-hint');
   if(preHint) preHint.style.display='';
   revealed=false;
@@ -6312,9 +6323,11 @@ function revealAnswer(sel,card){
   const expEl=document.getElementById('c-exp');
   if(expEl) expEl.classList.add('visible');
 
-  // Show FSRS buttons
+  // Show FSRS buttons — sync both nav elements
   const rb=document.getElementById('fsrs-nav');
+  const rb2=document.getElementById('fsrs-nav-2');
   if(rb) rb.classList.add('visible');
+  if(rb2) rb2.classList.add('visible');
 
   // ── BoardMD Attending — inject inline after answer revealed ──
   injectAttendingInline(card, sel);
