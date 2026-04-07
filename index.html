@@ -5027,7 +5027,16 @@ function buildSessionQueue(){
   const newToday=newCards.slice(0,newAllowed);
 
   // ── Anki queue: lrn due → new → review ───────────────────────────
+  const prevDeck = deck;
   deck=[...lrnDue,...newToday,...revDue];
+  // Preserve idx if session already in progress (don't restart from 0)
+  // Only reset if this is a fresh start (idx was 0 or deck was empty)
+  if(prevDeck.length > 0 && idx > 0){
+    // Keep idx but clamp to new deck length
+    idx = Math.min(idx, deck.length);
+  } else {
+    idx = 0;
+  }
   againQueue=[];
   idx=0;revealed=false;sessionRatings={};
 
