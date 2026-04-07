@@ -2051,11 +2051,11 @@ mark.hb{background:rgba(79,142,247,.28);border-bottom:2px solid rgba(40,100,220,
 /* Desktop: centered, constrained width */
 @media(min-width: 601px){
   .fsrs-nav {
-    left: 50% !important;
-    right: auto !important;
+    left: calc(50% - 380px) !important;
+    right: calc(50% - 380px) !important;
+    transform: none !important;
     width: 760px !important;
     max-width: 760px !important;
-    transform: translateX(-50%) !important;
     border-radius: 16px 16px 0 0 !important;
     border-left: 1px solid var(--border) !important;
     border-right: 1px solid var(--border) !important;
@@ -6332,9 +6332,8 @@ function revealAnswer(sel,card){
   // ── BoardMD Attending — inject inline after answer revealed ──
   injectAttendingInline(card, sel);
 
-  // Update FSRS intervals display
+  // Update FSRS intervals display — sync both nav elements
   const ivs=getIntervals(getState(card.id));
-  // Update interval labels using existing .label property
   const i0=document.getElementById('int0');
   const i1=document.getElementById('int1');
   const i2=document.getElementById('int2');
@@ -6343,6 +6342,15 @@ function revealAnswer(sel,card){
   if(i1) i1.textContent=ivs.hard.label;
   if(i2) i2.textContent=ivs.good.label;
   if(i3) i3.textContent=ivs.easy.label;
+  // Sync second nav
+  const i0b=document.getElementById('int0-b');
+  const i1b=document.getElementById('int1-b');
+  const i2b=document.getElementById('int2-b');
+  const i3b=document.getElementById('int3-b');
+  if(i0b) i0b.textContent=ivs.again.label;
+  if(i1b) i1b.textContent=ivs.hard.label;
+  if(i2b) i2b.textContent=ivs.good.label;
+  if(i3b) i3b.textContent=ivs.easy.label;
 }
 
 function rate(r){
