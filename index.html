@@ -1206,7 +1206,7 @@ html.light .att-btn{background:var(--surface2);}
 }
 
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{height:100%;overflow:hidden}
+/* height/overflow managed by app JS — not set globally */
 #app.active{
   font-family:'Sora',sans-serif;
   background:var(--bg);color:var(--text);
@@ -6334,6 +6334,7 @@ function toggleTheme(){
   document.documentElement.classList.toggle('light');
   localStorage.setItem('boardmd-theme', document.documentElement.classList.contains('light') ? 'light' : 'dark');
   updateThemeIcons();
+  try { updateDashThemeIcon(); } catch(e) {}
 }
 
 // Apply saved theme on load
@@ -8747,16 +8748,8 @@ function toggleExpand(id) {
   if(chev) chev.classList.toggle('open', open);
 }
 
-function toggleTheme() {
-  const isDark = document.body.getAttribute('data-theme') === 'dark';
-  document.body.setAttribute('data-theme', isDark ? '' : 'dark');
-  const lbl = document.getElementById('theme-btn-label');
-  if(lbl) lbl.textContent = isDark ? 'Dark' : 'Light';
-  const icon = document.getElementById('theme-icon');
-  if(icon) icon.innerHTML = isDark
-    ? '<path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>'
-    : '<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>';
-}
+// toggleTheme — uses original html.light class system (see line above)
+// duplicate removed to avoid conflict
 function openDashSettings() {
   document.getElementById('settingsOverlay').classList.add('open');
 }
