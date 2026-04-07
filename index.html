@@ -6765,10 +6765,12 @@ function toggleTheme(){
   try { updateDashThemeIcon(); } catch(e) {}
 }
 
-// Apply saved theme on load
+// Apply saved theme on load — BUT force dark during loading overlay
 (function(){
-  const saved = localStorage.getItem('boardmd-theme');
-  if(saved === 'light') document.documentElement.classList.add('light');
+  // Always start dark so loading overlay looks great
+  document.documentElement.classList.remove('light');
+  // Store the user's preference to apply after loading
+  window._bmdSavedTheme = localStorage.getItem('boardmd-theme') || 'light';
   updateThemeIcons();
 })();
 
@@ -8403,12 +8405,24 @@ function updateLoadingProgress(pct, count, latestBatch){
 function hideLoadingOverlay(){
   const el = document.getElementById('bmd-loading-overlay');
   if(el){
-    el.style.pointerEvents = 'none'; // immediately disable interaction
+    el.style.pointerEvents = 'none';
     el.style.transition = 'opacity .6s ease';
     el.style.opacity = '0';
-    setTimeout(() => { try { el.remove(); } catch(e){} }, 700);
+    setTimeout(() => {
+      try { el.remove(); } catch(e){}
+      // Apply saved theme after overlay gone
+      if(window._bmdSavedTheme === 'light'){
+        document.documentElement.classList.add('light');
+      }
+      updateThemeIcons();
+    }, 700);
+  } else {
+    // No overlay — apply theme immediately
+    if(window._bmdSavedTheme === 'light'){
+      document.documentElement.classList.add('light');
+    }
+    updateThemeIcons();
   }
-  // Reset preview state
   _bgCards = [];
 }
 
@@ -8456,6 +8470,11 @@ async function loadCardsFromSupabase(){
   if(cached && cached.length > 0){
     console.log(`BoardMD: ${cached.length} cards from cache (instant)`);
     buildDecks(cached);
+    // Apply saved theme immediately (no overlay to wait for)
+    if(window._bmdSavedTheme === 'light'){
+      document.documentElement.classList.add('light');
+    }
+    updateThemeIcons();
     // Background refresh once per day — silent, user never sees it
     setTimeout(() => backgroundRefreshCards(cached.length), 3000);
     return cached.length;
