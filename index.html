@@ -3213,21 +3213,20 @@ mark.hb{background:rgba(79,142,247,.28);border-bottom:2px solid rgba(40,100,220,
 @media(max-width:600px){
   #app.active .bmd-bottom-nav { display: flex; max-width: 100%; margin: 0 auto; }
 }
-/* Desktop: show centered at 760px, always when app is active */
+/* Desktop: full width, same as mobile */
 @media(min-width:601px){
-  #app.active .bmd-bottom-nav,
-  #app.active .deck-home ~ .bmd-bottom-nav,
-  .bmd-bottom-nav {
+  #app.active .bmd-bottom-nav {
     display: flex !important;
-    max-width: 760px;
-    left: 50%;
-    right: auto;
-    margin-left: -380px;
-    padding: 12px 0 20px;
-    border-radius: 16px 16px 0 0;
-    border-left: 1px solid var(--border);
-    border-right: 1px solid var(--border);
+    max-width: 100% !important;
+    left: 0 !important;
+    right: 0 !important;
+    margin: 0 !important;
+    padding: 12px 0 20px !important;
+    border-radius: 0 !important;
   }
+  .bmd-bottom-nav .nav-item { padding: 4px 28px; }
+  .bmd-bottom-nav .nav-label { font-size: 12px; }
+  .bmd-bottom-nav .nav-item svg { width: 24px; height: 24px; }
 }
 .bmd-bottom-nav .nav-item { display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;padding:4px 14px; }
 .bmd-bottom-nav .nav-item svg { width:21px;height:21px;stroke:var(--muted);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;transition:all .2s; }
