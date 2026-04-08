@@ -9005,10 +9005,10 @@ TOPIC: ${card.topic||''} | SYSTEM: ${card.system||''}
 EXPLANATION: ${(card.e||'').replace(/<[^>]+>/g,' ').slice(0,300)}`;
 
   const prompts = {
-    why: `You are a brilliant, warm attending physician. The student just answered this USMLE board question:\n\n${ctx}\n\nIn 2-3 paragraphs: acknowledge right/wrong (one sentence). Explain WHY this is the correct answer using core pathophysiology. Be direct, clinical — like a great attending, not a textbook. End with one punchy clinical pearl.`,
-    explain: `You are a brilliant attending. The student wants deeper understanding:\n\n${ctx}\n\nTeach this concept at the whiteboard. One vivid analogy. Cover: pathophysiology, clinical clues, board trap. 3 paragraphs max.`,
+    why: `You are a brilliant, warm attending physician. The student just answered this USMLE board question:\n\n${ctx}\n\nIn 2-3 paragraphs: acknowledge right/wrong (one sentence). Explain WHY this is the correct answer using core pathophysiology. Be direct, clinical — like a great attending, not a textbook. End with one punchy clinical pearl.\n\nFinally, on a new line, write exactly: PUBMED_QUERY: [6-8 specific medical terms for PubMed search relevant to this answer]`,
+    explain: `You are a brilliant attending. The student wants deeper understanding:\n\n${ctx}\n\nTeach this concept at the whiteboard. One vivid analogy. Cover: pathophysiology, clinical clues, board trap. 3 paragraphs max.\n\nFinally, on a new line, write exactly: PUBMED_QUERY: [6-8 specific medical terms for PubMed search relevant to this concept]`,
     mcq: `You are a brilliant USMLE question writer. Based on this topic:\n\n${ctx}\n\nWrite 3 new USMLE-style MCQs on the SAME concept. Return ONLY valid JSON, no markdown, no extra text:\n{"questions":[{"stem":"[clinical vignette]","options":["A. text","B. text","C. text","D. text"],"correct":"A","explanation":"[2-3 sentences why A is correct]","distractors":{"B":"[why B is wrong]","C":"[why C is wrong]","D":"[why D is wrong]"},"keypoint":"[one punchy ≤15 word board pearl]"},{"stem":"[vignette]","options":["A. text","B. text","C. text","D. text"],"correct":"B","explanation":"[2-3 sentences]","distractors":{"A":"[why wrong]","C":"[why wrong]","D":"[why wrong]"},"keypoint":"[≤15 word pearl]"},{"stem":"[vignette]","options":["A. text","B. text","C. text","D. text"],"correct":"C","explanation":"[2-3 sentences]","distractors":{"A":"[why wrong]","B":"[why wrong]","D":"[why wrong]"},"keypoint":"[≤15 word pearl]"}]}`,
-    surprise: `You are a brilliant attending. Give ONE unforgettable clinical pearl about:\n\n${ctx}\n\nSomething NOT in the explanation — a real-world connection, classic trick, or board trap. 2 paragraphs max. Be vivid.`,
+    surprise: `You are a brilliant attending. Give ONE unforgettable clinical pearl about:\n\n${ctx}\n\nSomething NOT in the explanation — a real-world connection, classic trick, or board trap. 2 paragraphs max. Be vivid.\n\nFinally, on a new line, write exactly: PUBMED_QUERY: [6-8 specific medical terms for PubMed search relevant to this pearl]`,
     custom: `You are a brilliant attending physician. The student has a question about this USMLE topic:\n\n${ctx}\n\nStudent question: "${document.getElementById('att-ask-input')?.value||''}"\n\nAnswer clearly and clinically in 2-3 paragraphs. Focus on what's relevant for USMLE boards.`,
     translate: `Translate the following medical flashcard content to Brazilian Portuguese. Keep medical terms accurate. Return ONLY the translation in this exact format:\n\nQUESTÃO: [translated question]\nA. [option] B. [option] C. [option] D. [option]\nRESPOSTA CORRETA: [translated answer]\nEXPLICAÇÃO: [translated explanation]\nPONTO-CHAVE: [translated key point]\n\nContent to translate:\nQUESTION: ${card.q}\nOPTIONS: ${(card.w||[]).map((o,i)=>String.fromCharCode(65+i)+'. '+o).join(' ')}\nCORRECT ANSWER: ${card.c}\nEXPLANATION: ${(card.e||'').replace(/<[^>]+>/g,' ').slice(0,500)}\nKEY POINT: ${(card.kp||'')}`,
   };
@@ -9043,6 +9043,14 @@ EXPLANATION: ${(card.e||'').replace(/<[^>]+>/g,' ').slice(0,300)}`;
       }
     }
 
+    // Extract PUBMED_QUERY if present
+    let pubmedQuery = null;
+    const pubmedMatch = responseText.match(/PUBMED_QUERY:\s*(.+)/);
+    if(pubmedMatch){
+      pubmedQuery = pubmedMatch[1].trim();
+      responseText = responseText.replace(/PUBMED_QUERY:\s*.+/, '').trim();
+    }
+
     const formatted = responseText
       .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
       .replace(/\*(.*?)\*/g, '<em>$1</em>')
@@ -9053,7 +9061,14 @@ EXPLANATION: ${(card.e||'').replace(/<[^>]+>/g,' ').slice(0,300)}`;
       <div class="att-response-msg">
         <div class="att-response-label">${typeLabels[type]}</div>
         <div class="att-response-text"><p>${formatted}</p></div>
-      </div>`;
+      </div>
+      ${pubmedQuery ? `<div id="att-pubmed-section" style="margin-top:10px;">
+        <button onclick="toggleAttPubmed(this,'${encodeURIComponent(pubmedQuery)}')" style="display:flex;align-items:center;gap:8px;width:100%;padding:9px 13px;background:transparent;border:1px solid var(--border);border-radius:8px;cursor:pointer;color:var(--text-faint);font-family:monospace;font-size:11px;letter-spacing:0.06em;text-align:left;transition:all 0.15s;">
+          <span style="flex:1">View PubMed Sources</span>
+          <span style="font-size:9px">&#9660;</span>
+        </button>
+        <div id="att-pubmed-results" style="display:none;border:1px solid rgba(99,102,241,0.3);border-top:none;border-radius:0 0 8px 8px;background:var(--surface2);overflow:hidden;"></div>
+      </div>` : ''}`;
 
     // no counting during beta
 
