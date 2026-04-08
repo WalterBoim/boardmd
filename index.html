@@ -6441,7 +6441,20 @@ async function prefetchPubmedAbstracts(card){
       try {
         const ar = await fetch('https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=pubmed&id='+art.uid+'&rettype=abstract&retmode=text');
         const txt = await ar.text();
-        let abstractStr2 = ''; try { const abJson = JSON.parse(txt); const artData2 = abJson?.PubmedArticleSet?.PubmedArticle?.[0]?.MedlineCitation?.Article; const abstData = artData2?.Abstract?.AbstractText; if(Array.isArray(abstData)){ abstractStr2 = abstData.map(a => (typeof a === 'string' ? a : a['#text']||'')).join(' '); } else if(typeof abstData === 'string'){ abstractStr2 = abstData; } else if(abstData?.['#text']){ abstractStr2 = abstData['#text']; } } catch(e){} const match = abstractStr2 ? [null, abstractStr2] : null;
+        let abstractStr2 = '';
+        const txtLines = txt.split('\n');
+        let inAbstract = false;
+        for(const line of txtLines){
+          if(line.match(/^AB\s+-\s*/)){
+            inAbstract = true;
+            abstractStr2 += line.replace(/^AB\s+-\s*/,'') + ' ';
+          } else if(inAbstract){
+            if(line.match(/^[A-Z]{2,4}\s+-/) || line.match(/^PMID-/)) break;
+            abstractStr2 += line.trim() + ' ';
+          }
+        }
+        abstractStr2 = abstractStr2.trim();
+        const match = abstractStr2 ? [null, abstractStr2] : null;
         const abstract = match ? match[1].replace(/\n\s+/g,' ').trim().slice(0,600) : '';
         abstracts.push({ ...art, abstract });
       } catch(e){ abstracts.push({ ...art, abstract: '' }); }
@@ -11390,9 +11403,22 @@ function openAttAbstract(uid){
   if(abstractText){
     document.getElementById('att-abstract-body').innerHTML = `<div style="font-size:13px;color:var(--text-dim);line-height:1.8;">${abstractText}</div>`;
   } else {
-    fetch('https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=pubmed&id='+uid+'&retmode=json')
+    fetch('https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=pubmed&id='+uid+'&rettype=abstract&retmode=text')
       .then(r=>r.text()).then(txt=>{
-        let abstractStr2 = ''; try { const abJson = JSON.parse(txt); const artData2 = abJson?.PubmedArticleSet?.PubmedArticle?.[0]?.MedlineCitation?.Article; const abstData = artData2?.Abstract?.AbstractText; if(Array.isArray(abstData)){ abstractStr2 = abstData.map(a => (typeof a === 'string' ? a : a['#text']||'')).join(' '); } else if(typeof abstData === 'string'){ abstractStr2 = abstData; } else if(abstData?.['#text']){ abstractStr2 = abstData['#text']; } } catch(e){} const match = abstractStr2 ? [null, abstractStr2] : null;
+        let abstractStr2 = '';
+        const txtLines = txt.split('\n');
+        let inAbstract = false;
+        for(const line of txtLines){
+          if(line.match(/^AB\s+-\s*/)){
+            inAbstract = true;
+            abstractStr2 += line.replace(/^AB\s+-\s*/,'') + ' ';
+          } else if(inAbstract){
+            if(line.match(/^[A-Z]{2,4}\s+-/) || line.match(/^PMID-/)) break;
+            abstractStr2 += line.trim() + ' ';
+          }
+        }
+        abstractStr2 = abstractStr2.trim();
+        const match = abstractStr2 ? [null, abstractStr2] : null;
         const abst = match ? match[1].replace(/\n\s+/g,' ').trim() : 'Abstract not available.';
         const body = document.getElementById('att-abstract-body');
         if(body) body.innerHTML = `<div style="font-size:13px;color:var(--text-dim);line-height:1.8;">${abst}</div>`;
