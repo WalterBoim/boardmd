@@ -9063,12 +9063,19 @@ EXPLANATION: ${(card.e||'').replace(/<[^>]+>/g,' ').slice(0,300)}`;
         <div class="att-response-text"><p>${formatted}</p></div>
       </div>
       ${pubmedQuery ? `<div id="att-pubmed-section" style="margin-top:10px;">
-        <button onclick="toggleAttPubmed(this,'${encodeURIComponent(pubmedQuery)}')" style="display:flex;align-items:center;gap:8px;width:100%;padding:9px 13px;background:transparent;border:1px solid var(--border);border-radius:8px;cursor:pointer;color:var(--text-faint);font-family:monospace;font-size:11px;letter-spacing:0.06em;text-align:left;transition:all 0.15s;">
-          <span style="flex:1">View PubMed Sources</span>
-          <span style="font-size:9px">&#9660;</span>
-        </button>
-        <div id="att-pubmed-results" style="display:none;border:1px solid rgba(99,102,241,0.3);border-top:none;border-radius:0 0 8px 8px;background:var(--surface2);overflow:hidden;"></div>
+        <div style="padding:6px 12px 8px;font-family:monospace;font-size:10px;color:#8b5cf6;opacity:0.7;letter-spacing:0.06em;border-bottom:1px solid var(--border);">PUBMED SOURCES</div>
+        <div id="att-pubmed-results" style="border:1px solid rgba(99,102,241,0.2);border-radius:8px;background:var(--surface2);overflow:hidden;">
+          <div style="padding:12px 14px;font-family:monospace;font-size:11px;color:var(--text-faint);display:flex;align-items:center;gap:8px;">
+            <div style="width:10px;height:10px;border:2px solid var(--border);border-top-color:#8b5cf6;border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0;"></div>
+            Searching PubMed...
+          </div>
+        </div>
       </div>` : ''}`;
+
+    // Auto-fetch PubMed se tiver query
+    if(pubmedQuery){
+      setTimeout(() => fetchAttPubmed(pubmedQuery), 100);
+    }
 
     // no counting during beta
 
@@ -11196,6 +11203,36 @@ function selectProfileStep(step) {
       btn.style.color = 'var(--muted)';
     }
   });
+}
+
+function fetchAttPubmed(query){
+  const results = document.getElementById('att-pubmed-results');
+  if(!results) return;
+  fetch('https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed&term='+encodeURIComponent(query)+'&retmax=3&sort=relevance&retmode=json')
+    .then(r=>r.json()).then(sd=>{
+      const ids = sd.esearchresult?.idlist||[];
+      if(!ids.length){ results.innerHTML='<div style="padding:12px 14px;font-size:11px;color:var(--text-faint);">No articles found.</div>'; return; }
+      return fetch('https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=pubmed&id='+ids.join(',')+'&retmode=json')
+        .then(r=>r.json()).then(rd=>{
+          let html = '<div style="padding:6px 12px;font-family:monospace;font-size:10px;color:#8b5cf6;opacity:0.5;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;border-bottom:1px solid var(--border);">query: '+query+'</div>';
+          (rd.result?.uids||[]).forEach(uid=>{
+            const a=rd.result[uid];
+            const title=(a.title||'Untitled').replace(/</g,'&lt;');
+            const journal=a.source||'';
+            const year=a.pubdate?.substring(0,4)||'';
+            html+=`<div onclick="window.open('https://pubmed.ncbi.nlm.nih.gov/`+uid+`/','_blank')" style="padding:11px 13px;border-bottom:1px solid var(--border);cursor:pointer;transition:background 0.12s;" onmouseover="this.style.background='rgba(99,102,241,0.05)'" onmouseout="this.style.background=''">
+              <div style="font-size:12px;color:var(--text);font-weight:500;line-height:1.4;margin-bottom:4px;">`+title+`</div>
+              <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+                <span style="font-family:monospace;font-size:10px;color:#8b5cf6;opacity:0.8;">`+journal+`</span>
+                <span style="font-family:monospace;font-size:10px;color:var(--text-faint);">`+year+`</span>
+                <span style="font-family:monospace;font-size:10px;color:var(--text-faint);background:var(--surface);border:1px solid var(--border);padding:1px 5px;border-radius:3px;margin-left:auto;">PMID `+uid+`</span>
+              </div>
+            </div>`;
+          });
+          html+='<div style="padding:8px 13px;font-family:monospace;font-size:10px;color:var(--text-faint);border-top:1px solid var(--border);">NCBI PubMed — National Library of Medicine</div>';
+          results.innerHTML=html;
+        });
+    }).catch(()=>{ results.innerHTML='<div style="padding:12px 14px;font-size:11px;color:var(--text-faint);">Could not connect to PubMed.</div>'; });
 }
 </script>
 
