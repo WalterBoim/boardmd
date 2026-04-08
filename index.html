@@ -4739,6 +4739,9 @@ const DECAY=-0.5, FACTOR=Math.pow(0.9,1/DECAY)-1;
 const ST_NEW=0, ST_LRN=1, ST_REV=2, ST_RLN=3;
 const RT_AGAIN=1, RT_HARD=2, RT_GOOD=3, RT_EASY=4;
 
+// ── PubMed RAG Cache ──
+const _pubmedCache = {};
+
 // ── SETTINGS ────────────────────────────────────────────────────────
 const SETTINGS_KEY='bmd_settings_v3';
 const DEFAULT_SETTINGS={
@@ -6412,8 +6415,7 @@ function revealAnswer(sel,card){
   if(rb2) rb2.classList.add('visible');
 
   
-// ── PubMed RAG Cache — abstracts pre-fetched per card ──────────────
-const _pubmedCache = {};
+
 
 async function prefetchPubmedAbstracts(card){
   const query = card.pubmed_query || (card.topic ? card.topic + ' ' + (card.subject||'') : null);
