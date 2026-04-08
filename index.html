@@ -6441,7 +6441,7 @@ async function prefetchPubmedAbstracts(card){
       try {
         const ar = await fetch('https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=pubmed&id='+art.uid+'&rettype=abstract&retmode=text');
         const txt = await ar.text();
-        const lines = txt.split('\n'); const abStart = lines.findIndex(l => l.match(/^AB\s+-/)); const abst_lines = []; if(abStart>=0){ abst_lines.push(lines[abStart].replace(/^AB\s+-\s*/,'')); for(let i=abStart+1;i<lines.length;i++){ if(lines[i].match(/^[A-Z]{2,4}\s+-/)) break; abst_lines.push(lines[i].trim()); } } const match = abst_lines.length > 0 ? [null, abst_lines.join(' ')] : null;
+        const abJson = JSON.parse(txt); const artData = abJson?.PubmedArticleSet?.PubmedArticle?.[0]?.MedlineCitation?.Article; const abst = artData?.Abstract?.AbstractText; let abstractStr = ''; if(Array.isArray(abst)){ abstractStr = abst.map(a => (a['@_Label'] ? a['@_Label']+': ' : '') + (typeof a === 'string' ? a : a['#text']||'')).join(' '); } else if(typeof abst === 'string'){ abstractStr = abst; } else if(abst?.['#text']){ abstractStr = abst['#text']; } const match = abstractStr ? [null, abstractStr] : null;
         const abstract = match ? match[1].replace(/\n\s+/g,' ').trim().slice(0,600) : '';
         abstracts.push({ ...art, abstract });
       } catch(e){ abstracts.push({ ...art, abstract: '' }); }
@@ -11390,9 +11390,9 @@ function openAttAbstract(uid){
   if(abstractText){
     document.getElementById('att-abstract-body').innerHTML = `<div style="font-size:13px;color:var(--text-dim);line-height:1.8;">${abstractText}</div>`;
   } else {
-    fetch('https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=pubmed&id='+uid+'&rettype=abstract&retmode=text')
+    fetch('https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=pubmed&id='+uid+'&retmode=json')
       .then(r=>r.text()).then(txt=>{
-        const lines = txt.split('\n'); const abStart = lines.findIndex(l => l.match(/^AB\s+-/)); const abst_lines = []; if(abStart>=0){ abst_lines.push(lines[abStart].replace(/^AB\s+-\s*/,'')); for(let i=abStart+1;i<lines.length;i++){ if(lines[i].match(/^[A-Z]{2,4}\s+-/)) break; abst_lines.push(lines[i].trim()); } } const match = abst_lines.length > 0 ? [null, abst_lines.join(' ')] : null;
+        const abJson = JSON.parse(txt); const artData = abJson?.PubmedArticleSet?.PubmedArticle?.[0]?.MedlineCitation?.Article; const abst = artData?.Abstract?.AbstractText; let abstractStr = ''; if(Array.isArray(abst)){ abstractStr = abst.map(a => (a['@_Label'] ? a['@_Label']+': ' : '') + (typeof a === 'string' ? a : a['#text']||'')).join(' '); } else if(typeof abst === 'string'){ abstractStr = abst; } else if(abst?.['#text']){ abstractStr = abst['#text']; } const match = abstractStr ? [null, abstractStr] : null;
         const abst = match ? match[1].replace(/\n\s+/g,' ').trim() : 'Abstract not available.';
         const body = document.getElementById('att-abstract-body');
         if(body) body.innerHTML = `<div style="font-size:13px;color:var(--text-dim);line-height:1.8;">${abst}</div>`;
