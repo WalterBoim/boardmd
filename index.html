@@ -9104,9 +9104,13 @@ EXPLANATION: ${(card.e||'').replace(/<[^>]+>/g,' ').slice(0,300)}`;
       responseText = responseText.replace(/PUBMED_QUERY:\s*.+/, '').trim();
     }
 
+    // Remove marcadores CITED: do texto visivel
+    responseText = responseText.replace(/CITED:\[\d+\]/g, '').trim();
+
     const formatted = responseText
       .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
       .replace(/\*(.*?)\*/g, '<em>$1</em>')
+      .replace(/\[(\d+)\]/g, '<sup style="color:#8b5cf6;font-size:10px;cursor:pointer;">[$1]</sup>')
       .replace(/\n\n/g, '</p><p>')
       .replace(/\n/g, '<br>');
 
@@ -11305,19 +11309,103 @@ function renderAttPubmedArticles(articles){
   const results = document.getElementById('att-pubmed-results');
   if(!results) return;
   let html = '';
-  articles.forEach(a => {
+  articles.forEach((a,i) => {
     const title = (a.title||'').replace(/</g,'&lt;');
-    html += `<div onclick="window.open('https://pubmed.ncbi.nlm.nih.gov/`+a.uid+`/','_blank')" style="padding:11px 13px;border-bottom:1px solid var(--border);cursor:pointer;transition:background 0.12s;" onmouseover="this.style.background='rgba(99,102,241,0.05)'" onmouseout="this.style.background=''">
+    const safeUid = a.uid;
+    html += `<div onclick="openAttAbstract('`+safeUid+`')" style="padding:11px 13px;border-bottom:1px solid var(--border);cursor:pointer;transition:background 0.12s;" onmouseover="this.style.background='rgba(99,102,241,0.05)'" onmouseout="this.style.background=''">
       <div style="font-size:12px;color:var(--text);font-weight:500;line-height:1.4;margin-bottom:4px;">`+title+`</div>
       <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
         <span style="font-family:monospace;font-size:10px;color:#8b5cf6;opacity:0.8;">`+a.journal+`</span>
         <span style="font-family:monospace;font-size:10px;color:var(--text-faint);">`+a.year+`</span>
         <span style="font-family:monospace;font-size:10px;color:var(--text-faint);background:var(--surface);border:1px solid var(--border);padding:1px 5px;border-radius:3px;margin-left:auto;">PMID `+a.uid+`</span>
       </div>
+      <div style="margin-top:4px;font-family:monospace;font-size:9px;color:#8b5cf6;opacity:0.5;letter-spacing:0.06em;">TAP TO READ ABSTRACT</div>
     </div>`;
   });
   html += '<div style="padding:8px 13px;font-family:monospace;font-size:10px;color:var(--text-faint);border-top:1px solid var(--border);">NCBI PubMed — National Library of Medicine</div>';
   results.innerHTML = html;
+  // Store articles for modal
+  window._attPubmedArticles = articles;
+}
+
+function openAttAbstract(uid){
+  const articles = window._attPubmedArticles || [];
+  const art = articles.find(a => a.uid === uid) || { uid, title:'', journal:'', year:'', authors:'' };
+
+  // Create modal if not exists
+  let modal = document.getElementById('att-abstract-modal');
+  if(!modal){
+    modal = document.createElement('div');
+    modal.id = 'att-abstract-modal';
+    modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:9999;display:flex;align-items:flex-end;justify-content:center;backdrop-filter:blur(4px);';
+    modal.onclick = e => { if(e.target===modal) closeAttAbstract(); };
+    document.body.appendChild(modal);
+  }
+
+  modal.innerHTML = `
+    <div style="width:100%;max-width:680px;background:var(--surface);border:1px solid var(--border);border-bottom:none;border-radius:16px 16px 0 0;max-height:80vh;display:flex;flex-direction:column;">
+      <div style="padding:20px 20px 0;">
+        <div style="width:36px;height:3px;background:var(--border);border-radius:2px;margin:0 auto 18px;"></div>
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:10px;">
+          <div style="flex:1;">
+            <div style="font-size:13px;font-weight:600;color:var(--text);line-height:1.45;margin-bottom:8px;">${art.title||'Loading...'}</div>
+            <div style="display:flex;flex-wrap:wrap;gap:8px;">
+              <span style="font-family:monospace;font-size:10px;color:#8b5cf6;opacity:0.8;">${art.journal}</span>
+              <span style="font-family:monospace;font-size:10px;color:var(--text-faint);">${art.year}</span>
+              <span style="font-family:monospace;font-size:10px;color:var(--text-faint);background:var(--surface2);border:1px solid var(--border);padding:1px 6px;border-radius:3px;">PMID ${uid}</span>
+            </div>
+            ${art.authors ? `<div style="font-size:11px;color:var(--text-faint);margin-top:5px;">${art.authors}</div>` : ''}
+          </div>
+          <button onclick="closeAttAbstract()" style="background:transparent;border:none;cursor:pointer;color:var(--text-faint);font-size:20px;line-height:1;padding:4px;flex-shrink:0;">×</button>
+        </div>
+        <div style="height:1px;background:var(--border);"></div>
+      </div>
+      <div id="att-abstract-body" style="padding:16px 20px;overflow-y:auto;flex:1;">
+        <div style="display:flex;align-items:center;gap:10px;font-family:monospace;font-size:11px;color:var(--text-faint);">
+          <div style="width:12px;height:12px;border:2px solid var(--border);border-top-color:#8b5cf6;border-radius:50%;animation:spin .7s linear infinite;"></div>
+          Loading abstract...
+        </div>
+      </div>
+      <div style="padding:14px 20px 36px;border-top:1px solid var(--border);display:flex;gap:10px;">
+        <button onclick="closeAttAbstract()" style="flex:1;padding:11px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--text-faint);font-family:monospace;font-size:11px;cursor:pointer;">Close</button>
+        <a href="https://pubmed.ncbi.nlm.nih.gov/${uid}/" target="_blank" rel="noopener" style="flex:2;padding:11px;border-radius:8px;border:1px solid rgba(99,102,241,0.3);background:rgba(99,102,241,0.08);color:#8b5cf6;font-family:monospace;font-size:11px;cursor:pointer;text-align:center;text-decoration:none;font-weight:600;display:flex;align-items:center;justify-content:center;gap:6px;">
+          Open Full Article on PubMed <span style="font-size:10px;">↗</span>
+        </a>
+      </div>
+    </div>`;
+
+  modal.style.display = 'flex';
+
+  // Check cache first
+  const cached = _pubmedCache;
+  let abstractText = null;
+  for(const cardId in cached){
+    const entry = cached[cardId];
+    if(entry.abstracts){
+      const found = entry.abstracts.find(a => a.uid === uid);
+      if(found && found.abstract){ abstractText = found.abstract; break; }
+    }
+  }
+
+  if(abstractText){
+    document.getElementById('att-abstract-body').innerHTML = `<div style="font-size:13px;color:var(--text-dim);line-height:1.8;">${abstractText}</div>`;
+  } else {
+    fetch('https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=pubmed&id='+uid+'&rettype=abstract&retmode=text')
+      .then(r=>r.text()).then(txt=>{
+        const match = txt.match(/AB\s+-\s+([\s\S]+?)(?:\n[A-Z]{2}\s+-|$)/);
+        const abst = match ? match[1].replace(/\n\s+/g,' ').trim() : 'Abstract not available.';
+        const body = document.getElementById('att-abstract-body');
+        if(body) body.innerHTML = `<div style="font-size:13px;color:var(--text-dim);line-height:1.8;">${abst}</div>`;
+      }).catch(()=>{
+        const body = document.getElementById('att-abstract-body');
+        if(body) body.innerHTML = '<div style="font-size:12px;color:var(--text-faint);">Could not load abstract.</div>';
+      });
+  }
+}
+
+function closeAttAbstract(){
+  const modal = document.getElementById('att-abstract-modal');
+  if(modal) modal.style.display = 'none';
 }
 </script>
 
