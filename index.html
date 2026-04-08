@@ -6411,8 +6411,48 @@ function revealAnswer(sel,card){
   if(rb) rb.classList.add('visible');
   if(rb2) rb2.classList.add('visible');
 
+  
+// ── PubMed RAG Cache — abstracts pre-fetched per card ──────────────
+const _pubmedCache = {};
+
+async function prefetchPubmedAbstracts(card){
+  const query = card.pubmed_query || (card.topic ? card.topic + ' ' + (card.subject||'') : null);
+  if(!query || _pubmedCache[card.id]) return;
+  _pubmedCache[card.id] = { status: 'loading', articles: [], abstracts: [] };
+  try {
+    const sr = await fetch('https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed&term='+encodeURIComponent(query.trim())+'&retmax=3&sort=relevance&retmode=json');
+    const sd = await sr.json();
+    const ids = sd.esearchresult?.idlist || [];
+    if(!ids.length){ _pubmedCache[card.id].status = 'empty'; return; }
+
+    // Fetch summaries
+    const smr = await fetch('https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=pubmed&id='+ids.join(',')+'&retmode=json');
+    const smd = await smr.json();
+    const articles = (smd.result?.uids||[]).map(uid => {
+      const a = smd.result[uid];
+      return { uid, title: a.title||'', journal: a.source||'', year: a.pubdate?.substring(0,4)||'', authors: (a.authors?.slice(0,3).map(x=>x.name).join(', ')||'')+(a.authors?.length>3?' et al.':'') };
+    });
+
+    // Fetch abstracts
+    const abstracts = [];
+    for(const art of articles){
+      try {
+        const ar = await fetch('https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=pubmed&id='+art.uid+'&rettype=abstract&retmode=text');
+        const txt = await ar.text();
+        const match = txt.match(/AB\s+-\s+([\s\S]+?)(?:\n[A-Z]{2}\s+-|$)/);
+        const abstract = match ? match[1].replace(/\n\s+/g,' ').trim().slice(0,600) : '';
+        abstracts.push({ ...art, abstract });
+      } catch(e){ abstracts.push({ ...art, abstract: '' }); }
+    }
+
+    _pubmedCache[card.id] = { status: 'ready', articles, abstracts };
+  } catch(e){ _pubmedCache[card.id] = { status: 'error', articles: [], abstracts: [] }; }
+}
+
   // ── BoardMD Attending — inject inline after answer revealed ──
   injectAttendingInline(card, sel);
+  // Pre-fetch PubMed abstracts in background while student reads answer
+  if(card.pubmed_query || card.topic) setTimeout(() => prefetchPubmedAbstracts(card), 500);
 
   // Update FSRS intervals display — sync both nav elements
   const ivs=getIntervals(getState(card.id));
@@ -8572,7 +8612,7 @@ async function loadCardsFromSupabase(){
   while(true){
     const { data, error, count } = await _supa
       .from('cards')
-      .select('id,deck,system,topic,subject,qid,q,c,w,e,kp,d,img', { count: total === null ? 'exact' : undefined })
+      .select('id,deck,system,topic,subject,qid,q,c,w,e,kp,d,img,pubmed_query', { count: total === null ? 'exact' : undefined })
       .range(from, from + PAGE - 1);
 
     if(error){ console.error('Supabase error:', error); break; }
@@ -8629,7 +8669,7 @@ async function backgroundRefreshCards(cachedCount){
       while(true){
         const { data, error: e2 } = await _supa
           .from('cards')
-          .select('id,deck,system,topic,subject,qid,q,c,w,e,kp,d,img')
+          .select('id,deck,system,topic,subject,qid,q,c,w,e,kp,d,img,pubmed_query')
           .range(from, from + PAGE - 1);
         if(e2 || !data || data.length === 0) break;
         allCards.push(...data);
@@ -9022,7 +9062,18 @@ EXPLANATION: ${(card.e||'').replace(/<[^>]+>/g,' ').slice(0,300)}`;
   try {
     let responseText = '';
     if(typeof puter !== 'undefined' && puter.ai){
-      const response = await puter.ai.chat(prompts[type], { model: 'gemini-2.0-flash' });
+      // ── RAG: inject PubMed abstracts as context if available ──
+      let ragContext = '';
+      const cached = _pubmedCache[card.id];
+      if(cached && cached.status === 'ready' && cached.abstracts.length > 0){
+        ragContext = '\n\nRELEVANT PRIMARY LITERATURE (use these to ground your answer and cite PMIDs inline):\n';
+        cached.abstracts.forEach((a,i) => {
+          if(a.abstract) ragContext += `\n[${i+1}] ${a.title} — ${a.journal} ${a.year} (PMID ${a.uid})\nAbstract: ${a.abstract}\n`;
+        });
+        ragContext += '\nCite relevant PMIDs inline in your response as (PMID XXXXXXXX). Be evidence-based.';
+      }
+      const finalPrompt = prompts[type] + ragContext;
+      const response = await puter.ai.chat(finalPrompt, { model: 'gemini-2.0-flash' });
       responseText = typeof response === 'string' ? response
         : (response?.message?.content || response?.text || JSON.stringify(response));
     } else {
@@ -11233,6 +11284,25 @@ function fetchAttPubmed(query){
           results.innerHTML=html;
         });
     }).catch(()=>{ results.innerHTML='<div style="padding:12px 14px;font-size:11px;color:var(--text-faint);">Could not connect to PubMed.</div>'; });
+}
+
+function renderAttPubmedArticles(articles){
+  const results = document.getElementById('att-pubmed-results');
+  if(!results) return;
+  let html = '';
+  articles.forEach(a => {
+    const title = (a.title||'').replace(/</g,'&lt;');
+    html += `<div onclick="window.open('https://pubmed.ncbi.nlm.nih.gov/`+a.uid+`/','_blank')" style="padding:11px 13px;border-bottom:1px solid var(--border);cursor:pointer;transition:background 0.12s;" onmouseover="this.style.background='rgba(99,102,241,0.05)'" onmouseout="this.style.background=''">
+      <div style="font-size:12px;color:var(--text);font-weight:500;line-height:1.4;margin-bottom:4px;">`+title+`</div>
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+        <span style="font-family:monospace;font-size:10px;color:#8b5cf6;opacity:0.8;">`+a.journal+`</span>
+        <span style="font-family:monospace;font-size:10px;color:var(--text-faint);">`+a.year+`</span>
+        <span style="font-family:monospace;font-size:10px;color:var(--text-faint);background:var(--surface);border:1px solid var(--border);padding:1px 5px;border-radius:3px;margin-left:auto;">PMID `+a.uid+`</span>
+      </div>
+    </div>`;
+  });
+  html += '<div style="padding:8px 13px;font-family:monospace;font-size:10px;color:var(--text-faint);border-top:1px solid var(--border);">NCBI PubMed — National Library of Medicine</div>';
+  results.innerHTML = html;
 }
 </script>
 
