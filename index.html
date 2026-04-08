@@ -6441,7 +6441,7 @@ async function prefetchPubmedAbstracts(card){
       try {
         const ar = await fetch('https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=pubmed&id='+art.uid+'&rettype=abstract&retmode=text');
         const txt = await ar.text();
-        const match = txt.match(/AB\s+-\s+([\s\S]+?)(?:\n[A-Z]{2}\s+-|$)/);
+        const lines = txt.split('\n'); const abStart = lines.findIndex(l => l.match(/^AB\s+-/)); const abst_lines = []; if(abStart>=0){ abst_lines.push(lines[abStart].replace(/^AB\s+-\s*/,'')); for(let i=abStart+1;i<lines.length;i++){ if(lines[i].match(/^[A-Z]{2,4}\s+-/)) break; abst_lines.push(lines[i].trim()); } } const match = abst_lines.length > 0 ? [null, abst_lines.join(' ')] : null;
         const abstract = match ? match[1].replace(/\n\s+/g,' ').trim().slice(0,600) : '';
         abstracts.push({ ...art, abstract });
       } catch(e){ abstracts.push({ ...art, abstract: '' }); }
@@ -9072,7 +9072,7 @@ EXPLANATION: ${(card.e||'').replace(/<[^>]+>/g,' ').slice(0,300)}`;
         cached.abstracts.forEach((a,i) => {
           if(a.abstract) ragContext += `\n[${i+1}] ${a.title} — ${a.journal} ${a.year}\nAbstract: ${a.abstract}\n`;
         });
-        ragContext += `\n\nCITATION RULES — ABSOLUTE:\n1. Use ONLY [1] [2] [3] inline — never write PMID numbers directly.\n2. NEVER cite any article not listed above.\n3. NEVER invent references, authors, or studies.\n4. Only cite if directly relevant. If unsure, do not cite.\n5. At the very end write: CITED:[1] CITED:[2] for each article you used (or nothing if you cited none).`;
+        ragContext += `\n\nCITATION RULES — ABSOLUTE:\n1. You MUST cite the provided articles inline using [1] [2] [3] wherever relevant in your response.\n2. NEVER write PMID numbers directly in the text.\n3. NEVER cite any article, author, or study not listed above.\n4. NEVER invent references.\n5. At the very end of your response, on a new line, write ONLY: CITED:[1] CITED:[2] etc for each number you used inline. Example: CITED:[1] CITED:[3]\n6. If truly none are relevant, write CITED:[] at the end.`;
       }
       const finalPrompt = prompts[type] + ragContext;
       const response = await puter.ai.chat(finalPrompt, { model: 'gemini-2.0-flash' });
@@ -9105,7 +9105,7 @@ EXPLANATION: ${(card.e||'').replace(/<[^>]+>/g,' ').slice(0,300)}`;
     }
 
     // Remove marcadores CITED: do texto visivel
-    responseText = responseText.replace(/CITED:\[\d+\]/g, '').trim();
+    responseText = responseText.replace(/CITED:\[\d*\]/g, '').replace(/CITED:/g, '').trim();
 
     const formatted = responseText
       .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
@@ -9132,7 +9132,7 @@ EXPLANATION: ${(card.e||'').replace(/<[^>]+>/g,' ').slice(0,300)}`;
     // Renderiza referencias reais — nunca inventa
     const _cached = _pubmedCache[card.id];
     // Remove marcadores CITED: do texto visivel
-    responseText = responseText.replace(/CITED:\[\d+\]/g, '').trim();
+    responseText = responseText.replace(/CITED:\[\d*\]/g, '').replace(/CITED:/g, '').trim();
 
     if(_cached && _cached.status === 'ready' && _cached.articles.length > 0){
       // Extrai indices citados pelo Gemini
@@ -11392,7 +11392,7 @@ function openAttAbstract(uid){
   } else {
     fetch('https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=pubmed&id='+uid+'&rettype=abstract&retmode=text')
       .then(r=>r.text()).then(txt=>{
-        const match = txt.match(/AB\s+-\s+([\s\S]+?)(?:\n[A-Z]{2}\s+-|$)/);
+        const lines = txt.split('\n'); const abStart = lines.findIndex(l => l.match(/^AB\s+-/)); const abst_lines = []; if(abStart>=0){ abst_lines.push(lines[abStart].replace(/^AB\s+-\s*/,'')); for(let i=abStart+1;i<lines.length;i++){ if(lines[i].match(/^[A-Z]{2,4}\s+-/)) break; abst_lines.push(lines[i].trim()); } } const match = abst_lines.length > 0 ? [null, abst_lines.join(' ')] : null;
         const abst = match ? match[1].replace(/\n\s+/g,' ').trim() : 'Abstract not available.';
         const body = document.getElementById('att-abstract-body');
         if(body) body.innerHTML = `<div style="font-size:13px;color:var(--text-dim);line-height:1.8;">${abst}</div>`;
