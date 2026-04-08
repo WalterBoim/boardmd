@@ -9068,11 +9068,11 @@ EXPLANATION: ${(card.e||'').replace(/<[^>]+>/g,' ').slice(0,300)}`;
       let ragContext = '';
       const cached = _pubmedCache[card.id];
       if(cached && cached.status === 'ready' && cached.abstracts.length > 0){
-        ragContext = '\n\nRELEVANT PRIMARY LITERATURE (use these to ground your answer and cite PMIDs inline):\n';
+        ragContext = '\n\nRELEVANT PRIMARY LITERATURE (ONLY sources you may cite):\n';
         cached.abstracts.forEach((a,i) => {
-          if(a.abstract) ragContext += `\n[${i+1}] ${a.title} — ${a.journal} ${a.year} (PMID ${a.uid})\nAbstract: ${a.abstract}\n`;
+          if(a.abstract) ragContext += `\n[${i+1}] ${a.title} — ${a.journal} ${a.year}\nAbstract: ${a.abstract}\n`;
         });
-        ragContext += '\nCite relevant PMIDs inline in your response as (PMID XXXXXXXX). Be evidence-based.';
+        ragContext += `\n\nCITATION RULES — ABSOLUTE:\n1. Use ONLY [1] [2] [3] inline — never write PMID numbers directly.\n2. NEVER cite any article not listed above.\n3. NEVER invent references, authors, or studies.\n4. Only cite if directly relevant. If unsure, do not cite.\n5. At the very end write: CITED:[1] CITED:[2] for each article you used (or nothing if you cited none).`;
       }
       const finalPrompt = prompts[type] + ragContext;
       const response = await puter.ai.chat(finalPrompt, { model: 'gemini-2.0-flash' });
@@ -9125,9 +9125,22 @@ EXPLANATION: ${(card.e||'').replace(/<[^>]+>/g,' ').slice(0,300)}`;
         </div>
       </div>` : ''}`;
 
-    // Auto-fetch PubMed se tiver query
-    if(pubmedQuery){
-      setTimeout(() => fetchAttPubmed(pubmedQuery), 100);
+    // Renderiza referencias reais — nunca inventa
+    const _cached = _pubmedCache[card.id];
+    // Remove marcadores CITED: do texto visivel
+    responseText = responseText.replace(/CITED:\[\d+\]/g, '').trim();
+
+    if(_cached && _cached.status === 'ready' && _cached.articles.length > 0){
+      // Extrai indices citados pelo Gemini
+      const _citedRaw = formatted.match(/CITED:\[(\d+)\]/g) || [];
+      const _citedIdxs = [...new Set(_citedRaw.map(m => parseInt(m.match(/\d+/)[0]) - 1))];
+      const _toShow = _citedIdxs.length > 0
+        ? _citedIdxs.map(i => _cached.articles[i]).filter(Boolean)
+        : _cached.articles;
+      if(_toShow.length > 0) setTimeout(() => renderAttPubmedArticles(_toShow), 100);
+    } else if(pubmedQuery || card.pubmed_query || card.topic){
+      const _q = pubmedQuery || card.pubmed_query || (card.topic + ' ' + (card.subject||''));
+      setTimeout(() => fetchAttPubmed(_q.trim()), 100);
     }
 
     // no counting during beta
