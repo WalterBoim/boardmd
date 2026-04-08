@@ -4972,85 +4972,73 @@ let _cardState=0;
 function buildSessionQueue(){
   const D = window.DECKS || DECKS || {};
   if(!D[currentDeck] || D[currentDeck].length === 0){
-    console.warn('BoardMD: deck empty or not found:', currentDeck, '— available:', Object.keys(D));
-    deck=[]; return 0;
+    console.warn('BoardMD: deck empty or not found:', currentDeck);
+    deck=[]; idx=0; return 0;
   }
-  const now=Date.now();
-  const c=cfg();
-  const sys=currentSystem;
-  let pool=sys==='all'?[...getCards()]:getCards().filter(cd=>cd.system===sys);
+  const now = Date.now();
+  const c = cfg();
+  const sys = currentSystem;
+  let pool = sys==='all' ? [...getCards()] : getCards().filter(cd=>cd.system===sys);
 
-  // ── Read newSeen atomically (cross-tab safety) ────────────────────
-  // Re-read from localStorage immediately before building to avoid
-  // stale cache from another tab
+  // ── newSeen ──────────────────────────────────────────────────────────
   try{
     const fresh=JSON.parse(localStorage.getItem(TODAY_KEY)||'{}');
     const today=dayStamp();
-    if(fresh[currentDeck]&&fresh[currentDeck].date===today){
-      todayData[currentDeck]=fresh[currentDeck];
-    }
+    if(fresh[currentDeck]&&fresh[currentDeck].date===today) todayData[currentDeck]=fresh[currentDeck];
   }catch(e){}
-  // For shelf combined deck, aggregate newSeen across all shelf decks
   let newSeen;
-  if(currentDeck === '_shelf_combined' || currentDeck === '_shelf_all'){
-    newSeen = SHELF_DECKS.reduce((total, d) => {
-      return total + (todayData[d]?.newSeen || 0);
-    }, 0);
+  if(currentDeck==='_shelf_combined'||currentDeck==='_shelf_all'){
+    newSeen=SHELF_DECKS.reduce((t,d)=>t+(todayData[d]?.newSeen||0),0);
   } else {
-    newSeen = todayData[currentDeck]?.newSeen || 0;
+    newSeen=todayData[currentDeck]?.newSeen||0;
   }
   const newAllowed=Math.max(0,c.newPerDay-newSeen);
 
-  // ── Separate cards by state ───────────────────────────────────────
+  // ── Separate by state ─────────────────────────────────────────────────
   const lrnDue=[],lrnFuture=[],revDue=[],newCards=[];
+  // Track IDs already in againQueue to avoid duplicates
+  const againIds=new Set(againQueue.map(c=>c.id));
+
   pool.forEach(card=>{
+    if(againIds.has(card.id)) return; // skip — already in againQueue
     const s=getState(card.id);
     if(s.state===ST_LRN||s.state===ST_RLN){
-      if(s.due<=now) lrnDue.push(card);       // due now
-      else lrnFuture.push(card);              // future step — track for timer
+      if(s.due<=now) lrnDue.push(card);
+      else lrnFuture.push(card);
     } else if(s.state===ST_REV){
       if(s.due<=now+86400000) revDue.push(card);
-    } else {
+    } else { // ST_NEW
       newCards.push(card);
     }
   });
 
-  // ── Sort ──────────────────────────────────────────────────────────
+  // ── Sort & shuffle ────────────────────────────────────────────────────
   lrnDue.sort((a,b)=>getState(a.id).due-getState(b.id).due);
   revDue.sort((a,b)=>getState(a.id).due-getState(b.id).due);
-  // Shuffle new (Anki random order)
   for(let i=newCards.length-1;i>0;i--){
     const j=Math.floor(Math.random()*(i+1));
     [newCards[i],newCards[j]]=[newCards[j],newCards[i]];
   }
-
   const newToday=newCards.slice(0,newAllowed);
 
-  // ── Anki queue: lrn due → new → review ───────────────────────────
-  const prevDeck = deck;
+  // ── Build deck — ALWAYS reset idx to 0 for fresh session ─────────────
   deck=[...lrnDue,...newToday,...revDue];
-  // Preserve idx if session already in progress (don't restart from 0)
-  // Only reset if this is a fresh start (idx was 0 or deck was empty)
-  if(prevDeck.length > 0 && idx > 0){
-    // Keep idx but clamp to new deck length
-    idx = Math.min(idx, deck.length);
-  } else {
-    idx = 0;
+  // Only reset idx when starting a brand new session (not during rebuild)
+  // A rebuild during session is detected by revealed=false AND idx>0
+  const isMidSession = (idx > 0 && deck.length > 0);
+  if(!isMidSession){
+    idx=0; revealed=false; sessionRatings={};
   }
-  againQueue=[];
-  idx=0;revealed=false;sessionRatings={};
+  // Never reset againQueue here — it's managed by rate()
 
-  // ── Schedule timer to inject future learning cards ────────────────
-  // When a learning step fires (e.g. 10 min), inject card at front
+  // ── Schedule timers for future learning cards ─────────────────────────
   clearLrnTimers();
   lrnFuture.forEach(card=>{
     const s=getState(card.id);
     const delay=Math.max(0,s.due-Date.now());
     const tid=setTimeout(()=>{
-      // Re-check state at fire time (may have changed)
       const cs=getState(card.id);
       if((cs.state===ST_LRN||cs.state===ST_RLN)&&cs.due<=Date.now()+5000){
-        // Insert at current position so it shows next
         deck.splice(idx,0,card);
         updateStats();
       }
@@ -5384,10 +5372,16 @@ function goToHome(){
 
 function switchDeck(dk){
   currentDeck=dk;
+  // Reset session state when switching decks
+  idx=0; revealed=false; sessionRatings={}; againQueue=[];
   document.querySelectorAll('.deck-tab').forEach(t=>t.classList.toggle('active',t.id==='tab-'+dk));
   const lbl=document.getElementById('deck-label');
   if(lbl) lbl.textContent=(DECK_META[dk]||{}).short||dk;
-  buildFilterBar();buildSidebar();selectSystem('all');
+  currentSystem='all';
+  buildFilterBar();buildSidebar();
+  buildSessionQueue();
+  ensureStudyUI();
+  renderCard();updateStats();
 }
 
 function switchDeckTab(dk){
@@ -5537,7 +5531,16 @@ function selectSystem(sys){
   document.querySelectorAll('[data-sys]').forEach(b=>b.classList.toggle('active',b.dataset.sys===sys));
   const tab=document.querySelector(`.filter-btn[data-sys="${CSS.escape(sys)}"]`);
   if(tab) tab.scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'});
-  buildSessionQueue();
+  // Only rebuild if NOT mid-session, or if system changed from a sidebar click
+  const midSession = deck.length > 0 && idx > 0 && revealed === false;
+  if(!midSession){
+    idx=0; revealed=false; sessionRatings={};
+    againQueue=[];
+    buildSessionQueue();
+  } else {
+    // Mid-session system filter — rebuild but preserve position
+    buildSessionQueue();
+  }
   ensureStudyUI();
   renderCard();
   updateStats();
