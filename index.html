@@ -6439,7 +6439,7 @@ async function prefetchPubmedAbstracts(card){
     const abstracts = [];
     for(const art of articles){
       try {
-        const ar = await fetch('https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=pubmed&id='+art.uid+'&rettype=abstract&retmode=text');
+        const ar = await fetch('https://corsproxy.io/?url='+encodeURIComponent('https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=pubmed&id='+art.uid+'&rettype=abstract&retmode=text'));
         const txt = await ar.text();
         let abstractStr2 = '';
         const txtLines = txt.split('\n');
@@ -11403,7 +11403,7 @@ function openAttAbstract(uid){
   if(abstractText){
     document.getElementById('att-abstract-body').innerHTML = `<div style="font-size:13px;color:var(--text-dim);line-height:1.8;">${abstractText}</div>`;
   } else {
-    fetch('https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=pubmed&id='+uid+'&rettype=abstract&retmode=text')
+    fetch('https://corsproxy.io/?url='+encodeURIComponent('https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=pubmed&id='+uid+'&rettype=abstract&retmode=text'))
       .then(r=>r.text()).then(txt=>{
         let abstractStr2 = '';
         const txtLines = txt.split('\n');
