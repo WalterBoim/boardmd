@@ -11403,28 +11403,25 @@ function openAttAbstract(uid){
   if(abstractText){
     document.getElementById('att-abstract-body').innerHTML = `<div style="font-size:13px;color:var(--text-dim);line-height:1.8;">${abstractText}</div>`;
   } else {
-    fetch('https://corsproxy.io/?url='+encodeURIComponent('https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=pubmed&id='+uid+'&rettype=abstract&retmode=text'))
-      .then(r=>r.text()).then(txt=>{
-        let abstractStr2 = '';
-        const txtLines = txt.split('\n');
-        let inAbstract = false;
-        for(const line of txtLines){
-          if(line.match(/^AB\s+-\s*/)){
-            inAbstract = true;
-            abstractStr2 += line.replace(/^AB\s+-\s*/,'') + ' ';
-          } else if(inAbstract){
-            if(line.match(/^[A-Z]{2,4}\s+-/) || line.match(/^PMID-/)) break;
-            abstractStr2 += line.trim() + ' ';
-          }
-        }
-        abstractStr2 = abstractStr2.trim();
-        const match = abstractStr2 ? [null, abstractStr2] : null;
-        const abst = match ? match[1].replace(/\n\s+/g,' ').trim() : 'Abstract not available.';
+    // Abstract via NCBI eutils — sem CORS
+    fetch('https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=pubmed&id='+uid+'&retmode=json')
+      .then(r=>r.json()).then(data=>{
+        const art = data?.result?.[uid];
+        const title = (art?.title||'').replace(/</g,'&lt;');
+        const source = art?.source||'';
+        const year = art?.pubdate?.substring(0,4)||'';
         const body = document.getElementById('att-abstract-body');
-        if(body) body.innerHTML = `<div style="font-size:13px;color:var(--text-dim);line-height:1.8;">${abst}</div>`;
+        if(body) body.innerHTML = `
+          <div style="font-size:11px;color:var(--text-faint);font-family:monospace;margin-bottom:12px;padding:8px 10px;background:var(--surface2);border-radius:6px;border:1px solid var(--border);line-height:1.6;">
+            Full abstract requires PubMed — click below to open.
+          </div>
+          <div style="font-size:13px;color:var(--text-dim);line-height:1.8;">
+            <strong style="color:var(--text);">${title}</strong><br>
+            <span style="color:var(--text-faint);">${source} &nbsp;${year}</span>
+          </div>`;
       }).catch(()=>{
         const body = document.getElementById('att-abstract-body');
-        if(body) body.innerHTML = '<div style="font-size:12px;color:var(--text-faint);">Could not load abstract.</div>';
+        if(body) body.innerHTML = '<div style="font-size:12px;color:var(--text-faint);">Could not load article details.</div>';
       });
   }
 }
