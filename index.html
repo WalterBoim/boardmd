@@ -4433,6 +4433,7 @@ html.light .qs-val { color: inherit; }
             </div>
           </div>
           <div id="key-point-wrap" style="display:none;padding:0 18px 14px;"></div>
+          <div id="card-pubmed-wrap" style="display:none;"></div>
           <div style="padding:0 18px 8px;display:flex;justify-content:flex-end;align-items:center;">
             <button id="report-issue-btn" onclick="openReportIssue()" style="background:none;border:none;cursor:pointer;font-size:10px;font-weight:600;color:var(--text-faint);font-family:'JetBrains Mono',monospace;padding:2px 0;opacity:.5;transition:opacity .15s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='.5'">⚑ Report Issue</button>
           </div>
@@ -6398,6 +6399,30 @@ function revealAnswer(sel,card){
       if(_il) _il.textContent=card.img.license||'';
     } else {
       _iw.style.display='none';
+    }
+  }
+
+  // PubMed Sources
+  const _pw = document.getElementById('card-pubmed-wrap');
+  if(_pw){
+    if(card.pubmed_query){
+      _pw.style.display = '';
+      const _pa = document.createElement('div');
+      _pa.style.cssText = 'padding:0 18px 14px;';
+      const _pl = document.createElement('div');
+      _pl.style.cssText = 'font-size:9px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-faint);font-family:JetBrains Mono,monospace;margin-bottom:10px;';
+      _pl.textContent = 'PUBMED SOURCES';
+      const _pc = document.createElement('div');
+      _pc.id = 'card-pubmed-articles';
+      _pc.style.cssText = 'border:1px solid var(--border);border-radius:8px;overflow:hidden;background:var(--surface2);';
+      _pc.innerHTML = '<div style="padding:10px 14px;font-size:11px;color:var(--text-faint);display:flex;align-items:center;gap:8px;"><div style="width:10px;height:10px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0;"></div>Searching PubMed...</div>';
+      _pa.appendChild(_pl);
+      _pa.appendChild(_pc);
+      _pw.innerHTML = '';
+      _pw.appendChild(_pa);
+      setTimeout(() => fetchCardPubmed(card), 300);
+    } else {
+      _pw.style.display = 'none';
     }
   }
 
@@ -11423,6 +11448,93 @@ function openAttAbstract(uid){
 
 function closeAttAbstract(){
   const modal = document.getElementById('att-abstract-modal');
+  if(modal) modal.style.display = 'none';
+}
+
+function fetchCardPubmed(card){
+  const container = document.getElementById('card-pubmed-articles');
+  if(!container) return;
+  const query = card.pubmed_query;
+  if(!query) return;
+  fetch('https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed&term='+encodeURIComponent(query)+'&retmax=3&sort=relevance&retmode=json')
+    .then(function(r){ return r.json(); })
+    .then(function(sd){
+      const ids = sd.esearchresult ? sd.esearchresult.idlist||[] : [];
+      if(!ids.length){
+        container.innerHTML = '<div style="padding:10px 14px;font-size:11px;color:var(--text-faint);">No articles found.</div>';
+        return;
+      }
+      return fetch('https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=pubmed&id='+ids.join(',')+' &retmode=json')
+        .then(function(r){ return r.json(); })
+        .then(function(rd){
+          const uids = rd.result && rd.result.uids ? rd.result.uids : [];
+          window._cardPubmedArticles = uids.map(function(uid){
+            const a = rd.result[uid];
+            const authors = a.authors ? a.authors.slice(0,3).map(function(x){ return x.name; }).join(', ') + (a.authors.length>3?' et al.':'') : '';
+            return { uid:uid, title:a.title||'', journal:a.source||'', year:a.pubdate?a.pubdate.substring(0,4):'', authors:authors };
+          });
+          let html = '';
+          uids.forEach(function(uid){
+            const a = rd.result[uid];
+            const title = (a.title||'').replace(/</g,'&lt;');
+            const journal = a.source||'';
+            const year = a.pubdate ? a.pubdate.substring(0,4) : '';
+            html += '<div onclick="openCardAbstract(\'' + uid + '\')" style="padding:11px 13px;border-bottom:1px solid var(--border);cursor:pointer;" onmouseover="this.style.background=\'rgba(79,142,247,.06)\'" onmouseout="this.style.background=\'\'"><div style="font-size:12px;color:var(--text);font-weight:500;line-height:1.4;margin-bottom:4px;">' + title + '</div><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;"><span style="font-family:JetBrains Mono,monospace;font-size:10px;color:var(--accent);opacity:.8;">' + journal + '</span><span style="font-family:JetBrains Mono,monospace;font-size:10px;color:var(--text-faint);">' + year + '</span><span style="font-family:JetBrains Mono,monospace;font-size:10px;color:var(--text-faint);background:var(--surface);border:1px solid var(--border);padding:1px 5px;border-radius:3px;margin-left:auto;">PMID ' + uid + '</span></div><div style="margin-top:4px;font-size:9px;color:var(--accent);opacity:.5;letter-spacing:.06em;">TAP TO READ ABSTRACT</div></div>';
+          });
+          html += '<div style="padding:7px 13px;font-size:10px;color:var(--text-faint);border-top:1px solid var(--border);">NCBI PubMed — National Library of Medicine</div>';
+          container.innerHTML = html;
+        });
+    })
+    .catch(function(){ container.innerHTML = '<div style="padding:10px 14px;font-size:11px;color:var(--text-faint);">Could not connect to PubMed.</div>'; });
+}
+
+function openCardAbstract(uid){
+  const articles = window._cardPubmedArticles || [];
+  const art = articles.find(function(a){ return a.uid === uid; }) || { uid:uid, title:'', journal:'', year:'', authors:'' };
+  let modal = document.getElementById('card-abstract-modal');
+  if(!modal){
+    modal = document.createElement('div');
+    modal.id = 'card-abstract-modal';
+    modal.setAttribute('style','position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:9999;display:flex;align-items:flex-end;justify-content:center;backdrop-filter:blur(4px);');
+    modal.addEventListener('click', function(e){ if(e.target===modal) closeCardAbstract(); });
+    document.body.appendChild(modal);
+  }
+  const inner = document.createElement('div');
+  inner.setAttribute('style','width:100%;max-width:680px;background:var(--surface);border:1px solid var(--border);border-bottom:none;border-radius:16px 16px 0 0;max-height:80vh;display:flex;flex-direction:column;');
+  const handle = document.createElement('div');
+  handle.setAttribute('style','width:36px;height:3px;background:var(--border);border-radius:2px;margin:18px auto 0;');
+  const titleEl = document.createElement('div');
+  titleEl.setAttribute('style','padding:14px 20px 0;');
+  titleEl.innerHTML = '<div style="font-size:13px;font-weight:600;color:var(--text);line-height:1.45;margin-bottom:8px;">' + art.title + '</div><div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px;"><span style="font-size:10px;color:var(--accent);opacity:.8;">' + art.journal + '</span><span style="font-size:10px;color:var(--text-faint);">' + art.year + '</span><span style="font-size:10px;color:var(--text-faint);background:var(--surface2);border:1px solid var(--border);padding:1px 6px;border-radius:3px;">PMID ' + uid + '</span></div>' + (art.authors ? '<div style="font-size:11px;color:var(--text-faint);margin-bottom:8px;">' + art.authors + '</div>' : '') + '<div style="height:1px;background:var(--border);"></div>';
+  const body = document.createElement('div');
+  body.id = 'card-abstract-body';
+  body.setAttribute('style','padding:16px 20px;overflow-y:auto;flex:1;');
+  body.innerHTML = '<div style="display:flex;align-items:center;gap:10px;font-size:11px;color:var(--text-faint);"><div style="width:12px;height:12px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;"></div>Loading abstract...</div>';
+  const footer = document.createElement('div');
+  footer.setAttribute('style','padding:14px 20px 36px;border-top:1px solid var(--border);display:flex;gap:10px;');
+  footer.innerHTML = '<button onclick="closeCardAbstract()" style="flex:1;padding:11px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--text-faint);font-size:11px;cursor:pointer;">Close</button><a href="https://pubmed.ncbi.nlm.nih.gov/' + uid + '/" target="_blank" rel="noopener" style="flex:2;padding:11px;border-radius:8px;border:1px solid rgba(79,142,247,.3);background:rgba(79,142,247,.08);color:var(--accent);font-size:11px;cursor:pointer;text-align:center;text-decoration:none;font-weight:600;display:flex;align-items:center;justify-content:center;gap:6px;">Open Full Article on PubMed <span style="font-size:10px;">&#x2197;</span></a>';
+  inner.appendChild(handle);
+  inner.appendChild(titleEl);
+  inner.appendChild(body);
+  inner.appendChild(footer);
+  modal.innerHTML = '';
+  modal.appendChild(inner);
+  modal.style.display = 'flex';
+  fetch('https://hwdcgbcnphkmxaasties.supabase.co/functions/v1/pubmed-abstract', {
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({pmid:uid})
+  }).then(function(r){ return r.json(); }).then(function(data){
+    const b = document.getElementById('card-abstract-body');
+    if(b) b.innerHTML = data.abstract ? '<div style="font-size:13px;color:var(--text-dim);line-height:1.8;">' + data.abstract + '</div>' : '<div style="font-size:12px;color:var(--text-faint);">Abstract not available.</div>';
+  }).catch(function(){
+    const b = document.getElementById('card-abstract-body');
+    if(b) b.innerHTML = '<div style="font-size:12px;color:var(--text-faint);">Could not load abstract.</div>';
+  });
+}
+
+function closeCardAbstract(){
+  const modal = document.getElementById('card-abstract-modal');
   if(modal) modal.style.display = 'none';
 }
 </script>
