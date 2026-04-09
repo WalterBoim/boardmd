@@ -5635,6 +5635,8 @@ function shuffleOpts(card){
 
 // ── RENDER CARD ───────────────────────────────────────────────────────
 function renderCard(){
+  const _pwReset = document.getElementById('card-pubmed-wrap');
+  if(_pwReset){ _pwReset.style.display='none'; _pwReset.style.visibility='hidden'; _pwReset.innerHTML=''; }
   revealed=false;
   _cardStartTime = Date.now(); // track response time
   // Remove Attending block from previous card
@@ -6406,7 +6408,7 @@ function revealAnswer(sel,card){
   const _pw = document.getElementById('card-pubmed-wrap');
   if(_pw){
     if(card.pubmed_query){
-      _pw.style.display = '';
+      _pw.style.display = ''; _pw.style.visibility = 'visible';
       const _pa = document.createElement('div');
       _pa.style.cssText = 'padding:0 18px 14px;';
       const _pl = document.createElement('div');
