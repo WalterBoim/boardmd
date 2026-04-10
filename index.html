@@ -6805,7 +6805,8 @@ function searchQids(){
     else missing.push(qid);
   });
 
-  qidSessionCards=found.flatMap(f=>f.cards);
+  const _seen=new Set();
+  qidSessionCards=found.flatMap(f=>f.cards).filter(c=>_seen.has(c.id)?false:(_seen.add(c.id),true));
 
   // Update UI
   const wrap=document.getElementById('qid-results-wrap');
@@ -8574,16 +8575,11 @@ function hideLoadingOverlay(){
     setTimeout(() => {
       try { el.remove(); } catch(e){}
       // Apply saved theme after overlay gone
-      if(window._bmdSavedTheme === 'light'){
-        document.documentElement.classList.add('light');
-      }
+      document.documentElement.classList.add('light');
       updateThemeIcons();
     }, 700);
   } else {
-    // No overlay — apply theme immediately
-    if(window._bmdSavedTheme === 'light'){
-      document.documentElement.classList.add('light');
-    }
+    document.documentElement.classList.add('light');
     updateThemeIcons();
   }
   _bgCards = [];
@@ -8633,10 +8629,7 @@ async function loadCardsFromSupabase(){
   if(cached && cached.length > 0){
     console.log(`BoardMD: ${cached.length} cards from cache (instant)`);
     buildDecks(cached);
-    // Apply saved theme immediately (no overlay to wait for)
-    if(window._bmdSavedTheme === 'light'){
-      document.documentElement.classList.add('light');
-    }
+    document.documentElement.classList.add('light');
     updateThemeIcons();
     // Background refresh once per day — silent, user never sees it
     setTimeout(() => backgroundRefreshCards(cached.length), 3000);
@@ -8806,11 +8799,7 @@ async function loadFsrsFromSupabase(){
 
 // ── INIT ─────────────────────────────────────────────────────────────
 (async function init(){
-  // Carrega cards
-  await loadCardsFromSupabase();
-
-  // Verifica sessão
-  const session = await getSession();
+  const [, session] = await Promise.all([loadCardsFromSupabase(), getSession()]);
   if(session){
     _supaUser = session.user;
     // Carrega progresso FSRS da nuvem
@@ -8854,6 +8843,31 @@ async function loadFsrsFromSupabase(){
   // Dispara o app
   window.cardsLoaded = true;
   if(window.pendingInit) window.pendingInit();
+
+  // onAuthStateChange — captura retorno OAuth
+  _supa.auth.onAuthStateChange(async (event, sess) => {
+    if(event === 'SIGNED_IN' && sess) {
+      _supaUser = sess.user;
+      const username = sess.user.user_metadata?.full_name || sess.user.email.split('@')[0];
+      const shortName = username.split(' ')[0];
+      const pill = document.getElementById('nav-user-pill');
+      const loginBtn = document.getElementById('nav-login-btn');
+      const nameEl = document.getElementById('nav-user-name');
+      if(pill) pill.style.display='flex';
+      if(loginBtn) loginBtn.style.display='none';
+      if(nameEl) nameEl.textContent = shortName;
+      const appPill = document.getElementById('app-user-pill');
+      const appLoginBtn = document.getElementById('app-login-btn');
+      const appLabel = document.getElementById('app-user-label');
+      const appAvatar = document.getElementById('app-user-avatar');
+      if(appPill) appPill.style.display='flex';
+      if(appLoginBtn) appLoginBtn.style.display='none';
+      if(appLabel) appLabel.textContent = shortName;
+      if(appAvatar) appAvatar.textContent = shortName.charAt(0).toUpperCase();
+      await loadFsrsFromSupabase();
+    }
+    if(event === 'SIGNED_OUT') location.reload();
+  });
 
   // Register Service Worker for PWA
   if('serviceWorker' in navigator){
