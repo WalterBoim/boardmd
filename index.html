@@ -6435,6 +6435,51 @@ function revealAnswer(sel,card){
   if(i3b) i3b.textContent=ivs.easy.label;
 }
 
+async function prefetchPubmedAbstracts(card){
+  const query = card.pubmed_query || (card.topic ? card.topic + ' ' + (card.subject||'') : null);
+  if(!query || _pubmedCache[card.id]) return;
+  _pubmedCache[card.id] = { status: 'loading', articles: [], abstracts: [] };
+  try {
+    const sr = await fetch('https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed&term='+encodeURIComponent(query.trim())+'&retmax=3&sort=relevance&retmode=json');
+    const sd = await sr.json();
+    const ids = sd.esearchresult?.idlist || [];
+    if(!ids.length){ _pubmedCache[card.id].status = 'empty'; return; }
+
+    const smr = await fetch('https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=pubmed&id='+ids.join(',')+'&retmode=json');
+    const smd = await smr.json();
+    const articles = (smd.result?.uids||[]).map(uid => {
+      const a = smd.result[uid];
+      return { uid, title: a.title||'', journal: a.source||'', year: a.pubdate?.substring(0,4)||'', authors: (a.authors?.slice(0,3).map(x=>x.name).join(', ')||'')+(a.authors?.length>3?' et al.':'') };
+    });
+
+    const abstracts = [];
+    for(const art of articles){
+      try {
+        const ar = await fetch('https://corsproxy.io/?url='+encodeURIComponent('https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=pubmed&id='+art.uid+'&rettype=abstract&retmode=text'));
+        const txt = await ar.text();
+        let abstractStr2 = '';
+        const txtLines = txt.split('\n');
+        let inAbstract = false;
+        for(const line of txtLines){
+          if(line.match(/^AB\s+-\s*/)){
+            inAbstract = true;
+            abstractStr2 += line.replace(/^AB\s+-\s*/,'') + ' ';
+          } else if(inAbstract){
+            if(line.match(/^[A-Z]{2,4}\s+-/) || line.match(/^PMID-/)) break;
+            abstractStr2 += line.trim() + ' ';
+          }
+        }
+        abstractStr2 = abstractStr2.trim();
+        const match = abstractStr2 ? [null, abstractStr2] : null;
+        const abstract = match ? match[1].replace(/\n\s+/g,' ').trim().slice(0,600) : '';
+        abstracts.push({ ...art, abstract });
+      } catch(e){ abstracts.push({ ...art, abstract: '' }); }
+    }
+
+    _pubmedCache[card.id] = { status: 'ready', articles, abstracts };
+  } catch(e){ _pubmedCache[card.id] = { status: 'error', articles: [], abstracts: [] }; }
+}
+
 function rate(r){
   const full=[...deck,...againQueue];
   if(idx>=full.length) return;
@@ -8572,7 +8617,7 @@ async function loadCardsFromSupabase(){
   while(true){
     const { data, error, count } = await _supa
       .from('cards')
-      .select('id,deck,system,topic,subject,qid,q,c,w,e,kp,d,img', { count: total === null ? 'exact' : undefined })
+      .select('id,deck,system,topic,subject,qid,q,c,w,e,kp,d,img,pubmed_query', { count: total === null ? 'exact' : undefined })
       .order('id')
       .range(from, from + PAGE - 1);
 
@@ -8630,7 +8675,7 @@ async function backgroundRefreshCards(cachedCount){
       while(true){
         const { data, error: e2 } = await _supa
           .from('cards')
-          .select('id,deck,system,topic,subject,qid,q,c,w,e,kp,d,img')
+          .select('id,deck,system,topic,subject,qid,q,c,w,e,kp,d,img,pubmed_query')
           .order('id')
           .range(from, from + PAGE - 1);
         if(e2 || !data || data.length === 0) break;
@@ -9007,7 +9052,7 @@ TOPIC: ${card.topic||''} | SYSTEM: ${card.system||''}
 EXPLANATION: ${(card.e||'').replace(/<[^>]+>/g,' ').slice(0,300)}`;
 
   const prompts = {
-    why: `You are a brilliant, warm attending physician. The student just answered this USMLE board question:\n\n${ctx}\n\nIn 2-3 paragraphs: acknowledge right/wrong (one sentence). Explain WHY this is the correct answer using core pathophysiology. Be direct, clinical — like a great attending, not a textbook. End with one punchy clinical pearl.`,
+    why: `You are a brilliant, warm attending physician. The student just answered this USMLE board question:\n\n${ctx}\n\nIn 2-3 paragraphs: acknowledge right/wrong (one sentence). Explain WHY this is the correct answer using core pathophysiology. Be direct, clinical — like a great attending, not a textbook. End with one punchy clinical pearl.\n\nFinally, on a new line, write exactly: PUBMED_QUERY: [6-8 specific medical terms for PubMed search relevant to this answer]`,
     explain: `You are a brilliant attending. The student wants deeper understanding:\n\n${ctx}\n\nTeach this concept at the whiteboard. One vivid analogy. Cover: pathophysiology, clinical clues, board trap. 3 paragraphs max.`,
     mcq: `You are a brilliant USMLE question writer. Based on this topic:\n\n${ctx}\n\nWrite 3 new USMLE-style MCQs on the SAME concept. Return ONLY valid JSON, no markdown, no extra text:\n{"questions":[{"stem":"[clinical vignette]","options":["A. text","B. text","C. text","D. text"],"correct":"A","explanation":"[2-3 sentences why A is correct]","distractors":{"B":"[why B is wrong]","C":"[why C is wrong]","D":"[why D is wrong]"},"keypoint":"[one punchy ≤15 word board pearl]"},{"stem":"[vignette]","options":["A. text","B. text","C. text","D. text"],"correct":"B","explanation":"[2-3 sentences]","distractors":{"A":"[why wrong]","C":"[why wrong]","D":"[why wrong]"},"keypoint":"[≤15 word pearl]"},{"stem":"[vignette]","options":["A. text","B. text","C. text","D. text"],"correct":"C","explanation":"[2-3 sentences]","distractors":{"A":"[why wrong]","B":"[why wrong]","D":"[why wrong]"},"keypoint":"[≤15 word pearl]"}]}`,
     surprise: `You are a brilliant attending. Give ONE unforgettable clinical pearl about:\n\n${ctx}\n\nSomething NOT in the explanation — a real-world connection, classic trick, or board trap. 2 paragraphs max. Be vivid.`,
@@ -9024,7 +9069,18 @@ EXPLANATION: ${(card.e||'').replace(/<[^>]+>/g,' ').slice(0,300)}`;
   try {
     let responseText = '';
     if(typeof puter !== 'undefined' && puter.ai){
-      const response = await puter.ai.chat(prompts[type], { model: 'gemini-2.0-flash' });
+      // ── RAG: inject PubMed abstracts as context if available ──
+      let ragContext = '';
+      const cached = _pubmedCache[card.id];
+      if(cached && cached.status === 'ready' && cached.abstracts.length > 0){
+        ragContext = '\n\nRELEVANT PRIMARY LITERATURE (ONLY sources you may cite):\n';
+        cached.abstracts.forEach((a,i) => {
+          if(a.abstract) ragContext += `\n[${i+1}] ${a.title} — ${a.journal} ${a.year}\nAbstract: ${a.abstract}\n`;
+        });
+        ragContext += `\n\nCITATION RULES — ABSOLUTE:\n1. You MUST cite the provided articles inline using [1] [2] [3] wherever relevant in your response.\n2. NEVER write PMID numbers directly in the text.\n3. NEVER cite any article, author, or study not listed above.\n4. NEVER invent references.\n5. At the very end of your response, on a new line, write ONLY: CITED:[1] CITED:[2] etc for each number you used inline. Example: CITED:[1] CITED:[3]\n6. If truly none are relevant, write CITED:[] at the end.`;
+      }
+      const finalPrompt = prompts[type] + ragContext;
+      const response = await puter.ai.chat(finalPrompt, { model: 'gemini-2.0-flash' });
       responseText = typeof response === 'string' ? response
         : (response?.message?.content || response?.text || JSON.stringify(response));
     } else {
@@ -9045,6 +9101,17 @@ EXPLANATION: ${(card.e||'').replace(/<[^>]+>/g,' ').slice(0,300)}`;
       }
     }
 
+    // Extract PUBMED_QUERY if present
+    let pubmedQuery = null;
+    const pubmedMatch = responseText.match(/PUBMED_QUERY:\s*(.+)/);
+    if(pubmedMatch){
+      pubmedQuery = pubmedMatch[1].trim();
+      responseText = responseText.replace(/PUBMED_QUERY:\s*.+/, '').trim();
+    }
+
+    // Remove CITED markers from visible text
+    responseText = responseText.replace(/CITED:\[\d*\]/g, '').replace(/CITED:/g, '').trim();
+
     const formatted = responseText
       .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
       .replace(/\*(.*?)\*/g, '<em>$1</em>')
@@ -9055,7 +9122,30 @@ EXPLANATION: ${(card.e||'').replace(/<[^>]+>/g,' ').slice(0,300)}`;
       <div class="att-response-msg">
         <div class="att-response-label">${typeLabels[type]}</div>
         <div class="att-response-text"><p>${formatted}</p></div>
-      </div>`;
+      </div>
+      ${pubmedQuery ? `<div id="att-pubmed-section" style="margin-top:10px;">
+        <div style="padding:6px 12px 8px;font-family:monospace;font-size:10px;color:#8b5cf6;opacity:0.7;letter-spacing:0.06em;border-bottom:1px solid var(--border);">PUBMED SOURCES</div>
+        <div id="att-pubmed-results" style="border:1px solid rgba(99,102,241,0.2);border-radius:8px;background:var(--surface2);overflow:hidden;">
+          <div style="padding:12px 14px;font-family:monospace;font-size:11px;color:var(--text-faint);display:flex;align-items:center;gap:8px;">
+            <div style="width:10px;height:10px;border:2px solid var(--border);border-top-color:#8b5cf6;border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0;"></div>
+            Searching PubMed...
+          </div>
+        </div>
+      </div>` : ''}`;
+
+    // Render PubMed references
+    const _cached = _pubmedCache[card.id];
+    if(_cached && _cached.status === 'ready' && _cached.articles.length > 0){
+      const _citedRaw = formatted.match(/CITED:\[(\d+)\]/g) || [];
+      const _citedIdxs = [...new Set(_citedRaw.map(m => parseInt(m.match(/\d+/)[0]) - 1))];
+      const _toShow = _citedIdxs.length > 0
+        ? _citedIdxs.map(i => _cached.articles[i]).filter(Boolean)
+        : _cached.articles;
+      if(_toShow.length > 0) setTimeout(() => renderAttPubmedArticles(_toShow), 100);
+    } else if(pubmedQuery || card.pubmed_query || card.topic){
+      const _q = pubmedQuery || card.pubmed_query || (card.topic + ' ' + (card.subject||''));
+      setTimeout(() => fetchAttPubmed(_q.trim()), 100);
+    }
 
     // no counting during beta
 
@@ -9080,7 +9170,8 @@ EXPLANATION: ${(card.e||'').replace(/<[^>]+>/g,' ').slice(0,300)}`;
 // ── HIGHLIGHT SYSTEM ─────────────────────────────────────────────────────
 const HL_KEY = 'bmd_highlights_v1';
 let _hlColor = null; // null = mode off
-let _hlData = {}; // {cardId: {q: [...ranges], e: [...ranges]}}
+let _hlData = {};
+const _pubmedCache = {}; // {cardId: {q: [...ranges], e: [...ranges]}}
 
 function loadHlData(){
   try{ _hlData = JSON.parse(localStorage.getItem(HL_KEY)||'{}'); }catch(e){ _hlData={}; }
