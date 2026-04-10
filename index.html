@@ -6888,6 +6888,7 @@ function downloadDeck(deckId,name){
 
 
 
+}
 document.addEventListener('keydown',e=>{
   if(document.getElementById('app').classList.contains('active')){
     if(['a','b','c','d'].includes(e.key.toLowerCase())&&!revealed){
@@ -6927,7 +6928,6 @@ function toggleTheme(){
 }
 
 // Apply saved theme on load — BUT force dark during loading overlay
-}
 (function(){
   // Always start dark so loading overlay looks great
   document.documentElement.classList.remove('light');
