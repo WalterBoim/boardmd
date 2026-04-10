@@ -1,61 +1,60 @@
-// BoardMD Service Worker v1.0
-const CACHE_NAME = 'boardmd-v1';
+// BoardMD Service Worker
+// CACHE_NAME muda a cada deploy — força limpeza automática
+const CACHE_NAME = 'boardmd-' + '20260409';
 const STATIC_ASSETS = [
-  '/',
-  '/index.html',
   '/manifest.json',
+  '/icon-192.png',
+  '/icon-512.png',
 ];
 
-// Install — cache static assets
+// Install
 self.addEventListener('install', event => {
-  console.log('[SW] Installing BoardMD Service Worker');
+  console.log('[SW] Installing:', CACHE_NAME);
   event.waitUntil(
     caches.open(CACHE_NAME).then(cache => {
       return cache.addAll(STATIC_ASSETS).catch(err => {
-        console.log('[SW] Cache addAll partial fail (ok):', err);
+        console.log('[SW] Cache partial fail (ok):', err);
       });
     })
   );
   self.skipWaiting();
 });
 
-// Activate — clean old caches
+// Activate — limpa caches antigos
 self.addEventListener('activate', event => {
-  console.log('[SW] Activating BoardMD Service Worker');
+  console.log('[SW] Activating:', CACHE_NAME);
   event.waitUntil(
     caches.keys().then(keys =>
       Promise.all(
-        keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k))
+        keys.filter(k => k !== CACHE_NAME).map(k => {
+          console.log('[SW] Deleting old cache:', k);
+          return caches.delete(k);
+        })
       )
     )
   );
   self.clients.claim();
 });
 
-// Fetch — network first, fall back to cache
+// Fetch
 self.addEventListener('fetch', event => {
   const url = new URL(event.request.url);
 
-  // Skip non-GET and external requests (Supabase, Puter, Google Fonts etc)
   if (event.request.method !== 'GET') return;
   if (url.origin !== self.location.origin) return;
 
-  // For navigation requests (HTML pages) — network first, cache fallback
-  if (event.request.mode === 'navigate') {
+  // HTML (navegação) — SEMPRE da rede, nunca do cache
+  if (event.request.mode === 'navigate' ||
+      url.pathname === '/' ||
+      url.pathname === '/index.html') {
     event.respondWith(
-      fetch(event.request)
-        .then(response => {
-          // Cache the fresh page
-          const clone = response.clone();
-          caches.open(CACHE_NAME).then(cache => cache.put(event.request, clone));
-          return response;
-        })
+      fetch(event.request, { cache: 'no-store' })
         .catch(() => caches.match('/index.html'))
     );
     return;
   }
 
-  // For static assets — cache first
+  // Assets estáticos (icons, manifest) — cache first
   event.respondWith(
     caches.match(event.request).then(cached => {
       if (cached) return cached;
@@ -83,7 +82,7 @@ self.addEventListener('push', event => {
     renotify: true,
     data: { url: data.url || '/' },
     actions: [
-      { action: 'study', title: '▶ Study Now' },
+      { action: 'study', title: 'Study Now' },
       { action: 'dismiss', title: 'Later' }
     ]
   };
