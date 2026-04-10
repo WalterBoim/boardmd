@@ -4766,10 +4766,16 @@ let deckSettings={};
 })();
 function saveSettings(){try{localStorage.setItem(SETTINGS_KEY,JSON.stringify(deckSettings));}catch(e){}}
 function cfg(){
-  if(deckSettings[currentDeck]) return deckSettings[currentDeck];
+  if(currentDeck && currentDeck !== '_search' && deckSettings[currentDeck]) return deckSettings[currentDeck];
   // Shelf combined — use shelf_em settings as reference
   if(currentDeck === '_shelf_combined' || currentDeck === '_shelf_all'){
     return deckSettings['shelf_em'] || deckSettings['shelf_surgery'] || {...DEFAULT_SETTINGS};
+  }
+  // _search mode — use the step's primary deck settings
+  if(currentDeck === '_search'){
+    if(currentStep === 's1') return deckSettings['boardmd_s1'] || deckSettings['s1'] || {...DEFAULT_SETTINGS};
+    if(currentStep === 'shelf') return deckSettings['shelf_em'] || deckSettings['shelf_surgery'] || {...DEFAULT_SETTINGS};
+    return deckSettings['boardmd_s2'] || deckSettings['s2'] || {...DEFAULT_SETTINGS};
   }
   return {...DEFAULT_SETTINGS};
 }
@@ -5612,6 +5618,11 @@ function ensureStudyUI(){
     <div id="pre-hint" class="kbd-hint" style="margin-top:4px">Press <span class="kbd">A</span><span class="kbd">B</span><span class="kbd">C</span><span class="kbd">D</span> to answer</div>
     <div class="fsrs-nav" id="fsrs-nav-2">
       <div class="fsrs-row">
+        <button class="fsrs-btn again" onclick="rate(0)"><span class="fsrs-lbl">Again</span><span class="fsrs-int" id="int0-b">&lt;1d</span></button>
+        <button class="fsrs-btn hard"  onclick="rate(1)"><span class="fsrs-lbl">Hard</span><span class="fsrs-int" id="int1-b">1d</span></button>
+        <button class="fsrs-btn good"  onclick="rate(2)"><span class="fsrs-lbl">Good</span><span class="fsrs-int" id="int2-b">3d</span></button>
+        <button class="fsrs-btn easy"  onclick="rate(3)"><span class="fsrs-lbl">Easy</span><span class="fsrs-int" id="int3-b">7d</span></button>
+      </div>
     </div>
     <div class="plain-nav" id="plain-nav">
       <button class="nav-plain-btn" onclick="skipBack()">← Back</button>
@@ -6402,6 +6413,30 @@ function revealAnswer(sel,card){
     }
   }
 
+  // PubMed Sources
+  const _pw = document.getElementById('card-pubmed-wrap');
+  if(_pw){
+    if(card.pubmed_query){
+      _pw.style.display = ''; _pw.style.visibility = 'visible';
+      const _pa = document.createElement('div');
+      _pa.style.cssText = 'padding:0 18px 14px;';
+      const _pl = document.createElement('div');
+      _pl.style.cssText = 'font-size:9px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-faint);font-family:JetBrains Mono,monospace;margin-bottom:10px;';
+      _pl.textContent = 'PUBMED SOURCES';
+      const _pc = document.createElement('div');
+      _pc.id = 'card-pubmed-articles';
+      _pc.style.cssText = 'border:1px solid var(--border);border-radius:8px;overflow:hidden;background:var(--surface2);';
+      _pc.innerHTML = '<div style="padding:10px 14px;font-size:11px;color:var(--text-faint);display:flex;align-items:center;gap:8px;"><div style="width:10px;height:10px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0;"></div>Searching PubMed...</div>';
+      _pa.appendChild(_pl);
+      _pa.appendChild(_pc);
+      _pw.innerHTML = '';
+      _pw.appendChild(_pa);
+      setTimeout(() => fetchCardPubmed(card), 300);
+    } else {
+      _pw.style.display = 'none';
+    }
+  }
+
   // Response distribution
   renderResponseDist(card, sel);
 
@@ -6417,6 +6452,8 @@ function revealAnswer(sel,card){
 
   // ── BoardMD Attending — inject inline after answer revealed ──
   injectAttendingInline(card, sel);
+  // Pre-fetch PubMed abstracts in background
+  if(card.pubmed_query || card.topic) setTimeout(() => prefetchPubmedAbstracts(card), 500);
 
   // Update FSRS intervals display — sync both nav elements
   const ivs=getIntervals(getState(card.id));
