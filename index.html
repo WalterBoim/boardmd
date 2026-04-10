@@ -1080,7 +1080,7 @@ html.light .att-btn{background:var(--surface2);}
 .expand-row{background:var(--surface);border:1px solid var(--border2);border-radius:12px;margin-bottom:8px;overflow:hidden;}
 .expand-header{padding:12px 14px;display:flex;align-items:center;gap:12px;cursor:pointer;}
 .expand-chevron{width:16px;height:16px;stroke:#8892b0;fill:none;stroke-width:2;stroke-linecap:round;flex-shrink:0;transition:transform .2s;margin-left:4px;}
-.expand-/* removed stray body rule */
+.expand-body{display:none;}
 .expand-body.open{display:block;}
 .expand-chevron.open{transform:rotate(180deg);}.expand-body{display:none !important;}.expand-body.open{display:block !important;}
 .subdeck{padding:10px 14px 10px 56px;display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .12s;}
@@ -6927,6 +6927,7 @@ function toggleTheme(){
 }
 
 // Apply saved theme on load — BUT force dark during loading overlay
+}
 (function(){
   // Always start dark so loading overlay looks great
   document.documentElement.classList.remove('light');
