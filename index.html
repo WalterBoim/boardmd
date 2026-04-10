@@ -6444,6 +6444,12 @@ function revealAnswer(sel,card){
   
 
 
+  // ── BoardMD Attending — inject inline after answer revealed ──
+  injectAttendingInline(card, sel);
+  // Pre-fetch PubMed abstracts in background while student reads answer
+  if(card.pubmed_query || card.topic) setTimeout(() => prefetchPubmedAbstracts(card), 500);
+}
+
 async function prefetchPubmedAbstracts(card){
   const query = card.pubmed_query || (card.topic ? card.topic + ' ' + (card.subject||'') : null);
   if(!query || _pubmedCache[card.id]) return;
@@ -6491,10 +6497,6 @@ async function prefetchPubmedAbstracts(card){
   } catch(e){ _pubmedCache[card.id] = { status: 'error', articles: [], abstracts: [] }; }
 }
 
-  // ── BoardMD Attending — inject inline after answer revealed ──
-  injectAttendingInline(card, sel);
-  // Pre-fetch PubMed abstracts in background while student reads answer
-  if(card.pubmed_query || card.topic) setTimeout(() => prefetchPubmedAbstracts(card), 500);
 
   // Update FSRS intervals display — sync both nav elements
   const ivs=getIntervals(getState(card.id));
@@ -6515,7 +6517,6 @@ async function prefetchPubmedAbstracts(card){
   if(i1b) i1b.textContent=ivs.hard.label;
   if(i2b) i2b.textContent=ivs.good.label;
   if(i3b) i3b.textContent=ivs.easy.label;
-}
 
 function rate(r){
   const full=[...deck,...againQueue];
