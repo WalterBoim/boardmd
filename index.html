@@ -236,7 +236,7 @@ html.light .anki-due{color:#16a34a;}
 .sys-sep{height:1px;background:var(--border);margin:8px 0;}
 
 .study-main{flex:1;display:flex;justify-content:center;padding:24px 20px;overflow-y:auto;min-width:0;}
-.study-inner{max-width:920px;width:100%;display:flex;flex-direction:column;align-items:center;gap:16px;}
+.study-inner{max-width:760px;width:100%;display:flex;flex-direction:column;align-items:center;gap:16px;}
 
 .progress-wrap{width:100%;}
 .progress-info{display:flex;justify-content:space-between;font-size:11px;color:var(--text-faint);margin-bottom:6px;font-family:'JetBrains Mono',monospace;}
@@ -971,7 +971,7 @@ html.light { --uw-hover:#f0f7ff; --uw-correct:#e8f5e9; --uw-wrong:#fdecea; --uw-
 .hl-toolbar{display:flex;align-items:center;gap:6px;padding:0 4px;}
 #attending-overlay{position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:4000;display:none;align-items:flex-end;justify-content:center;backdrop-filter:blur(4px);}
 #attending-overlay.active{display:flex;}
-#attending-panel{background:var(--surface);border:1px solid var(--border);border-top-left-radius:20px;border-top-right-radius:20px;width:100%;max-width:920px;max-height:82vh;display:flex;flex-direction:column;overflow:hidden;animation:slideUpPanel .25s cubic-bezier(.34,1.2,.64,1);}
+#attending-panel{background:var(--surface);border:1px solid var(--border);border-top-left-radius:20px;border-top-right-radius:20px;width:100%;max-width:760px;max-height:82vh;display:flex;flex-direction:column;overflow:hidden;animation:slideUpPanel .25s cubic-bezier(.34,1.2,.64,1);}
 @keyframes slideUpPanel{from{transform:translateY(100%)}to{transform:translateY(0)}}
 .att-header{padding:16px 20px 12px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
 .att-header-left{display:flex;align-items:center;gap:10px;}
@@ -4433,7 +4433,6 @@ html.light .qs-val { color: inherit; }
             </div>
           </div>
           <div id="key-point-wrap" style="display:none;padding:0 18px 14px;"></div>
-          <div id="card-pubmed-wrap" style="display:none;"></div>
           <div style="padding:0 18px 8px;display:flex;justify-content:flex-end;align-items:center;">
             <button id="report-issue-btn" onclick="openReportIssue()" style="background:none;border:none;cursor:pointer;font-size:10px;font-weight:600;color:var(--text-faint);font-family:'JetBrains Mono',monospace;padding:2px 0;opacity:.5;transition:opacity .15s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='.5'">⚑ Report Issue</button>
           </div>
@@ -4739,9 +4738,6 @@ const FSRS_W=[0.4072,1.1829,3.1262,15.4722,7.2102,0.5316,1.0651,0.0589,1.5330,0.
 const DECAY=-0.5, FACTOR=Math.pow(0.9,1/DECAY)-1;
 const ST_NEW=0, ST_LRN=1, ST_REV=2, ST_RLN=3;
 const RT_AGAIN=1, RT_HARD=2, RT_GOOD=3, RT_EASY=4;
-
-// ── PubMed RAG Cache ──
-const _pubmedCache = {};
 
 // ── SETTINGS ────────────────────────────────────────────────────────
 const SETTINGS_KEY='bmd_settings_v3';
@@ -5635,8 +5631,6 @@ function shuffleOpts(card){
 
 // ── RENDER CARD ───────────────────────────────────────────────────────
 function renderCard(){
-  const _pwReset = document.getElementById('card-pubmed-wrap');
-  if(_pwReset){ _pwReset.style.display='none'; _pwReset.style.visibility='hidden'; _pwReset.innerHTML=''; }
   revealed=false;
   _cardStartTime = Date.now(); // track response time
   // Remove Attending block from previous card
@@ -6404,30 +6398,6 @@ function revealAnswer(sel,card){
     }
   }
 
-  // PubMed Sources
-  const _pw = document.getElementById('card-pubmed-wrap');
-  if(_pw){
-    if(card.pubmed_query){
-      _pw.style.display = ''; _pw.style.visibility = 'visible';
-      const _pa = document.createElement('div');
-      _pa.style.cssText = 'padding:0 18px 14px;';
-      const _pl = document.createElement('div');
-      _pl.style.cssText = 'font-size:9px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-faint);font-family:JetBrains Mono,monospace;margin-bottom:10px;';
-      _pl.textContent = 'PUBMED SOURCES';
-      const _pc = document.createElement('div');
-      _pc.id = 'card-pubmed-articles';
-      _pc.style.cssText = 'border:1px solid var(--border);border-radius:8px;overflow:hidden;background:var(--surface2);';
-      _pc.innerHTML = '<div style="padding:10px 14px;font-size:11px;color:var(--text-faint);display:flex;align-items:center;gap:8px;"><div style="width:10px;height:10px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0;"></div>Searching PubMed...</div>';
-      _pa.appendChild(_pl);
-      _pa.appendChild(_pc);
-      _pw.innerHTML = '';
-      _pw.appendChild(_pa);
-      setTimeout(() => fetchCardPubmed(card), 300);
-    } else {
-      _pw.style.display = 'none';
-    }
-  }
-
   // Response distribution
   renderResponseDist(card, sel);
 
@@ -6441,60 +6411,8 @@ function revealAnswer(sel,card){
   if(rb) rb.classList.add('visible');
   if(rb2) rb2.classList.add('visible');
 
-  
-
-
-async function prefetchPubmedAbstracts(card){
-  const query = card.pubmed_query || (card.topic ? card.topic + ' ' + (card.subject||'') : null);
-  if(!query || _pubmedCache[card.id]) return;
-  _pubmedCache[card.id] = { status: 'loading', articles: [], abstracts: [] };
-  try {
-    const sr = await fetch('https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed&term='+encodeURIComponent(query.trim())+'&retmax=3&sort=relevance&retmode=json');
-    const sd = await sr.json();
-    const ids = sd.esearchresult?.idlist || [];
-    if(!ids.length){ _pubmedCache[card.id].status = 'empty'; return; }
-
-    // Fetch summaries
-    const smr = await fetch('https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=pubmed&id='+ids.join(',')+'&retmode=json');
-    const smd = await smr.json();
-    const articles = (smd.result?.uids||[]).map(uid => {
-      const a = smd.result[uid];
-      return { uid, title: a.title||'', journal: a.source||'', year: a.pubdate?.substring(0,4)||'', authors: (a.authors?.slice(0,3).map(x=>x.name).join(', ')||'')+(a.authors?.length>3?' et al.':'') };
-    });
-
-    // Fetch abstracts
-    const abstracts = [];
-    for(const art of articles){
-      try {
-        const ar = await fetch('https://corsproxy.io/?url='+encodeURIComponent('https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=pubmed&id='+art.uid+'&rettype=abstract&retmode=text'));
-        const txt = await ar.text();
-        let abstractStr2 = '';
-        const txtLines = txt.split('\n');
-        let inAbstract = false;
-        for(const line of txtLines){
-          if(line.match(/^AB\s+-\s*/)){
-            inAbstract = true;
-            abstractStr2 += line.replace(/^AB\s+-\s*/,'') + ' ';
-          } else if(inAbstract){
-            if(line.match(/^[A-Z]{2,4}\s+-/) || line.match(/^PMID-/)) break;
-            abstractStr2 += line.trim() + ' ';
-          }
-        }
-        abstractStr2 = abstractStr2.trim();
-        const match = abstractStr2 ? [null, abstractStr2] : null;
-        const abstract = match ? match[1].replace(/\n\s+/g,' ').trim().slice(0,600) : '';
-        abstracts.push({ ...art, abstract });
-      } catch(e){ abstracts.push({ ...art, abstract: '' }); }
-    }
-
-    _pubmedCache[card.id] = { status: 'ready', articles, abstracts };
-  } catch(e){ _pubmedCache[card.id] = { status: 'error', articles: [], abstracts: [] }; }
-}
-
   // ── BoardMD Attending — inject inline after answer revealed ──
   injectAttendingInline(card, sel);
-  // Pre-fetch PubMed abstracts in background while student reads answer
-  if(card.pubmed_query || card.topic) setTimeout(() => prefetchPubmedAbstracts(card), 500);
 
   // Update FSRS intervals display — sync both nav elements
   const ivs=getIntervals(getState(card.id));
@@ -8655,7 +8573,7 @@ async function loadCardsFromSupabase(){
   while(true){
     const { data, error, count } = await _supa
       .from('cards')
-      .select('id,deck,system,topic,subject,qid,q,c,w,e,kp,d,img,pubmed_query', { count: total === null ? 'exact' : undefined })
+      .select('id,deck,system,topic,subject,qid,q,c,w,e,kp,d,img', { count: total === null ? 'exact' : undefined })
       .range(from, from + PAGE - 1);
 
     if(error){ console.error('Supabase error:', error); break; }
@@ -8712,7 +8630,7 @@ async function backgroundRefreshCards(cachedCount){
       while(true){
         const { data, error: e2 } = await _supa
           .from('cards')
-          .select('id,deck,system,topic,subject,qid,q,c,w,e,kp,d,img,pubmed_query')
+          .select('id,deck,system,topic,subject,qid,q,c,w,e,kp,d,img')
           .range(from, from + PAGE - 1);
         if(e2 || !data || data.length === 0) break;
         allCards.push(...data);
@@ -9088,10 +9006,10 @@ TOPIC: ${card.topic||''} | SYSTEM: ${card.system||''}
 EXPLANATION: ${(card.e||'').replace(/<[^>]+>/g,' ').slice(0,300)}`;
 
   const prompts = {
-    why: `You are a brilliant, warm attending physician. The student just answered this USMLE board question:\n\n${ctx}\n\nIn 2-3 paragraphs: acknowledge right/wrong (one sentence). Explain WHY this is the correct answer using core pathophysiology. Be direct, clinical — like a great attending, not a textbook. End with one punchy clinical pearl.\n\nFinally, on a new line, write exactly: PUBMED_QUERY: [6-8 specific medical terms for PubMed search relevant to this answer]`,
-    explain: `You are a brilliant attending. The student wants deeper understanding:\n\n${ctx}\n\nTeach this concept at the whiteboard. One vivid analogy. Cover: pathophysiology, clinical clues, board trap. 3 paragraphs max.\n\nFinally, on a new line, write exactly: PUBMED_QUERY: [6-8 specific medical terms for PubMed search relevant to this concept]`,
+    why: `You are a brilliant, warm attending physician. The student just answered this USMLE board question:\n\n${ctx}\n\nIn 2-3 paragraphs: acknowledge right/wrong (one sentence). Explain WHY this is the correct answer using core pathophysiology. Be direct, clinical — like a great attending, not a textbook. End with one punchy clinical pearl.`,
+    explain: `You are a brilliant attending. The student wants deeper understanding:\n\n${ctx}\n\nTeach this concept at the whiteboard. One vivid analogy. Cover: pathophysiology, clinical clues, board trap. 3 paragraphs max.`,
     mcq: `You are a brilliant USMLE question writer. Based on this topic:\n\n${ctx}\n\nWrite 3 new USMLE-style MCQs on the SAME concept. Return ONLY valid JSON, no markdown, no extra text:\n{"questions":[{"stem":"[clinical vignette]","options":["A. text","B. text","C. text","D. text"],"correct":"A","explanation":"[2-3 sentences why A is correct]","distractors":{"B":"[why B is wrong]","C":"[why C is wrong]","D":"[why D is wrong]"},"keypoint":"[one punchy ≤15 word board pearl]"},{"stem":"[vignette]","options":["A. text","B. text","C. text","D. text"],"correct":"B","explanation":"[2-3 sentences]","distractors":{"A":"[why wrong]","C":"[why wrong]","D":"[why wrong]"},"keypoint":"[≤15 word pearl]"},{"stem":"[vignette]","options":["A. text","B. text","C. text","D. text"],"correct":"C","explanation":"[2-3 sentences]","distractors":{"A":"[why wrong]","B":"[why wrong]","D":"[why wrong]"},"keypoint":"[≤15 word pearl]"}]}`,
-    surprise: `You are a brilliant attending. Give ONE unforgettable clinical pearl about:\n\n${ctx}\n\nSomething NOT in the explanation — a real-world connection, classic trick, or board trap. 2 paragraphs max. Be vivid.\n\nFinally, on a new line, write exactly: PUBMED_QUERY: [6-8 specific medical terms for PubMed search relevant to this pearl]`,
+    surprise: `You are a brilliant attending. Give ONE unforgettable clinical pearl about:\n\n${ctx}\n\nSomething NOT in the explanation — a real-world connection, classic trick, or board trap. 2 paragraphs max. Be vivid.`,
     custom: `You are a brilliant attending physician. The student has a question about this USMLE topic:\n\n${ctx}\n\nStudent question: "${document.getElementById('att-ask-input')?.value||''}"\n\nAnswer clearly and clinically in 2-3 paragraphs. Focus on what's relevant for USMLE boards.`,
     translate: `Translate the following medical flashcard content to Brazilian Portuguese. Keep medical terms accurate. Return ONLY the translation in this exact format:\n\nQUESTÃO: [translated question]\nA. [option] B. [option] C. [option] D. [option]\nRESPOSTA CORRETA: [translated answer]\nEXPLICAÇÃO: [translated explanation]\nPONTO-CHAVE: [translated key point]\n\nContent to translate:\nQUESTION: ${card.q}\nOPTIONS: ${(card.w||[]).map((o,i)=>String.fromCharCode(65+i)+'. '+o).join(' ')}\nCORRECT ANSWER: ${card.c}\nEXPLANATION: ${(card.e||'').replace(/<[^>]+>/g,' ').slice(0,500)}\nKEY POINT: ${(card.kp||'')}`,
   };
@@ -9105,18 +9023,7 @@ EXPLANATION: ${(card.e||'').replace(/<[^>]+>/g,' ').slice(0,300)}`;
   try {
     let responseText = '';
     if(typeof puter !== 'undefined' && puter.ai){
-      // ── RAG: inject PubMed abstracts as context if available ──
-      let ragContext = '';
-      const cached = _pubmedCache[card.id];
-      if(cached && cached.status === 'ready' && cached.abstracts.length > 0){
-        ragContext = '\n\nRELEVANT PRIMARY LITERATURE (ONLY sources you may cite):\n';
-        cached.abstracts.forEach((a,i) => {
-          if(a.abstract) ragContext += `\n[${i+1}] ${a.title} — ${a.journal} ${a.year}\nAbstract: ${a.abstract}\n`;
-        });
-        ragContext += `\n\nCITATION RULES — ABSOLUTE:\n1. You MUST cite the provided articles inline using [1] [2] [3] wherever relevant in your response.\n2. NEVER write PMID numbers directly in the text.\n3. NEVER cite any article, author, or study not listed above.\n4. NEVER invent references.\n5. At the very end of your response, on a new line, write ONLY: CITED:[1] CITED:[2] etc for each number you used inline. Example: CITED:[1] CITED:[3]\n6. If truly none are relevant, write CITED:[] at the end.`;
-      }
-      const finalPrompt = prompts[type] + ragContext;
-      const response = await puter.ai.chat(finalPrompt, { model: 'gemini-2.0-flash' });
+      const response = await puter.ai.chat(prompts[type], { model: 'gemini-2.0-flash' });
       responseText = typeof response === 'string' ? response
         : (response?.message?.content || response?.text || JSON.stringify(response));
     } else {
@@ -9137,21 +9044,9 @@ EXPLANATION: ${(card.e||'').replace(/<[^>]+>/g,' ').slice(0,300)}`;
       }
     }
 
-    // Extract PUBMED_QUERY if present
-    let pubmedQuery = null;
-    const pubmedMatch = responseText.match(/PUBMED_QUERY:\s*(.+)/);
-    if(pubmedMatch){
-      pubmedQuery = pubmedMatch[1].trim();
-      responseText = responseText.replace(/PUBMED_QUERY:\s*.+/, '').trim();
-    }
-
-    // Remove marcadores CITED: do texto visivel
-    responseText = responseText.replace(/CITED:\[\d*\]/g, '').replace(/CITED:/g, '').trim();
-
     const formatted = responseText
       .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
       .replace(/\*(.*?)\*/g, '<em>$1</em>')
-      .replace(/\[(\d+)\]/g, '<sup style="color:#8b5cf6;font-size:10px;cursor:pointer;">[$1]</sup>')
       .replace(/\n\n/g, '</p><p>')
       .replace(/\n/g, '<br>');
 
@@ -9159,34 +9054,7 @@ EXPLANATION: ${(card.e||'').replace(/<[^>]+>/g,' ').slice(0,300)}`;
       <div class="att-response-msg">
         <div class="att-response-label">${typeLabels[type]}</div>
         <div class="att-response-text"><p>${formatted}</p></div>
-      </div>
-      ${pubmedQuery ? `<div id="att-pubmed-section" style="margin-top:10px;">
-        <div style="padding:6px 12px 8px;font-family:monospace;font-size:10px;color:#8b5cf6;opacity:0.7;letter-spacing:0.06em;border-bottom:1px solid var(--border);">PUBMED SOURCES</div>
-        <div id="att-pubmed-results" style="border:1px solid rgba(99,102,241,0.2);border-radius:8px;background:var(--surface2);overflow:hidden;">
-          <div style="padding:12px 14px;font-family:monospace;font-size:11px;color:var(--text-faint);display:flex;align-items:center;gap:8px;">
-            <div style="width:10px;height:10px;border:2px solid var(--border);border-top-color:#8b5cf6;border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0;"></div>
-            Searching PubMed...
-          </div>
-        </div>
-      </div>` : ''}`;
-
-    // Renderiza referencias reais — nunca inventa
-    const _cached = _pubmedCache[card.id];
-    // Remove marcadores CITED: do texto visivel
-    responseText = responseText.replace(/CITED:\[\d*\]/g, '').replace(/CITED:/g, '').trim();
-
-    if(_cached && _cached.status === 'ready' && _cached.articles.length > 0){
-      // Extrai indices citados pelo Gemini
-      const _citedRaw = formatted.match(/CITED:\[(\d+)\]/g) || [];
-      const _citedIdxs = [...new Set(_citedRaw.map(m => parseInt(m.match(/\d+/)[0]) - 1))];
-      const _toShow = _citedIdxs.length > 0
-        ? _citedIdxs.map(i => _cached.articles[i]).filter(Boolean)
-        : _cached.articles;
-      if(_toShow.length > 0) setTimeout(() => renderAttPubmedArticles(_toShow), 100);
-    } else if(pubmedQuery || card.pubmed_query || card.topic){
-      const _q = pubmedQuery || card.pubmed_query || (card.topic + ' ' + (card.subject||''));
-      setTimeout(() => fetchAttPubmed(_q.trim()), 100);
-    }
+      </div>`;
 
     // no counting during beta
 
@@ -9479,6 +9347,230 @@ function checkAttMCQ(qi, chosen){
     <div style="font-size:12px;color:var(--text);line-height:1.6;font-family:'Inter',sans-serif;">${explanation}</div>
     ${distractorHtml}
     ${kpHtml}`;
+}
+function fetchAttPubmed(query){
+  const results = document.getElementById('att-pubmed-results');
+  if(!results) return;
+  fetch('https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed&term='+encodeURIComponent(query)+'&retmax=3&sort=relevance&retmode=json')
+    .then(r=>r.json()).then(sd=>{
+      const ids = sd.esearchresult?.idlist||[];
+      if(!ids.length){ results.innerHTML='<div style="padding:12px 14px;font-size:11px;color:var(--text-faint);">No articles found.</div>'; return; }
+      return fetch('https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=pubmed&id='+ids.join(',')+'&retmode=json')
+        .then(r=>r.json()).then(rd=>{
+          let html = '<div style="padding:6px 12px;font-family:monospace;font-size:10px;color:#8b5cf6;opacity:0.5;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;border-bottom:1px solid var(--border);">query: '+query+'</div>';
+          (rd.result?.uids||[]).forEach(uid=>{
+            const a=rd.result[uid];
+            const title=(a.title||'Untitled').replace(/</g,'&lt;');
+            const journal=a.source||'';
+            const year=a.pubdate?.substring(0,4)||'';
+            html+=`<div onclick="window.open('https://pubmed.ncbi.nlm.nih.gov/`+uid+`/','_blank')" style="padding:11px 13px;border-bottom:1px solid var(--border);cursor:pointer;transition:background 0.12s;" onmouseover="this.style.background='rgba(99,102,241,0.05)'" onmouseout="this.style.background=''">
+              <div style="font-size:12px;color:var(--text);font-weight:500;line-height:1.4;margin-bottom:4px;">`+title+`</div>
+              <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+                <span style="font-family:monospace;font-size:10px;color:#8b5cf6;opacity:0.8;">`+journal+`</span>
+                <span style="font-family:monospace;font-size:10px;color:var(--text-faint);">`+year+`</span>
+                <span style="font-family:monospace;font-size:10px;color:var(--text-faint);background:var(--surface);border:1px solid var(--border);padding:1px 5px;border-radius:3px;margin-left:auto;">PMID `+uid+`</span>
+              </div>
+            </div>`;
+          });
+          html+='<div style="padding:8px 13px;font-family:monospace;font-size:10px;color:var(--text-faint);border-top:1px solid var(--border);">NCBI PubMed — National Library of Medicine</div>';
+          results.innerHTML=html;
+        });
+    }).catch(()=>{ results.innerHTML='<div style="padding:12px 14px;font-size:11px;color:var(--text-faint);">Could not connect to PubMed.</div>'; });
+}
+
+function renderAttPubmedArticles(articles){
+  const results = document.getElementById('att-pubmed-results');
+  if(!results) return;
+  let html = '';
+  articles.forEach((a,i) => {
+    const title = (a.title||'').replace(/</g,'&lt;');
+    const safeUid = a.uid;
+    html += `<div onclick="openAttAbstract('`+safeUid+`')" style="padding:11px 13px;border-bottom:1px solid var(--border);cursor:pointer;transition:background 0.12s;" onmouseover="this.style.background='rgba(99,102,241,0.05)'" onmouseout="this.style.background=''">
+      <div style="font-size:12px;color:var(--text);font-weight:500;line-height:1.4;margin-bottom:4px;">`+title+`</div>
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+        <span style="font-family:monospace;font-size:10px;color:#8b5cf6;opacity:0.8;">`+a.journal+`</span>
+        <span style="font-family:monospace;font-size:10px;color:var(--text-faint);">`+a.year+`</span>
+        <span style="font-family:monospace;font-size:10px;color:var(--text-faint);background:var(--surface);border:1px solid var(--border);padding:1px 5px;border-radius:3px;margin-left:auto;">PMID `+a.uid+`</span>
+      </div>
+      <div style="margin-top:4px;font-family:monospace;font-size:9px;color:#8b5cf6;opacity:0.5;letter-spacing:0.06em;">TAP TO READ ABSTRACT</div>
+    </div>`;
+  });
+  html += '<div style="padding:8px 13px;font-family:monospace;font-size:10px;color:var(--text-faint);border-top:1px solid var(--border);">NCBI PubMed — National Library of Medicine</div>';
+  results.innerHTML = html;
+  // Store articles for modal
+  window._attPubmedArticles = articles;
+}
+
+function openAttAbstract(uid){
+  const articles = window._attPubmedArticles || [];
+  const art = articles.find(a => a.uid === uid) || { uid, title:'', journal:'', year:'', authors:'' };
+
+  // Create modal if not exists
+  let modal = document.getElementById('att-abstract-modal');
+  if(!modal){
+    modal = document.createElement('div');
+    modal.id = 'att-abstract-modal';
+    modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:9999;display:flex;align-items:flex-end;justify-content:center;backdrop-filter:blur(4px);';
+    modal.onclick = e => { if(e.target===modal) closeAttAbstract(); };
+    document.body.appendChild(modal);
+  }
+
+  modal.innerHTML = `
+    <div style="width:100%;max-width:680px;background:var(--surface);border:1px solid var(--border);border-bottom:none;border-radius:16px 16px 0 0;max-height:80vh;display:flex;flex-direction:column;">
+      <div style="padding:20px 20px 0;">
+        <div style="width:36px;height:3px;background:var(--border);border-radius:2px;margin:0 auto 18px;"></div>
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:10px;">
+          <div style="flex:1;">
+            <div style="font-size:13px;font-weight:600;color:var(--text);line-height:1.45;margin-bottom:8px;">${art.title||'Loading...'}</div>
+            <div style="display:flex;flex-wrap:wrap;gap:8px;">
+              <span style="font-family:monospace;font-size:10px;color:#8b5cf6;opacity:0.8;">${art.journal}</span>
+              <span style="font-family:monospace;font-size:10px;color:var(--text-faint);">${art.year}</span>
+              <span style="font-family:monospace;font-size:10px;color:var(--text-faint);background:var(--surface2);border:1px solid var(--border);padding:1px 6px;border-radius:3px;">PMID ${uid}</span>
+            </div>
+            ${art.authors ? `<div style="font-size:11px;color:var(--text-faint);margin-top:5px;">${art.authors}</div>` : ''}
+          </div>
+          <button onclick="closeAttAbstract()" style="background:transparent;border:none;cursor:pointer;color:var(--text-faint);font-size:20px;line-height:1;padding:4px;flex-shrink:0;">×</button>
+        </div>
+        <div style="height:1px;background:var(--border);"></div>
+      </div>
+      <div id="att-abstract-body" style="padding:16px 20px;overflow-y:auto;flex:1;">
+        <div style="display:flex;align-items:center;gap:10px;font-family:monospace;font-size:11px;color:var(--text-faint);">
+          <div style="width:12px;height:12px;border:2px solid var(--border);border-top-color:#8b5cf6;border-radius:50%;animation:spin .7s linear infinite;"></div>
+          Loading abstract...
+        </div>
+      </div>
+      <div style="padding:14px 20px 36px;border-top:1px solid var(--border);display:flex;gap:10px;">
+        <button onclick="closeAttAbstract()" style="flex:1;padding:11px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--text-faint);font-family:monospace;font-size:11px;cursor:pointer;">Close</button>
+        <a href="https://pubmed.ncbi.nlm.nih.gov/${uid}/" target="_blank" rel="noopener" style="flex:2;padding:11px;border-radius:8px;border:1px solid rgba(99,102,241,0.3);background:rgba(99,102,241,0.08);color:#8b5cf6;font-family:monospace;font-size:11px;cursor:pointer;text-align:center;text-decoration:none;font-weight:600;display:flex;align-items:center;justify-content:center;gap:6px;">
+          Open Full Article on PubMed <span style="font-size:10px;">↗</span>
+        </a>
+      </div>
+    </div>`;
+
+  modal.style.display = 'flex';
+
+  // Check cache first
+  const cached = _pubmedCache;
+  let abstractText = null;
+  for(const cardId in cached){
+    const entry = cached[cardId];
+    if(entry.abstracts){
+      const found = entry.abstracts.find(a => a.uid === uid);
+      if(found && found.abstract){ abstractText = found.abstract; break; }
+    }
+  }
+
+  if(abstractText){
+    document.getElementById('att-abstract-body').innerHTML = `<div style="font-size:13px;color:var(--text-dim);line-height:1.8;">${abstractText}</div>`;
+  } else {
+    // Abstract via Supabase Edge Function — sem CORS
+    fetch('https://hwdcgbcnphkmxaasties.supabase.co/functions/v1/pubmed-abstract', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ pmid: uid })
+    })
+      .then(r=>r.json()).then(data=>{
+        const body = document.getElementById('att-abstract-body');
+        if(body) body.innerHTML = data.abstract
+          ? `<div style="font-size:13px;color:var(--text-dim);line-height:1.8;">${data.abstract}</div>`
+          : '<div style="font-size:12px;color:var(--text-faint);">Abstract not available for this article.</div>';
+      }).catch(()=>{
+        const body = document.getElementById('att-abstract-body');
+        if(body) body.innerHTML = '<div style="font-size:12px;color:var(--text-faint);">Could not load abstract.</div>';
+      });
+  }
+}
+
+function closeAttAbstract(){
+  const modal = document.getElementById('att-abstract-modal');
+  if(modal) modal.style.display = 'none';
+}
+
+function fetchCardPubmed(card){
+  const container = document.getElementById('card-pubmed-articles');
+  if(!container) return;
+  const query = card.pubmed_query;
+  if(!query) return;
+  fetch('https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed&term='+encodeURIComponent(query)+'&retmax=3&sort=relevance&retmode=json')
+    .then(function(r){ return r.json(); })
+    .then(function(sd){
+      const ids = sd.esearchresult ? sd.esearchresult.idlist||[] : [];
+      if(!ids.length){
+        container.innerHTML = '<div style="padding:10px 14px;font-size:11px;color:var(--text-faint);">No articles found.</div>';
+        return;
+      }
+      return fetch('https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=pubmed&id='+ids.join(',')+' &retmode=json')
+        .then(function(r){ return r.json(); })
+        .then(function(rd){
+          const uids = rd.result && rd.result.uids ? rd.result.uids : [];
+          window._cardPubmedArticles = uids.map(function(uid){
+            const a = rd.result[uid];
+            const authors = a.authors ? a.authors.slice(0,3).map(function(x){ return x.name; }).join(', ') + (a.authors.length>3?' et al.':'') : '';
+            return { uid:uid, title:a.title||'', journal:a.source||'', year:a.pubdate?a.pubdate.substring(0,4):'', authors:authors };
+          });
+          let html = '';
+          uids.forEach(function(uid){
+            const a = rd.result[uid];
+            const title = (a.title||'').replace(/</g,'&lt;');
+            const journal = a.source||'';
+            const year = a.pubdate ? a.pubdate.substring(0,4) : '';
+            html += '<div onclick="openCardAbstract(\'' + uid + '\')" style="padding:11px 13px;border-bottom:1px solid var(--border);cursor:pointer;" onmouseover="this.style.background=\'rgba(79,142,247,.06)\'" onmouseout="this.style.background=\'\'"><div style="font-size:12px;color:var(--text);font-weight:500;line-height:1.4;margin-bottom:4px;">' + title + '</div><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;"><span style="font-family:JetBrains Mono,monospace;font-size:10px;color:var(--accent);opacity:.8;">' + journal + '</span><span style="font-family:JetBrains Mono,monospace;font-size:10px;color:var(--text-faint);">' + year + '</span><span style="font-family:JetBrains Mono,monospace;font-size:10px;color:var(--text-faint);background:var(--surface);border:1px solid var(--border);padding:1px 5px;border-radius:3px;margin-left:auto;">PMID ' + uid + '</span></div><div style="margin-top:4px;font-size:9px;color:var(--accent);opacity:.5;letter-spacing:.06em;">TAP TO READ ABSTRACT</div></div>';
+          });
+          html += '<div style="padding:7px 13px;font-size:10px;color:var(--text-faint);border-top:1px solid var(--border);">NCBI PubMed — National Library of Medicine</div>';
+          container.innerHTML = html;
+        });
+    })
+    .catch(function(){ container.innerHTML = '<div style="padding:10px 14px;font-size:11px;color:var(--text-faint);">Could not connect to PubMed.</div>'; });
+}
+
+function openCardAbstract(uid){
+  const articles = window._cardPubmedArticles || [];
+  const art = articles.find(function(a){ return a.uid === uid; }) || { uid:uid, title:'', journal:'', year:'', authors:'' };
+  let modal = document.getElementById('card-abstract-modal');
+  if(!modal){
+    modal = document.createElement('div');
+    modal.id = 'card-abstract-modal';
+    modal.setAttribute('style','position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:9999;display:flex;align-items:flex-end;justify-content:center;backdrop-filter:blur(4px);');
+    modal.addEventListener('click', function(e){ if(e.target===modal) closeCardAbstract(); });
+    document.body.appendChild(modal);
+  }
+  const inner = document.createElement('div');
+  inner.setAttribute('style','width:100%;max-width:680px;background:var(--surface);border:1px solid var(--border);border-bottom:none;border-radius:16px 16px 0 0;max-height:80vh;display:flex;flex-direction:column;');
+  const handle = document.createElement('div');
+  handle.setAttribute('style','width:36px;height:3px;background:var(--border);border-radius:2px;margin:18px auto 0;');
+  const titleEl = document.createElement('div');
+  titleEl.setAttribute('style','padding:14px 20px 0;');
+  titleEl.innerHTML = '<div style="font-size:13px;font-weight:600;color:var(--text);line-height:1.45;margin-bottom:8px;">' + art.title + '</div><div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px;"><span style="font-size:10px;color:var(--accent);opacity:.8;">' + art.journal + '</span><span style="font-size:10px;color:var(--text-faint);">' + art.year + '</span><span style="font-size:10px;color:var(--text-faint);background:var(--surface2);border:1px solid var(--border);padding:1px 6px;border-radius:3px;">PMID ' + uid + '</span></div>' + (art.authors ? '<div style="font-size:11px;color:var(--text-faint);margin-bottom:8px;">' + art.authors + '</div>' : '') + '<div style="height:1px;background:var(--border);"></div>';
+  const body = document.createElement('div');
+  body.id = 'card-abstract-body';
+  body.setAttribute('style','padding:16px 20px;overflow-y:auto;flex:1;');
+  body.innerHTML = '<div style="display:flex;align-items:center;gap:10px;font-size:11px;color:var(--text-faint);"><div style="width:12px;height:12px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;"></div>Loading abstract...</div>';
+  const footer = document.createElement('div');
+  footer.setAttribute('style','padding:14px 20px 36px;border-top:1px solid var(--border);display:flex;gap:10px;');
+  footer.innerHTML = '<button onclick="closeCardAbstract()" style="flex:1;padding:11px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--text-faint);font-size:11px;cursor:pointer;">Close</button><a href="https://pubmed.ncbi.nlm.nih.gov/' + uid + '/" target="_blank" rel="noopener" style="flex:2;padding:11px;border-radius:8px;border:1px solid rgba(79,142,247,.3);background:rgba(79,142,247,.08);color:var(--accent);font-size:11px;cursor:pointer;text-align:center;text-decoration:none;font-weight:600;display:flex;align-items:center;justify-content:center;gap:6px;">Open Full Article on PubMed <span style="font-size:10px;">&#x2197;</span></a>';
+  inner.appendChild(handle);
+  inner.appendChild(titleEl);
+  inner.appendChild(body);
+  inner.appendChild(footer);
+  modal.innerHTML = '';
+  modal.appendChild(inner);
+  modal.style.display = 'flex';
+  fetch('https://hwdcgbcnphkmxaasties.supabase.co/functions/v1/pubmed-abstract', {
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({pmid:uid})
+  }).then(function(r){ return r.json(); }).then(function(data){
+    const b = document.getElementById('card-abstract-body');
+    if(b) b.innerHTML = data.abstract ? '<div style="font-size:13px;color:var(--text-dim);line-height:1.8;">' + data.abstract + '</div>' : '<div style="font-size:12px;color:var(--text-faint);">Abstract not available.</div>';
+  }).catch(function(){
+    const b = document.getElementById('card-abstract-body');
+    if(b) b.innerHTML = '<div style="font-size:12px;color:var(--text-faint);">Could not load abstract.</div>';
+  });
+}
+
+function closeCardAbstract(){
+  const modal = document.getElementById('card-abstract-modal');
+  if(modal) modal.style.display = 'none';
 }
 document.addEventListener('click', function(e){
   const btn = e.target.closest('.opt-btn');
@@ -11314,231 +11406,6 @@ function selectProfileStep(step) {
       btn.style.color = 'var(--muted)';
     }
   });
-}
-
-function fetchAttPubmed(query){
-  const results = document.getElementById('att-pubmed-results');
-  if(!results) return;
-  fetch('https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed&term='+encodeURIComponent(query)+'&retmax=3&sort=relevance&retmode=json')
-    .then(r=>r.json()).then(sd=>{
-      const ids = sd.esearchresult?.idlist||[];
-      if(!ids.length){ results.innerHTML='<div style="padding:12px 14px;font-size:11px;color:var(--text-faint);">No articles found.</div>'; return; }
-      return fetch('https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=pubmed&id='+ids.join(',')+'&retmode=json')
-        .then(r=>r.json()).then(rd=>{
-          let html = '<div style="padding:6px 12px;font-family:monospace;font-size:10px;color:#8b5cf6;opacity:0.5;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;border-bottom:1px solid var(--border);">query: '+query+'</div>';
-          (rd.result?.uids||[]).forEach(uid=>{
-            const a=rd.result[uid];
-            const title=(a.title||'Untitled').replace(/</g,'&lt;');
-            const journal=a.source||'';
-            const year=a.pubdate?.substring(0,4)||'';
-            html+=`<div onclick="window.open('https://pubmed.ncbi.nlm.nih.gov/`+uid+`/','_blank')" style="padding:11px 13px;border-bottom:1px solid var(--border);cursor:pointer;transition:background 0.12s;" onmouseover="this.style.background='rgba(99,102,241,0.05)'" onmouseout="this.style.background=''">
-              <div style="font-size:12px;color:var(--text);font-weight:500;line-height:1.4;margin-bottom:4px;">`+title+`</div>
-              <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
-                <span style="font-family:monospace;font-size:10px;color:#8b5cf6;opacity:0.8;">`+journal+`</span>
-                <span style="font-family:monospace;font-size:10px;color:var(--text-faint);">`+year+`</span>
-                <span style="font-family:monospace;font-size:10px;color:var(--text-faint);background:var(--surface);border:1px solid var(--border);padding:1px 5px;border-radius:3px;margin-left:auto;">PMID `+uid+`</span>
-              </div>
-            </div>`;
-          });
-          html+='<div style="padding:8px 13px;font-family:monospace;font-size:10px;color:var(--text-faint);border-top:1px solid var(--border);">NCBI PubMed — National Library of Medicine</div>';
-          results.innerHTML=html;
-        });
-    }).catch(()=>{ results.innerHTML='<div style="padding:12px 14px;font-size:11px;color:var(--text-faint);">Could not connect to PubMed.</div>'; });
-}
-
-function renderAttPubmedArticles(articles){
-  const results = document.getElementById('att-pubmed-results');
-  if(!results) return;
-  let html = '';
-  articles.forEach((a,i) => {
-    const title = (a.title||'').replace(/</g,'&lt;');
-    const safeUid = a.uid;
-    html += `<div onclick="openAttAbstract('`+safeUid+`')" style="padding:11px 13px;border-bottom:1px solid var(--border);cursor:pointer;transition:background 0.12s;" onmouseover="this.style.background='rgba(99,102,241,0.05)'" onmouseout="this.style.background=''">
-      <div style="font-size:12px;color:var(--text);font-weight:500;line-height:1.4;margin-bottom:4px;">`+title+`</div>
-      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
-        <span style="font-family:monospace;font-size:10px;color:#8b5cf6;opacity:0.8;">`+a.journal+`</span>
-        <span style="font-family:monospace;font-size:10px;color:var(--text-faint);">`+a.year+`</span>
-        <span style="font-family:monospace;font-size:10px;color:var(--text-faint);background:var(--surface);border:1px solid var(--border);padding:1px 5px;border-radius:3px;margin-left:auto;">PMID `+a.uid+`</span>
-      </div>
-      <div style="margin-top:4px;font-family:monospace;font-size:9px;color:#8b5cf6;opacity:0.5;letter-spacing:0.06em;">TAP TO READ ABSTRACT</div>
-    </div>`;
-  });
-  html += '<div style="padding:8px 13px;font-family:monospace;font-size:10px;color:var(--text-faint);border-top:1px solid var(--border);">NCBI PubMed — National Library of Medicine</div>';
-  results.innerHTML = html;
-  // Store articles for modal
-  window._attPubmedArticles = articles;
-}
-
-function openAttAbstract(uid){
-  const articles = window._attPubmedArticles || [];
-  const art = articles.find(a => a.uid === uid) || { uid, title:'', journal:'', year:'', authors:'' };
-
-  // Create modal if not exists
-  let modal = document.getElementById('att-abstract-modal');
-  if(!modal){
-    modal = document.createElement('div');
-    modal.id = 'att-abstract-modal';
-    modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:9999;display:flex;align-items:flex-end;justify-content:center;backdrop-filter:blur(4px);';
-    modal.onclick = e => { if(e.target===modal) closeAttAbstract(); };
-    document.body.appendChild(modal);
-  }
-
-  modal.innerHTML = `
-    <div style="width:100%;max-width:680px;background:var(--surface);border:1px solid var(--border);border-bottom:none;border-radius:16px 16px 0 0;max-height:80vh;display:flex;flex-direction:column;">
-      <div style="padding:20px 20px 0;">
-        <div style="width:36px;height:3px;background:var(--border);border-radius:2px;margin:0 auto 18px;"></div>
-        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:10px;">
-          <div style="flex:1;">
-            <div style="font-size:13px;font-weight:600;color:var(--text);line-height:1.45;margin-bottom:8px;">${art.title||'Loading...'}</div>
-            <div style="display:flex;flex-wrap:wrap;gap:8px;">
-              <span style="font-family:monospace;font-size:10px;color:#8b5cf6;opacity:0.8;">${art.journal}</span>
-              <span style="font-family:monospace;font-size:10px;color:var(--text-faint);">${art.year}</span>
-              <span style="font-family:monospace;font-size:10px;color:var(--text-faint);background:var(--surface2);border:1px solid var(--border);padding:1px 6px;border-radius:3px;">PMID ${uid}</span>
-            </div>
-            ${art.authors ? `<div style="font-size:11px;color:var(--text-faint);margin-top:5px;">${art.authors}</div>` : ''}
-          </div>
-          <button onclick="closeAttAbstract()" style="background:transparent;border:none;cursor:pointer;color:var(--text-faint);font-size:20px;line-height:1;padding:4px;flex-shrink:0;">×</button>
-        </div>
-        <div style="height:1px;background:var(--border);"></div>
-      </div>
-      <div id="att-abstract-body" style="padding:16px 20px;overflow-y:auto;flex:1;">
-        <div style="display:flex;align-items:center;gap:10px;font-family:monospace;font-size:11px;color:var(--text-faint);">
-          <div style="width:12px;height:12px;border:2px solid var(--border);border-top-color:#8b5cf6;border-radius:50%;animation:spin .7s linear infinite;"></div>
-          Loading abstract...
-        </div>
-      </div>
-      <div style="padding:14px 20px 36px;border-top:1px solid var(--border);display:flex;gap:10px;">
-        <button onclick="closeAttAbstract()" style="flex:1;padding:11px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--text-faint);font-family:monospace;font-size:11px;cursor:pointer;">Close</button>
-        <a href="https://pubmed.ncbi.nlm.nih.gov/${uid}/" target="_blank" rel="noopener" style="flex:2;padding:11px;border-radius:8px;border:1px solid rgba(99,102,241,0.3);background:rgba(99,102,241,0.08);color:#8b5cf6;font-family:monospace;font-size:11px;cursor:pointer;text-align:center;text-decoration:none;font-weight:600;display:flex;align-items:center;justify-content:center;gap:6px;">
-          Open Full Article on PubMed <span style="font-size:10px;">↗</span>
-        </a>
-      </div>
-    </div>`;
-
-  modal.style.display = 'flex';
-
-  // Check cache first
-  const cached = _pubmedCache;
-  let abstractText = null;
-  for(const cardId in cached){
-    const entry = cached[cardId];
-    if(entry.abstracts){
-      const found = entry.abstracts.find(a => a.uid === uid);
-      if(found && found.abstract){ abstractText = found.abstract; break; }
-    }
-  }
-
-  if(abstractText){
-    document.getElementById('att-abstract-body').innerHTML = `<div style="font-size:13px;color:var(--text-dim);line-height:1.8;">${abstractText}</div>`;
-  } else {
-    // Abstract via Supabase Edge Function — sem CORS
-    fetch('https://hwdcgbcnphkmxaasties.supabase.co/functions/v1/pubmed-abstract', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ pmid: uid })
-    })
-      .then(r=>r.json()).then(data=>{
-        const body = document.getElementById('att-abstract-body');
-        if(body) body.innerHTML = data.abstract
-          ? `<div style="font-size:13px;color:var(--text-dim);line-height:1.8;">${data.abstract}</div>`
-          : '<div style="font-size:12px;color:var(--text-faint);">Abstract not available for this article.</div>';
-      }).catch(()=>{
-        const body = document.getElementById('att-abstract-body');
-        if(body) body.innerHTML = '<div style="font-size:12px;color:var(--text-faint);">Could not load abstract.</div>';
-      });
-  }
-}
-
-function closeAttAbstract(){
-  const modal = document.getElementById('att-abstract-modal');
-  if(modal) modal.style.display = 'none';
-}
-
-function fetchCardPubmed(card){
-  const container = document.getElementById('card-pubmed-articles');
-  if(!container) return;
-  const query = card.pubmed_query;
-  if(!query) return;
-  fetch('https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed&term='+encodeURIComponent(query)+'&retmax=3&sort=relevance&retmode=json')
-    .then(function(r){ return r.json(); })
-    .then(function(sd){
-      const ids = sd.esearchresult ? sd.esearchresult.idlist||[] : [];
-      if(!ids.length){
-        container.innerHTML = '<div style="padding:10px 14px;font-size:11px;color:var(--text-faint);">No articles found.</div>';
-        return;
-      }
-      return fetch('https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=pubmed&id='+ids.join(',')+' &retmode=json')
-        .then(function(r){ return r.json(); })
-        .then(function(rd){
-          const uids = rd.result && rd.result.uids ? rd.result.uids : [];
-          window._cardPubmedArticles = uids.map(function(uid){
-            const a = rd.result[uid];
-            const authors = a.authors ? a.authors.slice(0,3).map(function(x){ return x.name; }).join(', ') + (a.authors.length>3?' et al.':'') : '';
-            return { uid:uid, title:a.title||'', journal:a.source||'', year:a.pubdate?a.pubdate.substring(0,4):'', authors:authors };
-          });
-          let html = '';
-          uids.forEach(function(uid){
-            const a = rd.result[uid];
-            const title = (a.title||'').replace(/</g,'&lt;');
-            const journal = a.source||'';
-            const year = a.pubdate ? a.pubdate.substring(0,4) : '';
-            html += '<div onclick="openCardAbstract(\'' + uid + '\')" style="padding:11px 13px;border-bottom:1px solid var(--border);cursor:pointer;" onmouseover="this.style.background=\'rgba(79,142,247,.06)\'" onmouseout="this.style.background=\'\'"><div style="font-size:12px;color:var(--text);font-weight:500;line-height:1.4;margin-bottom:4px;">' + title + '</div><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;"><span style="font-family:JetBrains Mono,monospace;font-size:10px;color:var(--accent);opacity:.8;">' + journal + '</span><span style="font-family:JetBrains Mono,monospace;font-size:10px;color:var(--text-faint);">' + year + '</span><span style="font-family:JetBrains Mono,monospace;font-size:10px;color:var(--text-faint);background:var(--surface);border:1px solid var(--border);padding:1px 5px;border-radius:3px;margin-left:auto;">PMID ' + uid + '</span></div><div style="margin-top:4px;font-size:9px;color:var(--accent);opacity:.5;letter-spacing:.06em;">TAP TO READ ABSTRACT</div></div>';
-          });
-          html += '<div style="padding:7px 13px;font-size:10px;color:var(--text-faint);border-top:1px solid var(--border);">NCBI PubMed — National Library of Medicine</div>';
-          container.innerHTML = html;
-        });
-    })
-    .catch(function(){ container.innerHTML = '<div style="padding:10px 14px;font-size:11px;color:var(--text-faint);">Could not connect to PubMed.</div>'; });
-}
-
-function openCardAbstract(uid){
-  const articles = window._cardPubmedArticles || [];
-  const art = articles.find(function(a){ return a.uid === uid; }) || { uid:uid, title:'', journal:'', year:'', authors:'' };
-  let modal = document.getElementById('card-abstract-modal');
-  if(!modal){
-    modal = document.createElement('div');
-    modal.id = 'card-abstract-modal';
-    modal.setAttribute('style','position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:9999;display:flex;align-items:flex-end;justify-content:center;backdrop-filter:blur(4px);');
-    modal.addEventListener('click', function(e){ if(e.target===modal) closeCardAbstract(); });
-    document.body.appendChild(modal);
-  }
-  const inner = document.createElement('div');
-  inner.setAttribute('style','width:100%;max-width:680px;background:var(--surface);border:1px solid var(--border);border-bottom:none;border-radius:16px 16px 0 0;max-height:80vh;display:flex;flex-direction:column;');
-  const handle = document.createElement('div');
-  handle.setAttribute('style','width:36px;height:3px;background:var(--border);border-radius:2px;margin:18px auto 0;');
-  const titleEl = document.createElement('div');
-  titleEl.setAttribute('style','padding:14px 20px 0;');
-  titleEl.innerHTML = '<div style="font-size:13px;font-weight:600;color:var(--text);line-height:1.45;margin-bottom:8px;">' + art.title + '</div><div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px;"><span style="font-size:10px;color:var(--accent);opacity:.8;">' + art.journal + '</span><span style="font-size:10px;color:var(--text-faint);">' + art.year + '</span><span style="font-size:10px;color:var(--text-faint);background:var(--surface2);border:1px solid var(--border);padding:1px 6px;border-radius:3px;">PMID ' + uid + '</span></div>' + (art.authors ? '<div style="font-size:11px;color:var(--text-faint);margin-bottom:8px;">' + art.authors + '</div>' : '') + '<div style="height:1px;background:var(--border);"></div>';
-  const body = document.createElement('div');
-  body.id = 'card-abstract-body';
-  body.setAttribute('style','padding:16px 20px;overflow-y:auto;flex:1;');
-  body.innerHTML = '<div style="display:flex;align-items:center;gap:10px;font-size:11px;color:var(--text-faint);"><div style="width:12px;height:12px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;"></div>Loading abstract...</div>';
-  const footer = document.createElement('div');
-  footer.setAttribute('style','padding:14px 20px 36px;border-top:1px solid var(--border);display:flex;gap:10px;');
-  footer.innerHTML = '<button onclick="closeCardAbstract()" style="flex:1;padding:11px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--text-faint);font-size:11px;cursor:pointer;">Close</button><a href="https://pubmed.ncbi.nlm.nih.gov/' + uid + '/" target="_blank" rel="noopener" style="flex:2;padding:11px;border-radius:8px;border:1px solid rgba(79,142,247,.3);background:rgba(79,142,247,.08);color:var(--accent);font-size:11px;cursor:pointer;text-align:center;text-decoration:none;font-weight:600;display:flex;align-items:center;justify-content:center;gap:6px;">Open Full Article on PubMed <span style="font-size:10px;">&#x2197;</span></a>';
-  inner.appendChild(handle);
-  inner.appendChild(titleEl);
-  inner.appendChild(body);
-  inner.appendChild(footer);
-  modal.innerHTML = '';
-  modal.appendChild(inner);
-  modal.style.display = 'flex';
-  fetch('https://hwdcgbcnphkmxaasties.supabase.co/functions/v1/pubmed-abstract', {
-    method:'POST',
-    headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({pmid:uid})
-  }).then(function(r){ return r.json(); }).then(function(data){
-    const b = document.getElementById('card-abstract-body');
-    if(b) b.innerHTML = data.abstract ? '<div style="font-size:13px;color:var(--text-dim);line-height:1.8;">' + data.abstract + '</div>' : '<div style="font-size:12px;color:var(--text-faint);">Abstract not available.</div>';
-  }).catch(function(){
-    const b = document.getElementById('card-abstract-body');
-    if(b) b.innerHTML = '<div style="font-size:12px;color:var(--text-faint);">Could not load abstract.</div>';
-  });
-}
-
-function closeCardAbstract(){
-  const modal = document.getElementById('card-abstract-modal');
-  if(modal) modal.style.display = 'none';
 }
 </script>
 
