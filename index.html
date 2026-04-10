@@ -1080,7 +1080,7 @@ html.light .att-btn{background:var(--surface2);}
 .expand-row{background:var(--surface);border:1px solid var(--border2);border-radius:12px;margin-bottom:8px;overflow:hidden;}
 .expand-header{padding:12px 14px;display:flex;align-items:center;gap:12px;cursor:pointer;}
 .expand-chevron{width:16px;height:16px;stroke:#8892b0;fill:none;stroke-width:2;stroke-linecap:round;flex-shrink:0;transition:transform .2s;margin-left:4px;}
-.expand-body{display:none;}
+.expand-/* removed stray body rule */
 .expand-body.open{display:block;}
 .expand-chevron.open{transform:rotate(180deg);}.expand-body{display:none !important;}.expand-body.open{display:block !important;}
 .subdeck{padding:10px 14px 10px 56px;display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .12s;}
@@ -6444,12 +6444,6 @@ function revealAnswer(sel,card){
   
 
 
-  // ── BoardMD Attending — inject inline after answer revealed ──
-  injectAttendingInline(card, sel);
-  // Pre-fetch PubMed abstracts in background while student reads answer
-  if(card.pubmed_query || card.topic) setTimeout(() => prefetchPubmedAbstracts(card), 500);
-}
-
 async function prefetchPubmedAbstracts(card){
   const query = card.pubmed_query || (card.topic ? card.topic + ' ' + (card.subject||'') : null);
   if(!query || _pubmedCache[card.id]) return;
@@ -6497,6 +6491,10 @@ async function prefetchPubmedAbstracts(card){
   } catch(e){ _pubmedCache[card.id] = { status: 'error', articles: [], abstracts: [] }; }
 }
 
+  // ── BoardMD Attending — inject inline after answer revealed ──
+  injectAttendingInline(card, sel);
+  // Pre-fetch PubMed abstracts in background while student reads answer
+  if(card.pubmed_query || card.topic) setTimeout(() => prefetchPubmedAbstracts(card), 500);
 
   // Update FSRS intervals display — sync both nav elements
   const ivs=getIntervals(getState(card.id));
@@ -6517,6 +6515,7 @@ async function prefetchPubmedAbstracts(card){
   if(i1b) i1b.textContent=ivs.hard.label;
   if(i2b) i2b.textContent=ivs.good.label;
   if(i3b) i3b.textContent=ivs.easy.label;
+}
 
 function rate(r){
   const full=[...deck,...againQueue];
@@ -6884,8 +6883,6 @@ function downloadDeck(deckId,name){
   a.click();
 }
 
-
-} // close revealAnswer
 
 // ── STEP SELECTOR ────────────────────────────────────────────
 
@@ -8316,7 +8313,7 @@ function showEditsManager(){
         <button class="qid-close" onclick="document.getElementById('edits-manager-overlay').remove()">✕</button>
       </div>
       <div style="overflow-y:auto;flex:1;">${rows}</div>
-      <div style="padding:16px 24px;border-top:1px solid var(--border);display:flex;gap:10px;border-radius:0 0 16px 16px;">
+      <div style="padding:16px 24px;border-top:1px solid var(--border);display:flex;gap:10px;">
         <button onclick="exportCardEdits()" style="background:var(--accent);color:#fff;border:none;border-radius:9px;padding:10px 22px;font-family:'Lato',sans-serif;font-size:13px;font-weight:700;cursor:pointer;">
           Export JSON for BoardMD team
         </button>
@@ -11380,13 +11377,13 @@ function openAttAbstract(uid){
   if(!modal){
     modal = document.createElement('div');
     modal.id = 'att-abstract-modal';
-    modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:9999;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px);';
+    modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:9999;display:flex;align-items:flex-end;justify-content:center;backdrop-filter:blur(4px);';
     modal.onclick = e => { if(e.target===modal) closeAttAbstract(); };
     document.body.appendChild(modal);
   }
 
   modal.innerHTML = `
-    <div style="width:min(860px,95vw);background:var(--surface);border:1px solid var(--border);border-radius:16px;max-height:88vh;display:flex;flex-direction:column;">
+    <div style="width:100%;max-width:680px;background:var(--surface);border:1px solid var(--border);border-bottom:none;border-radius:16px 16px 0 0;max-height:80vh;display:flex;flex-direction:column;">
       <div style="padding:20px 20px 0;">
         <div style="width:36px;height:3px;background:var(--border);border-radius:2px;margin:0 auto 18px;"></div>
         <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:10px;">
@@ -11409,7 +11406,7 @@ function openAttAbstract(uid){
           Loading abstract...
         </div>
       </div>
-      <div style="padding:14px 20px 36px;border-top:1px solid var(--border);display:flex;gap:10px;border-radius:0 0 16px 16px;">
+      <div style="padding:14px 20px 36px;border-top:1px solid var(--border);display:flex;gap:10px;">
         <button onclick="closeAttAbstract()" style="flex:1;padding:11px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--text-faint);font-family:monospace;font-size:11px;cursor:pointer;">Close</button>
         <a href="https://pubmed.ncbi.nlm.nih.gov/${uid}/" target="_blank" rel="noopener" style="flex:2;padding:11px;border-radius:8px;border:1px solid rgba(99,102,241,0.3);background:rgba(99,102,241,0.08);color:#8b5cf6;font-family:monospace;font-size:11px;cursor:pointer;text-align:center;text-decoration:none;font-weight:600;display:flex;align-items:center;justify-content:center;gap:6px;">
           Open Full Article on PubMed <span style="font-size:10px;">↗</span>
@@ -11500,7 +11497,7 @@ function openCardAbstract(uid){
   if(!modal){
     modal = document.createElement('div');
     modal.id = 'card-abstract-modal';
-    modal.setAttribute('style','position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:9999;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px);');
+    modal.setAttribute('style','position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:9999;display:flex;align-items:flex-end;justify-content:center;backdrop-filter:blur(4px);');
     modal.addEventListener('click', function(e){ if(e.target===modal) closeCardAbstract(); });
     document.body.appendChild(modal);
   }
@@ -11516,7 +11513,7 @@ function openCardAbstract(uid){
   body.setAttribute('style','padding:16px 20px;overflow-y:auto;flex:1;');
   body.innerHTML = '<div style="display:flex;align-items:center;gap:10px;font-size:11px;color:var(--text-faint);"><div style="width:12px;height:12px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;"></div>Loading abstract...</div>';
   const footer = document.createElement('div');
-  footer.setAttribute('style','padding:14px 20px 36px;border-top:1px solid var(--border);display:flex;gap:10px;border-radius:0 0 16px 16px;');
+  footer.setAttribute('style','padding:14px 20px 36px;border-top:1px solid var(--border);display:flex;gap:10px;');
   footer.innerHTML = '<button onclick="closeCardAbstract()" style="flex:1;padding:11px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--text-faint);font-size:11px;cursor:pointer;">Close</button><a href="https://pubmed.ncbi.nlm.nih.gov/' + uid + '/" target="_blank" rel="noopener" style="flex:2;padding:11px;border-radius:8px;border:1px solid rgba(79,142,247,.3);background:rgba(79,142,247,.08);color:var(--accent);font-size:11px;cursor:pointer;text-align:center;text-decoration:none;font-weight:600;display:flex;align-items:center;justify-content:center;gap:6px;">Open Full Article on PubMed <span style="font-size:10px;">&#x2197;</span></a>';
   inner.appendChild(handle);
   inner.appendChild(titleEl);
@@ -11558,7 +11555,7 @@ html.dark .hl-btn-active { border-color:#fff!important; }
 
 
 <!-- SEARCH PICKER MODAL -->
-<div id="search-picker-overlay" style="display:none;position:fixed;inset:0;z-index:3000;background:rgba(0,0,0,.5);backdrop-filter:blur(6px);align-items:center;justify-content:center;" onclick="if(event.target===this)closeSearchPicker()">
+<div id="search-picker-overlay" style="display:none;position:fixed;inset:0;z-index:3000;background:rgba(0,0,0,.5);backdrop-filter:blur(6px);align-items:flex-end;justify-content:center;" onclick="if(event.target===this)closeSearchPicker()">
   <div style="background:var(--surface);border-radius:20px 20px 0 0;padding:24px 20px 36px;width:100%;max-width:480px;animation:slideUp .22s cubic-bezier(.34,1.2,.64,1)">
     <div style="width:36px;height:4px;background:var(--border2);border-radius:2px;margin:0 auto 20px;"></div>
     <div style="font-size:13px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--muted);margin-bottom:14px;font-family:'Sora',sans-serif;">Search cards by</div>
