@@ -6444,6 +6444,33 @@ function revealAnswer(sel,card){
   
 
 
+
+  // ── BoardMD Attending — inject inline after answer revealed ──
+  injectAttendingInline(card, sel);
+  // Pre-fetch PubMed abstracts in background while student reads answer
+  if(card.pubmed_query || card.topic) setTimeout(() => prefetchPubmedAbstracts(card), 500);
+
+  // Update FSRS intervals display — sync both nav elements
+  const ivs=getIntervals(getState(card.id));
+  const i0=document.getElementById('int0');
+  const i1=document.getElementById('int1');
+  const i2=document.getElementById('int2');
+  const i3=document.getElementById('int3');
+  if(i0) i0.textContent=ivs.again.label;
+  if(i1) i1.textContent=ivs.hard.label;
+  if(i2) i2.textContent=ivs.good.label;
+  if(i3) i3.textContent=ivs.easy.label;
+  // Sync second nav
+  const i0b=document.getElementById('int0-b');
+  const i1b=document.getElementById('int1-b');
+  const i2b=document.getElementById('int2-b');
+  const i3b=document.getElementById('int3-b');
+  if(i0b) i0b.textContent=ivs.again.label;
+  if(i1b) i1b.textContent=ivs.hard.label;
+  if(i2b) i2b.textContent=ivs.good.label;
+  if(i3b) i3b.textContent=ivs.easy.label;
+}
+}
 async function prefetchPubmedAbstracts(card){
   const query = card.pubmed_query || (card.topic ? card.topic + ' ' + (card.subject||'') : null);
   if(!query || _pubmedCache[card.id]) return;
@@ -6489,32 +6516,6 @@ async function prefetchPubmedAbstracts(card){
 
     _pubmedCache[card.id] = { status: 'ready', articles, abstracts };
   } catch(e){ _pubmedCache[card.id] = { status: 'error', articles: [], abstracts: [] }; }
-}
-
-  // ── BoardMD Attending — inject inline after answer revealed ──
-  injectAttendingInline(card, sel);
-  // Pre-fetch PubMed abstracts in background while student reads answer
-  if(card.pubmed_query || card.topic) setTimeout(() => prefetchPubmedAbstracts(card), 500);
-
-  // Update FSRS intervals display — sync both nav elements
-  const ivs=getIntervals(getState(card.id));
-  const i0=document.getElementById('int0');
-  const i1=document.getElementById('int1');
-  const i2=document.getElementById('int2');
-  const i3=document.getElementById('int3');
-  if(i0) i0.textContent=ivs.again.label;
-  if(i1) i1.textContent=ivs.hard.label;
-  if(i2) i2.textContent=ivs.good.label;
-  if(i3) i3.textContent=ivs.easy.label;
-  // Sync second nav
-  const i0b=document.getElementById('int0-b');
-  const i1b=document.getElementById('int1-b');
-  const i2b=document.getElementById('int2-b');
-  const i3b=document.getElementById('int3-b');
-  if(i0b) i0b.textContent=ivs.again.label;
-  if(i1b) i1b.textContent=ivs.hard.label;
-  if(i2b) i2b.textContent=ivs.good.label;
-  if(i3b) i3b.textContent=ivs.easy.label;
 }
 
 function rate(r){
