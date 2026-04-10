@@ -6884,11 +6884,12 @@ function downloadDeck(deckId,name){
 }
 
 
+} // close revealAnswer
+
 // ── STEP SELECTOR ────────────────────────────────────────────
 
 
 
-}
 document.addEventListener('keydown',e=>{
   if(document.getElementById('app').classList.contains('active')){
     if(['a','b','c','d'].includes(e.key.toLowerCase())&&!revealed){
