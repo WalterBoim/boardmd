@@ -4433,6 +4433,7 @@ html.light .qs-val { color: inherit; }
             </div>
           </div>
           <div id="key-point-wrap" style="display:none;padding:0 18px 14px;"></div>
+          <div id="card-pubmed-wrap" style="display:none;"></div>
           <div style="padding:0 18px 8px;display:flex;justify-content:flex-end;align-items:center;">
             <button id="report-issue-btn" onclick="openReportIssue()" style="background:none;border:none;cursor:pointer;font-size:10px;font-weight:600;color:var(--text-faint);font-family:'JetBrains Mono',monospace;padding:2px 0;opacity:.5;transition:opacity .15s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='.5'">⚑ Report Issue</button>
           </div>
@@ -5636,6 +5637,9 @@ function renderCard(){
   // Remove Attending block from previous card
   const oldAtt = document.getElementById('att-inline-wrap');
   if(oldAtt) oldAtt.remove();
+  // Reset inline PubMed wrap
+  const _pwReset = document.getElementById('card-pubmed-wrap');
+  if(_pwReset){ _pwReset.style.display='none'; _pwReset.style.visibility='hidden'; _pwReset.innerHTML=''; }
   // Hide FSRS buttons until answer revealed
   const _fsrs=document.getElementById('fsrs-nav');
   const _fsrs2=document.getElementById('fsrs-nav-2');
