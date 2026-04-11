@@ -9185,6 +9185,10 @@ async function loadFsrsFromSupabase(){
   // Dispara o app
   window.cardsLoaded = true;
   if(window.pendingInit) window.pendingInit();
+  // Ensure deck-home is shown after cards load
+  if(document.getElementById('app').classList.contains('active')){
+    if(typeof window.showDeckHome === 'function') window.showDeckHome();
+  }
 
   (function(){
     try {
@@ -10281,6 +10285,7 @@ function bmdDashSync() {
     if(dh) dh.classList.add('active');
     if(fb) fb.style.display = 'none';
     if(al) al.style.display = 'none';
+    document.getElementById('app').classList.remove('bmd-studying');
     if(typeof clearLrnTimers === 'function') clearLrnTimers();
     // dashboard header: show .hdr + .streak-bar + #bmd-step-tabs
     const hdr = document.querySelector('.app-header .hdr');
