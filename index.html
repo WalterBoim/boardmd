@@ -9054,10 +9054,11 @@ function injectAttendingInline(card, sel){
   // Insere no study-inner, entre o card e os botões FSRS
   const studyInner = document.getElementById('study-inner');
   if(studyInner){
-    // Procura o plain-nav ou fsrs-nav como referência
-    const plainNav = studyInner.querySelector('#plain-nav');
-    const fsrsNav  = studyInner.querySelector('#fsrs-nav');
-    const ref = plainNav || fsrsNav;
+    const ref = studyInner.querySelector('#plain-nav')
+             || studyInner.querySelector('#fsrs-nav')
+             || studyInner.querySelector('#fsrs-nav-2')
+             || studyInner.querySelector('.fsrs-nav')
+             || studyInner.querySelector('.plain-nav');
     if(ref){
       studyInner.insertBefore(wrap, ref);
     } else {
