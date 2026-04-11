@@ -8639,20 +8639,8 @@ function buildDecks(allCards){
 
 // ── LOAD ALL CARDS FROM SUPABASE ─────────────────────────────────────
 async function loadCardsFromSupabase(){
-  // ── CACHE HIT: instant load, no overlay ──
-  const cached = getCachedCards();
-  if(cached && cached.length > 0){
-    console.log(`BoardMD: ${cached.length} cards from cache (instant)`);
-    buildDecks(cached);
-    // Apply saved theme immediately (no overlay to wait for)
-    if(window._bmdSavedTheme === 'light'){
-      document.documentElement.classList.add('light');
-    }
-    updateThemeIcons();
-    // Background refresh once per day — silent, user never sees it
-    setTimeout(() => backgroundRefreshCards(cached.length), 3000);
-    return cached.length;
-  }
+  // Cache desabilitado — sempre carrega do Supabase (localStorage nao suporta 42k cards)
+  console.log('BoardMD: carregando cards do Supabase...');
 
   // ── CACHE MISS: show splash, load from Supabase ──
   showLoadingOverlay();
@@ -8683,8 +8671,6 @@ async function loadCardsFromSupabase(){
   }
 
   buildDecks(allCards);
-  setCachedCards(allCards);
-
   console.log(`BoardMD: ${allCards.length} cards loaded from Supabase`);
   hideLoadingOverlay();
   return allCards.length;
