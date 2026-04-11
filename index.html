@@ -6727,7 +6727,12 @@ function closeSettings(){document.getElementById('settings-overlay').style.displ
 function parseSteps(str){return str.split(/[\s,]+/).map(Number).filter(n=>n>0&&n<1440)||[10];}
 function saveSettingsModal(){
   // Garante que currentDeck tem settings inicializados
-  const dk = currentDeck && currentDeck!=='_search' ? currentDeck : (currentStep==='s1'?'s1':'boardmd_s2');
+  let dk = currentDeck && currentDeck!=='_search' ? currentDeck : null;
+  if(!dk){
+    if(currentStep==='s1') dk='boardmd_s1';
+    else if(currentStep==='shelf') dk='shelf_em';
+    else dk='boardmd_s2';
+  }
   if(!deckSettings[dk]) deckSettings[dk]={...DEFAULT_SETTINGS};
   const c=deckSettings[dk];
   const _npd=parseInt(document.getElementById('cfg-newPerDay').value,10); c.newPerDay=isNaN(_npd)?20:Math.max(0,_npd);
@@ -8862,6 +8867,23 @@ async function loadFsrsFromSupabase(){
   // Dispara o app
   window.cardsLoaded = true;
   if(window.pendingInit) window.pendingInit();
+
+  (function(){
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const qidParam = params.get('qid');
+      if(qidParam){
+        setTimeout(function(){
+          const textarea = document.getElementById('qid-textarea');
+          if(textarea){
+            textarea.value = qidParam;
+            openQidFilter();
+            setTimeout(function(){ searchQids(); }, 200);
+          }
+        }, 500);
+      }
+    } catch(e){}
+  })();
 
   // Register Service Worker for PWA
   if('serviceWorker' in navigator){
@@ -11558,8 +11580,8 @@ html.dark .hl-btn-active { border-color:#fff!important; }
 
 
 <!-- SEARCH PICKER MODAL -->
-<div id="search-picker-overlay" style="display:none;position:fixed;inset:0;z-index:3000;background:rgba(0,0,0,.5);backdrop-filter:blur(6px);align-items:flex-end;justify-content:center;" onclick="if(event.target===this)closeSearchPicker()">
-  <div style="background:var(--surface);border-radius:20px 20px 0 0;padding:24px 20px 36px;width:100%;max-width:480px;animation:slideUp .22s cubic-bezier(.34,1.2,.64,1)">
+<div id="search-picker-overlay" style="display:none;position:fixed;inset:0;z-index:3000;background:rgba(0,0,0,.5);backdrop-filter:blur(6px);align-items:center;justify-content:center;" onclick="if(event.target===this)closeSearchPicker()">
+  <div style="background:var(--surface);border-radius:16px;padding:24px 20px 36px;width:min(480px,95vw);max-width:480px;animation:slideUp .22s cubic-bezier(.34,1.2,.64,1)">
     <div style="width:36px;height:4px;background:var(--border2);border-radius:2px;margin:0 auto 20px;"></div>
     <div style="font-size:13px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--muted);margin-bottom:14px;font-family:'Sora',sans-serif;">Search cards by</div>
     <div style="display:flex;flex-direction:column;gap:10px;">
