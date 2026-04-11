@@ -3469,7 +3469,7 @@ html.light .qs-val { color: inherit; }
   #bmd-split-divider {
     display: flex !important;
     flex-shrink: 0 !important;
-    width: 8px !important;
+    width: 16px !important;
     align-self: stretch !important;
     align-items: center !important;
     justify-content: center !important;
@@ -3477,22 +3477,25 @@ html.light .qs-val { color: inherit; }
     position: relative !important;
     background: transparent !important;
     user-select: none !important;
-    z-index: 5 !important;
+    -webkit-user-select: none !important;
+    z-index: 10 !important;
+    touch-action: none !important;
   }
   #bmd-split-divider::before {
     content: '';
     position: absolute;
     top: 0; bottom: 0;
     left: 50%;
+    transform: translateX(-50%);
     width: 1px;
     background: var(--border);
     transition: width .15s, background .15s;
+    pointer-events: none;
   }
   #bmd-split-divider:hover::before,
   #bmd-split-divider.dragging::before {
     width: 3px;
     background: var(--accent);
-    left: calc(50% - 1px);
   }
   .bmd-div-handle {
     display: flex !important;
@@ -3504,11 +3507,15 @@ html.light .qs-val { color: inherit; }
     opacity: 0 !important;
     transition: opacity .15s !important;
     pointer-events: none !important;
+    background: var(--surface2) !important;
+    border: 1px solid var(--border2) !important;
+    border-radius: 8px !important;
+    padding: 6px 4px !important;
   }
   .bmd-div-handle span {
     display: block !important;
     width: 2px !important;
-    height: 12px !important;
+    height: 10px !important;
     border-radius: 2px !important;
     background: var(--muted) !important;
   }
@@ -9212,7 +9219,18 @@ function injectAttendingInline(card, sel){
 
   // Insere no study-inner, entre o card e os botões FSRS
   const studyInner = document.getElementById('study-inner');
-  if(studyInner){
+  // On desktop (≥900px), inject into right answer column
+  const ansCol = document.getElementById('bmd-ans-col');
+  if(ansCol && window.innerWidth >= 900){
+    // Insert before card-footer-counter inside ans-col, or append
+    const footerRef = ansCol.querySelector('.card-footer-counter');
+    if(footerRef){
+      ansCol.insertBefore(wrap, footerRef);
+    } else {
+      ansCol.appendChild(wrap);
+    }
+  } else if(studyInner){
+    // Mobile: insert before FSRS nav as before
     const ref = studyInner.querySelector('#plain-nav')
              || studyInner.querySelector('#fsrs-nav')
              || studyInner.querySelector('#fsrs-nav-2')
@@ -11926,88 +11944,87 @@ html.dark .hl-btn-active { border-color:#fff!important; }
 
 
 <script id="bmd-split-js">
-// ── BoardMD split-screen: reveal class + drag resize ──
+// ── BoardMD split-screen: reveal + drag ──
 (function(){
 
-  // --- has-answer class (patch after all scripts load) ---
+  // Patch revealAnswer + renderCard after window.load (all scripts settled)
   window.addEventListener('load', function(){
-    var _origReveal = window.revealAnswer;
+    var _oRev = window.revealAnswer;
     window.revealAnswer = function(sel, card){
-      var r = _origReveal ? _origReveal(sel, card) : undefined;
+      var r = _oRev ? _oRev(sel, card) : undefined;
       var ac = document.getElementById('bmd-ans-col');
       if(ac) ac.classList.add('has-answer');
       return r;
     };
-    var _origRender = window.renderCard;
+    var _oRen = window.renderCard;
     window.renderCard = function(){
       var ac = document.getElementById('bmd-ans-col');
       if(ac) ac.classList.remove('has-answer');
-      return _origRender ? _origRender() : undefined;
+      return _oRen ? _oRen() : undefined;
     };
   });
 
-  // --- drag resize ---
-  var dragging = false, startX = 0, startW = 0, rowW = 0;
+  // ── Drag state ──
+  var _drag = { on: false, x0: 0, w0: 0, rw: 0 };
 
-  document.addEventListener('mousemove', function(e){
-    if(!dragging) return;
-    var qCol = document.getElementById('bmd-q-col');
-    var colsRow = document.getElementById('bmd-cols-row');
-    if(!qCol || !colsRow) return;
-    var pct = ((startW + e.clientX - startX) / rowW) * 100;
-    qCol.style.width = Math.min(Math.max(pct, 25), 75) + '%';
+  window.addEventListener('mousemove', function(e){
+    if(!_drag.on) return;
+    var q = document.getElementById('bmd-q-col');
+    if(!q) return;
+    var pct = ((_drag.w0 + e.clientX - _drag.x0) / _drag.rw) * 100;
+    q.style.width = Math.min(Math.max(pct, 25), 75) + '%';
   });
 
-  document.addEventListener('mouseup', function(){
-    if(!dragging) return;
-    dragging = false;
-    var div = document.getElementById('bmd-split-divider');
-    if(div) div.classList.remove('dragging');
+  window.addEventListener('mouseup', function(){
+    if(!_drag.on) return;
+    _drag.on = false;
+    var d = document.getElementById('bmd-split-divider');
+    if(d) d.classList.remove('dragging');
+    document.documentElement.style.cursor = '';
+    document.documentElement.style.userSelect = '';
     document.body.style.cursor = '';
     document.body.style.userSelect = '';
-    var qCol = document.getElementById('bmd-q-col');
-    var colsRow = document.getElementById('bmd-cols-row');
-    if(qCol && colsRow){
-      localStorage.setItem('bmd_q_pct', ((qCol.offsetWidth / colsRow.offsetWidth)*100).toFixed(1));
-    }
+    var q = document.getElementById('bmd-q-col');
+    var r = document.getElementById('bmd-cols-row');
+    if(q && r) localStorage.setItem('bmd_q_pct', ((q.offsetWidth/r.offsetWidth)*100).toFixed(1));
   });
 
-  // Attach to divider — called once on DOMContentLoaded and re-called safe to repeat
-  function attachDivider(){
-    if(window.innerWidth < 900) return;
-    var divider = document.getElementById('bmd-split-divider');
-    var qCol    = document.getElementById('bmd-q-col');
-    if(!divider || !qCol || divider._dragAttached) return;
-    divider._dragAttached = true;
+  function setupDrag(){
+    var d = document.getElementById('bmd-split-divider');
+    var q = document.getElementById('bmd-q-col');
+    if(!d || !q) return;
+    if(d._ok) return;
+    d._ok = true;
 
-    // Restore saved width
     var saved = localStorage.getItem('bmd_q_pct');
-    if(saved) qCol.style.width = parseFloat(saved) + '%';
+    if(saved) q.style.width = parseFloat(saved) + '%';
 
-    divider.addEventListener('mousedown', function(e){
+    d.addEventListener('mousedown', function(e){
       if(window.innerWidth < 900) return;
       e.preventDefault();
       e.stopPropagation();
-      dragging = true;
-      startX = e.clientX;
-      var colsRow = document.getElementById('bmd-cols-row');
-      startW = qCol.offsetWidth;
-      rowW   = colsRow ? colsRow.offsetWidth : 800;
-      divider.classList.add('dragging');
+      var r = document.getElementById('bmd-cols-row');
+      _drag.on = true;
+      _drag.x0 = e.clientX;
+      _drag.w0 = q.offsetWidth;
+      _drag.rw = r ? r.offsetWidth : window.innerWidth * 0.9;
+      d.classList.add('dragging');
+      document.documentElement.style.cursor = 'col-resize';
+      document.documentElement.style.userSelect = 'none';
       document.body.style.cursor = 'col-resize';
       document.body.style.userSelect = 'none';
     });
 
-    divider.addEventListener('dblclick', function(){
-      qCol.style.width = '50%';
+    d.addEventListener('dblclick', function(){
+      q.style.width = '50%';
       localStorage.setItem('bmd_q_pct', '50.0');
     });
   }
 
-  document.addEventListener('DOMContentLoaded', attachDivider);
-  // Also try after a short delay in case DOM isn't ready
-  setTimeout(attachDivider, 1000);
-  setTimeout(attachDivider, 3000);
+  // Try multiple times to ensure divider is in DOM
+  [0, 500, 1500, 3000].forEach(function(t){
+    setTimeout(setupDrag, t);
+  });
 
 })();
 </script>
