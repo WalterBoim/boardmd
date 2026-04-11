@@ -6835,7 +6835,19 @@ function searchQids(){
       cards.forEach(card=>{
         const row=document.createElement('div');
         row.className='qid-result-row qid-result-found';
-        row.innerHTML=`<span class="qid-result-label">QID ${qid}</span><span class="qid-result-topic">${card.topic||card.system||'—'} <span style="opacity:.6;font-size:10px">[${card.deck}]</span></span><span style="color:var(--emerald)">✓</span>`;
+        row.style.cursor='pointer';
+        row.title='Click to study only this card';
+        row.innerHTML=`<span class="qid-result-label">QID ${qid}</span><span class="qid-result-topic">${card.topic||card.system||'—'} <span style="opacity:.6;font-size:10px">[${card.deck}]</span></span><span style="color:var(--emerald);font-size:10px;">Study ›</span>`;
+        row.onclick=(function(c){ return function(){
+          closeQidFilter();
+          currentDeck='_search';
+          deck=[c];
+          againQueue=[];idx=0;revealed=false;sessionRatings={};
+          document.getElementById('app').classList.add('active');
+          document.getElementById('landing').style.display='none';
+          hideDeckHome();
+          renderCard();
+        };})(card);
         resList.appendChild(row);
       });
     });
