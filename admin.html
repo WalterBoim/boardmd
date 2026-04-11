@@ -8,30 +8,12 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
 :root{
-  --bg:#f2f4fb;
-  --surface:#ffffff;
-  --surface2:#f7f8fc;
-  --border:#e4e8f0;
-  --border2:#d0d5e8;
-  --text:#0d1021;
-  --text-dim:#4a5068;
-  --text-faint:#8a91aa;
-  --accent:#4f8ef7;
-  --accent-dim:rgba(79,142,247,.1);
-  --red:#e53e3e;
-  --red-dim:rgba(229,62,62,.08);
-  --orange:#dd6b20;
-  --orange-dim:rgba(221,107,32,.08);
-  --yellow:#b7791f;
-  --yellow-dim:rgba(183,121,31,.08);
-  --green:#2f855a;
-  --green-dim:rgba(47,133,90,.08);
-  --purple:#553c9a;
-  --purple-dim:rgba(85,60,154,.08);
+  --bg:#f2f4fb;--surface:#ffffff;--surface2:#f7f8fc;--border:#e4e8f0;--border2:#d0d5e8;
+  --text:#0d1021;--text-dim:#4a5068;--text-faint:#8a91aa;--accent:#4f8ef7;--accent-dim:rgba(79,142,247,.1);
+  --red:#e53e3e;--red-dim:rgba(229,62,62,.08);--orange:#dd6b20;--orange-dim:rgba(221,107,32,.08);
+  --yellow:#b7791f;--yellow-dim:rgba(183,121,31,.08);--green:#2f855a;--green-dim:rgba(47,133,90,.08);
 }
 body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
-
-/* LOGIN */
 #login-screen{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:1000;}
 .login-box{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:40px;width:360px;text-align:center;}
 .login-logo{font-size:22px;font-weight:700;margin-bottom:4px;letter-spacing:-.5px;}
@@ -40,21 +22,12 @@ body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);min-he
 .login-box input{width:100%;padding:12px 16px;border:1px solid var(--border2);border-radius:10px;font-family:'Sora',sans-serif;font-size:13px;background:var(--surface2);color:var(--text);margin-bottom:12px;outline:none;}
 .login-box input:focus{border-color:var(--accent);}
 .login-btn{width:100%;padding:12px;background:var(--accent);color:#fff;border:none;border-radius:10px;font-family:'Sora',sans-serif;font-size:13px;font-weight:600;cursor:pointer;}
-.login-btn:hover{opacity:.9;}
 .login-err{font-size:11px;color:var(--red);margin-top:8px;display:none;}
-
-/* HEADER */
 header{background:var(--surface);border-bottom:1px solid var(--border);padding:0 32px;height:56px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
 .hdr-logo{font-size:16px;font-weight:700;letter-spacing:-.3px;}
 .hdr-logo span{color:var(--accent);}
 .hdr-badge{font-size:10px;background:var(--red-dim);color:var(--red);border:1px solid rgba(229,62,62,.2);padding:3px 8px;border-radius:5px;font-weight:600;margin-left:10px;}
-.hdr-right{display:flex;align-items:center;gap:12px;}
-.hdr-sync{font-size:11px;color:var(--text-faint);}
-
-/* MAIN */
 main{max-width:1200px;margin:0 auto;padding:28px 24px;}
-
-/* STATS ROW */
 .stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px;}
 .stat-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px 20px;}
 .stat-label{font-size:11px;color:var(--text-faint);font-weight:500;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;}
@@ -64,8 +37,6 @@ main{max-width:1200px;margin:0 auto;padding:28px 24px;}
 .s-err .stat-val{color:var(--red);}
 .s-contra .stat-val{color:var(--orange);}
 .s-out .stat-val{color:var(--yellow);}
-
-/* FILTERS */
 .filters{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px 20px;margin-bottom:20px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
 .filter-label{font-size:11px;color:var(--text-faint);font-weight:600;text-transform:uppercase;letter-spacing:.5px;}
 .filter-group{display:flex;gap:6px;flex-wrap:wrap;}
@@ -77,71 +48,47 @@ main{max-width:1200px;margin:0 auto;padding:28px 24px;}
 .chip.c-yellow.active{background:var(--yellow);border-color:var(--yellow);color:#fff;}
 .chip.c-green.active{background:var(--green);border-color:var(--green);color:#fff;}
 .filter-sep{width:1px;height:20px;background:var(--border);margin:0 4px;}
-
-/* CARDS LIST */
 .cards-list{display:flex;flex-direction:column;gap:12px;}
-
-/* CARD */
 .qa-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;overflow:hidden;transition:border-color .15s;}
-.qa-card:hover{border-color:var(--border2);}
 .qa-card.reviewed{opacity:.5;}
-
 .card-header{padding:16px 20px;display:flex;align-items:flex-start;gap:14px;cursor:pointer;}
 .card-status-badge{padding:3px 10px;border-radius:5px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;white-space:nowrap;flex-shrink:0;}
 .b-ERROR{background:var(--red-dim);color:var(--red);border:1px solid rgba(229,62,62,.2);}
 .b-CONTRADICTED{background:var(--orange-dim);color:var(--orange);border:1px solid rgba(221,107,32,.2);}
 .b-OUTDATED{background:var(--yellow-dim);color:var(--yellow);border:1px solid rgba(183,121,31,.2);}
 .b-OK{background:var(--green-dim);color:var(--green);border:1px solid rgba(47,133,90,.2);}
-
 .card-meta{flex:1;min-width:0;}
 .card-deck{font-size:10px;color:var(--text-faint);font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;}
 .card-question{font-size:13px;color:var(--text);font-weight:500;line-height:1.5;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .card-issue{font-size:11px;color:var(--text-dim);margin-top:4px;line-height:1.4;}
 .card-expand-btn{font-size:18px;color:var(--text-faint);padding:2px 6px;flex-shrink:0;transition:transform .2s;}
 .card-expand-btn.open{transform:rotate(180deg);}
-
 .card-body{border-top:1px solid var(--border);padding:20px;display:none;}
 .card-body.open{display:block;}
-
 .cb-section{margin-bottom:16px;}
 .cb-section:last-child{margin-bottom:0;}
 .cb-label{font-size:10px;color:var(--text-faint);font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;}
 .cb-text{font-size:13px;color:var(--text-dim);line-height:1.6;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:12px 14px;}
-
-.fix-box{position:relative;}
 .fix-textarea{width:100%;font-size:13px;color:var(--text);line-height:1.6;background:var(--surface2);border:1px solid var(--accent);border-radius:8px;padding:12px 14px;font-family:'Sora',sans-serif;resize:vertical;min-height:100px;outline:none;}
-.fix-textarea:focus{background:var(--surface);border-color:var(--accent);}
-
-.pmid-link{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--accent);text-decoration:none;background:var(--accent-dim);border:1px solid rgba(79,142,247,.2);padding:5px 12px;border-radius:6px;margin-top:8px;}
-.pmid-link:hover{opacity:.8;}
-
+.fix-textarea:focus{background:var(--surface);}
+.card-links{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;}
+.card-link{display:inline-flex;align-items:center;gap:5px;font-size:11px;color:var(--accent);text-decoration:none;background:var(--accent-dim);border:1px solid rgba(79,142,247,.2);padding:5px 10px;border-radius:6px;}
+.card-link:hover{opacity:.8;}
+.card-link.pmid{color:var(--green);background:var(--green-dim);border-color:rgba(47,133,90,.2);}
 .card-actions{display:flex;gap:8px;margin-top:16px;padding-top:16px;border-top:1px solid var(--border);}
 .btn-save{flex:2;padding:10px;background:var(--accent);color:#fff;border:none;border-radius:8px;font-family:'Sora',sans-serif;font-size:12px;font-weight:600;cursor:pointer;}
 .btn-save:hover{opacity:.9;}
 .btn-ok{flex:1;padding:10px;background:var(--green-dim);color:var(--green);border:1px solid rgba(47,133,90,.2);border-radius:8px;font-family:'Sora',sans-serif;font-size:12px;font-weight:600;cursor:pointer;}
-.btn-ok:hover{opacity:.8;}
 .btn-ignore{flex:1;padding:10px;background:var(--surface2);color:var(--text-faint);border:1px solid var(--border);border-radius:8px;font-family:'Sora',sans-serif;font-size:12px;font-weight:600;cursor:pointer;}
-.btn-ignore:hover{background:var(--border);}
-
 .empty-state{text-align:center;padding:60px 20px;color:var(--text-faint);}
-.empty-state p{font-size:14px;margin-top:8px;}
-
 .loading{text-align:center;padding:60px;color:var(--text-faint);font-size:13px;}
-
-/* TOAST */
 .toast{position:fixed;bottom:24px;right:24px;background:var(--text);color:#fff;padding:12px 20px;border-radius:10px;font-size:12px;font-weight:600;z-index:9999;opacity:0;transform:translateY(10px);transition:all .25s;pointer-events:none;}
 .toast.show{opacity:1;transform:translateY(0);}
-
-@media(max-width:768px){
-  .stats-row{grid-template-columns:repeat(2,1fr);}
-  main{padding:16px;}
-  header{padding:0 16px;}
-}
+@media(max-width:768px){.stats-row{grid-template-columns:repeat(2,1fr);}main{padding:16px;}header{padding:0 16px;}}
 </style>
 </head>
 <body>
 
-<!-- LOGIN -->
 <div id="login-screen">
   <div class="login-box">
     <div class="login-logo">Board<span>MD</span></div>
@@ -152,46 +99,25 @@ main{max-width:1200px;margin:0 auto;padding:28px 24px;}
   </div>
 </div>
 
-<!-- HEADER -->
 <header id="app-header" style="display:none;">
   <div style="display:flex;align-items:center;">
     <div class="hdr-logo">Board<span>MD</span></div>
     <span class="hdr-badge" id="flag-count-badge">...</span>
   </div>
-  <div class="hdr-right">
-    <span class="hdr-sync" id="sync-status">Loading...</span>
+  <div style="display:flex;align-items:center;gap:12px;">
+    <span style="font-size:11px;color:var(--text-faint);" id="sync-status">Loading...</span>
     <button onclick="loadData()" style="font-size:11px;padding:6px 12px;border:1px solid var(--border2);border-radius:6px;background:var(--surface2);cursor:pointer;font-family:'Sora',sans-serif;color:var(--text-dim);">Refresh</button>
   </div>
 </header>
 
-<!-- MAIN -->
 <main id="app-main" style="display:none;">
-
-  <!-- STATS -->
   <div class="stats-row">
-    <div class="stat-card s-ok">
-      <div class="stat-label">Approved</div>
-      <div class="stat-val" id="stat-ok">—</div>
-      <div class="stat-sub">cards reviewed OK</div>
-    </div>
-    <div class="stat-card s-err">
-      <div class="stat-label">Errors</div>
-      <div class="stat-val" id="stat-error">—</div>
-      <div class="stat-sub">factual errors</div>
-    </div>
-    <div class="stat-card s-contra">
-      <div class="stat-label">Contradicted</div>
-      <div class="stat-val" id="stat-contra">—</div>
-      <div class="stat-sub">conflicts with evidence</div>
-    </div>
-    <div class="stat-card s-out">
-      <div class="stat-label">Outdated</div>
-      <div class="stat-val" id="stat-out">—</div>
-      <div class="stat-sub">guideline changes</div>
-    </div>
+    <div class="stat-card s-ok"><div class="stat-label">Approved</div><div class="stat-val" id="stat-ok">—</div><div class="stat-sub">cards reviewed OK</div></div>
+    <div class="stat-card s-err"><div class="stat-label">Errors</div><div class="stat-val" id="stat-error">—</div><div class="stat-sub">factual errors</div></div>
+    <div class="stat-card s-contra"><div class="stat-label">Contradicted</div><div class="stat-val" id="stat-contra">—</div><div class="stat-sub">conflicts with evidence</div></div>
+    <div class="stat-card s-out"><div class="stat-label">Outdated</div><div class="stat-val" id="stat-out">—</div><div class="stat-sub">guideline changes</div></div>
   </div>
 
-  <!-- FILTERS -->
   <div class="filters">
     <span class="filter-label">Status</span>
     <div class="filter-group" id="status-filters">
@@ -214,27 +140,24 @@ main{max-width:1200px;margin:0 auto;padding:28px 24px;}
     </div>
   </div>
 
-  <!-- CARDS -->
   <div class="cards-list" id="cards-list">
     <div class="loading">Loading flagged cards...</div>
   </div>
-
 </main>
 
 <div class="toast" id="toast"></div>
 
 <script>
-const SUPABASE_URL = 'https://hwdcgbcnphkmxaasties.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh3ZGNnYmNucGhrbXhhYXN0aWVzIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NDgzMzU3NywiZXhwIjoyMDkwNDA5NTc3fQ.GIcazJcpkSllu_gFuZ0C0jXn8s06m_2uhKsvb0L30YQ';
+const SB_URL = 'https://hwdcgbcnphkmxaasties.supabase.co';
+const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh3ZGNnYmNucGhrbXhhYXN0aWVzIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NDgzMzU3NywiZXhwIjoyMDkwNDA5NTc3fQ.GIcazJcpkSllu_gFuZ0C0jXn8s06m_2uhKsvb0L30YQ';
 const ADMIN_PWD = 'boardmd2026';
 
 let allData = [];
 let cardCache = {};
-let filters = { status: 'ALL', deck: 'ALL', rev: 'ALL' };
+let filters = {status:'ALL', deck:'ALL', rev:'ALL'};
 
 function doLogin(){
-  const v = document.getElementById('pwd-input').value;
-  if(v === ADMIN_PWD){
+  if(document.getElementById('pwd-input').value === ADMIN_PWD){
     document.getElementById('login-screen').style.display = 'none';
     document.getElementById('app-header').style.display = 'flex';
     document.getElementById('app-main').style.display = 'block';
@@ -245,115 +168,98 @@ function doLogin(){
 }
 
 async function sb(path, opts={}){
-  const r = await fetch(SUPABASE_URL + '/rest/v1/' + path, {
-    headers: {
-      'apikey': SUPABASE_KEY,
-      'Authorization': 'Bearer ' + SUPABASE_KEY,
-      'Content-Type': 'application/json',
-      'Prefer': opts.prefer || 'return=representation',
-      ...opts.headers
-    },
+  const r = await fetch(SB_URL+'/rest/v1/'+path,{
+    headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Content-Type':'application/json','Prefer':opts.prefer||'return=representation',...(opts.headers||{})},
     ...opts
   });
   if(!r.ok) throw new Error(await r.text());
-  const ct = r.headers.get('content-type') || '';
+  const ct = r.headers.get('content-type')||'';
   return ct.includes('json') ? r.json() : null;
 }
 
 async function loadData(){
   document.getElementById('sync-status').textContent = 'Loading...';
   try {
-    // Load all qa_results that are not OK (flagged)
     const flags = await sb('qa_results?status=neq.OK&order=deck.asc,status.asc&limit=1000');
-    
-    // Also load OK reviewed ones
-    const reviewed = await sb('qa_results?reviewed=eq.true&limit=1000');
-    
-    allData = [...flags, ...reviewed.filter(r => !flags.find(f => f.id === r.id))];
-    
-    // Stats
+    allData = flags;
+
     const allStats = await sb('qa_results?select=status&limit=50000');
     const counts = {OK:0,ERROR:0,CONTRADICTED:0,OUTDATED:0};
-    allStats.forEach(r => { if(counts[r.status] !== undefined) counts[r.status]++; });
+    allStats.forEach(r => { if(counts[r.status]!==undefined) counts[r.status]++; });
     document.getElementById('stat-ok').textContent = counts.OK.toLocaleString();
     document.getElementById('stat-error').textContent = counts.ERROR;
     document.getElementById('stat-contra').textContent = counts.CONTRADICTED;
     document.getElementById('stat-out').textContent = counts.OUTDATED;
-    
-    const flagCount = counts.ERROR + counts.CONTRADICTED + counts.OUTDATED;
-    document.getElementById('flag-count-badge').textContent = flagCount + ' flags';
+    document.getElementById('flag-count-badge').textContent = (counts.ERROR+counts.CONTRADICTED+counts.OUTDATED)+' flags';
 
-    // Build deck filter chips
-    const decks = [...new Set(flags.map(f => f.deck).filter(Boolean))].sort();
+    const decks = [...new Set(flags.map(f=>f.deck).filter(Boolean))].sort();
     const df = document.getElementById('deck-filters');
     df.innerHTML = '<span class="chip active" data-deck="ALL" onclick="setFilter(\'deck\',\'ALL\',this)">All decks</span>';
     decks.forEach(d => {
       const c = document.createElement('span');
-      c.className = 'chip';
-      c.dataset.deck = d;
-      c.textContent = d;
-      c.onclick = function(){ setFilter('deck', d, this); };
+      c.className='chip'; c.dataset.deck=d; c.textContent=d;
+      c.onclick=function(){ setFilter('deck',d,this); };
       df.appendChild(c);
     });
 
-    // Preload card details
-    const cardIds = [...new Set(flags.map(f => f.card_id))];
+    const cardIds = [...new Set(flags.map(f=>f.card_id))];
     await preloadCards(cardIds);
-
-    document.getElementById('sync-status').textContent = 'Last sync: ' + new Date().toLocaleTimeString();
+    document.getElementById('sync-status').textContent = 'Last sync: '+new Date().toLocaleTimeString();
     render();
   } catch(e){
-    document.getElementById('sync-status').textContent = 'Error: ' + e.message;
-    console.error(e);
+    document.getElementById('sync-status').textContent = 'Error: '+e.message;
   }
 }
 
 async function preloadCards(ids){
-  const chunks = [];
-  for(let i=0; i<ids.length; i+=50) chunks.push(ids.slice(i,i+50));
-  for(const chunk of chunks){
+  for(let i=0;i<ids.length;i+=50){
+    const chunk = ids.slice(i,i+50);
     try {
-      const rows = await sb('cards?id=in.(' + chunk.join(',') + ')&select=id,deck,topic,q,c,e,kp');
-      rows.forEach(r => { cardCache[r.id] = r; });
-    } catch(e){ console.error('preload error', e); }
+      const rows = await sb('cards?id=in.('+chunk.join(',')+')'+'&select=id,deck,topic,qid,q,c,e,kp');
+      rows.forEach(r => { cardCache[r.id]=r; });
+    } catch(e){ console.error(e); }
   }
 }
 
 function setFilter(type, val, el){
-  filters[type] = val;
-  const group = el.closest('.filter-group');
-  group.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+  filters[type]=val;
+  el.closest('.filter-group').querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));
   el.classList.add('active');
   render();
 }
 
+function esc(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
 function render(){
-  let data = allData.filter(r => r.status !== 'OK');
-  
-  if(filters.status !== 'ALL') data = data.filter(r => r.status === filters.status);
-  if(filters.deck !== 'ALL') data = data.filter(r => r.deck === filters.deck);
-  if(filters.rev === 'true') data = data.filter(r => r.reviewed === true);
-  if(filters.rev === 'false') data = data.filter(r => !r.reviewed);
+  let data = allData;
+  if(filters.status!=='ALL') data=data.filter(r=>r.status===filters.status);
+  if(filters.deck!=='ALL') data=data.filter(r=>r.deck===filters.deck);
+  if(filters.rev==='true') data=data.filter(r=>r.reviewed===true);
+  if(filters.rev==='false') data=data.filter(r=>!r.reviewed);
 
   const el = document.getElementById('cards-list');
   if(!data.length){
-    el.innerHTML = '<div class="empty-state"><div style="font-size:32px;">&#10003;</div><p>No flagged cards match the current filters.</p></div>';
+    el.innerHTML='<div class="empty-state"><div style="font-size:32px;">&#10003;</div><p>No flagged cards match the current filters.</p></div>';
     return;
   }
 
   el.innerHTML = data.map(flag => {
-    const card = cardCache[flag.card_id] || {};
-    const q = (card.q || '').replace(/</g,'&lt;');
-    const e = (card.e || '').replace(/</g,'&lt;');
-    const fix = (flag.suggested_fix || '').replace(/</g,'&lt;');
-    const issue = (flag.issue || '').replace(/</g,'&lt;');
-    const pmid = flag.pmid || '';
+    const card = cardCache[flag.card_id]||{};
+    const q = esc(card.q||'');
+    const e = esc(card.e||'');
+    const fix = esc(flag.suggested_fix||'');
+    const issue = esc(flag.issue||'');
+    const pmid = flag.pmid||'';
+    const qid = card.qid||'';
+    const boardmdLink = qid ? `<a href="https://boardmd.app/?qid=${encodeURIComponent(qid)}" target="_blank" class="card-link">View on BoardMD (QID ${esc(qid)}) &#8599;</a>` : '';
+    const pmidLink = pmid ? `<a href="https://pubmed.ncbi.nlm.nih.gov/${pmid}/" target="_blank" class="card-link pmid">PubMed PMID ${esc(pmid)} &#8599;</a>` : '';
+
     return `
-    <div class="qa-card ${flag.reviewed ? 'reviewed' : ''}" id="card-${flag.id}">
+    <div class="qa-card ${flag.reviewed?'reviewed':''}" id="card-${flag.id}">
       <div class="card-header" onclick="toggleCard('${flag.id}')">
         <span class="card-status-badge b-${flag.status}">${flag.status}</span>
         <div class="card-meta">
-          <div class="card-deck">${flag.deck || ''} ${card.topic ? '· ' + card.topic : ''}</div>
+          <div class="card-deck">${esc(flag.deck||'')}${card.topic?' · '+esc(card.topic):''}</div>
           <div class="card-question">${q.substring(0,120)}${q.length>120?'...':''}</div>
           <div class="card-issue">${issue.substring(0,120)}${issue.length>120?'...':''}</div>
         </div>
@@ -365,23 +271,21 @@ function render(){
           <div class="cb-text">${q}</div>
         </div>
         <div class="cb-section">
-          <div class="cb-label">Current explanation</div>
+          <div class="cb-label">Current explanation in Supabase</div>
           <div class="cb-text">${e}</div>
         </div>
         <div class="cb-section">
-          <div class="cb-label">Issue identified by Sonnet</div>
+          <div class="cb-label">Issue identified by Sonnet 4.6</div>
           <div class="cb-text" style="color:var(--red);background:var(--red-dim);border-color:rgba(229,62,62,.2);">${issue}</div>
         </div>
-        ${pmid ? `<a href="https://pubmed.ncbi.nlm.nih.gov/${pmid}/" target="_blank" class="pmid-link">PubMed PMID ${pmid} &#8599;</a>` : ''}
+        <div class="card-links">${boardmdLink}${pmidLink}</div>
         <div class="cb-section" style="margin-top:16px;">
-          <div class="cb-label">Suggested correction (editable)</div>
-          <div class="fix-box">
-            <textarea class="fix-textarea" id="fix-${flag.id}">${fix}</textarea>
-          </div>
+          <div class="cb-label">Suggested correction (editable — saves to explanation field)</div>
+          <textarea class="fix-textarea" id="fix-${flag.id}">${fix}</textarea>
         </div>
         <div class="card-actions">
           <button class="btn-save" onclick="saveCard('${flag.id}','${flag.card_id}')">Save correction to Supabase</button>
-          <button class="btn-ok" onclick="markOK('${flag.id}')">Mark OK</button>
+          <button class="btn-ok" onclick="markOK('${flag.id}')">Mark OK — no change needed</button>
           <button class="btn-ignore" onclick="markIgnore('${flag.id}')">Ignore</button>
         </div>
       </div>
@@ -390,70 +294,48 @@ function render(){
 }
 
 function toggleCard(id){
-  const body = document.getElementById('body-' + id);
-  const btn = document.getElementById('exp-' + id);
-  const isOpen = body.classList.contains('open');
-  body.classList.toggle('open', !isOpen);
-  btn.classList.toggle('open', !isOpen);
+  const body=document.getElementById('body-'+id);
+  const btn=document.getElementById('exp-'+id);
+  const open=body.classList.contains('open');
+  body.classList.toggle('open',!open);
+  btn.classList.toggle('open',!open);
 }
 
 async function saveCard(flagId, cardId){
-  const fix = document.getElementById('fix-' + flagId).value.trim();
+  const fix=document.getElementById('fix-'+flagId).value.trim();
   if(!fix){ showToast('Correction text is empty'); return; }
   try {
-    // Update explanation on the card
-    await sb('cards?id=eq.' + cardId, {
-      method: 'PATCH',
-      body: JSON.stringify({ e: fix }),
-      prefer: 'return=minimal'
-    });
-    // Mark qa_result as reviewed
-    await sb('qa_results?id=eq.' + flagId, {
-      method: 'PATCH',
-      body: JSON.stringify({ reviewed: true }),
-      prefer: 'return=minimal'
-    });
-    document.getElementById('card-' + flagId).classList.add('reviewed');
+    await sb('cards?id=eq.'+cardId,{method:'PATCH',body:JSON.stringify({e:fix}),prefer:'return=minimal'});
+    await sb('qa_results?id=eq.'+flagId,{method:'PATCH',body:JSON.stringify({reviewed:true}),prefer:'return=minimal'});
+    document.getElementById('card-'+flagId).classList.add('reviewed');
+    const flag=allData.find(f=>f.id===flagId); if(flag) flag.reviewed=true;
     showToast('Card updated in Supabase');
-    const flag = allData.find(f => f.id === flagId);
-    if(flag) flag.reviewed = true;
-  } catch(e){ showToast('Error: ' + e.message); }
+  } catch(e){ showToast('Error: '+e.message); }
 }
 
 async function markOK(flagId){
   try {
-    await sb('qa_results?id=eq.' + flagId, {
-      method: 'PATCH',
-      body: JSON.stringify({ reviewed: true, status: 'OK' }),
-      prefer: 'return=minimal'
-    });
-    document.getElementById('card-' + flagId).classList.add('reviewed');
-    const flag = allData.find(f => f.id === flagId);
-    if(flag){ flag.reviewed = true; flag.status = 'OK'; }
-    showToast('Marked as OK');
+    await sb('qa_results?id=eq.'+flagId,{method:'PATCH',body:JSON.stringify({reviewed:true,status:'OK'}),prefer:'return=minimal'});
+    document.getElementById('card-'+flagId).classList.add('reviewed');
+    const flag=allData.find(f=>f.id===flagId); if(flag){ flag.reviewed=true; flag.status='OK'; }
+    showToast('Marked as OK — no changes saved to card');
     render();
-  } catch(e){ showToast('Error: ' + e.message); }
+  } catch(e){ showToast('Error: '+e.message); }
 }
 
 async function markIgnore(flagId){
   try {
-    await sb('qa_results?id=eq.' + flagId, {
-      method: 'PATCH',
-      body: JSON.stringify({ reviewed: true }),
-      prefer: 'return=minimal'
-    });
-    document.getElementById('card-' + flagId).classList.add('reviewed');
-    const flag = allData.find(f => f.id === flagId);
-    if(flag) flag.reviewed = true;
+    await sb('qa_results?id=eq.'+flagId,{method:'PATCH',body:JSON.stringify({reviewed:true}),prefer:'return=minimal'});
+    document.getElementById('card-'+flagId).classList.add('reviewed');
+    const flag=allData.find(f=>f.id===flagId); if(flag) flag.reviewed=true;
     showToast('Ignored');
-  } catch(e){ showToast('Error: ' + e.message); }
+  } catch(e){ showToast('Error: '+e.message); }
 }
 
 function showToast(msg){
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2500);
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2500);
 }
 </script>
 </body>
