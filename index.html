@@ -9085,7 +9085,7 @@ function renderLens(data, container){
   cWrap.appendChild(canvas);
   var pmBar=document.createElement('div');
   pmBar.style.cssText='background:#f0f7ff;border:1px solid #c8dff8;border-radius:0 0 12px 12px;padding:8px 12px;font-size:10px;color:#185FA5;line-height:1.5;';
-  pmBar.innerHTML='<strong>Baseado em evidencia PubMed</strong> | Alinhado com guidelines';
+  pmBar.innerHTML='<strong>Based on PubMed evidence</strong> | Aligned with current guidelines';
   wrap.appendChild(hdr);wrap.appendChild(cWrap);wrap.appendChild(pmBar);
   container.classList.add('visible');container.innerHTML='';container.appendChild(wrap);
   var ctx=canvas.getContext('2d');
@@ -9104,14 +9104,14 @@ function renderLens(data, container){
     });
     ctx.restore();
   }
-  var lL=[{text:data.left_label||'',bold:true,size:12,color:'#0C447C'},{gap:10}];
-  (data.left||[]).slice(0,4).forEach(function(b){lL.push({text:b,bold:false,size:10.5,color:'#185FA5',gap2:8});});
+  var lL=[{text:data.left_label||'',bold:true,size:14,color:'#0C447C'},{gap:14}];
+  (data.left||[]).slice(0,3).forEach(function(b){lL.push({text:b,bold:false,size:12,color:'#185FA5',gap2:14});});
   drawZone(function(){ctx.beginPath();ctx.arc(cx1,cy,r,0,Math.PI*2);ctx.clip();},lL,xLeft);
-  var lM=[{text:'Both',bold:true,size:11,color:'#085041'},{gap:8}];
-  (data.shared||[]).slice(0,3).forEach(function(b){lM.push({text:b,bold:false,size:9.5,color:'#0F6E56',gap2:7});});
+  var lM=[{text:'Both',bold:true,size:13,color:'#085041'},{gap:12}];
+  (data.shared||[]).slice(0,2).forEach(function(b){lM.push({text:b,bold:false,size:11,color:'#0F6E56',gap2:12});});
   drawZone(function(){ctx.beginPath();ctx.arc(cx1,cy,r,0,Math.PI*2);ctx.clip();ctx.beginPath();ctx.arc(cx2,cy,r,0,Math.PI*2);ctx.clip();},lM,xMid);
-  var lR=[{text:data.right_label||'',bold:true,size:12,color:'#633806'},{gap:10}];
-  (data.right||[]).slice(0,4).forEach(function(b){lR.push({text:b,bold:false,size:10.5,color:'#BA7517',gap2:8});});
+  var lR=[{text:data.right_label||'',bold:true,size:14,color:'#633806'},{gap:14}];
+  (data.right||[]).slice(0,3).forEach(function(b){lR.push({text:b,bold:false,size:12,color:'#BA7517',gap2:14});});
   drawZone(function(){ctx.beginPath();ctx.arc(cx2,cy,r,0,Math.PI*2);ctx.clip();},lR,xRight);
 }
 
