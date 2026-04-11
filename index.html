@@ -3494,19 +3494,19 @@ html.light .qs-val { color: inherit; }
 
 @media (min-width: 900px) {
 
-  /* Expand study area to near full width */
-  .study-main {
+  /* Only activate split when actively studying */
+  #app.bmd-studying .study-main {
     padding: 20px 28px !important;
     justify-content: flex-start !important;
   }
-  .study-inner {
+  #app.bmd-studying .study-inner {
     max-width: 1300px !important;
     width: 100% !important;
     padding-bottom: calc(80px + 40px) !important;
   }
 
-  /* card-el = flex column: header on top, then row with q + divider + ans */
-  #card-el {
+  /* card-el: flex column, header on top, cols row below */
+  #app.bmd-studying #card-el {
     max-width: 1300px !important;
     width: 100% !important;
     display: flex !important;
@@ -3519,7 +3519,7 @@ html.light .qs-val { color: inherit; }
   }
 
   /* card-header: full width */
-  .card-header {
+  #app.bmd-studying .card-header {
     flex-shrink: 0 !important;
     border-bottom: 1px solid var(--border) !important;
     padding: 16px 24px 12px !important;
@@ -3527,17 +3527,16 @@ html.light .qs-val { color: inherit; }
     max-width: 100% !important;
   }
 
-  /* Row container that holds q-col + divider + ans-col */
-  #bmd-cols-row {
+  /* Row container */
+  #app.bmd-studying #bmd-cols-row {
     display: flex !important;
     flex-direction: row !important;
     flex: 1 !important;
     min-height: 0 !important;
-    overflow: hidden !important;
   }
 
-  /* LEFT COLUMN — question + options */
-  #bmd-q-col {
+  /* LEFT COLUMN */
+  #app.bmd-studying #bmd-q-col {
     flex-shrink: 0 !important;
     width: var(--bmd-q-width, 50%) !important;
     min-width: 280px !important;
@@ -3551,14 +3550,14 @@ html.light .qs-val { color: inherit; }
     padding: 22px 24px 24px !important;
     align-self: flex-start !important;
   }
-  #bmd-q-col::-webkit-scrollbar { width: 4px; }
-  #bmd-q-col::-webkit-scrollbar-thumb {
+  #app.bmd-studying #bmd-q-col::-webkit-scrollbar { width: 4px; }
+  #app.bmd-studying #bmd-q-col::-webkit-scrollbar-thumb {
     background: var(--border2);
     border-radius: 2px;
   }
 
   /* DRAGGABLE DIVIDER */
-  #bmd-split-divider {
+  #app.bmd-studying #bmd-split-divider {
     display: flex !important;
     flex-shrink: 0 !important;
     width: 8px !important;
@@ -3572,7 +3571,7 @@ html.light .qs-val { color: inherit; }
     z-index: 10 !important;
     user-select: none !important;
   }
-  #bmd-split-divider::after {
+  #app.bmd-studying #bmd-split-divider::after {
     content: '' !important;
     display: block !important;
     width: 1px !important;
@@ -3580,12 +3579,12 @@ html.light .qs-val { color: inherit; }
     background: var(--border) !important;
     transition: background .15s, width .15s !important;
   }
-  #bmd-split-divider:hover::after,
-  #bmd-split-divider.dragging::after {
+  #app.bmd-studying #bmd-split-divider:hover::after,
+  #app.bmd-studying #bmd-split-divider.dragging::after {
     width: 3px !important;
     background: var(--accent) !important;
   }
-  #bmd-split-divider .divider-handle {
+  #app.bmd-studying #bmd-split-divider .divider-handle {
     position: absolute !important;
     top: 50% !important;
     left: 50% !important;
@@ -3603,20 +3602,20 @@ html.light .qs-val { color: inherit; }
     transition: opacity .15s !important;
     pointer-events: none !important;
   }
-  #bmd-split-divider .divider-handle span {
+  #app.bmd-studying #bmd-split-divider .divider-handle span {
     display: block !important;
     width: 2px !important;
     height: 14px !important;
     border-radius: 2px !important;
     background: var(--muted) !important;
   }
-  #bmd-split-divider:hover .divider-handle,
-  #bmd-split-divider.dragging .divider-handle {
+  #app.bmd-studying #bmd-split-divider:hover .divider-handle,
+  #app.bmd-studying #bmd-split-divider.dragging .divider-handle {
     opacity: 1 !important;
   }
 
-  /* RIGHT COLUMN — answer + explanation + attending */
-  #bmd-ans-col {
+  /* RIGHT COLUMN */
+  #app.bmd-studying #bmd-ans-col {
     flex: 1 1 0 !important;
     min-width: 280px !important;
     padding: 0 !important;
@@ -3624,47 +3623,35 @@ html.light .qs-val { color: inherit; }
     max-height: calc(100vh - 80px) !important;
   }
 
-  /* explanation inside right column */
-  #bmd-ans-col .explanation,
-  #bmd-ans-col #c-exp {
+  #app.bmd-studying #bmd-ans-col .explanation,
+  #app.bmd-studying #bmd-ans-col #c-exp {
     max-width: 100% !important;
     border-top: none !important;
     padding: 20px 24px !important;
   }
-
-  /* image, key-point, pubmed, report */
-  #bmd-ans-col .card-img-wrap { margin: 0 24px 16px !important; }
-  #bmd-ans-col #key-point-wrap { padding: 0 24px 14px !important; }
-  #bmd-ans-col #card-pubmed-wrap { padding: 0 24px !important; }
-
-  /* footer counter */
-  #bmd-ans-col .card-footer-counter {
+  #app.bmd-studying #bmd-ans-col .card-img-wrap { margin: 0 24px 16px !important; }
+  #app.bmd-studying #bmd-ans-col #key-point-wrap { padding: 0 24px 14px !important; }
+  #app.bmd-studying #bmd-ans-col #card-pubmed-wrap { padding: 0 24px !important; }
+  #app.bmd-studying #bmd-ans-col .card-footer-counter {
     border-top: 1px solid var(--border) !important;
     padding: 10px 24px !important;
   }
-
-  /* resp-dist in left col */
-  #bmd-q-col #resp-dist-wrap {
+  #app.bmd-studying #bmd-q-col #resp-dist-wrap {
     padding: 14px 0 10px !important;
     border-top: 1px solid var(--border) !important;
     margin-top: 8px !important;
   }
 
-  /* FSRS row — below the card grid */
-  #bmd-fsrs-row {
+  /* FSRS row */
+  #app.bmd-studying #bmd-fsrs-row {
     width: 100% !important;
     max-width: 1300px !important;
   }
-  #bmd-fsrs-row .fsrs-nav {
-    max-width: 100% !important;
-    padding: 12px 0 !important;
-  }
-  #bmd-fsrs-row .plain-nav {
-    max-width: 100% !important;
-  }
+  #app.bmd-studying #bmd-fsrs-row .fsrs-nav { max-width: 100% !important; padding: 12px 0 !important; }
+  #app.bmd-studying #bmd-fsrs-row .plain-nav { max-width: 100% !important; }
 
-  /* Attending inline */
-  #att-inline-wrap {
+  /* Attending */
+  #app.bmd-studying #att-inline-wrap {
     max-width: 100% !important;
     margin: 0 !important;
     border-radius: 0 !important;
@@ -3672,8 +3659,8 @@ html.light .qs-val { color: inherit; }
     border-right: none !important;
   }
 
-  /* Before answer revealed: right column placeholder centered */
-  #bmd-ans-col:not(.has-answer) {
+  /* Placeholder */
+  #app.bmd-studying #bmd-ans-col:not(.has-answer) {
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
@@ -5392,6 +5379,7 @@ function showDeckHome(){
   if(fb) fb.style.display='none';
   const al=document.getElementById('app-layout-wrap');
   if(al) al.style.display='none';
+  document.getElementById('app').classList.remove('bmd-studying');
   clearLrnTimers();
   buildDeckHomeTable();
 }
@@ -6003,6 +5991,7 @@ function renderCard(){
       const waitEl = document.getElementById('c-q');
       if(waitEl){
         document.getElementById('app-layout-wrap').style.display='flex';
+        document.getElementById('app').classList.add('bmd-studying');
         document.getElementById('deck-home').classList.remove('active');
         const _fsrs3=document.getElementById('fsrs-nav');
         const _fsrs4=document.getElementById('fsrs-nav-2');
@@ -8163,6 +8152,7 @@ function hideAllPanels(){
   if(fb) fb.style.display='none';
   const al = document.getElementById('app-layout-wrap');
   if(al) al.style.display='none';
+  document.getElementById('app').classList.remove('bmd-studying');
   const lb = document.getElementById('lb-panel');
   if(lb) lb.classList.remove('active');
   const pp = document.getElementById('profile-panel');
@@ -10314,6 +10304,7 @@ window.hideDeckHome = function() {
   if(dh) dh.classList.remove('active');
   if(fb) fb.style.display = '';
   if(al) al.style.display = '';
+  document.getElementById('app').classList.add('bmd-studying');
   // study mode: hide dashboard-specific rows
   const sb  = document.querySelector('.app-header .streak-bar');
   const tabs = document.getElementById('bmd-step-tabs');
