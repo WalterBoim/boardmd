@@ -3479,6 +3479,7 @@ html.light .qs-val { color: inherit; }
 /* ── Mobile defaults (no split) ── */
 #bmd-split-divider { display: none; }
 #bmd-ans-col { display: block; }
+#bmd-cols-row { display: block; }
 #bmd-q-col {
   display: block;
   border-right: none;
@@ -3486,6 +3487,7 @@ html.light .qs-val { color: inherit; }
   position: static;
   max-height: none;
   overflow-y: visible;
+  width: auto !important;
 }
 #bmd-fsrs-row { display: block; }
 #bmd-ans-placeholder { display: none; }
@@ -3495,6 +3497,7 @@ html.light .qs-val { color: inherit; }
   /* Expand study area to near full width */
   .study-main {
     padding: 20px 28px !important;
+    justify-content: flex-start !important;
   }
   .study-inner {
     max-width: 1300px !important;
@@ -3502,38 +3505,51 @@ html.light .qs-val { color: inherit; }
     padding-bottom: calc(80px + 40px) !important;
   }
 
-  /* card-el becomes the flex container */
+  /* card-el = flex column: header on top, then row with q + divider + ans */
   #card-el {
     max-width: 1300px !important;
+    width: 100% !important;
     display: flex !important;
-    flex-wrap: wrap !important;
-    align-items: flex-start !important;
-    gap: 0 !important;
-    background: transparent !important;
+    flex-direction: column !important;
+    border: 1px solid var(--border) !important;
+    border-radius: 16px !important;
+    overflow: hidden !important;
+    background: var(--surface) !important;
+    box-shadow: none !important;
   }
 
-  /* card-header spans full width above both columns */
+  /* card-header: full width */
   .card-header {
+    flex-shrink: 0 !important;
+    border-bottom: 1px solid var(--border) !important;
+    padding: 16px 24px 12px !important;
     width: 100% !important;
     max-width: 100% !important;
-    flex: 0 0 100% !important;
-    padding: 18px 24px 14px !important;
-    border-bottom: 1px solid var(--border) !important;
-    margin-bottom: 0 !important;
+  }
+
+  /* Row container that holds q-col + divider + ans-col */
+  #bmd-cols-row {
+    display: flex !important;
+    flex-direction: row !important;
+    flex: 1 !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
   }
 
   /* LEFT COLUMN — question + options */
   #bmd-q-col {
-    flex: 1 1 0 !important;
-    min-width: 0 !important;
+    flex-shrink: 0 !important;
+    width: var(--bmd-q-width, 50%) !important;
+    min-width: 280px !important;
+    max-width: 75% !important;
     position: sticky !important;
     top: 68px !important;
     max-height: calc(100vh - 80px) !important;
     overflow-y: auto !important;
     scrollbar-width: thin !important;
     scrollbar-color: var(--border) transparent !important;
-    border-right: 1px solid var(--border) !important;
-    padding: 24px 28px 28px !important;
+    padding: 22px 24px 24px !important;
+    align-self: flex-start !important;
   }
   #bmd-q-col::-webkit-scrollbar { width: 4px; }
   #bmd-q-col::-webkit-scrollbar-thumb {
@@ -3541,15 +3557,71 @@ html.light .qs-val { color: inherit; }
     border-radius: 2px;
   }
 
-  /* DIVIDER — hidden, border already on q-col */
-  #bmd-split-divider { display: none !important; }
+  /* DRAGGABLE DIVIDER */
+  #bmd-split-divider {
+    display: flex !important;
+    flex-shrink: 0 !important;
+    width: 8px !important;
+    cursor: col-resize !important;
+    position: relative !important;
+    align-self: stretch !important;
+    align-items: center !important;
+    justify-content: center !important;
+    background: transparent !important;
+    transition: background .15s !important;
+    z-index: 10 !important;
+    user-select: none !important;
+  }
+  #bmd-split-divider::after {
+    content: '' !important;
+    display: block !important;
+    width: 1px !important;
+    height: 100% !important;
+    background: var(--border) !important;
+    transition: background .15s, width .15s !important;
+  }
+  #bmd-split-divider:hover::after,
+  #bmd-split-divider.dragging::after {
+    width: 3px !important;
+    background: var(--accent) !important;
+  }
+  #bmd-split-divider .divider-handle {
+    position: absolute !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    width: 20px !important;
+    height: 36px !important;
+    border-radius: 10px !important;
+    background: var(--surface2) !important;
+    border: 1px solid var(--border2) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 2px !important;
+    opacity: 0 !important;
+    transition: opacity .15s !important;
+    pointer-events: none !important;
+  }
+  #bmd-split-divider .divider-handle span {
+    display: block !important;
+    width: 2px !important;
+    height: 14px !important;
+    border-radius: 2px !important;
+    background: var(--muted) !important;
+  }
+  #bmd-split-divider:hover .divider-handle,
+  #bmd-split-divider.dragging .divider-handle {
+    opacity: 1 !important;
+  }
 
   /* RIGHT COLUMN — answer + explanation + attending */
   #bmd-ans-col {
     flex: 1 1 0 !important;
-    min-width: 0 !important;
+    min-width: 280px !important;
     padding: 0 !important;
-    /* scrolls normally with page */
+    overflow-y: auto !important;
+    max-height: calc(100vh - 80px) !important;
   }
 
   /* explanation inside right column */
@@ -3557,79 +3629,55 @@ html.light .qs-val { color: inherit; }
   #bmd-ans-col #c-exp {
     max-width: 100% !important;
     border-top: none !important;
-    padding: 20px 28px !important;
+    padding: 20px 24px !important;
   }
 
-  /* image wrap inside right col */
-  #bmd-ans-col .card-img-wrap {
-    margin: 0 28px 16px !important;
-  }
+  /* image, key-point, pubmed, report */
+  #bmd-ans-col .card-img-wrap { margin: 0 24px 16px !important; }
+  #bmd-ans-col #key-point-wrap { padding: 0 24px 14px !important; }
+  #bmd-ans-col #card-pubmed-wrap { padding: 0 24px !important; }
 
-  /* key point + pubmed inside right col */
-  #bmd-ans-col #key-point-wrap {
-    padding: 0 28px 14px !important;
-  }
-  #bmd-ans-col #card-pubmed-wrap {
-    padding: 0 28px !important;
-  }
-
-  /* Report issue btn */
-  #bmd-ans-col #report-issue-btn {
-    margin: 0 28px !important;
-  }
-
-  /* footer counter inside right col — hide or keep */
+  /* footer counter */
   #bmd-ans-col .card-footer-counter {
     border-top: 1px solid var(--border) !important;
-    padding: 10px 28px !important;
+    padding: 10px 24px !important;
   }
 
-  /* resp-dist-wrap stays in left col — give it proper padding */
+  /* resp-dist in left col */
   #bmd-q-col #resp-dist-wrap {
     padding: 14px 0 10px !important;
     border-top: 1px solid var(--border) !important;
     margin-top: 8px !important;
   }
 
-  /* FSRS row — spans full width below both columns */
+  /* FSRS row — below the card grid */
   #bmd-fsrs-row {
     width: 100% !important;
-    margin-top: 0 !important;
+    max-width: 1300px !important;
   }
   #bmd-fsrs-row .fsrs-nav {
-    max-width: 1300px !important;
-    margin: 0 auto !important;
+    max-width: 100% !important;
     padding: 12px 0 !important;
   }
   #bmd-fsrs-row .plain-nav {
-    max-width: 1300px !important;
-    margin: 0 auto !important;
+    max-width: 100% !important;
   }
 
-  /* Attending inline — inside right column, injected dynamically */
+  /* Attending inline */
   #att-inline-wrap {
     max-width: 100% !important;
     margin: 0 !important;
     border-radius: 0 !important;
     border-left: none !important;
     border-right: none !important;
-    padding: 0 !important;
   }
 
-  /* Before answer revealed: right column shows subtle placeholder */
+  /* Before answer revealed: right column placeholder centered */
   #bmd-ans-col:not(.has-answer) {
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
     min-height: 200px !important;
-  }
-
-  /* card-el border/background on desktop — clean frame */
-  #card-el {
-    border: 1px solid var(--border) !important;
-    border-radius: 18px !important;
-    overflow: hidden !important;
-    background: var(--surface) !important;
   }
 }
 
@@ -4658,6 +4706,8 @@ html.light .qs-val { color: inherit; }
               <span class="card-qid" id="c-qid" style="font-size:9px;flex-shrink:0;"></span>
             </div>
           </div>
+          <!-- COLS ROW: question | divider | answer -->
+          <div id="bmd-cols-row">
           <!-- LEFT COLUMN (question + options) -->
           <div id="bmd-q-col">
           <div class="card-body">
@@ -4669,8 +4719,10 @@ html.light .qs-val { color: inherit; }
             <div style="font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text-faint);font-family:'JetBrains Mono',monospace;margin-bottom:10px;">Response Distribution</div>
           </div>
           </div><!-- /bmd-q-col -->
-          <!-- SPLIT DIVIDER (visible only on desktop after reveal) -->
-          <div id="bmd-split-divider" style="display:none"></div>
+          <!-- SPLIT DIVIDER (draggable, desktop only) -->
+          <div id="bmd-split-divider" style="display:none">
+            <div class="divider-handle"><span></span><span></span></div>
+          </div>
           <!-- RIGHT COLUMN (answer + explanation + attending + FSRS) -->
           <div id="bmd-ans-col">
             <!-- Placeholder shown before answer revealed (desktop only) -->
@@ -4713,6 +4765,7 @@ html.light .qs-val { color: inherit; }
             <span class="cfc-due" id="cfc-due">0</span>
           </div>
           </div><!-- /bmd-ans-col -->
+          </div><!-- /bmd-cols-row -->
         </div>
 
         <div id="bmd-fsrs-row">
@@ -12042,6 +12095,106 @@ html.dark .hl-btn-active { border-color:#fff!important; }
   </div>
 </div>
 
+<script>
+// ── BMD SPLIT-SCREEN DRAG RESIZE ──────────────────────────────
+(function(){
+  function initSplitDrag(){
+    const divider = document.getElementById('bmd-split-divider');
+    const qCol    = document.getElementById('bmd-q-col');
+    const colsRow = document.getElementById('bmd-cols-row');
+    if(!divider || !qCol || !colsRow) return;
+
+    // Show divider on desktop
+    function checkDesktop(){
+      if(window.innerWidth >= 900){
+        divider.style.display = 'flex';
+      } else {
+        divider.style.display = 'none';
+      }
+    }
+    checkDesktop();
+    window.addEventListener('resize', checkDesktop);
+
+    // Restore saved width
+    const saved = localStorage.getItem('bmd_q_col_pct');
+    if(saved) qCol.style.width = saved + '%';
+
+    let dragging = false, startX = 0, startW = 0, rowW = 0;
+
+    divider.addEventListener('mousedown', function(e){
+      e.preventDefault();
+      dragging = true;
+      startX = e.clientX;
+      startW = qCol.offsetWidth;
+      rowW   = colsRow.offsetWidth;
+      divider.classList.add('dragging');
+      document.body.style.cursor = 'col-resize';
+      document.body.style.userSelect = 'none';
+    });
+
+    document.addEventListener('mousemove', function(e){
+      if(!dragging) return;
+      const dx = e.clientX - startX;
+      const newW = startW + dx;
+      const pct = (newW / rowW) * 100;
+      const clamped = Math.min(Math.max(pct, 25), 75);
+      qCol.style.width = clamped + '%';
+    });
+
+    document.addEventListener('mouseup', function(){
+      if(!dragging) return;
+      dragging = false;
+      divider.classList.remove('dragging');
+      document.body.style.cursor = '';
+      document.body.style.userSelect = '';
+      // Save preference
+      const currentPct = (qCol.offsetWidth / colsRow.offsetWidth) * 100;
+      localStorage.setItem('bmd_q_col_pct', currentPct.toFixed(1));
+    });
+
+    // Touch support (iPad)
+    divider.addEventListener('touchstart', function(e){
+      const t = e.touches[0];
+      dragging = true;
+      startX = t.clientX;
+      startW = qCol.offsetWidth;
+      rowW   = colsRow.offsetWidth;
+      divider.classList.add('dragging');
+    }, {passive:true});
+
+    document.addEventListener('touchmove', function(e){
+      if(!dragging) return;
+      const t = e.touches[0];
+      const dx = t.clientX - startX;
+      const pct = ((startW + dx) / rowW) * 100;
+      const clamped = Math.min(Math.max(pct, 25), 75);
+      qCol.style.width = clamped + '%';
+    }, {passive:true});
+
+    document.addEventListener('touchend', function(){
+      if(!dragging) return;
+      dragging = false;
+      divider.classList.remove('dragging');
+      const currentPct = (qCol.offsetWidth / colsRow.offsetWidth) * 100;
+      localStorage.setItem('bmd_q_col_pct', currentPct.toFixed(1));
+    });
+
+    // Double-click to reset to 50/50
+    divider.addEventListener('dblclick', function(){
+      qCol.style.width = '50%';
+      localStorage.setItem('bmd_q_col_pct', '50.0');
+    });
+  }
+
+  // Init after DOM ready
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', initSplitDrag);
+  } else {
+    initSplitDrag();
+  }
+})();
+// ── END BMD SPLIT-SCREEN DRAG ──────────────────────────────────
+</script>
 </body>
 </html>
 <!-- v2 -->
