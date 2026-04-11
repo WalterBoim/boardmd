@@ -11947,7 +11947,7 @@ html.dark .hl-btn-active { border-color:#fff!important; }
 // ── BoardMD split-screen: reveal + drag ──
 (function(){
 
-  // Patch revealAnswer + renderCard after window.load (all scripts settled)
+  // Patch revealAnswer + renderCard after window.load
   window.addEventListener('load', function(){
     var _oRev = window.revealAnswer;
     window.revealAnswer = function(sel, card){
@@ -11964,20 +11964,20 @@ html.dark .hl-btn-active { border-color:#fff!important; }
     };
   });
 
-  // ── Drag state ──
-  var _drag = { on: false, x0: 0, w0: 0, rw: 0 };
+  // ── Drag — single shared state on window ──
+  window._bmdDrag = { on: false, x0: 0, w0: 0, rw: 0 };
 
   window.addEventListener('mousemove', function(e){
-    if(!_drag.on) return;
+    if(!window._bmdDrag.on) return;
     var q = document.getElementById('bmd-q-col');
     if(!q) return;
-    var pct = ((_drag.w0 + e.clientX - _drag.x0) / _drag.rw) * 100;
+    var pct = ((window._bmdDrag.w0 + e.clientX - window._bmdDrag.x0) / window._bmdDrag.rw) * 100;
     q.style.width = Math.min(Math.max(pct, 25), 75) + '%';
   });
 
   window.addEventListener('mouseup', function(){
-    if(!_drag.on) return;
-    _drag.on = false;
+    if(!window._bmdDrag.on) return;
+    window._bmdDrag.on = false;
     var d = document.getElementById('bmd-split-divider');
     if(d) d.classList.remove('dragging');
     document.documentElement.style.cursor = '';
@@ -11993,8 +11993,8 @@ html.dark .hl-btn-active { border-color:#fff!important; }
     var d = document.getElementById('bmd-split-divider');
     var q = document.getElementById('bmd-q-col');
     if(!d || !q) return;
-    if(d._ok) return;
-    d._ok = true;
+    if(d._bmdOk) return;
+    d._bmdOk = true;
 
     var saved = localStorage.getItem('bmd_q_pct');
     if(saved) q.style.width = parseFloat(saved) + '%';
@@ -12004,10 +12004,10 @@ html.dark .hl-btn-active { border-color:#fff!important; }
       e.preventDefault();
       e.stopPropagation();
       var r = document.getElementById('bmd-cols-row');
-      _drag.on = true;
-      _drag.x0 = e.clientX;
-      _drag.w0 = q.offsetWidth;
-      _drag.rw = r ? r.offsetWidth : window.innerWidth * 0.9;
+      window._bmdDrag.on = true;
+      window._bmdDrag.x0 = e.clientX;
+      window._bmdDrag.w0 = q.offsetWidth;
+      window._bmdDrag.rw = r ? r.offsetWidth : window.innerWidth * 0.9;
       d.classList.add('dragging');
       document.documentElement.style.cursor = 'col-resize';
       document.documentElement.style.userSelect = 'none';
@@ -12021,10 +12021,7 @@ html.dark .hl-btn-active { border-color:#fff!important; }
     });
   }
 
-  // Try multiple times to ensure divider is in DOM
-  [0, 500, 1500, 3000].forEach(function(t){
-    setTimeout(setupDrag, t);
-  });
+  [0, 500, 1500, 3000].forEach(function(t){ setTimeout(setupDrag, t); });
 
 })();
 </script>
