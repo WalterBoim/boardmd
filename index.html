@@ -11945,9 +11945,8 @@ html.dark .hl-btn-active { border-color:#fff!important; }
 
 <script id="bmd-split-js">
 // ── BoardMD split-screen ──
-window._bmdDrag = {on:false,x0:0,w0:0,rw:0};
 
-// Patch functions after load
+// Patch reveal/render after all scripts load
 window.addEventListener('load', function(){
   var _oRev = window.revealAnswer;
   window.revealAnswer = function(sel,card){
@@ -11964,49 +11963,48 @@ window.addEventListener('load', function(){
   };
 });
 
-// Global mousemove — always active
-document.addEventListener('mousemove', function(e){
-  if(!window._bmdDrag.on) return;
-  var q = document.getElementById('bmd-q-col');
-  if(!q) return;
-  var pct = ((window._bmdDrag.w0 + e.clientX - window._bmdDrag.x0) / window._bmdDrag.rw) * 100;
-  q.style.width = Math.min(Math.max(pct, 25), 75) + '%';
-});
-
-document.addEventListener('mouseup', function(){
-  if(!window._bmdDrag.on) return;
-  window._bmdDrag.on = false;
-  var d = document.getElementById('bmd-split-divider');
-  if(d) d.classList.remove('dragging');
-  document.body.style.cursor = '';
-  document.body.style.userSelect = '';
-  document.documentElement.style.cursor = '';
-  var q = document.getElementById('bmd-q-col');
-  var r = document.getElementById('bmd-cols-row');
-  if(q && r) localStorage.setItem('bmd_q_pct', ((q.offsetWidth/r.offsetWidth)*100).toFixed(1));
-});
-
+// Drag — listeners registered inline on mousedown, removed on mouseup
 function bmdSetupDrag(){
   var d = document.getElementById('bmd-split-divider');
   var q = document.getElementById('bmd-q-col');
   if(!d || !q || d._ok) return;
   d._ok = true;
+
   var saved = localStorage.getItem('bmd_q_pct');
   if(saved) q.style.width = parseFloat(saved) + '%';
+
   d.addEventListener('mousedown', function(e){
     if(window.innerWidth < 900) return;
     e.preventDefault();
     e.stopPropagation();
-    var r = document.getElementById('bmd-cols-row');
-    window._bmdDrag.on = true;
-    window._bmdDrag.x0 = e.clientX;
-    window._bmdDrag.w0 = q.offsetWidth;
-    window._bmdDrag.rw = r ? r.offsetWidth : 900;
+
+    var r   = document.getElementById('bmd-cols-row');
+    var x0  = e.clientX;
+    var w0  = q.offsetWidth;
+    var rw  = r ? r.offsetWidth : 900;
+
     d.classList.add('dragging');
     document.body.style.cursor = 'col-resize';
     document.body.style.userSelect = 'none';
-    document.documentElement.style.cursor = 'col-resize';
+
+    function onMove(ev){
+      var pct = ((w0 + ev.clientX - x0) / rw) * 100;
+      q.style.width = Math.min(Math.max(pct, 25), 75) + '%';
+    }
+    function onUp(){
+      document.removeEventListener('mousemove', onMove);
+      document.removeEventListener('mouseup', onUp);
+      d.classList.remove('dragging');
+      document.body.style.cursor = '';
+      document.body.style.userSelect = '';
+      var r2 = document.getElementById('bmd-cols-row');
+      if(r2) localStorage.setItem('bmd_q_pct', ((q.offsetWidth/r2.offsetWidth)*100).toFixed(1));
+    }
+
+    document.addEventListener('mousemove', onMove);
+    document.addEventListener('mouseup', onUp);
   });
+
   d.addEventListener('dblclick', function(){
     q.style.width = '50%';
     localStorage.removeItem('bmd_q_pct');
