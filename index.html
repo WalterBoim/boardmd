@@ -3356,7 +3356,7 @@ html.light .qs-val { color: inherit; }
   /* Live insight full width */
   .live-insight { margin: 0 !important; }
 
-  /* Card study area — max width on desktop */
+  /* Card study area — desktop single column (600-899px) */
   .study-main {
     display: flex !important;
     justify-content: center !important;
@@ -3382,6 +3382,70 @@ html.light .qs-val { color: inherit; }
     margin-right: auto !important;
   }
 }
+
+/* ── SPLIT-SCREEN LAYOUT (≥900px) ── */
+@media(min-width: 900px) {
+  /* study-inner becomes a flex row */
+  .study-inner {
+    max-width: 1280px !important;
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: flex-start !important;
+    gap: 0 !important;
+  }
+
+  /* Left column: question + options */
+  #bmd-split-left {
+    flex: 1 1 0 !important;
+    min-width: 0 !important;
+    padding-right: 0 !important;
+    position: sticky !important;
+    top: 68px !important;
+    max-height: calc(100vh - 80px) !important;
+    overflow-y: auto !important;
+    scrollbar-width: thin !important;
+    scrollbar-color: var(--border) transparent !important;
+  }
+  #bmd-split-left::-webkit-scrollbar { width: 4px; }
+  #bmd-split-left::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+  /* Divider line between columns */
+  #bmd-split-divider {
+    display: block !important;
+    width: 1px !important;
+    background: var(--border) !important;
+    align-self: stretch !important;
+    flex-shrink: 0 !important;
+    margin: 0 28px !important;
+  }
+
+  /* Right column: answer + explanation + attending + FSRS */
+  #bmd-split-right {
+    flex: 1 1 0 !important;
+    min-width: 0 !important;
+    padding-left: 0 !important;
+  }
+
+  /* card itself spans full left column width */
+  #card-el {
+    max-width: 100% !important;
+  }
+
+  /* explanation goes into right column — no max-width constraint */
+  .explanation, #c-exp,
+  #att-inline-wrap,
+  #key-point-wrap,
+  #card-pubmed-wrap,
+  .fsrs-nav,
+  .plain-nav {
+    max-width: 100% !important;
+  }
+
+  /* Progress bar spans full row above columns */
+  .progress-wrap {
+    grid-column: 1 / -1 !important;
+  }
+}
 </style>
 
 <style id="search-picker-css">
@@ -3404,6 +3468,198 @@ html.light .qs-val { color: inherit; }
 .ds-lrn { color: #f59e0b; font-weight: 700; }
 .ds-due { color: #00d4aa; font-weight: 700; }
 .ds-label { color: var(--muted); font-weight: 400; }
+</style>
+
+<style id="bmd-split-screen">
+/* ═══════════════════════════════════════════════
+   BOARDMD SPLIT-SCREEN LAYOUT  ≥900px
+   Question (left)  |  Answer + Attending (right)
+   ═══════════════════════════════════════════════ */
+
+/* ── Mobile defaults (no split) ── */
+#bmd-split-divider { display: none; }
+#bmd-ans-col { display: block; }
+#bmd-q-col {
+  display: block;
+  border-right: none;
+  padding: 0;
+  position: static;
+  max-height: none;
+  overflow-y: visible;
+}
+#bmd-fsrs-row { display: block; }
+#bmd-ans-placeholder { display: none; }
+
+@media (min-width: 900px) {
+
+  /* Expand study area to near full width */
+  .study-main {
+    padding: 20px 28px !important;
+  }
+  .study-inner {
+    max-width: 1300px !important;
+    width: 100% !important;
+    padding-bottom: calc(80px + 40px) !important;
+  }
+
+  /* card-el becomes the flex container */
+  #card-el {
+    max-width: 1300px !important;
+    display: flex !important;
+    flex-wrap: wrap !important;
+    align-items: flex-start !important;
+    gap: 0 !important;
+    background: transparent !important;
+  }
+
+  /* card-header spans full width above both columns */
+  .card-header {
+    width: 100% !important;
+    max-width: 100% !important;
+    flex: 0 0 100% !important;
+    padding: 18px 24px 14px !important;
+    border-bottom: 1px solid var(--border) !important;
+    margin-bottom: 0 !important;
+  }
+
+  /* LEFT COLUMN — question + options */
+  #bmd-q-col {
+    flex: 1 1 0 !important;
+    min-width: 0 !important;
+    position: sticky !important;
+    top: 68px !important;
+    max-height: calc(100vh - 80px) !important;
+    overflow-y: auto !important;
+    scrollbar-width: thin !important;
+    scrollbar-color: var(--border) transparent !important;
+    border-right: 1px solid var(--border) !important;
+    padding: 24px 28px 28px !important;
+  }
+  #bmd-q-col::-webkit-scrollbar { width: 4px; }
+  #bmd-q-col::-webkit-scrollbar-thumb {
+    background: var(--border2);
+    border-radius: 2px;
+  }
+
+  /* DIVIDER — hidden, border already on q-col */
+  #bmd-split-divider { display: none !important; }
+
+  /* RIGHT COLUMN — answer + explanation + attending */
+  #bmd-ans-col {
+    flex: 1 1 0 !important;
+    min-width: 0 !important;
+    padding: 0 !important;
+    /* scrolls normally with page */
+  }
+
+  /* explanation inside right column */
+  #bmd-ans-col .explanation,
+  #bmd-ans-col #c-exp {
+    max-width: 100% !important;
+    border-top: none !important;
+    padding: 20px 28px !important;
+  }
+
+  /* image wrap inside right col */
+  #bmd-ans-col .card-img-wrap {
+    margin: 0 28px 16px !important;
+  }
+
+  /* key point + pubmed inside right col */
+  #bmd-ans-col #key-point-wrap {
+    padding: 0 28px 14px !important;
+  }
+  #bmd-ans-col #card-pubmed-wrap {
+    padding: 0 28px !important;
+  }
+
+  /* Report issue btn */
+  #bmd-ans-col #report-issue-btn {
+    margin: 0 28px !important;
+  }
+
+  /* footer counter inside right col — hide or keep */
+  #bmd-ans-col .card-footer-counter {
+    border-top: 1px solid var(--border) !important;
+    padding: 10px 28px !important;
+  }
+
+  /* resp-dist-wrap stays in left col — give it proper padding */
+  #bmd-q-col #resp-dist-wrap {
+    padding: 14px 0 10px !important;
+    border-top: 1px solid var(--border) !important;
+    margin-top: 8px !important;
+  }
+
+  /* FSRS row — spans full width below both columns */
+  #bmd-fsrs-row {
+    width: 100% !important;
+    margin-top: 0 !important;
+  }
+  #bmd-fsrs-row .fsrs-nav {
+    max-width: 1300px !important;
+    margin: 0 auto !important;
+    padding: 12px 0 !important;
+  }
+  #bmd-fsrs-row .plain-nav {
+    max-width: 1300px !important;
+    margin: 0 auto !important;
+  }
+
+  /* Attending inline — inside right column, injected dynamically */
+  #att-inline-wrap {
+    max-width: 100% !important;
+    margin: 0 !important;
+    border-radius: 0 !important;
+    border-left: none !important;
+    border-right: none !important;
+    padding: 0 !important;
+  }
+
+  /* Before answer revealed: right column shows subtle placeholder */
+  #bmd-ans-col:not(.has-answer) {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    min-height: 200px !important;
+  }
+
+  /* card-el border/background on desktop — clean frame */
+  #card-el {
+    border: 1px solid var(--border) !important;
+    border-radius: 18px !important;
+    overflow: hidden !important;
+    background: var(--surface) !important;
+  }
+}
+
+/* Label for right col when not yet revealed */
+#bmd-ans-placeholder {
+  display: none;
+}
+@media (min-width: 900px) {
+  #bmd-ans-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    color: var(--muted);
+    font-size: 13px;
+    font-family: 'Sora', sans-serif;
+    font-weight: 500;
+    letter-spacing: .02em;
+    padding: 40px 20px;
+    opacity: .45;
+  }
+  #bmd-ans-placeholder svg {
+    opacity: .4;
+  }
+  /* Hide placeholder once revealed */
+  #bmd-ans-col.has-answer #bmd-ans-placeholder {
+    display: none !important;
+  }
+}
 </style>
 </head>
 <body>
@@ -4402,6 +4658,8 @@ html.light .qs-val { color: inherit; }
               <span class="card-qid" id="c-qid" style="font-size:9px;flex-shrink:0;"></span>
             </div>
           </div>
+          <!-- LEFT COLUMN (question + options) -->
+          <div id="bmd-q-col">
           <div class="card-body">
             <div class="card-question hl-zone" id="c-q">Loading…</div>
             <div class="options" id="c-opts"></div>
@@ -4410,6 +4668,16 @@ html.light .qs-val { color: inherit; }
           <div id="resp-dist-wrap" style="display:none;padding:14px 20px 10px;border-top:1px solid var(--border);">
             <div style="font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text-faint);font-family:'JetBrains Mono',monospace;margin-bottom:10px;">Response Distribution</div>
           </div>
+          </div><!-- /bmd-q-col -->
+          <!-- SPLIT DIVIDER (visible only on desktop after reveal) -->
+          <div id="bmd-split-divider" style="display:none"></div>
+          <!-- RIGHT COLUMN (answer + explanation + attending + FSRS) -->
+          <div id="bmd-ans-col">
+            <!-- Placeholder shown before answer revealed (desktop only) -->
+            <div id="bmd-ans-placeholder">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+              Select your answer to reveal
+            </div>
 
           <div class="explanation" id="c-exp">
             <div class="exp-section">
@@ -4444,8 +4712,10 @@ html.light .qs-val { color: inherit; }
             <span class="cfc-sep">+</span>
             <span class="cfc-due" id="cfc-due">0</span>
           </div>
+          </div><!-- /bmd-ans-col -->
         </div>
 
+        <div id="bmd-fsrs-row">
         <div class="plain-nav" id="plain-nav">
           <button class="nav-plain-btn" onclick="skipBack()">← Back</button>
           <button class="nav-plain-btn" onclick="skipFwd()">Skip →</button>
@@ -4462,6 +4732,7 @@ html.light .qs-val { color: inherit; }
         </div>
 
         <div style="display:none" id="pre-hint"></div>
+        </div><!-- /bmd-fsrs-row -->
 
       </div>
     </div>
@@ -5644,6 +5915,9 @@ function shuffleOpts(card){
 // ── RENDER CARD ───────────────────────────────────────────────────────
 function renderCard(){
   revealed=false;
+  // Split-screen: reset right column for new card
+  const _ansCol = document.getElementById('bmd-ans-col');
+  if(_ansCol) _ansCol.classList.remove('has-answer');
   _cardStartTime = Date.now(); // track response time
   // Remove Attending block from previous card
   const oldAtt = document.getElementById('att-inline-wrap');
@@ -6167,6 +6441,9 @@ function launchBidSession(){
 function revealAnswer(sel,card){
   if(revealed) return;
   revealed=true;
+  // Split-screen: mark right column as revealed
+  const ansCol = document.getElementById('bmd-ans-col');
+  if(ansCol) ansCol.classList.add('has-answer');
 
   // Track response time
   if(_cardStartTime > 0){
