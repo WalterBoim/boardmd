@@ -280,6 +280,10 @@ function render(){
         </div>
         <div class="card-links">${boardmdLink}${pmidLink}</div>
         <div class="cb-section" style="margin-top:16px;">
+          <div class="cb-label">Correct answer (editable — saves to answer field)</div>
+          <textarea class="fix-textarea" id="correct-${flag.id}" style="min-height:60px;">${esc(card.c||'')}</textarea>
+        </div>
+        <div class="cb-section">
           <div class="cb-label">Suggested correction (editable — saves to explanation field)</div>
           <textarea class="fix-textarea" id="fix-${flag.id}">${fix}</textarea>
         </div>
@@ -305,7 +309,10 @@ async function saveCard(flagId, cardId){
   const fix=document.getElementById('fix-'+flagId).value.trim();
   if(!fix){ showToast('Correction text is empty'); return; }
   try {
-    await sb('cards?id=eq.'+cardId,{method:'PATCH',body:JSON.stringify({e:fix}),prefer:'return=minimal'});
+    const correctAnswer = document.getElementById('correct-'+flagId).value.trim();
+    const updatePayload = {e:fix};
+    if(correctAnswer) updatePayload.c = correctAnswer;
+    await sb('cards?id=eq.'+cardId,{method:'PATCH',body:JSON.stringify(updatePayload),prefer:'return=minimal'});
     await sb('qa_results?id=eq.'+flagId,{method:'PATCH',body:JSON.stringify({reviewed:true}),prefer:'return=minimal'});
     document.getElementById('card-'+flagId).classList.add('reviewed');
     const flag=allData.find(f=>f.id===flagId); if(flag) flag.reviewed=true;
