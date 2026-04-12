@@ -715,6 +715,10 @@ html.light .pstat, html.light .badge-item, html.light .lvl-progress{background:v
 .sys-chip:hover{border-color:var(--emerald);color:var(--text);}
 .sys-chip.selected{border-color:var(--emerald);background:rgba(34,197,94,.12);color:var(--emerald);}
 .sys-chip input{display:none;}
+.disc-chip{display:flex;align-items:center;gap:8px;padding:10px 12px;border-radius:10px;border:1px solid var(--border);background:var(--surface2);cursor:pointer;transition:all .15s;font-family:'Lato',sans-serif;font-size:12px;color:var(--text-dim);font-weight:600;}
+.disc-chip:hover{border-color:var(--amber);color:var(--text);}
+.disc-chip.selected{border-color:var(--amber);background:rgba(245,158,11,.12);color:var(--amber);}
+.disc-chip input{display:none;}
 </style>
 <style id="bmd-fonts">
 :root {
@@ -11913,6 +11917,24 @@ html.dark .hl-btn-active { border-color:#fff!important; }
           <div style="font-size:11px;color:var(--muted);margin-top:2px;">Paste QIDs from your UWorld test results</div>
         </div>
       </button>
+      <button onclick="closeSearchPicker();openSysFilter();" style="display:flex;align-items:center;gap:14px;padding:16px 18px;background:var(--surface2);border:1px solid var(--border2);border-radius:14px;cursor:pointer;text-align:left;width:100%;transition:all .15s;font-family:'Sora',sans-serif;" onmouseover="this.style.borderColor='var(--emerald)'" onmouseout="this.style.borderColor='var(--border2)'">
+        <div style="width:38px;height:38px;border-radius:10px;background:rgba(34,197,94,.1);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+          <svg viewBox="0 0 24 24" style="width:18px;height:18px;stroke:var(--emerald);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M4 6h16M7 12h10M10 18h4"/></svg>
+        </div>
+        <div>
+          <div style="font-size:14px;font-weight:700;color:var(--text);">System Filter</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:2px;">Browse by organ system — Cardiovascular, Neuro, GI...</div>
+        </div>
+      </button>
+      <button onclick="closeSearchPicker();openDiscFilter();" style="display:flex;align-items:center;gap:14px;padding:16px 18px;background:var(--surface2);border:1px solid var(--border2);border-radius:14px;cursor:pointer;text-align:left;width:100%;transition:all .15s;font-family:'Sora',sans-serif;" onmouseover="this.style.borderColor='var(--amber)'" onmouseout="this.style.borderColor='var(--border2)'">
+        <div style="width:38px;height:38px;border-radius:10px;background:rgba(245,158,11,.1);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+          <svg viewBox="0 0 24 24" style="width:18px;height:18px;stroke:var(--amber);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+        </div>
+        <div>
+          <div style="font-size:14px;font-weight:700;color:var(--text);">Discipline Filter</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:2px;">Browse by discipline — Pathology, Pharmacology, Surgery...</div>
+        </div>
+      </button>
       <button onclick="closeSearchPicker();openBidFilter();" style="display:flex;align-items:center;gap:14px;padding:16px 18px;background:var(--surface2);border:1px solid var(--border2);border-radius:14px;cursor:pointer;text-align:left;width:100%;transition:all .15s;font-family:'Sora',sans-serif;" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border2)'">
         <div style="width:38px;height:38px;border-radius:10px;background:rgba(168,85,247,.1);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
           <svg viewBox="0 0 24 24" style="width:18px;height:18px;stroke:#a855f7;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M4 6h16M4 10h16M4 14h10M4 18h6"/></svg>
@@ -11920,15 +11942,6 @@ html.dark .hl-btn-active { border-color:#fff!important; }
         <div>
           <div style="font-size:14px;font-weight:700;color:var(--text);">BID <span style="font-size:11px;font-weight:400;color:var(--muted);">BoardMD card ID</span></div>
           <div style="font-size:11px;color:var(--muted);margin-top:2px;">Find specific BoardMD cards by BID number</div>
-        </div>
-      </button>
-      <button onclick="closeSearchPicker();openSysFilter();" style="display:flex;align-items:center;gap:14px;padding:16px 18px;background:var(--surface2);border:1px solid var(--border2);border-radius:14px;cursor:pointer;text-align:left;width:100%;transition:all .15s;font-family:'Sora',sans-serif;" onmouseover="this.style.borderColor='var(--emerald)'" onmouseout="this.style.borderColor='var(--border2)'">
-        <div style="width:38px;height:38px;border-radius:10px;background:rgba(34,197,94,.1);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-          <svg viewBox="0 0 24 24" style="width:18px;height:18px;stroke:var(--emerald);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M4 6h16M7 12h10M10 18h4"/></svg>
-        </div>
-        <div>
-          <div style="font-size:14px;font-weight:700;color:var(--text);">System Filter</div>
-          <div style="font-size:11px;color:var(--muted);margin-top:2px;">Browse by USMLE system or discipline</div>
         </div>
       </button>
     </div>
@@ -11958,6 +11971,31 @@ html.dark .hl-btn-active { border-color:#fff!important; }
       </button>
       <button class="qid-btn-clear" onclick="clearSysFilter()">Clear</button>
       <span id="sys-status" style="font-size:11px;color:var(--text-faint);margin-left:auto"></span>
+    </div>
+  </div>
+</div>
+
+<!-- DISCIPLINE FILTER MODAL -->
+<div id="disc-overlay" class="qid-overlay" style="display:none" onclick="if(event.target===this)closeDiscFilter()">
+  <div class="qid-modal" style="max-width:580px;">
+    <div class="qid-modal-header">
+      <div>
+        <div class="sys-modal-title" style="color:var(--amber);">Discipline Filter</div>
+        <div class="qid-modal-sub">Select one or more disciplines to study. Searches across all loaded decks.</div>
+      </div>
+      <button class="qid-close" onclick="closeDiscFilter()">&#x2715;</button>
+    </div>
+    <div class="sys-step-tabs">
+      <button class="sys-step-tab active" id="disc-tab-s1" onclick="setDiscStep('s1')">Step 1</button>
+      <button class="sys-step-tab" id="disc-tab-s2" onclick="setDiscStep('s2')">Step 2 CK</button>
+    </div>
+    <div class="sys-grid" id="disc-chips-grid"></div>
+    <div class="qid-actions">
+      <button class="qid-btn-search" onclick="launchDiscFilter()" style="background:var(--amber);">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-1px;margin-right:5px"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>Study Selected
+      </button>
+      <button class="qid-btn-clear" onclick="clearDiscFilter()">Clear</button>
+      <span id="disc-status" style="font-size:11px;color:var(--text-faint);margin-left:auto"></span>
     </div>
   </div>
 </div>
@@ -12151,6 +12189,75 @@ function launchSysFilter(){
   const matches=allCards.filter(c=>sysSelected.has(c.system));
   if(!matches.length){alert('No cards found for selected systems.');return;}
   closeSysFilter();
+  currentDeck='_search';
+  deck=[...matches];
+  deck.sort((a,b)=>{const sa=getState(a.id),sb=getState(b.id);if(sa.state!==0&&sb.state===0)return -1;if(sa.state===0&&sb.state!==0)return 1;return(sa.due||0)-(sb.due||0);});
+  againQueue=[];idx=0;revealed=false;sessionRatings={};
+  document.getElementById('app').classList.add('active');
+  document.getElementById('landing').style.display='none';
+  hideDeckHome();
+  document.querySelectorAll('.deck-tab').forEach(t=>t.classList.remove('active'));
+  ensureStudyUI();
+  renderCard();updateStats();
+}
+
+// ── DISCIPLINE FILTER ──────────────────────────────────────────────────────
+const DISC_S1 = ["Pathology","Physiology","Pharmacology","Microbiology","Gross Anatomy & Embryology","Biochemistry & Nutrition","Behavioral Sciences","Histology & Cell Biology","Immunology","Genetics"];
+const DISC_S2 = ["Medicine","Surgery","Pediatrics","Obstetrics & Gynecology","Psychiatry","Pathology","Pharmacology","Microbiology","Physiology","Biochemistry & Nutrition"];
+let discFilterStep = 's1';
+let discSelected = new Set();
+function openDiscFilter(){
+  document.getElementById('disc-overlay').style.display='flex';
+  renderDiscChips();
+}
+function closeDiscFilter(){
+  document.getElementById('disc-overlay').style.display='none';
+}
+function setDiscStep(step){
+  discFilterStep=step;
+  discSelected.clear();
+  document.getElementById('disc-tab-s1').classList.toggle('active',step==='s1');
+  document.getElementById('disc-tab-s2').classList.toggle('active',step==='s2');
+  renderDiscChips();
+}
+function renderDiscChips(){
+  const grid=document.getElementById('disc-chips-grid');
+  const disciplines=discFilterStep==='s1'?DISC_S1:DISC_S2;
+  grid.innerHTML='';
+  disciplines.forEach(disc=>{
+    const selected=discSelected.has(disc);
+    const chip=document.createElement('label');
+    chip.className='disc-chip'+(selected?' selected':'');
+    chip.innerHTML='<input type="checkbox"'+(selected?' checked':'')+' onclick="event.stopPropagation()"><span>'+disc+'</span>';
+    chip.onclick=(e)=>{
+      if(e.target.tagName==='INPUT') return;
+      e.preventDefault();
+      if(discSelected.has(disc)) discSelected.delete(disc);
+      else discSelected.add(disc);
+      renderDiscChips();
+      updateDiscStatus();
+    };
+    grid.appendChild(chip);
+  });
+  updateDiscStatus();
+}
+function updateDiscStatus(){
+  const status=document.getElementById('disc-status');
+  if(!discSelected.size){status.textContent='';return;}
+  const allCards=Object.values(window.DECKS||DECKS).flat();
+  const matches=allCards.filter(c=>discSelected.has((c.discipline||c.disc||'').trim()));
+  status.textContent=matches.length+' cards found';
+}
+function clearDiscFilter(){
+  discSelected.clear();
+  renderDiscChips();
+}
+function launchDiscFilter(){
+  if(!discSelected.size) return;
+  const allCards=Object.values(window.DECKS||DECKS).flat();
+  const matches=allCards.filter(c=>discSelected.has((c.discipline||c.disc||'').trim()));
+  if(!matches.length){alert('No cards found for the selected disciplines.\nCards need a discipline field to use this filter.');return;}
+  closeDiscFilter();
   currentDeck='_search';
   deck=[...matches];
   deck.sort((a,b)=>{const sa=getState(a.id),sb=getState(b.id);if(sa.state!==0&&sb.state===0)return -1;if(sa.state===0&&sb.state!==0)return 1;return(sa.due||0)-(sb.due||0);});
