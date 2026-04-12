@@ -6745,7 +6745,14 @@ function rate(r){
         todayData[currentDeck]={date:today,newSeen:0};
       }
     }catch(e){}
-    if(currentDeck!=='_search') todayData[currentDeck].newSeen=(todayData[currentDeck].newSeen||0)+1;
+    if(currentDeck==='_search'){
+      const nativeDk=card.deck||'boardmd_s1';
+      const today2=dayStamp();
+      if(!todayData[nativeDk]||todayData[nativeDk].date!==today2) todayData[nativeDk]={date:today2,newSeen:0};
+      todayData[nativeDk].newSeen=(todayData[nativeDk].newSeen||0)+1;
+    } else {
+      todayData[currentDeck].newSeen=(todayData[currentDeck].newSeen||0)+1;
+    }
     saveTodayData();
   }
 
@@ -6844,7 +6851,27 @@ function showDone(){
 
 // ── UPDATE STATS (header counters) ────────────────────────────────────
 function updateStats(){
-  if(currentDeck==='_search'||!DECKS[currentDeck]){
+  if(currentDeck==='_search'){
+    const now=Date.now();
+    let nw=0,lrn=0,du=0;
+    const sessionCards=[...deck,...againQueue];
+    sessionCards.forEach(card=>{
+      const s=getState(card.id);
+      if(s.state===ST_NEW) nw++;
+      else if(s.state===ST_LRN||s.state===ST_RLN){ if(s.due<=now+1200000) lrn++; }
+      else if(s.state===ST_REV){ if(s.due<=now+86400000) du++; }
+    });
+    lrn=Math.max(lrn,againQueue.length);
+    const acNew=document.getElementById('ac-new');
+    const acLrn=document.getElementById('ac-lrn');
+    const acDue=document.getElementById('ac-due');
+    if(acNew) acNew.textContent=nw;
+    if(acLrn) acLrn.textContent=lrn;
+    if(acDue) acDue.textContent=du;
+    _syncFC(nw,lrn,du,_cardState);
+    return;
+  }
+  if(!DECKS[currentDeck]){
     _syncFC(0,0,0,_cardState);return;
   }
   const pool=currentSystem==='all'?getCards():getCards().filter(c=>c.system===currentSystem);
@@ -12139,11 +12166,14 @@ let sysFilterStep = 's1';
 let sysSelected = new Set();
 function openSysFilter(){
   const o=document.getElementById('sys-overlay');
-  o.style.cssText='display:flex;z-index:3500';
+  o.style.display='flex';
+  o.style.zIndex='3500';
   renderSysChips();
 }
 function closeSysFilter(){
-  document.getElementById('sys-overlay').style.cssText='display:none;z-index:3500';
+  const _so=document.getElementById('sys-overlay');
+  _so.style.display='none';
+  _so.style.zIndex='3500';
 }
 function setSysStep(step){
   sysFilterStep=step;
@@ -12209,11 +12239,14 @@ let discFilterStep = 's1';
 let discSelected = new Set();
 function openDiscFilter(){
   const o=document.getElementById('disc-overlay');
-  o.style.cssText='display:flex;z-index:3500';
+  o.style.display='flex';
+  o.style.zIndex='3500';
   renderDiscChips();
 }
 function closeDiscFilter(){
-  document.getElementById('disc-overlay').style.cssText='display:none;z-index:3500';
+  const _do=document.getElementById('disc-overlay');
+  _do.style.display='none';
+  _do.style.zIndex='3500';
 }
 function setDiscStep(step){
   discFilterStep=step;
