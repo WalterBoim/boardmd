@@ -11951,7 +11951,7 @@ html.dark .hl-btn-active { border-color:#fff!important; }
 
 
 <!-- SYSTEM FILTER MODAL v2 -->
-<div id="sys-overlay" class="qid-overlay" style="display:none" onclick="if(event.target===this)closeSysFilter()">
+<div id="sys-overlay" class="qid-overlay" style="display:none;z-index:3500" onclick="if(event.target===this)closeSysFilter()">
   <div class="qid-modal" style="max-width:580px;">
     <div class="qid-modal-header">
       <div>
@@ -11976,7 +11976,7 @@ html.dark .hl-btn-active { border-color:#fff!important; }
 </div>
 
 <!-- DISCIPLINE FILTER MODAL -->
-<div id="disc-overlay" class="qid-overlay" style="display:none" onclick="if(event.target===this)closeDiscFilter()">
+<div id="disc-overlay" class="qid-overlay" style="display:none;z-index:3500" onclick="if(event.target===this)closeDiscFilter()">
   <div class="qid-modal" style="max-width:580px;">
     <div class="qid-modal-header">
       <div>
@@ -12138,11 +12138,12 @@ const SYS_S2 = ["Cardiovascular System","Gastrointestinal System","Renal/Urinary
 let sysFilterStep = 's1';
 let sysSelected = new Set();
 function openSysFilter(){
-  document.getElementById('sys-overlay').style.display='flex';
+  const o=document.getElementById('sys-overlay');
+  o.style.cssText='display:flex;z-index:3500';
   renderSysChips();
 }
 function closeSysFilter(){
-  document.getElementById('sys-overlay').style.display='none';
+  document.getElementById('sys-overlay').style.cssText='display:none;z-index:3500';
 }
 function setSysStep(step){
   sysFilterStep=step;
@@ -12207,11 +12208,12 @@ const DISC_S2 = ["Medicine","Surgery","Pediatrics","Obstetrics & Gynecology","Ps
 let discFilterStep = 's1';
 let discSelected = new Set();
 function openDiscFilter(){
-  document.getElementById('disc-overlay').style.display='flex';
+  const o=document.getElementById('disc-overlay');
+  o.style.cssText='display:flex;z-index:3500';
   renderDiscChips();
 }
 function closeDiscFilter(){
-  document.getElementById('disc-overlay').style.display='none';
+  document.getElementById('disc-overlay').style.cssText='display:none;z-index:3500';
 }
 function setDiscStep(step){
   discFilterStep=step;
