@@ -12066,6 +12066,19 @@ function bmdSetupDrag(){
 
 [0,200,500,1000,2000].forEach(function(t){ setTimeout(bmdSetupDrag, t); });
 </script>
+<script>
+const SYS_S1=['Cardiovascular System','Gastrointestinal System','Reproductive & Endocrine Systems','Respiratory and Renal/Urinary Systems','Behavioral Health & Nervous Systems/Special Senses','Blood & Lymphoreticular/Immune Systems','Multisystem Processes & Disorders','Musculoskeletal, Skin & Subcutaneous Tissue'];
+const SYS_S2=['Cardiovascular System','Gastrointestinal System','Renal/Urinary & Reproductive Systems','Respiratory System','Behavioral Health','Blood & Lymphoreticular/Immune Systems','Multisystem Processes & Disorders','Musculoskeletal Sys/Skin & Subcutaneous Tissue','Nervous System & Special Senses','Endocrine System','Pregnancy, Childbirth & the Puerperium'];
+let sysFilterStep='s1';
+let sysSelected=new Set();
+function openSysFilter(){document.getElementById('sys-overlay').style.display='flex';renderSysChips();}
+function closeSysFilter(){document.getElementById('sys-overlay').style.display='none';}
+function setSysStep(step){sysFilterStep=step;sysSelected.clear();document.getElementById('sys-tab-s1').classList.toggle('active',step==='s1');document.getElementById('sys-tab-s2').classList.toggle('active',step==='s2');renderSysChips();}
+function renderSysChips(){const grid=document.getElementById('sys-chips-grid');const systems=sysFilterStep==='s1'?SYS_S1:SYS_S2;grid.innerHTML='';systems.forEach(sys=>{const selected=sysSelected.has(sys);const chip=document.createElement('label');chip.className='sys-chip'+(selected?' selected':'');chip.innerHTML='<input type="checkbox"'+(selected?' checked':'')+'><span>'+sys+'</span>';chip.onclick=(e)=>{e.preventDefault();if(sysSelected.has(sys))sysSelected.delete(sys);else sysSelected.add(sys);renderSysChips();updateSysStatus();};grid.appendChild(chip);});updateSysStatus();}
+function updateSysStatus(){const status=document.getElementById('sys-status');if(!sysSelected.size){status.textContent='';return;}const allCards=Object.values(window.DECKS||DECKS).flat();const matches=allCards.filter(c=>sysSelected.has(c.system));status.textContent=matches.length+' cards found';}
+function clearSysFilter(){sysSelected.clear();renderSysChips();}
+function launchSysFilter(){if(!sysSelected.size){return;}const allCards=Object.values(window.DECKS||DECKS).flat();const matches=allCards.filter(c=>sysSelected.has(c.system));if(!matches.length){alert('No cards found.');return;}closeSysFilter();currentDeck='_search';deck=[...matches];deck.sort((a,b)=>{const sa=getState(a.id),sb=getState(b.id);if(sa.state!==0&&sb.state===0)return -1;if(sa.state===0&&sb.state!==0)return 1;return(sa.due||0)-(sb.due||0);});againQueue=[];idx=0;revealed=false;sessionRatings={};document.getElementById('app').classList.add('active');document.getElementById('landing').style.display='none';hideDeckHome();document.querySelectorAll('.deck-tab').forEach(t=>t.classList.remove('active'));ensureStudyUI();renderCard();updateStats();}
+</script>
 </body>
 
 <!-- SYSTEM FILTER MODAL -->
