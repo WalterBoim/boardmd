@@ -3454,13 +3454,22 @@ html.light .qs-val { color: inherit; }
     width: 50%;
     min-width: 260px !important;
     max-width: 75% !important;
-    padding: 20px 24px 24px !important;
     position: sticky !important;
     top: 60px !important;
     max-height: calc(100vh - 72px) !important;
     overflow-y: auto !important;
     scrollbar-width: thin !important;
     align-self: flex-start !important;
+    display: flex !important;
+    flex-direction: column !important;
+    padding: 0 !important;
+  }
+  /* Inner scroll area inside q-col */
+  #bmd-q-inner {
+    flex: 1 !important;
+    overflow-y: auto !important;
+    padding: 20px 24px 8px !important;
+    scrollbar-width: thin !important;
   }
   #bmd-q-col::-webkit-scrollbar { width: 3px; }
   #bmd-q-col::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
@@ -3536,7 +3545,7 @@ html.light .qs-val { color: inherit; }
   #bmd-ans-col .card-img-wrap  { margin: 0 24px 14px !important; }
   #bmd-ans-col #key-point-wrap { padding: 0 24px 14px !important; }
   #bmd-ans-col #card-pubmed-wrap { padding: 0 24px !important; }
-  #bmd-q-col .card-footer-counter { border-top: 1px solid var(--border) !important; padding: 10px 4px 6px !important; position: sticky !important; bottom: 0 !important; background: var(--surface) !important; margin-top: 8px !important; }
+  #bmd-q-col .card-footer-counter { border-top: 1px solid var(--border) !important; padding: 10px 24px 8px !important; flex-shrink: 0 !important; background: var(--surface) !important; }
   #bmd-ans-col #att-inline-wrap { max-width: 100% !important; margin: 0 !important; border-radius: 0 !important; border-left: none !important; border-right: none !important; }
 
   /* Placeholder before answer revealed */
@@ -4560,6 +4569,7 @@ html.light .qs-val { color: inherit; }
           </div>
           <div id="bmd-cols-row">
           <div id="bmd-q-col">
+          <div id="bmd-q-inner">
           <div class="card-body">
             <div class="card-question hl-zone" id="c-q">Loading…</div>
             <div class="options" id="c-opts"></div>
@@ -4568,6 +4578,7 @@ html.light .qs-val { color: inherit; }
           <div id="resp-dist-wrap" style="display:none;padding:14px 20px 10px;border-top:1px solid var(--border);">
             <div style="font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text-faint);font-family:'JetBrains Mono',monospace;margin-bottom:10px;">Response Distribution</div>
           </div>
+          </div><!-- /bmd-q-inner -->
           <div class="card-footer-counter">
             <span class="cfc-new" id="cfc-new">0</span>
             <span class="cfc-sep">+</span>
@@ -5751,10 +5762,12 @@ function ensureStudyUI(){
       </div>
       <div id="bmd-cols-row">
       <div id="bmd-q-col">
+      <div id="bmd-q-inner">
       <div class="card-body">
         <div class="card-question hl-zone hl-q" id="c-q">Loading…</div>
         <div class="options hl-zone hl-q" id="c-opts"></div>
       </div>
+      </div><!-- /bmd-q-inner -->
       <div class="card-footer-counter">
         <span class="cfc-new" id="cfc-new">0</span>
         <span class="cfc-sep">+</span>
