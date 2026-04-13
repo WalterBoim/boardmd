@@ -704,21 +704,6 @@ html.light .pstat, html.light .badge-item, html.light .lvl-progress{background:v
   .deck-tab{font-size:12px;padding:8px 10px;}
   .qid-modal,.bid-modal{width:95vw;padding:20px 16px;}
 }
-
-/* ── SYSTEM FILTER MODAL ── */
-.sys-modal-title{font-family:'Instrument Serif',serif;font-size:22px;color:var(--emerald);}
-.sys-step-tabs{display:flex;gap:8px;margin-bottom:16px;}
-.sys-step-tab{padding:7px 18px;border-radius:8px;border:1px solid var(--border);background:none;color:var(--text-dim);font-family:'Lato',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:all .15s;}
-.sys-step-tab.active{background:var(--emerald);color:#fff;border-color:var(--emerald);}
-.sys-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px;}
-.sys-chip{display:flex;align-items:center;gap:8px;padding:10px 12px;border-radius:10px;border:1px solid var(--border);background:var(--surface2);cursor:pointer;transition:all .15s;font-family:'Lato',sans-serif;font-size:12px;color:var(--text-dim);font-weight:600;}
-.sys-chip:hover{border-color:var(--emerald);color:var(--text);}
-.sys-chip.selected{border-color:var(--emerald);background:rgba(34,197,94,.12);color:var(--emerald);}
-.sys-chip input{display:none;}
-.disc-chip{display:flex;align-items:center;gap:8px;padding:10px 12px;border-radius:10px;border:1px solid var(--border);background:var(--surface2);cursor:pointer;transition:all .15s;font-family:'Lato',sans-serif;font-size:12px;color:var(--text-dim);font-weight:600;}
-.disc-chip:hover{border-color:var(--amber);color:var(--text);}
-.disc-chip.selected{border-color:var(--amber);background:rgba(245,158,11,.12);color:var(--amber);}
-.disc-chip input{display:none;}
 </style>
 <style id="bmd-fonts">
 :root {
@@ -3578,8 +3563,12 @@ html.light .qs-val { color: inherit; }
     gap: 8px !important;
     padding: 32px !important;
   }
-  #bmd-ans-col #bmd-ans-placeholder { display: flex !important; }
   #bmd-ans-col.has-answer #bmd-ans-placeholder { display: none !important; }
+  #bmd-ans-col:not(.has-answer) #c-exp         { display: none !important; }
+  #bmd-ans-col:not(.has-answer) #key-point-wrap,
+  #bmd-ans-col:not(.has-answer) #card-pubmed-wrap,
+  #bmd-ans-col:not(.has-answer) #att-inline-wrap,
+  /* counter always visible in q-col */
 }
 </style>
 </head>
@@ -4600,6 +4589,35 @@ html.light .qs-val { color: inherit; }
           </div>
           </div><!-- /bmd-q-col -->
           <div id="bmd-split-divider"><div class="bmd-div-handle"><span></span><span></span></div></div>
+          <div id="bmd-ans-col">
+            <div id="bmd-ans-placeholder">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+              Select your answer to reveal
+            </div>
+          <div class="explanation" id="c-exp">
+            <div class="exp-section">
+              <div class="exp-label"><span class="exp-label-icon" style="background:rgba(34,197,94,.15);color:var(--emerald)"></span>Correct answer</div>
+              <div class="exp-correct"><div class="exp-correct-inner" id="exp-ans"></div></div>
+            </div>
+            <div id="c-img-wrap" style="display:none" class="card-img-wrap">
+              <img id="c-img" class="card-img" src="" alt=""/>
+              <div class="card-img-credit">
+                <span id="c-img-credit"></span>
+                <span id="c-img-license" style="opacity:.7"></span>
+              </div>
+            </div>
+            <div class="exp-section">
+              <div class="exp-label"><span class="exp-label-icon" style="background:rgba(59,127,255,.15);color:var(--accent)">≡</span>Explanation</div>
+              <div class="exp-text hl-zone" id="exp-txt"></div>
+            </div>
+            <div class="exp-section" id="exp-dist-wrap" style="display:none">
+              <div class="exp-label"><span class="exp-label-icon" style="background:rgba(244,63,94,.15);color:var(--rose)"></span>Why the others are wrong</div>
+              <div class="exp-dist hl-zone" id="exp-dist"></div>
+            </div>
+          </div>
+          <div id="key-point-wrap" style="display:none;padding:0 18px 14px;"></div>
+          <div id="card-pubmed-wrap" style="display:none;"></div>
+          </div><!-- /bmd-ans-col -->
           </div><!-- /bmd-cols-row -->
           <div style="display:flex;justify-content:flex-end;padding:4px 18px 2px;">
             <button id="report-issue-btn" onclick="openReportIssue()" style="background:none;border:none;cursor:pointer;font-size:10px;font-weight:600;color:var(--text-faint);font-family:'JetBrains Mono',monospace;padding:2px 0;opacity:.4;transition:opacity .15s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='.4'">⚑ Report Issue</button>
@@ -5761,7 +5779,7 @@ function ensureStudyUI(){
       <div id="bmd-split-divider"><div class="bmd-div-handle"><span></span><span></span></div></div>
       <div id="bmd-ans-col">
         <div id="bmd-ans-placeholder"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>Select your answer to reveal</div>
-      <div class="explanation" id="c-exp" style="display:none">
+      <div class="explanation" id="c-exp">
         <div class="exp-section">
           <div class="exp-label"><span class="exp-label-icon" style="background:rgba(34,197,94,.15);color:var(--emerald)">✓</span>Correct answer</div>
           <div class="exp-correct"><div class="exp-correct-inner" id="exp-ans"></div></div>
@@ -5782,9 +5800,6 @@ function ensureStudyUI(){
           <div class="exp-dist" id="exp-dist"></div>
         </div>
       </div>
-      <div id="key-point-wrap" style="display:none;padding:0 18px 14px;"></div>
-      <div id="card-pubmed-wrap" style="display:none;"></div>
-      <div id="att-inline-wrap" style="display:none;"></div>
       </div><!-- /bmd-ans-col -->
       </div><!-- /bmd-cols-row -->
     </div>
@@ -6715,14 +6730,7 @@ function rate(r){
         todayData[currentDeck]={date:today,newSeen:0};
       }
     }catch(e){}
-    if(currentDeck==='_search'){
-      const nativeDk=card.deck||'boardmd_s1';
-      const today2=dayStamp();
-      if(!todayData[nativeDk]||todayData[nativeDk].date!==today2) todayData[nativeDk]={date:today2,newSeen:0};
-      todayData[nativeDk].newSeen=(todayData[nativeDk].newSeen||0)+1;
-    } else {
-      todayData[currentDeck].newSeen=(todayData[currentDeck].newSeen||0)+1;
-    }
+    if(currentDeck!=='_search') todayData[currentDeck].newSeen=(todayData[currentDeck].newSeen||0)+1;
     saveTodayData();
   }
 
@@ -6821,27 +6829,7 @@ function showDone(){
 
 // ── UPDATE STATS (header counters) ────────────────────────────────────
 function updateStats(){
-  if(currentDeck==='_search'){
-    const now=Date.now();
-    let nw=0,lrn=0,du=0;
-    const sessionCards=[...deck,...againQueue];
-    sessionCards.forEach(card=>{
-      const s=getState(card.id);
-      if(s.state===ST_NEW) nw++;
-      else if(s.state===ST_LRN||s.state===ST_RLN){ if(s.due<=now+1200000) lrn++; }
-      else if(s.state===ST_REV){ if(s.due<=now+86400000) du++; }
-    });
-    lrn=Math.max(lrn,againQueue.length);
-    const acNew=document.getElementById('ac-new');
-    const acLrn=document.getElementById('ac-lrn');
-    const acDue=document.getElementById('ac-due');
-    if(acNew) acNew.textContent=nw;
-    if(acLrn) acLrn.textContent=lrn;
-    if(acDue) acDue.textContent=du;
-    _syncFC(nw,lrn,du,_cardState);
-    return;
-  }
-  if(!DECKS[currentDeck]){
+  if(currentDeck==='_search'||!DECKS[currentDeck]){
     _syncFC(0,0,0,_cardState);return;
   }
   const pool=currentSystem==='all'?getCards():getCards().filter(c=>c.system===currentSystem);
@@ -11914,24 +11902,6 @@ html.dark .hl-btn-active { border-color:#fff!important; }
           <div style="font-size:11px;color:var(--muted);margin-top:2px;">Paste QIDs from your UWorld test results</div>
         </div>
       </button>
-      <button onclick="closeSearchPicker();openSysFilter();" style="display:flex;align-items:center;gap:14px;padding:16px 18px;background:var(--surface2);border:1px solid var(--border2);border-radius:14px;cursor:pointer;text-align:left;width:100%;transition:all .15s;font-family:'Sora',sans-serif;" onmouseover="this.style.borderColor='var(--emerald)'" onmouseout="this.style.borderColor='var(--border2)'">
-        <div style="width:38px;height:38px;border-radius:10px;background:rgba(34,197,94,.1);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-          <svg viewBox="0 0 24 24" style="width:18px;height:18px;stroke:var(--emerald);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M4 6h16M7 12h10M10 18h4"/></svg>
-        </div>
-        <div>
-          <div style="font-size:14px;font-weight:700;color:var(--text);">System Filter</div>
-          <div style="font-size:11px;color:var(--muted);margin-top:2px;">Browse by organ system — Cardiovascular, Neuro, GI...</div>
-        </div>
-      </button>
-      <button onclick="closeSearchPicker();openDiscFilter();" style="display:flex;align-items:center;gap:14px;padding:16px 18px;background:var(--surface2);border:1px solid var(--border2);border-radius:14px;cursor:pointer;text-align:left;width:100%;transition:all .15s;font-family:'Sora',sans-serif;" onmouseover="this.style.borderColor='var(--amber)'" onmouseout="this.style.borderColor='var(--border2)'">
-        <div style="width:38px;height:38px;border-radius:10px;background:rgba(245,158,11,.1);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-          <svg viewBox="0 0 24 24" style="width:18px;height:18px;stroke:var(--amber);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
-        </div>
-        <div>
-          <div style="font-size:14px;font-weight:700;color:var(--text);">Discipline Filter</div>
-          <div style="font-size:11px;color:var(--muted);margin-top:2px;">Browse by discipline — Pathology, Pharmacology, Surgery...</div>
-        </div>
-      </button>
       <button onclick="closeSearchPicker();openBidFilter();" style="display:flex;align-items:center;gap:14px;padding:16px 18px;background:var(--surface2);border:1px solid var(--border2);border-radius:14px;cursor:pointer;text-align:left;width:100%;transition:all .15s;font-family:'Sora',sans-serif;" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border2)'">
         <div style="width:38px;height:38px;border-radius:10px;background:rgba(168,85,247,.1);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
           <svg viewBox="0 0 24 24" style="width:18px;height:18px;stroke:#a855f7;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M4 6h16M4 10h16M4 14h10M4 18h6"/></svg>
@@ -11945,57 +11915,6 @@ html.dark .hl-btn-active { border-color:#fff!important; }
   </div>
 </div>
 
-
-
-<!-- SYSTEM FILTER MODAL v2 -->
-<div id="sys-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:3500;align-items:center;justify-content:center;backdrop-filter:blur(6px);" onclick="if(event.target===this)closeSysFilter()">
-  <div class="qid-modal" style="max-width:580px;">
-    <div class="qid-modal-header">
-      <div>
-        <div class="sys-modal-title">System Filter</div>
-        <div class="qid-modal-sub">Select one or more systems to study. Searches across all loaded decks.</div>
-      </div>
-      <button class="qid-close" onclick="closeSysFilter()">&#x2715;</button>
-    </div>
-    <div class="sys-step-tabs">
-      <button class="sys-step-tab active" id="sys-tab-s1" onclick="setSysStep('s1')">Step 1</button>
-      <button class="sys-step-tab" id="sys-tab-s2" onclick="setSysStep('s2')">Step 2 CK</button>
-    </div>
-    <div class="sys-grid" id="sys-chips-grid"></div>
-    <div class="qid-actions">
-      <button class="qid-btn-search" onclick="launchSysFilter()" style="background:var(--emerald);">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-1px;margin-right:5px"><path d="M4 6h16M7 12h10M10 18h4"/></svg>Study Selected
-      </button>
-      <button class="qid-btn-clear" onclick="clearSysFilter()">Clear</button>
-      <span id="sys-status" style="font-size:11px;color:var(--text-faint);margin-left:auto"></span>
-    </div>
-  </div>
-</div>
-
-<!-- DISCIPLINE FILTER MODAL -->
-<div id="disc-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:3500;align-items:center;justify-content:center;backdrop-filter:blur(6px);" onclick="if(event.target===this)closeDiscFilter()">
-  <div class="qid-modal" style="max-width:580px;">
-    <div class="qid-modal-header">
-      <div>
-        <div class="sys-modal-title" style="color:var(--amber);">Discipline Filter</div>
-        <div class="qid-modal-sub">Select one or more disciplines to study. Searches across all loaded decks.</div>
-      </div>
-      <button class="qid-close" onclick="closeDiscFilter()">&#x2715;</button>
-    </div>
-    <div class="sys-step-tabs">
-      <button class="sys-step-tab active" id="disc-tab-s1" onclick="setDiscStep('s1')">Step 1</button>
-      <button class="sys-step-tab" id="disc-tab-s2" onclick="setDiscStep('s2')">Step 2 CK</button>
-    </div>
-    <div class="sys-grid" id="disc-chips-grid"></div>
-    <div class="qid-actions">
-      <button class="qid-btn-search" onclick="launchDiscFilter()" style="background:var(--amber);">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-1px;margin-right:5px"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>Study Selected
-      </button>
-      <button class="qid-btn-clear" onclick="clearDiscFilter()">Clear</button>
-      <span id="disc-status" style="font-size:11px;color:var(--text-faint);margin-left:auto"></span>
-    </div>
-  </div>
-</div>
 
 <!-- PROFILE EDITOR MODAL -->
 <div id="profile-editor-overlay" style="display:none;position:fixed;inset:0;z-index:4000;background:rgba(0,0,0,.55);backdrop-filter:blur(6px);align-items:flex-end;justify-content:center;" onclick="if(event.target===this)closeProfileEditor()">
@@ -12065,12 +11984,6 @@ html.dark .hl-btn-active { border-color:#fff!important; }
 window.addEventListener('load', function(){
   var _oRev = window.revealAnswer;
   window.revealAnswer = function(sel,card){
-    var ac = document.getElementById('bmd-ans-col');
-    if(ac) ac.classList.add('has-answer');
-    var cexp = document.getElementById('c-exp');
-    if(cexp) cexp.style.display='block';
-    var ph = document.getElementById('bmd-ans-placeholder');
-    if(ph) ph.style.display='none';
     var r = _oRev ? _oRev(sel,card) : undefined;
     var ac = document.getElementById('bmd-ans-col');
     if(ac) ac.classList.add('has-answer');
@@ -12132,158 +12045,7 @@ function bmdSetupDrag(){
 }
 
 [0,200,500,1000,2000].forEach(function(t){ setTimeout(bmdSetupDrag, t); });
-
-
-<script>
-// ── SYSTEM FILTER ─────────────────────────────────────────────────────
-const SYS_S1 = ["Cardiovascular System","Gastrointestinal System","Reproductive & Endocrine Systems","Respiratory and Renal/Urinary Systems","Behavioral Health & Nervous Systems/Special Senses","Blood & Lymphoreticular/Immune Systems","Multisystem Processes & Disorders","Musculoskeletal, Skin & Subcutaneous Tissue"];
-const SYS_S2 = ["Cardiovascular System","Gastrointestinal System","Renal/Urinary & Reproductive Systems","Respiratory System","Behavioral Health","Blood & Lymphoreticular/Immune Systems","Multisystem Processes & Disorders","Musculoskeletal Sys/Skin & Subcutaneous Tissue","Nervous System & Special Senses","Endocrine System","Pregnancy, Childbirth & the Puerperium"];
-let sysFilterStep = 's1';
-let sysSelected = new Set();
-function openSysFilter(){
-  const o=document.getElementById('sys-overlay');
-  o.style.display='flex';
-  o.style.zIndex='3500';
-  renderSysChips();
-}
-function closeSysFilter(){
-  const _so=document.getElementById('sys-overlay');
-  _so.style.display='none';
-  _so.style.zIndex='3500';
-}
-function setSysStep(step){
-  sysFilterStep=step;
-  sysSelected.clear();
-  document.getElementById('sys-tab-s1').classList.toggle('active',step==='s1');
-  document.getElementById('sys-tab-s2').classList.toggle('active',step==='s2');
-  renderSysChips();
-}
-function renderSysChips(){
-  const grid=document.getElementById('sys-chips-grid');
-  const systems=sysFilterStep==='s1'?SYS_S1:SYS_S2;
-  grid.innerHTML='';
-  systems.forEach(sys=>{
-    const selected=sysSelected.has(sys);
-    const chip=document.createElement('label');
-    chip.className='sys-chip'+(selected?' selected':'');
-    chip.innerHTML='<input type="checkbox"'+(selected?' checked':'')+' onclick="event.stopPropagation()"><span>'+sys+'</span>';
-    chip.onclick=(e)=>{
-      if(e.target.tagName==='INPUT') return;
-      e.preventDefault();
-      if(sysSelected.has(sys)) sysSelected.delete(sys);
-      else sysSelected.add(sys);
-      renderSysChips();
-      updateSysStatus();
-    };
-    grid.appendChild(chip);
-  });
-  updateSysStatus();
-}
-function updateSysStatus(){
-  const status=document.getElementById('sys-status');
-  if(!sysSelected.size){status.textContent='';return;}
-  const allCards=Object.values(window.DECKS||DECKS).flat();
-  const matches=allCards.filter(c=>sysSelected.has(c.system));
-  status.textContent=matches.length+' cards found';
-}
-function clearSysFilter(){
-  sysSelected.clear();
-  renderSysChips();
-}
-function launchSysFilter(){
-  if(!sysSelected.size) return;
-  const allCards=Object.values(window.DECKS||DECKS).flat();
-  const matches=allCards.filter(c=>sysSelected.has(c.system));
-  if(!matches.length){alert('No cards found for selected systems.');return;}
-  closeSysFilter();
-  currentDeck='_search';
-  deck=[...matches];
-  deck.sort((a,b)=>{const sa=getState(a.id),sb=getState(b.id);if(sa.state!==0&&sb.state===0)return -1;if(sa.state===0&&sb.state!==0)return 1;return(sa.due||0)-(sb.due||0);});
-  againQueue=[];idx=0;revealed=false;sessionRatings={};
-  document.getElementById('app').classList.add('active');
-  document.getElementById('landing').style.display='none';
-  hideDeckHome();
-  document.querySelectorAll('.deck-tab').forEach(t=>t.classList.remove('active'));
-  ensureStudyUI();
-  renderCard();updateStats();
-}
-
-// ── DISCIPLINE FILTER ──────────────────────────────────────────────────────
-const DISC_S1 = ["Pathology","Physiology","Pharmacology","Microbiology","Gross Anatomy & Embryology","Biochemistry & Nutrition","Behavioral Sciences","Histology & Cell Biology","Immunology","Genetics"];
-const DISC_S2 = ["Medicine","Surgery","Pediatrics","Obstetrics & Gynecology","Psychiatry","Pathology","Pharmacology","Microbiology","Physiology","Biochemistry & Nutrition"];
-let discFilterStep = 's1';
-let discSelected = new Set();
-function openDiscFilter(){
-  const o=document.getElementById('disc-overlay');
-  o.style.display='flex';
-  o.style.zIndex='3500';
-  renderDiscChips();
-}
-function closeDiscFilter(){
-  const _do=document.getElementById('disc-overlay');
-  _do.style.display='none';
-  _do.style.zIndex='3500';
-}
-function setDiscStep(step){
-  discFilterStep=step;
-  discSelected.clear();
-  document.getElementById('disc-tab-s1').classList.toggle('active',step==='s1');
-  document.getElementById('disc-tab-s2').classList.toggle('active',step==='s2');
-  renderDiscChips();
-}
-function renderDiscChips(){
-  const grid=document.getElementById('disc-chips-grid');
-  const disciplines=discFilterStep==='s1'?DISC_S1:DISC_S2;
-  grid.innerHTML='';
-  disciplines.forEach(disc=>{
-    const selected=discSelected.has(disc);
-    const chip=document.createElement('label');
-    chip.className='disc-chip'+(selected?' selected':'');
-    chip.innerHTML='<input type="checkbox"'+(selected?' checked':'')+' onclick="event.stopPropagation()"><span>'+disc+'</span>';
-    chip.onclick=(e)=>{
-      if(e.target.tagName==='INPUT') return;
-      e.preventDefault();
-      if(discSelected.has(disc)) discSelected.delete(disc);
-      else discSelected.add(disc);
-      renderDiscChips();
-      updateDiscStatus();
-    };
-    grid.appendChild(chip);
-  });
-  updateDiscStatus();
-}
-function updateDiscStatus(){
-  const status=document.getElementById('disc-status');
-  if(!discSelected.size){status.textContent='';return;}
-  const allCards=Object.values(window.DECKS||DECKS).flat();
-  const matches=allCards.filter(c=>discSelected.has((c.discipline||c.disc||'').trim()));
-  status.textContent=matches.length+' cards found';
-}
-function clearDiscFilter(){
-  discSelected.clear();
-  renderDiscChips();
-}
-function launchDiscFilter(){
-  if(!discSelected.size) return;
-  const allCards=Object.values(window.DECKS||DECKS).flat();
-  const matches=allCards.filter(c=>discSelected.has((c.discipline||c.disc||'').trim()));
-  if(!matches.length){alert('No cards found for the selected disciplines.\nCards need a discipline field to use this filter.');return;}
-  closeDiscFilter();
-  currentDeck='_search';
-  deck=[...matches];
-  deck.sort((a,b)=>{const sa=getState(a.id),sb=getState(b.id);if(sa.state!==0&&sb.state===0)return -1;if(sa.state===0&&sb.state!==0)return 1;return(sa.due||0)-(sb.due||0);});
-  againQueue=[];idx=0;revealed=false;sessionRatings={};
-  document.getElementById('app').classList.add('active');
-  document.getElementById('landing').style.display='none';
-  hideDeckHome();
-  document.querySelectorAll('.deck-tab').forEach(t=>t.classList.remove('active'));
-  ensureStudyUI();
-  renderCard();updateStats();
-}
-</script>
-
 </script>
 </body>
 </html>
-<!-- v2 --> 
- 
+<!-- v2 -->
