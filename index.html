@@ -11033,7 +11033,8 @@ function studySystemFilter() {
     document.getElementById('sf-status').textContent = 'Select at least one system';
     return;
   }
-  var pool = getCards().filter(function(c) {
+  var allCards = Object.values(window.DECKS||{}).reduce(function(a,b){return a.concat(b);},[]);
+  var pool = allCards.filter(function(c) {
     return sel.some(function(s) { return (c.system||'').toLowerCase() === s.toLowerCase(); });
   });
   if(pool.length === 0) {
@@ -11152,7 +11153,8 @@ function studyDisciplineFilter() {
     document.getElementById('df-status').textContent = 'Select at least one discipline';
     return;
   }
-  var pool = getCards().filter(function(c) {
+  var allCards = Object.values(window.DECKS||{}).reduce(function(a,b){return a.concat(b);},[]);
+  var pool = allCards.filter(function(c) {
     return sel.some(function(d) { return (c.discipline||'').toLowerCase() === d.toLowerCase(); });
   });
   if(pool.length === 0) {
