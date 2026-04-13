@@ -12068,6 +12068,8 @@ html.dark .hl-btn-active { border-color:#fff!important; }
 window.addEventListener('load', function(){
   var _oRev = window.revealAnswer;
   window.revealAnswer = function(sel,card){
+    var acs = document.querySelectorAll('#bmd-ans-col');
+    acs.forEach(function(a){ a.classList.add('has-answer'); });
     var r = _oRev ? _oRev(sel,card) : undefined;
     var ac = document.getElementById('bmd-ans-col');
     if(ac) ac.classList.add('has-answer');
