@@ -6829,7 +6829,20 @@ function showDone(){
 
 // ── UPDATE STATS (header counters) ────────────────────────────────────
 function updateStats(){
-  if(currentDeck==='_search'||!DECKS[currentDeck]){
+  if(currentDeck==='_search'){
+    // For search/filter sessions, calculate from current deck array
+    const now=Date.now(),c=cfg();
+    let nw=0,lrn=0,du=0;
+    (deck||[]).forEach(function(card){
+      const s=getState(card.id);
+      if(s.state===ST_NEW) nw++;
+      else if(s.state===ST_LRN||s.state===ST_RLN){ if(s.due<=now+1200000) lrn++; }
+      else if(s.state===ST_REV){ if(s.due<=now+86400000) du++; }
+    });
+    lrn=Math.max(lrn,againQueue.length);
+    _syncFC(nw,lrn,du,_cardState);return;
+  }
+  if(!DECKS[currentDeck]){
     _syncFC(0,0,0,_cardState);return;
   }
   const pool=currentSystem==='all'?getCards():getCards().filter(c=>c.system===currentSystem);
@@ -11043,6 +11056,7 @@ function studySystemFilter() {
   }
   closeSystemFilter();
   pool.sort(function(){return Math.random()-.5;});
+  showToast(pool.length + ' cards found — ' + sel.join(', '));
   currentDeck = '_search';
   deck = pool;
   againQueue = []; idx = 0; revealed = false; sessionRatings = {};
@@ -11163,6 +11177,7 @@ function studyDisciplineFilter() {
   }
   closeDisciplineFilter();
   pool.sort(function(){return Math.random()-.5;});
+  showToast(pool.length + ' cards found — ' + sel.join(', '));
   currentDeck = '_search';
   deck = pool;
   againQueue = []; idx = 0; revealed = false; sessionRatings = {};
