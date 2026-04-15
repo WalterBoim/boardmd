@@ -2161,6 +2161,104 @@ mark.hb{background:rgba(79,142,247,.28);border-bottom:2px solid rgba(40,100,220,
   border-radius: 0 !important;
   max-width: 100% !important;
 }
+
+/* ══════════════════════════════════════════════
+   BoardMD Layout Fix — 15 Apr 2026
+   Isolado por media query: desktop e mobile separados
+   ══════════════════════════════════════════════ */
+
+/* ── COMPARTILHADO: dock fixa na base ── */
+.plain-nav {
+  flex-shrink: 0 !important;
+  display: flex !important;
+  gap: 6px !important;
+  justify-content: center !important;
+  width: 100% !important;
+  background: var(--bg) !important;
+  padding: 4px 16px 6px !important;
+}
+.nav-plain-btn {
+  padding: 4px 16px !important;
+  border-radius: 6px !important;
+  font-size: 11px !important;
+  font-weight: 500 !important;
+  border: 1px solid var(--border) !important;
+  background: none !important;
+  color: var(--text-faint) !important;
+  cursor: pointer !important;
+}
+.nav-plain-btn:hover {
+  color: var(--text-dim) !important;
+  border-color: var(--border-bright) !important;
+}
+.fsrs-nav.visible {
+  flex-shrink: 0 !important;
+  width: 100% !important;
+  background: var(--bg) !important;
+  border-top: 1px solid var(--border) !important;
+  padding: 8px 16px 4px !important;
+}
+
+/* ── DESKTOP: layout travado, uma scrollbar ── */
+@media (min-width: 601px) {
+  #app {
+    height: 100vh !important;
+    overflow: hidden !important;
+  }
+  .app-layout {
+    height: calc(100vh - var(--app-hdr-h, 90px)) !important;
+    overflow: hidden !important;
+  }
+  .study-main {
+    overflow: hidden !important;
+    display: flex !important;
+    flex-direction: column !important;
+    height: 100% !important;
+  }
+  .study-inner {
+    flex: 1 !important;
+    overflow-y: auto !important;
+    padding-bottom: 16px !important;
+    scrollbar-width: thin !important;
+  }
+  body.studying {
+    overflow: hidden !important;
+    height: 100vh !important;
+  }
+}
+
+/* ── MOBILE: layout travado, dock fixa ── */
+@media (max-width: 600px) {
+  #app {
+    height: 100vh !important;
+    overflow: hidden !important;
+    display: flex !important;
+    flex-direction: column !important;
+  }
+  .app-layout {
+    flex: 1 !important;
+    overflow: hidden !important;
+    display: flex !important;
+    flex-direction: column !important;
+  }
+  .study-main {
+    flex: 1 !important;
+    overflow: hidden !important;
+    display: flex !important;
+    flex-direction: column !important;
+  }
+  .study-inner {
+    flex: 1 !important;
+    overflow-y: auto !important;
+    padding-bottom: 8px !important;
+    scrollbar-width: none !important;
+  }
+  .study-inner::-webkit-scrollbar { display: none !important; }
+  body.studying {
+    overflow: hidden !important;
+    height: 100vh !important;
+  }
+}
 </style>
 
 <style id="bmd-perf-v2">
@@ -5501,7 +5599,7 @@ function switchDeckAndStudy(dk){
 
 function goHome(){
   document.getElementById('landing').style.display='';
-  document.getElementById('app').classList.remove('active');
+  document.getElementById('app').classList.remove('active');document.body.classList.remove('studying');
   clearLrnTimers();
   window.scrollTo(0,0);
 }
@@ -5514,7 +5612,7 @@ const SHELF_DECKS = ['shelf_surgery','shelf_em','shelf'];
 
 function openApp(dk){
   document.getElementById('landing').style.display='none';
-  document.getElementById('app').classList.add('active');
+  document.getElementById('app').classList.add('active');document.body.classList.add('studying');
   applyFont();
   if(STEP2_DECKS.includes(dk)){
     currentStep='s2';
@@ -5864,7 +5962,7 @@ function renderCard(){
       const waitMin = Math.ceil(waitMs / 60000);
       const waitEl = document.getElementById('c-q');
       if(waitEl){
-        document.getElementById('app-layout-wrap').style.display='flex';
+        document.getElementById('app-layout-wrap').style.display='flex';document.body.classList.add('studying');
         document.getElementById('deck-home').classList.remove('active');
         const _fsrs3=document.getElementById('fsrs-nav');
         const _fsrs4=document.getElementById('fsrs-nav-2');
