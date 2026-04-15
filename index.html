@@ -235,7 +235,7 @@ html.light .anki-due{color:#16a34a;}
 .sys-cnt{font-family:'JetBrains Mono',monospace;font-size:10px;opacity:.7;}
 .sys-sep{height:1px;background:var(--border);margin:8px 0;}
 
-.study-main{flex:1;display:flex;justify-content:center;padding:24px 20px;overflow-y:auto;min-width:0;}
+.study-main{flex:1;display:flex;flex-direction:column;justify-content:flex-start;padding:0;overflow:hidden;min-width:0;}
 .study-inner{max-width:760px;width:100%;display:flex;flex-direction:column;align-items:center;gap:16px;}
 
 .progress-wrap{width:100%;}
@@ -2039,17 +2039,7 @@ mark.hb{background:rgba(79,142,247,.28);border-bottom:2px solid rgba(40,100,220,
   flex-direction: column !important;
   align-items: center !important;
 }
-body.studying .fsrs-nav.visible {
-  position: fixed !important;
-  bottom: 76px !important;
-  left: 0 !important;
-  right: 0 !important;
-  z-index: 190 !important;
-  background: var(--bg) !important;
-  border-top: 1px solid var(--border) !important;
-  padding: 10px 16px 12px !important;
-  width: 100% !important;
-}
+
 /* Mobile: extra bottom padding for bottom nav */
 @media(max-width: 600px){
   .fsrs-nav {
