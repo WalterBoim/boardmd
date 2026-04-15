@@ -67,7 +67,7 @@ html.light .footer{border-color:var(--border);}
 .theme-toggle:hover{border-color:var(--accent);color:var(--accent);}
 .theme-toggle svg{width:16px;height:16px;}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:'Lato','Helvetica Neue',Arial,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:var(--font-size);line-height:1.6;overflow-x:hidden;max-width:100vw;}
+body{font-family:'Lato','Helvetica Neue',Arial,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:var(--font-size);line-height:1.6;overflow-x:hidden;max-width:100vw;}body.studying{overflow:hidden;height:100vh;}
 
 /* ── NAV ── */
 .nav{display:flex;align-items:center;justify-content:space-between;padding:20px 40px;position:sticky;top:0;z-index:100;background:rgba(8,12,18,.88);backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,.05);}
@@ -2144,7 +2144,7 @@ mark.hb{background:rgba(79,142,247,.28);border-bottom:2px solid rgba(40,100,220,
 .study-inner {
   padding: 0 !important;
   max-width: 100% !important;
-  padding-bottom: calc(80px + 60px + 20px) !important;
+  padding-bottom: calc(76px + 80px + 20px) !important;
 }
 /* Hide old done-wrap decorations */
 .done-wrap { padding: 32px 20px !important; }
@@ -5246,6 +5246,7 @@ function showDeckHome(){
   if(fb) fb.style.display='none';
   const al=document.getElementById('app-layout-wrap');
   if(al) al.style.display='none';
+  document.body.classList.remove('studying');
   clearLrnTimers();
   buildDeckHomeTable();
 }
@@ -5256,6 +5257,7 @@ function hideDeckHome(){
   if(fb) fb.style.display='';
   const al=document.getElementById('app-layout-wrap');
   if(al) al.style.display='';
+  document.body.classList.add('studying');
 }
 
 // ── DECK VISIBILITY ───────────────────────────────────────────────────
