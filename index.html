@@ -226,8 +226,8 @@ html.light .anki-due{color:#16a34a;}
 .filter-count{font-size:10px;font-family:'JetBrains Mono',monospace;background:var(--surface2);border:1px solid var(--border);padding:1px 5px;border-radius:4px;color:var(--text-faint);}
 .filter-btn.active .filter-count{background:var(--accent-dim);border-color:var(--accent);color:var(--accent);}
 
-.app-layout{display:flex;flex:1;}
-.sidebar{width:200px;background:var(--surface);border-right:1px solid var(--border);padding:12px 8px;overflow-y:auto;position:sticky;top:80px;height:calc(100vh - 80px);flex-shrink:0;}
+.app-layout{display:flex;flex:1;overflow:hidden;height:calc(100vh - var(--app-hdr-h,90px));}
+.sidebar{width:200px;background:var(--surface);border-right:1px solid var(--border);padding:12px 8px;overflow-y:auto;height:100%;flex-shrink:0;}
 .sidebar-title{font-size:9px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--text-faint);padding:0 8px;margin-bottom:8px;}
 .sys-btn{width:100%;text-align:left;background:none;border:none;color:var(--text-faint);padding:6px 8px;border-radius:7px;cursor:pointer;font-size:12px;font-family:'Lato',sans-serif;display:flex;align-items:center;justify-content:space-between;transition:all .12s;margin-bottom:1px;}
 .sys-btn:hover{background:var(--surface2);color:var(--text-dim);}
@@ -235,7 +235,7 @@ html.light .anki-due{color:#16a34a;}
 .sys-cnt{font-family:'JetBrains Mono',monospace;font-size:10px;opacity:.7;}
 .sys-sep{height:1px;background:var(--border);margin:8px 0;}
 
-.study-main{flex:1;display:flex;justify-content:center;padding:24px 20px;overflow-y:auto;min-width:0;}
+.study-main{flex:1;display:flex;justify-content:center;padding:24px 20px;overflow-y:auto;min-width:0;height:100%;}
 .study-inner{max-width:760px;width:100%;display:flex;flex-direction:column;align-items:center;gap:16px;}
 
 .progress-wrap{width:100%;}
@@ -2030,9 +2030,11 @@ mark.hb{background:rgba(79,142,247,.28);border-bottom:2px solid rgba(40,100,220,
   display: none;
   width: 100%;
   padding: 12px 0 24px !important;
-  background: transparent !important;
+  background: var(--bg) !important;
   border: none !important;
-  position: static !important;
+  position: sticky !important;
+  bottom: 0 !important;
+  z-index: 10 !important;
 }
 .fsrs-nav.visible {
   display: flex !important;
@@ -12390,6 +12392,20 @@ function bmdSetupDrag(){
 }
 
 [0,200,500,1000,2000].forEach(function(t){ setTimeout(bmdSetupDrag, t); });
+</script>
+
+<script>
+/* BoardMD layout fix — medir altura do header em tempo real */
+(function(){
+  function setHdrH(){
+    var h=document.querySelector('.app-header');
+    if(h) document.documentElement.style.setProperty('--app-hdr-h',h.getBoundingClientRect().height+'px');
+  }
+  setHdrH();
+  window.addEventListener('load',setHdrH);
+  var h=document.querySelector('.app-header');
+  if(h && window.ResizeObserver) new ResizeObserver(setHdrH).observe(h);
+})();
 </script>
 </body>
 </html>
