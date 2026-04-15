@@ -2140,12 +2140,24 @@ mark.hb{background:rgba(79,142,247,.28);border-bottom:2px solid rgba(40,100,220,
   padding: 0 !important;
   width: 100% !important;
   max-width: 100% !important;
-  overflow-x: hidden !important;
+  overflow: hidden !important;
+  display: flex !important;
+  flex-direction: column !important;
+  height: calc(100vh - var(--app-hdr-h, 90px)) !important;
 }
 .study-inner {
+  flex: 1 !important;
+  overflow-y: auto !important;
   padding: 0 !important;
   max-width: 100% !important;
-  padding-bottom: calc(76px + 80px + 20px) !important;
+  padding-bottom: 20px !important;
+}
+.fsrs-nav.visible {
+  flex-shrink: 0 !important;
+  width: 100% !important;
+  background: var(--bg) !important;
+  border-top: 1px solid var(--border) !important;
+  padding: 10px 16px 16px !important;
 }
 /* Hide old done-wrap decorations */
 .done-wrap { padding: 32px 20px !important; }
