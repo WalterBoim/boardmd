@@ -2135,6 +2135,8 @@ mark.hb{background:rgba(79,142,247,.28);border-bottom:2px solid rgba(40,100,220,
 .app-layout {
   width: 100% !important;
   max-width: 100% !important;
+  height: calc(100vh - var(--app-hdr-h, 90px)) !important;
+  overflow: hidden !important;
 }
 .sidebar { display: none !important; }
 .study-main {
@@ -2142,6 +2144,8 @@ mark.hb{background:rgba(79,142,247,.28);border-bottom:2px solid rgba(40,100,220,
   width: 100% !important;
   max-width: 100% !important;
   overflow-x: hidden !important;
+  overflow-y: auto !important;
+  height: 100% !important;
 }
 .study-inner {
   padding: 0 !important;
