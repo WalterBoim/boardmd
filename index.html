@@ -148,7 +148,7 @@ body{font-family:'Lato','Helvetica Neue',Arial,sans-serif;background:var(--bg);c
 .footer-copy{font-size:12px;color:var(--text-faint);}
 
 /* ══════════════ APP ══════════════ */
-#app{display:none;height:100vh;flex-direction:column;overflow:hidden;}
+#app{display:none;min-height:100vh;flex-direction:column;}
 #app.active{display:flex;}
 
 .app-header{background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:200;}
@@ -226,8 +226,8 @@ html.light .anki-due{color:#16a34a;}
 .filter-count{font-size:10px;font-family:'JetBrains Mono',monospace;background:var(--surface2);border:1px solid var(--border);padding:1px 5px;border-radius:4px;color:var(--text-faint);}
 .filter-btn.active .filter-count{background:var(--accent-dim);border-color:var(--accent);color:var(--accent);}
 
-.app-layout{display:flex;flex:1;overflow:hidden;height:calc(100vh - var(--app-hdr-h,90px));}
-.sidebar{width:200px;background:var(--surface);border-right:1px solid var(--border);padding:12px 8px;overflow-y:auto;height:100%;flex-shrink:0;}
+.app-layout{display:flex;flex:1;}
+.sidebar{width:200px;background:var(--surface);border-right:1px solid var(--border);padding:12px 8px;overflow-y:auto;position:sticky;top:80px;height:calc(100vh - 80px);flex-shrink:0;}
 .sidebar-title{font-size:9px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--text-faint);padding:0 8px;margin-bottom:8px;}
 .sys-btn{width:100%;text-align:left;background:none;border:none;color:var(--text-faint);padding:6px 8px;border-radius:7px;cursor:pointer;font-size:12px;font-family:'Lato',sans-serif;display:flex;align-items:center;justify-content:space-between;transition:all .12s;margin-bottom:1px;}
 .sys-btn:hover{background:var(--surface2);color:var(--text-dim);}
@@ -235,7 +235,7 @@ html.light .anki-due{color:#16a34a;}
 .sys-cnt{font-family:'JetBrains Mono',monospace;font-size:10px;opacity:.7;}
 .sys-sep{height:1px;background:var(--border);margin:8px 0;}
 
-.study-main{flex:1;display:flex;justify-content:center;padding:24px 20px;overflow-y:auto;min-width:0;height:100%;}
+.study-main{flex:1;display:flex;justify-content:center;padding:24px 20px;overflow-y:auto;min-width:0;}
 .study-inner{max-width:760px;width:100%;display:flex;flex-direction:column;align-items:center;gap:16px;}
 
 .progress-wrap{width:100%;}
@@ -2029,9 +2029,10 @@ mark.hb{background:rgba(79,142,247,.28);border-bottom:2px solid rgba(40,100,220,
 .fsrs-nav {
   display: none;
   width: 100%;
-  padding: 10px 0 14px !important;
-  background: var(--bg) !important;
-  border-top: 1px solid var(--border) !important;
+  padding: 12px 0 24px !important;
+  background: transparent !important;
+  border: none !important;
+  position: static !important;
 }
 .fsrs-nav.visible {
   display: flex !important;
@@ -2132,8 +2133,6 @@ mark.hb{background:rgba(79,142,247,.28);border-bottom:2px solid rgba(40,100,220,
 .app-layout {
   width: 100% !important;
   max-width: 100% !important;
-  height: calc(100vh - var(--app-hdr-h, 90px)) !important;
-  overflow: hidden !important;
 }
 .sidebar { display: none !important; }
 .study-main {
@@ -2141,8 +2140,6 @@ mark.hb{background:rgba(79,142,247,.28);border-bottom:2px solid rgba(40,100,220,
   width: 100% !important;
   max-width: 100% !important;
   overflow-x: hidden !important;
-  overflow-y: auto !important;
-  height: 100% !important;
 }
 .study-inner {
   padding: 0 !important;
@@ -2196,7 +2193,7 @@ mark.hb{background:rgba(79,142,247,.28);border-bottom:2px solid rgba(40,100,220,
 #app.active{
   font-family:'Sora',sans-serif;
   background:var(--bg);color:var(--text);
-  height:100vh;overflow:hidden;
+  min-height:100vh;overflow-x:hidden;padding-bottom:100px;
 }
 
 /* ── HEADER ── */
@@ -4632,21 +4629,20 @@ html.light .qs-val { color: inherit; }
           <button class="nav-plain-btn" onclick="skipFwd()">Skip →</button>
         </div>
 
-        <!-- FSRS nav movido para fora do scroll -->
+        <!-- FSRS nav — inline after card, scrolls with content -->
+        <div class="fsrs-nav" id="fsrs-nav">
+          <div class="fsrs-row">
+            <button class="fsrs-btn again" onclick="rate(0)"><span class="fsrs-lbl">Again</span><span class="fsrs-int" id="int0">&lt;1d</span></button>
+            <button class="fsrs-btn hard"  onclick="rate(1)"><span class="fsrs-lbl">Hard</span><span class="fsrs-int" id="int1">1d</span></button>
+            <button class="fsrs-btn good"  onclick="rate(2)"><span class="fsrs-lbl">Good</span><span class="fsrs-int" id="int2">3d</span></button>
+            <button class="fsrs-btn easy"  onclick="rate(3)"><span class="fsrs-lbl">Easy</span><span class="fsrs-int" id="int3">7d</span></button>
+          </div>
+        </div>
 
         <div style="display:none" id="pre-hint"></div>
 
       </div>
     </div>
-  <!-- FSRS nav — fora do scroll, fixo na base do layout -->
-  <div class="fsrs-nav" id="fsrs-nav" style="position:sticky;bottom:0;z-index:50;background:var(--bg);border-top:1px solid var(--border);padding:10px 16px 14px;">
-    <div class="fsrs-row">
-      <button class="fsrs-btn again" onclick="rate(0)"><span class="fsrs-lbl">Again</span><span class="fsrs-int" id="int0">&lt;1d</span></button>
-      <button class="fsrs-btn hard"  onclick="rate(1)"><span class="fsrs-lbl">Hard</span><span class="fsrs-int" id="int1">1d</span></button>
-      <button class="fsrs-btn good"  onclick="rate(2)"><span class="fsrs-lbl">Good</span><span class="fsrs-int" id="int2">3d</span></button>
-      <button class="fsrs-btn easy"  onclick="rate(3)"><span class="fsrs-lbl">Easy</span><span class="fsrs-int" id="int3">7d</span></button>
-    </div>
-  </div>
   </div>
 
   <!-- POSTSTEP PANEL -->
@@ -12394,20 +12390,6 @@ function bmdSetupDrag(){
 }
 
 [0,200,500,1000,2000].forEach(function(t){ setTimeout(bmdSetupDrag, t); });
-</script>
-
-<script>
-/* BoardMD layout fix — medir altura do header em tempo real */
-(function(){
-  function setHdrH(){
-    var h=document.querySelector('.app-header');
-    if(h) document.documentElement.style.setProperty('--app-hdr-h',h.getBoundingClientRect().height+'px');
-  }
-  setHdrH();
-  window.addEventListener('load',setHdrH);
-  var h=document.querySelector('.app-header');
-  if(h && window.ResizeObserver) new ResizeObserver(setHdrH).observe(h);
-})();
 </script>
 </body>
 </html>
