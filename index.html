@@ -8399,6 +8399,12 @@ function openCardEditor(){
   if(!full.length||idx>=full.length) return;
   const card = full[idx];
   _editingCard = card;
+  window._editorCard = card;
+  const delBtn = document.getElementById('delete-card-btn');
+  if(delBtn){
+    const isAdmin = window._supaUser?.email === 'wboim@hotmail.com';
+    delBtn.style.display = isAdmin ? 'block' : 'none';
+  }
 
   // Carregar edições salvas ou usar card original
   const edits = getCardEdits();
