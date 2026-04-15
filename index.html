@@ -2129,7 +2129,7 @@ mark.hb{background:rgba(79,142,247,.28);border-bottom:2px solid rgba(40,100,220,
 </style>
 
 <style id="bmd-study-layout">
-/* ── Mobile/tablet (<900px): layout normal, rola tudo — sem mudanca ── */
+/* ── Base (todos os tamanhos) ── */
 .app-layout { width:100% !important; max-width:100% !important; }
 .sidebar { display:none !important; }
 .study-main { padding:0 !important; width:100% !important; max-width:100% !important; }
@@ -2139,28 +2139,35 @@ mark.hb{background:rgba(79,142,247,.28);border-bottom:2px solid rgba(40,100,220,
 .filter-bar { display:none !important; }
 .card { background:transparent !important; border:none !important; box-shadow:none !important; padding:0 !important; border-radius:0 !important; max-width:100% !important; }
 
+/* ── MOBILE (<900px): layout normal, rola tudo, ordem: Attending → FSRS → Back/Skip ── */
+@media (max-width: 899px) {
+  /* No mobile o dock fica oculto — elementos inline no study-inner funcionam */
+  #study-footer-dock { display: none !important; }
+  /* Garantir ordem correta no mobile via order */
+  #att-inline-wrap { order: 1; }
+  .fsrs-nav { order: 2; }
+  .plain-nav { order: 3; }
+  #card-el { display: flex; flex-direction: column; }
+}
+
 /* ── DESKTOP (>=900px): layout fixo estilo UWorld ── */
 @media (min-width: 900px) {
-  /* Trava o body inteiro */
   body.studying {
     overflow: hidden !important;
     height: 100vh !important;
   }
-  /* #app ocupa 100vh sem scroll */
   body.studying #app {
     height: 100vh !important;
     overflow: hidden !important;
     display: flex !important;
     flex-direction: column !important;
   }
-  /* app-layout ocupa o espaco entre header e bottom-nav */
   body.studying .app-layout {
     flex: 1 !important;
     overflow: hidden !important;
     display: flex !important;
     min-height: 0 !important;
   }
-  /* study-main: coluna flexivel que ocupa tudo */
   body.studying .study-main {
     flex: 1 !important;
     overflow: hidden !important;
@@ -2168,75 +2175,71 @@ mark.hb{background:rgba(79,142,247,.28);border-bottom:2px solid rgba(40,100,220,
     flex-direction: column !important;
     min-height: 0 !important;
   }
-  /* study-inner: so o conteudo rola, com espaco para o dock */
   body.studying .study-inner {
     flex: 1 !important;
     overflow-y: auto !important;
     overflow-x: hidden !important;
-    padding-bottom: 120px !important;
+    padding-bottom: 20px !important;
     scrollbar-width: thin !important;
     min-height: 0 !important;
   }
-  /* DOCK FIXO NA BASE — acima da bottom-nav (~64px) */
+  /* Dock fixo acima da bottom-nav (67px) */
   body.studying #study-footer-dock {
     position: fixed !important;
-    bottom: 64px !important;
+    bottom: 67px !important;
     left: 0 !important;
     right: 0 !important;
     z-index: 490 !important;
     background: var(--bg) !important;
     border-top: 1px solid var(--border) !important;
-    display: flex !important;
     flex-direction: column !important;
     align-items: center !important;
     padding: 8px 16px 6px !important;
     gap: 4px !important;
   }
-  /* Esconder fsrs/plain-nav inline — so o dock conta */
+  body.studying #study-footer-dock.dock-visible {
+    display: flex !important;
+  }
+  /* Esconder elementos inline no desktop — só o dock conta */
   body.studying #study-inner .fsrs-nav,
   body.studying #study-inner .plain-nav,
   body.studying #study-inner .kbd-hint,
-  body.studying #card-el .fsrs-nav,
-  body.studying #card-el .plain-nav,
-  body.studying #card-el .kbd-hint {
+  body.studying #card-el > .fsrs-nav,
+  body.studying #card-el > .plain-nav,
+  body.studying #card-el > .kbd-hint {
     display: none !important;
   }
-  /* Dock: reset nos filhos */
+  /* Dock filhos */
   #study-footer-dock .fsrs-nav {
     position: static !important;
     border-top: none !important;
     padding: 0 !important;
     background: transparent !important;
     width: 100% !important;
-    max-width: 920px !important;
+    max-width: 960px !important;
   }
   #study-footer-dock .plain-nav {
     position: static !important;
     padding: 0 !important;
     background: transparent !important;
     width: 100% !important;
-    max-width: 920px !important;
+    max-width: 960px !important;
     justify-content: center !important;
   }
   #study-footer-dock .nav-plain-btn {
-    padding: 3px 12px !important;
+    padding: 3px 10px !important;
     font-size: 10px !important;
-    opacity: 0.5 !important;
+    opacity: 0.45 !important;
   }
-  #study-footer-dock .nav-plain-btn:hover {
-    opacity: 1 !important;
-  }
+  #study-footer-dock .nav-plain-btn:hover { opacity: 1 !important; }
   #study-footer-dock .kbd-hint {
     margin: 0 !important;
     font-size: 10px !important;
-    opacity: 0.4 !important;
+    opacity: 0.35 !important;
   }
 }
-
-/* Dock invisivel quando nao esta estudando */
-body:not(.studying) #study-footer-dock {
-  display: none !important;
-}
+/* Dock invisivel fora do estudo */
+body:not(.studying) #study-footer-dock { display: none !important; }
 </style>
 
 <style id="bmd-perf-v2">
@@ -6194,7 +6197,7 @@ function renderCard(){
   // Esconder dock
   const dockEl=document.getElementById('study-footer-dock');
   const dockNavEl=document.getElementById('fsrs-nav-dock');
-  if(dockEl) dockEl.style.display='none';
+  if(dockEl) dockEl.classList.remove('dock-visible');
   if(dockNavEl) dockNavEl.classList.remove('visible');
   const preHint=document.getElementById('pre-hint');
   if(preHint) preHint.style.display='';
@@ -6738,7 +6741,7 @@ function revealAnswer(sel,card){
   const dockNav=document.getElementById('fsrs-nav-dock');
   const dock=document.getElementById('study-footer-dock');
   if(dockNav) dockNav.classList.add('visible');
-  if(dock && window.innerWidth>=900) dock.style.display='flex';
+  if(dock && window.innerWidth>=900) dock.classList.add('dock-visible');
 
   // ── BoardMD Attending — inject inline after answer revealed ──
   injectAttendingInline(card, sel);
