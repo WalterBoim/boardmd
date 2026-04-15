@@ -67,7 +67,7 @@ html.light .footer{border-color:var(--border);}
 .theme-toggle:hover{border-color:var(--accent);color:var(--accent);}
 .theme-toggle svg{width:16px;height:16px;}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:'Lato','Helvetica Neue',Arial,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:var(--font-size);line-height:1.6;overflow-x:hidden;max-width:100vw;}body.studying{overflow:hidden;height:100vh;}body.studying::-webkit-scrollbar{display:none;}
+body{font-family:'Lato','Helvetica Neue',Arial,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:var(--font-size);line-height:1.6;overflow-x:hidden;max-width:100vw;}
 
 /* ── NAV ── */
 .nav{display:flex;align-items:center;justify-content:space-between;padding:20px 40px;position:sticky;top:0;z-index:100;background:rgba(8,12,18,.88);backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,.05);}
@@ -148,7 +148,7 @@ body{font-family:'Lato','Helvetica Neue',Arial,sans-serif;background:var(--bg);c
 .footer-copy{font-size:12px;color:var(--text-faint);}
 
 /* ══════════════ APP ══════════════ */
-#app{display:none;height:100vh;flex-direction:column;overflow:hidden;}
+#app{display:none;min-height:100vh;flex-direction:column;}
 #app.active{display:flex;}
 
 .app-header{background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:200;}
@@ -235,7 +235,7 @@ html.light .anki-due{color:#16a34a;}
 .sys-cnt{font-family:'JetBrains Mono',monospace;font-size:10px;opacity:.7;}
 .sys-sep{height:1px;background:var(--border);margin:8px 0;}
 
-.study-main{flex:1;display:flex;flex-direction:column;justify-content:flex-start;padding:0;overflow:hidden;min-width:0;}
+.study-main{flex:1;display:flex;justify-content:center;padding:24px 20px;overflow-y:auto;min-width:0;}
 .study-inner{max-width:760px;width:100%;display:flex;flex-direction:column;align-items:center;gap:16px;}
 
 .progress-wrap{width:100%;}
@@ -334,8 +334,8 @@ html.light .exp-dist{background:rgba(225,29,72,.03);border-color:rgba(225,29,72,
 .fsrs-btn.easy{background:#2980b9;color:#fff;}
 .fsrs-btn.easy:hover{background:#2471a3;color:#fff;}
 
-.plain-nav{display:flex;gap:8px;justify-content:center;width:100%;flex-shrink:0;background:var(--bg);padding:6px 16px 8px;}
-.nav-plain-btn{padding:6px 20px;border-radius:7px;font-family:'Lato',sans-serif;font-size:11px;font-weight:600;border:1px solid var(--border);cursor:pointer;transition:all .15s;background:none;color:var(--text-faint);}
+.plain-nav{display:flex;gap:10px;justify-content:center;width:100%;}
+.nav-plain-btn{padding:11px 24px;border-radius:9px;font-family:'Lato',sans-serif;font-size:13px;font-weight:700;border:1px solid var(--border);cursor:pointer;transition:all .15s;background:var(--surface2);color:var(--text-dim);}
 .nav-plain-btn:hover{border-color:var(--border-bright);color:var(--text);}
 .kbd-hint{font-size:11px;color:var(--text-faint);text-align:center;}
 .kbd{display:inline-block;background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:1px 5px;font-family:'JetBrains Mono',monospace;font-size:10px;}
@@ -2039,7 +2039,6 @@ mark.hb{background:rgba(79,142,247,.28);border-bottom:2px solid rgba(40,100,220,
   flex-direction: column !important;
   align-items: center !important;
 }
-
 /* Mobile: extra bottom padding for bottom nav */
 @media(max-width: 600px){
   .fsrs-nav {
@@ -2140,26 +2139,12 @@ mark.hb{background:rgba(79,142,247,.28);border-bottom:2px solid rgba(40,100,220,
   padding: 0 !important;
   width: 100% !important;
   max-width: 100% !important;
-  overflow: hidden !important;
-  display: flex !important;
-  flex-direction: column !important;
-  height: calc(100vh - var(--app-hdr-h, 90px)) !important;
+  overflow-x: hidden !important;
 }
 .study-inner {
-  flex: 1 !important;
-  overflow-y: auto !important;
   padding: 0 !important;
   max-width: 100% !important;
-  padding-bottom: 20px !important;
-  scrollbar-width: none !important;
-}
-.study-inner::-webkit-scrollbar { display: none !important; }
-.fsrs-nav.visible {
-  flex-shrink: 0 !important;
-  width: 100% !important;
-  background: var(--bg) !important;
-  border-top: 1px solid var(--border) !important;
-  padding: 10px 16px 16px !important;
+  padding-bottom: calc(80px + 60px + 20px) !important;
 }
 /* Hide old done-wrap decorations */
 .done-wrap { padding: 32px 20px !important; }
@@ -5261,7 +5246,6 @@ function showDeckHome(){
   if(fb) fb.style.display='none';
   const al=document.getElementById('app-layout-wrap');
   if(al) al.style.display='none';
-  document.body.classList.remove('studying');
   clearLrnTimers();
   buildDeckHomeTable();
 }
@@ -5272,7 +5256,6 @@ function hideDeckHome(){
   if(fb) fb.style.display='';
   const al=document.getElementById('app-layout-wrap');
   if(al) al.style.display='';
-  document.body.classList.add('studying');
 }
 
 // ── DECK VISIBILITY ───────────────────────────────────────────────────
@@ -5518,7 +5501,7 @@ function switchDeckAndStudy(dk){
 
 function goHome(){
   document.getElementById('landing').style.display='';
-  document.getElementById('app').classList.remove('active');document.body.classList.remove('studying');
+  document.getElementById('app').classList.remove('active');
   clearLrnTimers();
   window.scrollTo(0,0);
 }
@@ -5531,7 +5514,7 @@ const SHELF_DECKS = ['shelf_surgery','shelf_em','shelf'];
 
 function openApp(dk){
   document.getElementById('landing').style.display='none';
-  document.getElementById('app').classList.add('active');document.body.classList.add('studying');
+  document.getElementById('app').classList.add('active');
   applyFont();
   if(STEP2_DECKS.includes(dk)){
     currentStep='s2';
@@ -5881,7 +5864,7 @@ function renderCard(){
       const waitMin = Math.ceil(waitMs / 60000);
       const waitEl = document.getElementById('c-q');
       if(waitEl){
-        document.getElementById('app-layout-wrap').style.display='flex';document.body.classList.add('studying');
+        document.getElementById('app-layout-wrap').style.display='flex';
         document.getElementById('deck-home').classList.remove('active');
         const _fsrs3=document.getElementById('fsrs-nav');
         const _fsrs4=document.getElementById('fsrs-nav-2');
