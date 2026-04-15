@@ -2139,12 +2139,18 @@ mark.hb{background:rgba(79,142,247,.28);border-bottom:2px solid rgba(40,100,220,
   padding: 0 !important;
   width: 100% !important;
   max-width: 100% !important;
-  overflow-x: hidden !important;
+  overflow: hidden !important;
+  display: flex !important;
+  flex-direction: column !important;
+  height: 100% !important;
 }
 .study-inner {
+  flex: 1 !important;
+  overflow-y: auto !important;
   padding: 0 !important;
   max-width: 100% !important;
-  padding-bottom: calc(80px + 60px + 20px) !important;
+  padding-bottom: 16px !important;
+  scrollbar-width: thin !important;
 }
 /* Hide old done-wrap decorations */
 .done-wrap { padding: 32px 20px !important; }
