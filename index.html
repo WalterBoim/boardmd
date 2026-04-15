@@ -2129,141 +2129,113 @@ mark.hb{background:rgba(79,142,247,.28);border-bottom:2px solid rgba(40,100,220,
 </style>
 
 <style id="bmd-study-layout">
-/* ── Study area layout — mobile-first, full width ── */
-.app-layout {
-  width: 100% !important;
-  max-width: 100% !important;
-}
-.sidebar { display: none !important; }
-.study-main {
-  padding: 0 !important;
-  width: 100% !important;
-  max-width: 100% !important;
-  overflow: hidden !important;
-  display: flex !important;
-  flex-direction: column !important;
-  height: 100% !important;
-}
-.study-inner {
-  flex: 1 !important;
-  overflow-y: auto !important;
-  padding: 0 !important;
-  max-width: 100% !important;
-  padding-bottom: 16px !important;
-  scrollbar-width: thin !important;
-}
-/* Hide old done-wrap decorations */
-.done-wrap { padding: 32px 20px !important; }
-/* Eliminate old anki-counter bar */
-.anki-counter { display: none !important; }
-/* Filter bar */
-.filter-bar { display: none !important; }
-/* Remove old card box-shadow styles that conflict */
-.card {
-  background: transparent !important;
-  border: none !important;
-  box-shadow: none !important;
-  padding: 0 !important;
-  border-radius: 0 !important;
-  max-width: 100% !important;
-}
+/* ── Mobile/tablet (<900px): layout normal, rola tudo — sem mudanca ── */
+.app-layout { width:100% !important; max-width:100% !important; }
+.sidebar { display:none !important; }
+.study-main { padding:0 !important; width:100% !important; max-width:100% !important; }
+.study-inner { max-width:100% !important; padding:0 !important; padding-bottom:16px !important; }
+.done-wrap { padding:32px 20px !important; }
+.anki-counter { display:none !important; }
+.filter-bar { display:none !important; }
+.card { background:transparent !important; border:none !important; box-shadow:none !important; padding:0 !important; border-radius:0 !important; max-width:100% !important; }
 
-/* ══════════════════════════════════════════════
-   BoardMD Layout Fix — 15 Apr 2026
-   Isolado por media query: desktop e mobile separados
-   ══════════════════════════════════════════════ */
-
-/* ── COMPARTILHADO: dock fixa na base ── */
-.plain-nav {
-  flex-shrink: 0 !important;
-  display: flex !important;
-  gap: 6px !important;
-  justify-content: center !important;
-  width: 100% !important;
-  background: var(--bg) !important;
-  padding: 4px 16px 6px !important;
-}
-.nav-plain-btn {
-  padding: 4px 16px !important;
-  border-radius: 6px !important;
-  font-size: 11px !important;
-  font-weight: 500 !important;
-  border: 1px solid var(--border) !important;
-  background: none !important;
-  color: var(--text-faint) !important;
-  cursor: pointer !important;
-}
-.nav-plain-btn:hover {
-  color: var(--text-dim) !important;
-  border-color: var(--border-bright) !important;
-}
-.fsrs-nav.visible {
-  flex-shrink: 0 !important;
-  width: 100% !important;
-  background: var(--bg) !important;
-  border-top: 1px solid var(--border) !important;
-  padding: 8px 16px 4px !important;
-}
-
-/* ── DESKTOP: layout travado, uma scrollbar ── */
-@media (min-width: 601px) {
-  #app {
+/* ── DESKTOP (>=900px): layout fixo estilo UWorld ── */
+@media (min-width: 900px) {
+  /* Trava o body inteiro */
+  body.studying {
+    overflow: hidden !important;
     height: 100vh !important;
-    overflow: hidden !important;
   }
-  .app-layout {
-    height: calc(100vh - var(--app-hdr-h, 90px)) !important;
-    overflow: hidden !important;
-  }
-  .study-main {
+  /* #app ocupa 100vh sem scroll */
+  body.studying #app {
+    height: 100vh !important;
     overflow: hidden !important;
     display: flex !important;
     flex-direction: column !important;
-    height: 100% !important;
   }
-  .study-inner {
+  /* app-layout ocupa o espaco entre header e bottom-nav */
+  body.studying .app-layout {
+    flex: 1 !important;
+    overflow: hidden !important;
+    display: flex !important;
+    min-height: 0 !important;
+  }
+  /* study-main: coluna flexivel que ocupa tudo */
+  body.studying .study-main {
+    flex: 1 !important;
+    overflow: hidden !important;
+    display: flex !important;
+    flex-direction: column !important;
+    min-height: 0 !important;
+  }
+  /* study-inner: so o conteudo rola, com espaco para o dock */
+  body.studying .study-inner {
     flex: 1 !important;
     overflow-y: auto !important;
-    padding-bottom: 16px !important;
+    overflow-x: hidden !important;
+    padding-bottom: 120px !important;
     scrollbar-width: thin !important;
+    min-height: 0 !important;
   }
-  body.studying {
-    overflow: hidden !important;
-    height: 100vh !important;
+  /* DOCK FIXO NA BASE — acima da bottom-nav (~64px) */
+  body.studying #study-footer-dock {
+    position: fixed !important;
+    bottom: 64px !important;
+    left: 0 !important;
+    right: 0 !important;
+    z-index: 490 !important;
+    background: var(--bg) !important;
+    border-top: 1px solid var(--border) !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    padding: 8px 16px 6px !important;
+    gap: 4px !important;
+  }
+  /* Esconder fsrs/plain-nav inline — so o dock conta */
+  body.studying #study-inner .fsrs-nav,
+  body.studying #study-inner .plain-nav,
+  body.studying #study-inner .kbd-hint,
+  body.studying #card-el .fsrs-nav,
+  body.studying #card-el .plain-nav,
+  body.studying #card-el .kbd-hint {
+    display: none !important;
+  }
+  /* Dock: reset nos filhos */
+  #study-footer-dock .fsrs-nav {
+    position: static !important;
+    border-top: none !important;
+    padding: 0 !important;
+    background: transparent !important;
+    width: 100% !important;
+    max-width: 920px !important;
+  }
+  #study-footer-dock .plain-nav {
+    position: static !important;
+    padding: 0 !important;
+    background: transparent !important;
+    width: 100% !important;
+    max-width: 920px !important;
+    justify-content: center !important;
+  }
+  #study-footer-dock .nav-plain-btn {
+    padding: 3px 12px !important;
+    font-size: 10px !important;
+    opacity: 0.5 !important;
+  }
+  #study-footer-dock .nav-plain-btn:hover {
+    opacity: 1 !important;
+  }
+  #study-footer-dock .kbd-hint {
+    margin: 0 !important;
+    font-size: 10px !important;
+    opacity: 0.4 !important;
   }
 }
 
-/* ── MOBILE: layout travado, dock fixa ── */
-@media (max-width: 600px) {
-  #app {
-    height: 100vh !important;
-    overflow: hidden !important;
-    display: flex !important;
-    flex-direction: column !important;
-  }
-  .app-layout {
-    flex: 1 !important;
-    overflow: hidden !important;
-    display: flex !important;
-    flex-direction: column !important;
-  }
-  .study-main {
-    flex: 1 !important;
-    overflow: hidden !important;
-    display: flex !important;
-    flex-direction: column !important;
-  }
-  .study-inner {
-    flex: 1 !important;
-    overflow-y: auto !important;
-    padding-bottom: 8px !important;
-    scrollbar-width: none !important;
-  }
-  .study-inner::-webkit-scrollbar { display: none !important; }
-  body.studying {
-    overflow: hidden !important;
-    height: 100vh !important;
-  }
+/* Dock invisivel quando nao esta estudando */
+body:not(.studying) #study-footer-dock {
+  display: none !important;
 }
 </style>
 
@@ -4622,6 +4594,22 @@ html.light .qs-val { color: inherit; }
   <div class="app-layout" id="app-layout-wrap" style="display:none">
     <aside class="sidebar" id="sidebar"></aside>
     <div class="study-main">
+      <!-- FOOTER DOCK: fixo na base no desktop, oculto no mobile -->
+      <div id="study-footer-dock" style="display:none">
+        <div class="fsrs-nav" id="fsrs-nav-dock">
+          <div class="fsrs-row">
+            <button class="fsrs-btn again" onclick="rate(0)"><span class="fsrs-lbl">Again</span><span class="fsrs-int" id="int0-d">&lt;1d</span></button>
+            <button class="fsrs-btn hard"  onclick="rate(1)"><span class="fsrs-lbl">Hard</span><span class="fsrs-int" id="int1-d">1d</span></button>
+            <button class="fsrs-btn good"  onclick="rate(2)"><span class="fsrs-lbl">Good</span><span class="fsrs-int" id="int2-d">3d</span></button>
+            <button class="fsrs-btn easy"  onclick="rate(3)"><span class="fsrs-lbl">Easy</span><span class="fsrs-int" id="int3-d">7d</span></button>
+          </div>
+        </div>
+        <div class="plain-nav">
+          <button class="nav-plain-btn" onclick="skipBack()">← Back</button>
+          <button class="nav-plain-btn" onclick="skipFwd()">Skip →</button>
+        </div>
+        <div class="kbd-hint">1=Again · 2=Hard · 3=Good · 4=Easy &nbsp;|&nbsp; ←→ Navigate</div>
+      </div>
       <div class="study-inner" id="study-inner">
 
         <div class="progress-wrap">
@@ -6203,6 +6191,11 @@ function renderCard(){
   const fsrsNav2=document.getElementById('fsrs-nav-2');
   if(fsrsNav) fsrsNav.classList.remove('visible');
   if(fsrsNav2) fsrsNav2.classList.remove('visible');
+  // Esconder dock
+  const dockEl=document.getElementById('study-footer-dock');
+  const dockNavEl=document.getElementById('fsrs-nav-dock');
+  if(dockEl) dockEl.style.display='none';
+  if(dockNavEl) dockNavEl.classList.remove('visible');
   const preHint=document.getElementById('pre-hint');
   if(preHint) preHint.style.display='';
   revealed=false;
@@ -6741,6 +6734,11 @@ function revealAnswer(sel,card){
   const rb2=document.getElementById('fsrs-nav-2');
   if(rb) rb.classList.add('visible');
   if(rb2) rb2.classList.add('visible');
+  // Dock desktop
+  const dockNav=document.getElementById('fsrs-nav-dock');
+  const dock=document.getElementById('study-footer-dock');
+  if(dockNav) dockNav.classList.add('visible');
+  if(dock && window.innerWidth>=900) dock.style.display='flex';
 
   // ── BoardMD Attending — inject inline after answer revealed ──
   injectAttendingInline(card, sel);
@@ -6766,6 +6764,15 @@ function revealAnswer(sel,card){
   if(i1b) i1b.textContent=ivs.hard.label;
   if(i2b) i2b.textContent=ivs.good.label;
   if(i3b) i3b.textContent=ivs.easy.label;
+  // Sync dock
+  const i0d=document.getElementById('int0-d');
+  const i1d=document.getElementById('int1-d');
+  const i2d=document.getElementById('int2-d');
+  const i3d=document.getElementById('int3-d');
+  if(i0d) i0d.textContent=ivs.again.label;
+  if(i1d) i1d.textContent=ivs.hard.label;
+  if(i2d) i2d.textContent=ivs.good.label;
+  if(i3d) i3d.textContent=ivs.easy.label;
 }
 
 async function prefetchPubmedAbstracts(card){
