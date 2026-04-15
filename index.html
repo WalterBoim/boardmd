@@ -235,7 +235,7 @@ html.light .anki-due{color:#16a34a;}
 .sys-cnt{font-family:'JetBrains Mono',monospace;font-size:10px;opacity:.7;}
 .sys-sep{height:1px;background:var(--border);margin:8px 0;}
 
-.study-main{flex:1;display:flex;justify-content:center;padding:24px 20px;overflow-y:auto;min-width:0;}
+.study-main{flex:1;display:flex;justify-content:center;padding:24px 20px 40px;overflow-y:auto;min-width:0;}
 .study-inner{max-width:760px;width:100%;display:flex;flex-direction:column;align-items:center;gap:16px;}
 
 .progress-wrap{width:100%;}
@@ -3640,8 +3640,8 @@ html.light .qs-val { color: inherit; }
   #bmd-ans-col {
     flex: 1 1 0 !important;
     min-width: 260px !important;
-    overflow-y: auto !important;
-    max-height: calc(100vh - 72px) !important;
+    overflow-y: visible !important;
+    max-height: none !important;
     align-self: flex-start !important;
   }
 
@@ -4728,11 +4728,6 @@ html.light .qs-val { color: inherit; }
           </div>
         </div>
 
-        <div class="plain-nav" id="plain-nav">
-          <button class="nav-plain-btn" onclick="skipBack()">← Back</button>
-          <button class="nav-plain-btn" onclick="skipFwd()">Skip →</button>
-        </div>
-
         <!-- FSRS nav — inline after card, scrolls with content -->
         <div class="fsrs-nav" id="fsrs-nav">
           <div class="fsrs-row">
@@ -4741,6 +4736,10 @@ html.light .qs-val { color: inherit; }
             <button class="fsrs-btn good"  onclick="rate(2)"><span class="fsrs-lbl">Good</span><span class="fsrs-int" id="int2">3d</span></button>
             <button class="fsrs-btn easy"  onclick="rate(3)"><span class="fsrs-lbl">Easy</span><span class="fsrs-int" id="int3">7d</span></button>
           </div>
+        </div>
+        <div class="plain-nav" id="plain-nav">
+          <button class="nav-plain-btn" onclick="skipBack()">← Back</button>
+          <button class="nav-plain-btn" onclick="skipFwd()">Skip →</button>
         </div>
 
         <div style="display:none" id="pre-hint"></div>
