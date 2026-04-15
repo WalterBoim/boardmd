@@ -5516,7 +5516,7 @@ function switchDeckAndStudy(dk){
 
 function goHome(){
   document.getElementById('landing').style.display='';
-  document.getElementById('app').classList.remove('active');
+  document.getElementById('app').classList.remove('active');document.body.classList.remove('studying');
   clearLrnTimers();
   window.scrollTo(0,0);
 }
@@ -5529,7 +5529,7 @@ const SHELF_DECKS = ['shelf_surgery','shelf_em','shelf'];
 
 function openApp(dk){
   document.getElementById('landing').style.display='none';
-  document.getElementById('app').classList.add('active');
+  document.getElementById('app').classList.add('active');document.body.classList.add('studying');
   applyFont();
   if(STEP2_DECKS.includes(dk)){
     currentStep='s2';
