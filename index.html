@@ -5879,7 +5879,7 @@ function renderCard(){
       const waitMin = Math.ceil(waitMs / 60000);
       const waitEl = document.getElementById('c-q');
       if(waitEl){
-        document.getElementById('app-layout-wrap').style.display='flex';
+        document.getElementById('app-layout-wrap').style.display='flex';document.body.classList.add('studying');
         document.getElementById('deck-home').classList.remove('active');
         const _fsrs3=document.getElementById('fsrs-nav');
         const _fsrs4=document.getElementById('fsrs-nav-2');
