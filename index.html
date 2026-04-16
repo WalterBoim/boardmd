@@ -3534,15 +3534,21 @@ html.light .qs-val { color: inherit; }
     width: 50%;
     min-width: 260px !important;
     max-width: 75% !important;
-    position: sticky !important;
-    top: 60px !important;
-    max-height: calc(100vh - 72px) !important;
+    position: static !important;
     overflow-y: auto !important;
+    overflow-x: hidden !important;
     scrollbar-width: thin !important;
-    align-self: flex-start !important;
+    align-self: stretch !important;
     display: flex !important;
     flex-direction: column !important;
     padding: 0 !important;
+    border-right: 1px solid var(--border) !important;
+  }
+  /* bmd-cols-row ocupa altura total disponivel */
+  #bmd-cols-row {
+    flex: 1 !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
   }
   /* Inner scroll area inside q-col */
   #bmd-q-inner {
