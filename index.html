@@ -5934,6 +5934,9 @@ function shuffleOpts(card){
 function renderCard(){
   revealed=false;
   _cardStartTime = Date.now(); // track response time
+  // Reset split divisor para 50/50 a cada novo card
+  const qCol = document.getElementById('bmd-q-col');
+  if(qCol && window.innerWidth >= 900) qCol.style.width = '50%';
   // Remove Attending block from previous card
   const oldAtt = document.getElementById('att-inline-wrap');
   if(oldAtt) oldAtt.remove();
