@@ -1,0 +1,17 @@
+name: Add Daily Review Deck
+on:
+  workflow_dispatch:
+  jobs:
+    edit:
+        runs-on: ubuntu-latest
+            steps:
+                  - uses: actions/checkout@v3
+                        - name: Apply edits
+                                run: python3 fix_daily_review.py
+                                      - name: Commit
+                                              run: |
+                                                        git config user.name "github-actions"
+                                                                  git config user.email "actions@github.com"
+                                                                            git add index.html
+                                                                                      git commit -m "Add Daily Review deck to home screen"
+                                                                                                git push
