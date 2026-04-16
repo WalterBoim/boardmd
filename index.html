@@ -5005,7 +5005,8 @@ const DECK_META = {
   hy:       {label:'HY Concepts Step 2 CK',        short:'HY Concepts Step 2 CK'},
   hy1:      {label:'HY Concepts Step 1',           short:'HY Concepts Step 1'},
   boardmd_s1: {label:'BoardMD Step 1', short:'BoardMD S1'},
-  boardmd_s2: {label:'BoardMD Step 2 CK', short:'BoardMD S2'}
+  boardmd_s2: {label:'BoardMD Step 2 CK', short:'BoardMD S2'},
+  daily_review: {label:'Daily Review', short:'Daily Review'}
 };
 
 // ═══════════════════════════════════════════════════════════════════
@@ -5364,7 +5365,7 @@ function saveHiddenDecks(){try{localStorage.setItem('bmd_hidden_decks',JSON.stri
 
 function buildDeckManage(){
   const s1Ids=['boardmd_s1','s1_core','s1','hy1','fa_step1','fa_s1','arrows','ethics'];
-  const s2Ids=['boardmd_s2','core','s2','shelf_surgery','shelf_em','shelf_fm','shelf_im','shelf_neuro','shelf_obgyn','shelf_peds','shelf_psych'];
+  const s2Ids=['boardmd_s2','core','daily_review','s2','shelf_surgery','shelf_em','shelf_fm','shelf_im','shelf_neuro','shelf_obgyn','shelf_peds','shelf_psych'];
   const s1Decks=[
     {id:'boardmd_s1',name:'BoardMD S1'},{id:'s1_core',name:'Core Review'},
     {id:'s1',name:'Rapid Review'},{id:'hy1',name:'HY Concepts'},
@@ -5373,7 +5374,7 @@ function buildDeckManage(){
   ];
   const s2Decks=[
     {id:'boardmd_s2',name:'BoardMD S2'},{id:'core',name:'Core Review'},
-    {id:'s2',name:'Rapid Review'},
+    {id:'daily_review',name:'Daily Review'},{id:'s2',name:'Rapid Review'},
     {id:'shelf',name:'BoardMD Shelf'},
   ];
   const stepIds   = currentStep==='s1' ? s1Ids   : s2Ids;
@@ -5442,6 +5443,7 @@ function buildDeckHomeTable(){
     {id:'ethics',     name:'HY Ethics & Communication',   sub:'Social Sciences · 251 cards',     step:'s1'},
     {id:'boardmd_s2', name:'BoardMD · Step 2 CK',         sub:'Adaptive MCQs · 15,623 cards',    step:'s2'},
     {id:'s2',         name:'Step 2 CK · Rapid Review',    sub:'Clinical Essentials · 522 cards', step:'s2'},
+    {id:'daily_review', name:'Daily Review',               sub:'Step 2 CK · Daily Cards',         step:'s2'},
     {id:'core',       name:'Step 2 CK · Core Review',     sub:'Board-Focused · 4,107 cards',     step:'s2'},
     {id:'shelf',         name:'BoardMD Shelf · All Rotations',      sub:'Shelf Exams · 180 cards',          step:'s2', shelf:true},
 
@@ -12544,4 +12546,5 @@ function bmdSetupDrag(){
 </body>
 </html>
 <!-- v2 -->
+<!-- redeploy -->
 <!-- redeploy -->
