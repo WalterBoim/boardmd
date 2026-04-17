@@ -240,14 +240,6 @@ html.light .anki-due{color:#16a34a;}
 
 .study-main{flex:1;display:flex;justify-content:center;padding:24px 20px;overflow-y:auto;min-width:0;}
 .study-inner{max-width:760px;width:100%;display:flex;flex-direction:column;align-items:center;gap:16px;}
-/* Desktop studying: full width, no centering, page locked */
-@media(min-width:900px){
-  body.studying .study-main{padding:0 !important;justify-content:flex-start !important;overflow:hidden !important;flex:1 !important;min-height:0 !important;}
-  body.studying .study-inner{max-width:100% !important;width:100% !important;align-items:stretch !important;gap:0 !important;flex:1 !important;min-height:0 !important;overflow:hidden !important;padding:0 !important;padding-bottom:0 !important;}
-  body.studying{overflow:hidden !important;height:100vh !important;}
-  body.studying #app{height:100vh !important;overflow:hidden !important;display:flex !important;flex-direction:column !important;}
-  body.studying .app-layout{flex:1 !important;min-height:0 !important;overflow:hidden !important;display:flex !important;}
-}
 
 .progress-wrap{width:100%;}
 .progress-info{display:flex;justify-content:space-between;font-size:11px;color:var(--text-faint);margin-bottom:6px;font-family:'JetBrains Mono',monospace;}
@@ -2140,37 +2132,17 @@ mark.hb{background:rgba(79,142,247,.28);border-bottom:2px solid rgba(40,100,220,
 </style>
 
 <style id="bmd-study-layout">
-/* ── Study area layout — mobile-first, full width ── */
-.app-layout {
-  width: 100% !important;
-  max-width: 100% !important;
-}
 .sidebar { display: none !important; }
-.study-main {
-  padding: 0 !important;
-  width: 100% !important;
-  max-width: 100% !important;
-  overflow-x: hidden !important;
-}
-.study-inner {
-  padding: 0 !important;
-  max-width: 100% !important;
-  padding-bottom: calc(80px + 60px + 20px) !important;
-}
-/* Hide old done-wrap decorations */
-.done-wrap { padding: 32px 20px !important; }
-/* Eliminate old anki-counter bar */
 .anki-counter { display: none !important; }
-/* Filter bar */
 .filter-bar { display: none !important; }
-/* Remove old card box-shadow styles that conflict */
-.card {
-  background: transparent !important;
-  border: none !important;
-  box-shadow: none !important;
-  padding: 0 !important;
-  border-radius: 0 !important;
-  max-width: 100% !important;
+.card { background: transparent !important; border: none !important; box-shadow: none !important; padding: 0 !important; border-radius: 0 !important; max-width: 100% !important; }
+.done-wrap { padding: 32px 20px !important; }
+@media(min-width:900px){
+  body.studying { overflow: hidden !important; height: 100vh !important; }
+  body.studying #app { height: 100vh !important; overflow: hidden !important; display: flex !important; flex-direction: column !important; }
+  body.studying .app-layout { flex: 1 !important; min-height: 0 !important; overflow: hidden !important; display: flex !important; width: 100% !important; }
+  body.studying .study-main { flex: 1 !important; min-height: 0 !important; overflow: hidden !important; display: flex !important; flex-direction: column !important; padding: 0 !important; width: 100% !important; justify-content: flex-start !important; }
+  body.studying .study-inner { flex: 1 !important; min-height: 0 !important; overflow: hidden !important; display: flex !important; flex-direction: column !important; padding: 0 !important; width: 100% !important; max-width: 100% !important; align-items: stretch !important; gap: 0 !important; }
 }
 </style>
 
