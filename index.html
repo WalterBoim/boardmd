@@ -3654,9 +3654,11 @@ html.light .qs-val { color: inherit; }
   #bmd-ans-col {
     flex: 1 1 0 !important;
     min-width: 260px !important;
-    overflow-y: visible !important;
-    max-height: none !important;
-    align-self: flex-start !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    max-height: 100% !important;
+    align-self: stretch !important;
+    scrollbar-width: thin !important;
   }
 
   /* Explanation padding in right col */
