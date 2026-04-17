@@ -2178,14 +2178,43 @@ mark.hb{background:rgba(79,142,247,.28);border-bottom:2px solid rgba(40,100,220,
     display: flex !important;
     flex-direction: column !important;
     min-height: 0 !important;
+    padding: 0 !important;
   }
   body.studying .study-inner {
     flex: 1 !important;
+    overflow: hidden !important;
+    display: flex !important;
+    flex-direction: column !important;
+    padding: 0 !important;
+    min-height: 0 !important;
+  }
+  body.studying #card-el {
+    flex: 1 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    min-height: 0 !important;
+    border-radius: 0 !important;
+    border-left: none !important;
+    border-right: none !important;
+    border-top: none !important;
+  }
+  body.studying #bmd-cols-row {
+    flex: 1 !important;
+    min-height: 0 !important;
+    display: flex !important;
+    flex-direction: row !important;
+    overflow: hidden !important;
+  }
+  body.studying #bmd-q-col {
     overflow-y: auto !important;
     overflow-x: hidden !important;
-    padding-bottom: 20px !important;
     scrollbar-width: thin !important;
-    min-height: 0 !important;
+  }
+  body.studying #bmd-ans-col {
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    scrollbar-width: thin !important;
+    flex: 1 !important;
   }
   /* Dock fixo acima da bottom-nav (67px) */
   body.studying #study-footer-dock {
@@ -5356,7 +5385,6 @@ function clearLrnTimers(){_lrnTimers.forEach(t=>clearTimeout(t));_lrnTimers=[];}
 
 // ── NAVIGATION ───────────────────────────────────────────────────────
 function showDeckHome(){
-  document.getElementById('app').classList.add('active');
   const dh=document.getElementById('deck-home');
   if(dh) dh.classList.add('active');
   const fb=document.getElementById('filter-bar-wrap');
