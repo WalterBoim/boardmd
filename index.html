@@ -413,7 +413,7 @@ html.light .qid-textarea{background:var(--surface2);}
   .stats-row{display:grid;grid-template-columns:repeat(2,1fr);}
   .section{padding:50px 20px;}
   .sidebar{display:none;}
-  .app-layout{display:block;width:100%;overflow-x:hidden;}
+  .app-layout:not([style*="display:none"]){display:block;width:100%;overflow-x:hidden;}
   .study-main{padding:12px 8px;width:100%;box-sizing:border-box;overflow-x:hidden;}
   .study-inner{max-width:100%;width:100%;padding:0;box-sizing:border-box;}
   #app{overflow-x:hidden;max-width:100vw;}
