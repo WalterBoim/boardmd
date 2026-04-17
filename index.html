@@ -10446,7 +10446,10 @@ function bmdDashSync() {
     const al = document.getElementById('app-layout-wrap');
     if(dh) dh.classList.add('active');
     if(fb) fb.style.display = 'none';
-    if(al) al.style.display = 'none';
+    if(al){ al.style.display='none'; al.style.visibility='hidden'; al.style.height='0'; al.style.overflow='hidden'; al.style.minHeight='0'; }
+    document.body.classList.remove('studying');
+    const fd = document.getElementById('study-footer-dock');
+    if(fd){ fd.style.display='none'; fd.classList.remove('dock-visible'); }
     if(typeof clearLrnTimers === 'function') clearLrnTimers();
     // dashboard header: show .hdr + .streak-bar + #bmd-step-tabs
     const hdr = document.querySelector('.app-header .hdr');
