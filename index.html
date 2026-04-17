@@ -8788,95 +8788,132 @@ function buildDecks(allCards){
 }
 
 // ── LOAD ALL CARDS FROM SUPABASE ─────────────────────────────────────
-async function loadCardsFromSupabase(){
-  // Cache desabilitado — sempre carrega do Supabase (localStorage nao suporta 42k cards)
-  console.log('BoardMD: carregando cards do Supabase...');
+// ── INDEXEDDB CACHE ──────────────────────────────────────────────────
+const IDB_NAME = 'boardmd_cache';
+const IDB_VERSION = 1;
+const IDB_STORE = 'cards';
+const IDB_META_KEY = 'bmd_idb_meta';
 
-  // ── CACHE MISS: show splash, load from Supabase ──
-  showLoadingOverlay();
+function openIDB(){
+  return new Promise((resolve, reject) => {
+    const req = indexedDB.open(IDB_NAME, IDB_VERSION);
+    req.onupgradeneeded = e => {
+      const db = e.target.result;
+      if(!db.objectStoreNames.contains(IDB_STORE)){
+        db.createObjectStore(IDB_STORE, { keyPath: 'id' });
+      }
+    };
+    req.onsuccess = e => resolve(e.target.result);
+    req.onerror = () => reject(req.error);
+  });
+}
 
+async function getIDBCards(){
+  try {
+    const db = await openIDB();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(IDB_STORE, 'readonly');
+      const req = tx.objectStore(IDB_STORE).getAll();
+      req.onsuccess = () => resolve(req.result || []);
+      req.onerror = () => resolve([]);
+    });
+  } catch(e){ return []; }
+}
+
+async function setIDBCards(cards){
+  try {
+    const db = await openIDB();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(IDB_STORE, 'readwrite');
+      const store = tx.objectStore(IDB_STORE);
+      store.clear();
+      cards.forEach(c => store.put(c));
+      tx.oncomplete = () => {
+        try { localStorage.setItem(IDB_META_KEY, JSON.stringify({ count: cards.length, ts: Date.now() })); } catch(e){}
+        resolve();
+      };
+      tx.onerror = () => resolve();
+    });
+  } catch(e){}
+}
+
+function getIDBMeta(){
+  try { return JSON.parse(localStorage.getItem(IDB_META_KEY) || 'null'); } catch(e){ return null; }
+}
+
+async function fetchAllFromSupabase(onProgress){
   const PAGE = 2000;
   const allCards = [];
   let from = 0;
   let total = null;
-
   while(true){
     const { data, error, count } = await _supa
       .from('cards')
       .select('id,deck,system,topic,subject,qid,q,c,w,e,kp,d,img,pubmed_query,cochrane_pmid', { count: total === null ? 'exact' : undefined })
       .order('id')
       .range(from, from + PAGE - 1);
-
-    if(error){ console.error('Supabase error:', error); break; }
-    if(!data || data.length === 0) break;
-
+    if(error || !data || data.length === 0) break;
     if(total === null && count !== null) total = count;
     allCards.push(...data);
     from += PAGE;
-
-    const pct = total ? Math.round(allCards.length / total * 100) : 0;
-    updateLoadingProgress(pct, allCards.length, data);
-
+    if(onProgress) onProgress(total ? Math.round(allCards.length / total * 100) : 0, allCards.length, data);
     if(data.length < PAGE) break;
   }
+  return allCards;
+}
 
+async function loadCardsFromSupabase(){
+  console.log('BoardMD: checking IndexedDB cache...');
+
+  const meta = getIDBMeta();
+  const cached = meta ? await getIDBCards() : [];
+
+  if(cached.length > 0){
+    // INSTANT LOAD from IndexedDB
+    console.log(`BoardMD: ${cached.length} cards from IndexedDB cache (instant)`);
+    buildDecks(cached);
+    hideLoadingOverlay();
+
+    // Background check: has Supabase got more/updated cards?
+    setTimeout(async () => {
+      try {
+        const { count } = await _supa.from('cards').select('id', { count: 'exact', head: true });
+        if(count && count !== cached.length){
+          console.log(`BoardMD: background refresh — ${count} on server vs ${cached.length} cached`);
+          const fresh = await fetchAllFromSupabase();
+          if(fresh.length > 0){
+            await setIDBCards(fresh);
+            buildDecks(fresh);
+            console.log(`BoardMD: background refresh done — ${fresh.length} cards`);
+          }
+        } else {
+          console.log(`BoardMD: cache up to date (${cached.length} cards)`);
+        }
+      } catch(e){ console.warn('background refresh failed:', e); }
+    }, 2000);
+
+    return cached.length;
+  }
+
+  // FIRST LOAD — show splash, download everything
+  console.log('BoardMD: no cache — loading from Supabase...');
+  showLoadingOverlay();
+  const allCards = await fetchAllFromSupabase((pct, n, chunk) => updateLoadingProgress(pct, n, chunk));
   buildDecks(allCards);
-  console.log(`BoardMD: ${allCards.length} cards loaded from Supabase`);
+  console.log(`BoardMD: ${allCards.length} cards loaded`);
   hideLoadingOverlay();
+
+  // Save to IndexedDB for next time
+  setIDBCards(allCards).then(() => console.log('BoardMD: cache saved to IndexedDB'));
+
   return allCards.length;
 }
 
-// Safety net — if overlay gets stuck for any reason, force remove after 60s
+// Safety net — force remove overlay after 60s if stuck
 setTimeout(() => {
   const el = document.getElementById('bmd-loading-overlay');
-  if(el) { el.style.pointerEvents='none'; el.style.opacity='0'; setTimeout(()=>{try{el.remove();}catch(e){}},500); }
+  if(el){ el.style.pointerEvents='none'; el.style.opacity='0'; setTimeout(()=>{try{el.remove();}catch(e){}},500); }
 }, 60000);
-
-// ── BACKGROUND REFRESH ─────────────────────────────────────────────────
-// Runs silently after instant cache load. Checks if Supabase has more cards.
-// If yes, updates cache for next session. User never sees this.
-const BG_REFRESH_KEY = 'bmd_bg_refresh_ts';
-async function backgroundRefreshCards(cachedCount){
-  try {
-    // Only once per day
-    const lastRefresh = parseInt(localStorage.getItem(BG_REFRESH_KEY)||'0');
-    if(Date.now() - lastRefresh < 23 * 3600 * 1000) return;
-    localStorage.setItem(BG_REFRESH_KEY, String(Date.now()));
-
-    // Check total count from Supabase
-    const { count, error } = await _supa
-      .from('cards')
-      .select('id', { count: 'exact', head: true });
-
-    if(error || !count) return;
-
-    if(count !== cachedCount){
-      console.log(`BoardMD: ${count} cards on server vs ${cachedCount} cached — refreshing in background`);
-      // Full silent reload
-      const PAGE = 2000;
-      const allCards = [];
-      let from = 0;
-      while(true){
-        const { data, error: e2 } = await _supa
-          .from('cards')
-          .select('id,deck,system,topic,subject,qid,q,c,w,e,kp,d,img,pubmed_query,cochrane_pmid')
-          .order('id')
-          .range(from, from + PAGE - 1);
-        if(e2 || !data || data.length === 0) break;
-        allCards.push(...data);
-        from += PAGE;
-        if(data.length < PAGE) break;
-      }
-      if(allCards.length > 0){
-        setCachedCards(allCards);
-        buildDecks(allCards); // update live session too
-        console.log(`BoardMD: background refresh complete — ${allCards.length} cards`);
-      }
-    } else {
-      console.log(`BoardMD: cache up to date (${cachedCount} cards)`);
-    }
-  } catch(e){ console.warn('background refresh failed:', e); }
-}
 
 // ── AUTH ─────────────────────────────────────────────────────────────
 async function getSession(){
