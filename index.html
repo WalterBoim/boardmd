@@ -2143,17 +2143,6 @@ mark.hb{background:rgba(79,142,247,.28);border-bottom:2px solid rgba(40,100,220,
 .filter-bar { display:none !important; }
 .card { background:transparent !important; border:none !important; box-shadow:none !important; padding:0 !important; border-radius:0 !important; max-width:100% !important; }
 
-/* ── MOBILE (<900px): layout normal, rola tudo, ordem: Attending → FSRS → Back/Skip ── */
-@media (max-width: 899px) {
-  /* No mobile o dock fica oculto — elementos inline no study-inner funcionam */
-  #study-footer-dock { display: none !important; }
-  /* Garantir ordem correta no mobile via order */
-  #att-inline-wrap { order: 1; }
-  .fsrs-nav { order: 2; }
-  .plain-nav { order: 3; }
-  #card-el { display: flex; flex-direction: column; }
-}
-
 /* ── DESKTOP (>=900px): layout fixo estilo UWorld ── */
 @media (min-width: 900px) {
   body.studying {
@@ -4680,7 +4669,7 @@ html.light .qs-val { color: inherit; }
           </div>
         </div>
 
-        <div class="card" id="card-el" style="display:none">
+        <div class="card" id="card-el">
           <div class="card-header">
             <!-- Line 1: system › topic (left) | state + interval (right) -->
             <div style="width:100%;display:flex;align-items:center;justify-content:space-between;margin-bottom:7px;">
