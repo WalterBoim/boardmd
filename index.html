@@ -240,6 +240,11 @@ html.light .anki-due{color:#16a34a;}
 
 .study-main{flex:1;display:flex;justify-content:center;padding:24px 20px;overflow-y:auto;min-width:0;}
 .study-inner{max-width:760px;width:100%;display:flex;flex-direction:column;align-items:center;gap:16px;}
+/* Desktop studying override — full width, no centering */
+@media(min-width:900px){
+  body.studying .study-main{padding:0 !important;justify-content:flex-start !important;overflow:hidden !important;}
+  body.studying .study-inner{max-width:100% !important;width:100% !important;align-items:stretch !important;gap:0 !important;flex:1 !important;min-height:0 !important;overflow:hidden !important;}
+}
 
 .progress-wrap{width:100%;}
 .progress-info{display:flex;justify-content:space-between;font-size:11px;color:var(--text-faint);margin-bottom:6px;font-family:'JetBrains Mono',monospace;}
@@ -3407,16 +3412,16 @@ html.light .qs-val { color: inherit; }
   body.studying .study-inner { flex: 1 !important; min-height: 0 !important; overflow: hidden !important; display: flex !important; flex-direction: column !important; padding: 0 !important; padding-bottom: 0 !important; }
 
   #card-el {
-    max-width: 1300px !important; width: 100% !important;
+    max-width: 100% !important; width: 100% !important;
     flex: 1 !important; min-height: 0 !important;
     display: flex !important; flex-direction: column !important;
-    border: 1px solid var(--border) !important; border-radius: 16px !important;
+    border: none !important; border-radius: 0 !important;
     overflow: hidden !important; background: var(--surface) !important; box-shadow: none !important;
   }
   #card-el .card-header {
     flex-shrink: 0 !important; width: 100% !important;
     border-bottom: 1px solid var(--border) !important;
-    border-radius: 16px 16px 0 0 !important; padding: 14px 24px 10px !important;
+    border-radius: 0 !important; padding: 14px 24px 10px !important;
   }
   #bmd-cols-row {
     display: flex !important; flex-direction: row !important;
@@ -3478,6 +3483,18 @@ html.light .qs-val { color: inherit; }
   #bmd-ans-col:not(.has-answer) #key-point-wrap,
   #bmd-ans-col:not(.has-answer) #card-pubmed-wrap,
   #bmd-ans-col:not(.has-answer) #att-inline-wrap { display: none !important; }
+
+  /* FSRS inside card-el: flex-shrink:0, always visible */
+  #card-el > .fsrs-nav {
+    flex-shrink: 0 !important;
+    width: 100% !important;
+    border-top: 1px solid var(--border) !important;
+    padding: 8px 16px 10px !important;
+    background: var(--surface) !important;
+    border-radius: 0 !important;
+  }
+  #card-el > .fsrs-nav .fsrs-row { width: 100% !important; max-width: 100% !important; }
+  #card-el > .fsrs-nav.visible { display: flex !important; flex-direction: column !important; align-items: center !important; }
 }
 </style>
 
@@ -4529,7 +4546,6 @@ html.light .qs-val { color: inherit; }
             <div class="card-question hl-zone" id="c-q">Loading…</div>
             <div class="options" id="c-opts"></div>
           </div>
-          <!-- Response Distribution -->
           <div id="resp-dist-wrap" style="display:none;padding:14px 20px 10px;border-top:1px solid var(--border);">
             <div style="font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text-faint);font-family:'JetBrains Mono',monospace;margin-bottom:10px;">Response Distribution</div>
           </div>
@@ -4568,22 +4584,23 @@ html.light .qs-val { color: inherit; }
           <div id="key-point-wrap" style="display:none;padding:0 18px 14px;"></div>
           <div id="card-pubmed-wrap" style="display:none;"></div>
           <div id="card-cochrane-wrap" style="display:none;"></div>
-          </div><!-- /bmd-ans-col -->
-          </div><!-- /bmd-cols-row -->
-          <div style="display:flex;justify-content:flex-end;padding:4px 18px 2px;">
+          <div style="display:flex;justify-content:flex-end;padding:4px 18px 6px;">
             <button id="report-issue-btn" onclick="openReportIssue()" style="background:none;border:none;cursor:pointer;font-size:10px;font-weight:600;color:var(--text-faint);font-family:'JetBrains Mono',monospace;padding:2px 0;opacity:.4;transition:opacity .15s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='.4'">⚑ Report Issue</button>
           </div>
-        </div>
+          </div><!-- /bmd-ans-col -->
+          </div><!-- /bmd-cols-row -->
 
-        <!-- FSRS nav — inline after card, scrolls with content -->
-        <div class="fsrs-nav" id="fsrs-nav">
-          <div class="fsrs-row">
-            <button class="fsrs-btn again" onclick="rate(0)"><span class="fsrs-lbl">Again</span><span class="fsrs-int" id="int0">&lt;1d</span></button>
-            <button class="fsrs-btn hard"  onclick="rate(1)"><span class="fsrs-lbl">Hard</span><span class="fsrs-int" id="int1">1d</span></button>
-            <button class="fsrs-btn good"  onclick="rate(2)"><span class="fsrs-lbl">Good</span><span class="fsrs-int" id="int2">3d</span></button>
-            <button class="fsrs-btn easy"  onclick="rate(3)"><span class="fsrs-lbl">Easy</span><span class="fsrs-int" id="int3">7d</span></button>
+          <!-- FSRS: flex-shrink:0 inside card-el, always visible at bottom -->
+          <div class="fsrs-nav" id="fsrs-nav">
+            <div class="fsrs-row">
+              <button class="fsrs-btn again" onclick="rate(0)"><span class="fsrs-lbl">Again</span><span class="fsrs-int" id="int0">&lt;1d</span></button>
+              <button class="fsrs-btn hard"  onclick="rate(1)"><span class="fsrs-lbl">Hard</span><span class="fsrs-int" id="int1">1d</span></button>
+              <button class="fsrs-btn good"  onclick="rate(2)"><span class="fsrs-lbl">Good</span><span class="fsrs-int" id="int2">3d</span></button>
+              <button class="fsrs-btn easy"  onclick="rate(3)"><span class="fsrs-lbl">Easy</span><span class="fsrs-int" id="int3">7d</span></button>
+            </div>
           </div>
-        </div>
+
+        </div><!-- /card-el -->
 
         <div style="display:none" id="pre-hint"></div>
 
