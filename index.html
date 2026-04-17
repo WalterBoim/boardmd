@@ -5361,6 +5361,11 @@ function showDeckHome(){
   if(fb) fb.style.display='none';
   const al=document.getElementById('app-layout-wrap');
   if(al){ al.style.display='none'; al.style.visibility='hidden'; }
+  const fn=document.getElementById('fsrs-nav');
+  if(fn) fn.classList.remove('visible');
+  const fd=document.getElementById('study-footer-dock');
+  if(fd){ fd.style.display='none'; fd.classList.remove('dock-visible'); }
+  document.body.classList.remove('studying');
   clearLrnTimers();
   buildDeckHomeTable();
 }
