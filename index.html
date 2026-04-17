@@ -5964,9 +5964,6 @@ function renderCard(){
   // Reset inline PubMed wrap
   const _pwReset = document.getElementById('card-pubmed-wrap');
   if(_pwReset){ _pwReset.style.display='none'; _pwReset.style.visibility='hidden'; _pwReset.innerHTML=''; }
-  // Reset Cochrane wrap
-  const _cwReset = document.getElementById('card-cochrane-wrap');
-  if(_cwReset){ _cwReset.style.display='none'; _cwReset.innerHTML=''; }
   // Hide FSRS buttons until answer revealed
   const _fsrs=document.getElementById('fsrs-nav');
   const _fsrs2=document.getElementById('fsrs-nav-2');
@@ -10172,8 +10169,7 @@ function fetchCardPubmed(card){
     .then(function(sd){
       const ids = sd.esearchresult ? sd.esearchresult.idlist||[] : [];
       if(!ids.length){
-        const _pw = document.getElementById('card-pubmed-wrap');
-        if(_pw){ _pw.style.display='none'; _pw.innerHTML=''; }
+        container.innerHTML = '<div style="padding:10px 14px;font-size:11px;color:var(--text-faint);">No articles found.</div>';
         return;
       }
       return fetch('https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=pubmed&id='+ids.join(',')+' &retmode=json')
@@ -10197,7 +10193,7 @@ function fetchCardPubmed(card){
           container.innerHTML = html;
         });
     })
-    .catch(function(){ const _pw = document.getElementById('card-pubmed-wrap'); if(_pw){ _pw.style.display='none'; _pw.innerHTML=''; } });
+    .catch(function(){ container.innerHTML = '<div style="padding:10px 14px;font-size:11px;color:var(--text-faint);">Could not connect to PubMed.</div>'; });
 }
 
 function openCardAbstract(uid){
@@ -10450,10 +10446,7 @@ function bmdDashSync() {
     const al = document.getElementById('app-layout-wrap');
     if(dh) dh.classList.add('active');
     if(fb) fb.style.display = 'none';
-    if(al){ al.style.display='none'; al.style.visibility='hidden'; al.style.height='0'; al.style.overflow='hidden'; al.style.minHeight='0'; }
-    document.body.classList.remove('studying');
-    const _fd2 = document.getElementById('study-footer-dock');
-    if(_fd2){ _fd2.style.display='none'; _fd2.classList.remove('dock-visible'); }
+    if(al) al.style.display = 'none';
     if(typeof clearLrnTimers === 'function') clearLrnTimers();
     // dashboard header: show .hdr + .streak-bar + #bmd-step-tabs
     const hdr = document.querySelector('.app-header .hdr');
