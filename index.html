@@ -5356,6 +5356,7 @@ function clearLrnTimers(){_lrnTimers.forEach(t=>clearTimeout(t));_lrnTimers=[];}
 
 // ── NAVIGATION ───────────────────────────────────────────────────────
 function showDeckHome(){
+  document.getElementById('app').classList.add('active');
   const dh=document.getElementById('deck-home');
   if(dh) dh.classList.add('active');
   const fb=document.getElementById('filter-bar-wrap');
