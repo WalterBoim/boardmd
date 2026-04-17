@@ -9142,6 +9142,7 @@ function injectAttendingInline(card, sel){
   const left   = Math.max(0, ATT_FREE_LIMIT - uses.count);
   const blocked = !isPro && left <= 0;
   const dis = blocked ? 'disabled' : '';
+  const wasCorrect = sel === card.c;
 
   const usageLine = isPro
     ? '<span style="font-size:10px;font-family:Inter,sans-serif;color:var(--emerald);">Beta — unlimited</span>'
@@ -9175,12 +9176,6 @@ function injectAttendingInline(card, sel){
     ${!wasCorrect ? `<div style="padding:0 14px 10px;">
       <button ${dis} onclick="askAttendingInline('wrong',this)" style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%;background:rgba(244,63,94,.08);border:1.5px solid rgba(244,63,94,.3);border-radius:10px;padding:10px 14px;font-size:12px;font-weight:700;color:#f43f5e;cursor:pointer;font-family:Inter,sans-serif;transition:all .15s;" onmouseover="this.style.background='rgba(244,63,94,.14)'" onmouseout="this.style.background='rgba(244,63,94,.08)'">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#f43f5e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-        Why I was wrong
-      </button>
-    </div>` : ''}
-    ${!wasCorrect ? `<div style="padding:0 14px 10px;">
-      <button ${dis} onclick="askAttendingInline('wrong',this)" style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%;background:rgba(255,83,112,.08);border:1.5px solid rgba(255,83,112,.35);border-radius:10px;padding:10px 14px;font-size:12px;font-weight:700;color:#ff5370;cursor:pointer;font-family:Inter,sans-serif;transition:all .15s;" onmouseover="this.style.background='rgba(255,83,112,.14)'" onmouseout="this.style.background='rgba(255,83,112,.08)'">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#ff5370" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
         Why I was wrong
       </button>
     </div>` : ''}
