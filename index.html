@@ -6561,6 +6561,15 @@ function revealAnswer(sel,card){
     if(dLines.length > 1){
       distHtml = dLines.map(line=>{
         line = line.trim();
+        if(!line) return '';
+        // Formato W1:/W2:/W3: — substitui pelo texto da opcao errada correspondente
+        const wNumMatch = line.match(/^W(\d+):\s*/);
+        if(wNumMatch){
+          const wIdx = parseInt(wNumMatch[1]) - 1;
+          const wText = wrongOpts[wIdx] || ('Option ' + wNumMatch[1]);
+          line = '<strong>' + wText + '</strong>: ' + line.slice(wNumMatch[0].length);
+          return '<div class="dist-item">' + (/<[a-z][^>]*>/i.test(line) ? line : mdToHtml(line)) + '</div>';
+        }
         // Negrito no nome da opção errada — tenta match no início da linha
         let bolded = false;
         for(const w of wrongOpts){
