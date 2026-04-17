@@ -9024,7 +9024,7 @@ async function loadCardsFromSupabase(){
   // ── CACHE MISS: show splash, load from Supabase ──
   showLoadingOverlay();
 
-  const PAGE = 2000;
+  const PAGE = 1000;
   const allCards = [];
   let from = 0;
   let total = null;
@@ -9082,7 +9082,7 @@ async function backgroundRefreshCards(cachedCount){
     if(count !== cachedCount){
       console.log(`BoardMD: ${count} cards on server vs ${cachedCount} cached — refreshing in background`);
       // Full silent reload
-      const PAGE = 2000;
+      const PAGE = 1000;
       const allCards = [];
       let from = 0;
       while(true){
