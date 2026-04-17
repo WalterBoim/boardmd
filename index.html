@@ -3391,167 +3391,93 @@ html.light .qs-val { color: inherit; }
 @keyframes slideUp { from{opacity:0;transform:translateY(40px)} to{opacity:1;transform:translateY(0)} }
 </style>
 <style id="bmd-split-screen">
-/* ── Mobile: no split, wrappers invisible ── */
+/* Mobile: single column */
 #bmd-cols-row { display: block; }
 #bmd-q-col    { display: block; padding: 0; position: static; max-height: none; overflow-y: visible; width: auto; border-right: none; }
 #bmd-ans-col  { display: block; }
 #bmd-split-divider { display: none; }
 .bmd-div-handle { display: none; }
 
-/* ── Desktop split: ≥900px, only inside study layout ── */
+/* Desktop: page locked, columns fill all space */
 @media (min-width: 900px) {
-  /* Widen study area */
-  .study-main  { padding: 20px 28px !important; }
-  .study-inner { max-width: 1300px !important; width: 100% !important; }
+  body.studying { overflow: hidden !important; height: 100vh !important; }
+  body.studying #app { height: 100vh !important; overflow: hidden !important; display: flex !important; flex-direction: column !important; }
+  body.studying .app-layout { flex: 1 !important; min-height: 0 !important; overflow: hidden !important; display: flex !important; }
+  body.studying .study-main { flex: 1 !important; min-height: 0 !important; overflow: hidden !important; display: flex !important; flex-direction: column !important; padding: 20px 28px !important; }
+  body.studying .study-inner { flex: 1 !important; min-height: 0 !important; overflow: hidden !important; display: flex !important; flex-direction: column !important; padding: 0 !important; padding-bottom: 0 !important; }
 
-  /* card-el: flex column — header top, cols-row below */
   #card-el {
-    max-width: 1300px !important;
-    display: flex !important;
-    flex-direction: column !important;
-    border: 1px solid var(--border) !important;
-    border-radius: 16px !important;
-    overflow: visible !important;
-    background: var(--surface) !important;
-    box-shadow: none !important;
+    max-width: 1300px !important; width: 100% !important;
+    flex: 1 !important; min-height: 0 !important;
+    display: flex !important; flex-direction: column !important;
+    border: 1px solid var(--border) !important; border-radius: 16px !important;
+    overflow: hidden !important; background: var(--surface) !important; box-shadow: none !important;
   }
-
-  /* header spans full width */
   #card-el .card-header {
-    flex-shrink: 0 !important;
-    width: 100% !important;
-    max-width: 100% !important;
+    flex-shrink: 0 !important; width: 100% !important;
     border-bottom: 1px solid var(--border) !important;
-    padding: 16px 24px 12px !important;
+    border-radius: 16px 16px 0 0 !important; padding: 14px 24px 10px !important;
   }
-
-  /* cols-row: flex row */
   #bmd-cols-row {
-    display: flex !important;
-    flex-direction: row !important;
-    align-items: stretch !important;
+    display: flex !important; flex-direction: row !important;
+    align-items: stretch !important; flex: 1 !important;
+    min-height: 0 !important; overflow: hidden !important;
   }
-
-  /* LEFT column */
   #bmd-q-col {
-    flex-shrink: 0 !important;
-    width: 50%;
-    min-width: 260px !important;
-    max-width: 75% !important;
-    position: sticky !important;
-    top: 60px !important;
-    max-height: calc(100vh - 72px) !important;
-    overflow-y: auto !important;
-    scrollbar-width: thin !important;
-    align-self: flex-start !important;
-    display: flex !important;
-    flex-direction: column !important;
-    padding: 0 !important;
+    flex-shrink: 0 !important; width: 50% !important;
+    min-width: 260px !important; max-width: 75% !important;
+    display: flex !important; flex-direction: column !important;
+    overflow: hidden !important; border-right: 1px solid var(--border) !important;
+    position: static !important;
   }
-  /* Inner scroll area inside q-col */
   #bmd-q-inner {
-    flex: 1 !important;
-    overflow-y: auto !important;
+    flex: 1 !important; min-height: 0 !important;
+    overflow-y: auto !important; scrollbar-width: thin !important;
     padding: 20px 24px 8px !important;
-    scrollbar-width: thin !important;
   }
-  #bmd-q-col::-webkit-scrollbar { width: 3px; }
-  #bmd-q-col::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
-
-  /* DIVIDER */
+  #bmd-q-inner::-webkit-scrollbar { width: 3px; }
+  #bmd-q-inner::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+  #bmd-q-col .card-footer-counter {
+    flex-shrink: 0 !important; border-top: 1px solid var(--border) !important;
+    padding: 8px 24px !important; background: var(--surface) !important;
+  }
   #bmd-split-divider {
-    display: flex !important;
-    flex-shrink: 0 !important;
-    width: 16px !important;
-    align-self: stretch !important;
-    align-items: center !important;
-    justify-content: center !important;
-    cursor: col-resize !important;
-    position: relative !important;
-    background: transparent !important;
-    user-select: none !important;
-    -webkit-user-select: none !important;
-    z-index: 10 !important;
-    touch-action: none !important;
+    display: flex !important; flex-shrink: 0 !important; width: 16px !important;
+    align-self: stretch !important; align-items: center !important; justify-content: center !important;
+    cursor: col-resize !important; position: relative !important; background: transparent !important;
+    user-select: none !important; -webkit-user-select: none !important; z-index: 10 !important; touch-action: none !important;
   }
   #bmd-split-divider::before {
-    content: '';
-    position: absolute;
-    top: 0; bottom: 0;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 1px;
-    background: var(--border);
-    transition: width .15s, background .15s;
-    pointer-events: none;
+    content: ''; position: absolute; top: 0; bottom: 0; left: 50%;
+    transform: translateX(-50%); width: 1px; background: var(--border);
+    transition: width .15s, background .15s; pointer-events: none;
   }
-  #bmd-split-divider:hover::before,
-  #bmd-split-divider.dragging::before {
-    width: 3px;
-    background: var(--accent);
-  }
+  #bmd-split-divider:hover::before, #bmd-split-divider.dragging::before { width: 3px; background: var(--accent); }
   .bmd-div-handle {
-    display: flex !important;
-    flex-direction: column !important;
-    gap: 3px !important;
-    align-items: center !important;
-    position: relative !important;
-    z-index: 1 !important;
-    opacity: 0 !important;
-    transition: opacity .15s !important;
-    pointer-events: none !important;
-    background: var(--surface2) !important;
-    border: 1px solid var(--border2) !important;
-    border-radius: 8px !important;
-    padding: 6px 4px !important;
+    display: flex !important; flex-direction: column !important; gap: 3px !important;
+    align-items: center !important; position: relative !important; z-index: 1 !important;
+    opacity: 0 !important; transition: opacity .15s !important; pointer-events: none !important;
+    background: var(--surface2) !important; border: 1px solid var(--border2) !important;
+    border-radius: 8px !important; padding: 6px 4px !important;
   }
-  .bmd-div-handle span {
-    display: block !important;
-    width: 2px !important;
-    height: 10px !important;
-    border-radius: 2px !important;
-    background: var(--muted) !important;
-  }
-  #bmd-split-divider:hover .bmd-div-handle,
-  #bmd-split-divider.dragging .bmd-div-handle { opacity: 1 !important; }
-
-  /* RIGHT column */
+  .bmd-div-handle span { display: block !important; width: 2px !important; height: 10px !important; border-radius: 2px !important; background: var(--muted) !important; }
+  #bmd-split-divider:hover .bmd-div-handle, #bmd-split-divider.dragging .bmd-div-handle { opacity: 1 !important; }
   #bmd-ans-col {
-    flex: 1 1 0 !important;
-    min-width: 260px !important;
-    overflow-y: auto !important;
-    max-height: calc(100vh - 72px) !important;
-    align-self: flex-start !important;
+    flex: 1 1 0 !important; min-width: 260px !important; min-height: 0 !important;
+    overflow-y: auto !important; scrollbar-width: thin !important; align-self: stretch !important;
   }
-
-  /* Explanation padding in right col */
+  #bmd-ans-col::-webkit-scrollbar { width: 3px; }
+  #bmd-ans-col::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
   #bmd-ans-col #c-exp          { max-width: 100% !important; padding: 18px 24px !important; border-top: none !important; }
   #bmd-ans-col .card-img-wrap  { margin: 0 24px 14px !important; }
   #bmd-ans-col #key-point-wrap { padding: 0 24px 14px !important; }
   #bmd-ans-col #card-pubmed-wrap { padding: 0 24px !important; }
-  #bmd-q-col .card-footer-counter { border-top: 1px solid var(--border) !important; padding: 10px 24px 8px !important; flex-shrink: 0 !important; background: var(--surface) !important; }
   #bmd-ans-col #att-inline-wrap { max-width: 100% !important; margin: 0 !important; border-radius: 0 !important; border-left: none !important; border-right: none !important; }
-
-  /* Placeholder before answer revealed */
-  #bmd-ans-col #bmd-ans-placeholder {
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    min-height: 200px !important;
-    color: var(--muted) !important;
-    font-size: 13px !important;
-    font-family: 'Sora', sans-serif !important;
-    opacity: .4 !important;
-    flex-direction: column !important;
-    gap: 8px !important;
-    padding: 32px !important;
-  }
   #bmd-ans-col.has-answer #bmd-ans-placeholder { display: none !important; }
-  #bmd-ans-col:not(.has-answer) #c-exp         { display: none !important; }
+  #bmd-ans-col:not(.has-answer) #c-exp { display: none !important; }
   #bmd-ans-col:not(.has-answer) #key-point-wrap,
   #bmd-ans-col:not(.has-answer) #card-pubmed-wrap,
-  #bmd-ans-col:not(.has-answer) #att-inline-wrap,
-  /* counter always visible in q-col */
+  #bmd-ans-col:not(.has-answer) #att-inline-wrap { display: none !important; }
 }
 </style>
 
@@ -4618,10 +4544,6 @@ html.light .qs-val { color: inherit; }
           </div><!-- /bmd-q-col -->
           <div id="bmd-split-divider"><div class="bmd-div-handle"><span></span><span></span></div></div>
           <div id="bmd-ans-col">
-            <div id="bmd-ans-placeholder">
-              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
-              Select your answer to reveal
-            </div>
           <div class="explanation" id="c-exp">
             <div class="exp-section">
               <div class="exp-label"><span class="exp-label-icon" style="background:rgba(34,197,94,.15);color:var(--emerald)"></span>Correct answer</div>
@@ -4651,10 +4573,6 @@ html.light .qs-val { color: inherit; }
           <div style="display:flex;justify-content:flex-end;padding:4px 18px 2px;">
             <button id="report-issue-btn" onclick="openReportIssue()" style="background:none;border:none;cursor:pointer;font-size:10px;font-weight:600;color:var(--text-faint);font-family:'JetBrains Mono',monospace;padding:2px 0;opacity:.4;transition:opacity .15s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='.4'">⚑ Report Issue</button>
           </div>
-        </div>
-
-        <div class="plain-nav" id="plain-nav">
-          <button class="nav-plain-btn" onclick="skipBack()">← Back</button>
         </div>
 
         <!-- FSRS nav — inline after card, scrolls with content -->
@@ -5269,6 +5187,7 @@ function clearLrnTimers(){_lrnTimers.forEach(t=>clearTimeout(t));_lrnTimers=[];}
 
 // ── NAVIGATION ───────────────────────────────────────────────────────
 function showDeckHome(){
+  document.body.classList.remove('studying');
   const dh=document.getElementById('deck-home');
   if(dh) dh.classList.add('active');
   const fb=document.getElementById('filter-bar-wrap');
@@ -5279,6 +5198,7 @@ function showDeckHome(){
   buildDeckHomeTable();
 }
 function hideDeckHome(){
+  document.body.classList.add('studying');
   const dh=document.getElementById('deck-home');
   if(dh) dh.classList.remove('active');
   const fb=document.getElementById('filter-bar-wrap');
@@ -5531,6 +5451,7 @@ function switchDeckAndStudy(dk){
 function goHome(){
   document.getElementById('landing').style.display='';
   document.getElementById('app').classList.remove('active');
+  document.body.classList.remove('studying');
   clearLrnTimers();
   window.scrollTo(0,0);
 }
@@ -5830,10 +5751,6 @@ function ensureStudyUI(){
         <button class="fsrs-btn good"  onclick="rate(2)"><span class="fsrs-lbl">Good</span><span class="fsrs-int" id="int2-b">3d</span></button>
         <button class="fsrs-btn easy"  onclick="rate(3)"><span class="fsrs-lbl">Easy</span><span class="fsrs-int" id="int3-b">7d</span></button>
       </div>
-    </div>
-    <div class="plain-nav" id="plain-nav">
-      <button class="nav-plain-btn" onclick="skipBack()">← Back</button>
-      <button class="nav-plain-btn" onclick="skipFwd()">Skip →</button>
     </div>
     <div class="kbd-hint">1=Again · 2=Hard · 3=Good · 4=Easy &nbsp;|&nbsp; ←→ Navigate</div>`;
 }
@@ -9280,18 +9197,21 @@ function injectAttendingInline(card, sel){
     <div style="padding:0 14px 10px;font-size:11px;color:var(--text-faint);font-family:'Inter',sans-serif;line-height:1.4;">For educational purposes only. Not medical advice.</div>
     <div class="att-inline-response" id="att-inline-response"></div>`;
 
-  // Insere no study-inner, entre o card e os botões FSRS
-  const studyInner = document.getElementById('study-inner');
-  if(studyInner){
-    const ref = studyInner.querySelector('#plain-nav')
-             || studyInner.querySelector('#fsrs-nav')
-             || studyInner.querySelector('#fsrs-nav-2')
-             || studyInner.querySelector('.fsrs-nav')
-             || studyInner.querySelector('.plain-nav');
-    if(ref){
-      studyInner.insertBefore(wrap, ref);
-    } else {
-      studyInner.appendChild(wrap);
+  // Desktop (>=900px): injeta na coluna direita
+  const ansCol = document.getElementById('bmd-ans-col');
+  if(ansCol && window.innerWidth >= 900){
+    const footerRef = ansCol.querySelector('.card-footer-counter');
+    if(footerRef){ ansCol.insertBefore(wrap, footerRef); }
+    else { ansCol.appendChild(wrap); }
+  } else {
+    // Mobile: injeta no study-inner antes do fsrs-nav
+    const studyInner = document.getElementById('study-inner');
+    if(studyInner){
+      const ref = studyInner.querySelector('#fsrs-nav')
+               || studyInner.querySelector('#fsrs-nav-2')
+               || studyInner.querySelector('.fsrs-nav');
+      if(ref){ studyInner.insertBefore(wrap, ref); }
+      else { studyInner.appendChild(wrap); }
     }
   }
 
@@ -12715,6 +12635,26 @@ function studyDisciplineFilter() {
 }
 </script>
 
+
+
+<script>
+// has-answer: mostra coluna direita ao revelar, esconde ao trocar card
+window.addEventListener('load', function(){
+  var _oRev = window.revealAnswer;
+  window.revealAnswer = function(sel,card){
+    var r = _oRev ? _oRev(sel,card) : undefined;
+    var ac = document.getElementById('bmd-ans-col');
+    if(ac) ac.classList.add('has-answer');
+    return r;
+  };
+  var _oRen = window.renderCard;
+  window.renderCard = function(){
+    var ac = document.getElementById('bmd-ans-col');
+    if(ac) ac.classList.remove('has-answer');
+    return _oRen ? _oRen() : undefined;
+  };
+});
+</script>
 
 <script>
 // ── SPLIT DIVIDER DRAG ────────────────────────────────────────────────────────
