@@ -10783,6 +10783,258 @@ function closeSearchPicker() {
   if(el) { el.style.display = 'none'; }
 }
 
+// ── SYSTEM FILTER ────────────────────────────────────────────────────────────
+var _sfTab = 's1';
+var _sfSel = { s1: new Set(), s2: new Set() };
+var _sfSystems = {
+  s1: [
+    'Multisystem Processes & Disorders',
+    'Cardiovascular System',
+    'Gastrointestinal System',
+    'Blood & Lymphoreticular/Immune Systems',
+    'Behavioral Health & Nervous Systems/Special Senses',
+    'Renal/Urinary & Reproductive Systems',
+    'Respiratory and Renal/Urinary Systems',
+    'Musculoskeletal, Skin & Subcutaneous Tissue',
+    'Reproductive & Endocrine Systems',
+    'Endocrine System',
+    'General Principles',
+    'Biochemistry',
+    'Pathology'
+  ],
+  s2: [
+    'Multisystem Processes & Disorders',
+    'Cardiovascular System',
+    'Nervous System & Special Senses',
+    'Gastrointestinal System',
+    'Renal/Urinary & Reproductive Systems',
+    'Respiratory System',
+    'Musculoskeletal Sys/Skin & Subcutaneous Tissue',
+    'Blood & Lymphoreticular/Immune Systems',
+    'Behavioral Health',
+    'Endocrine System',
+    'Pregnancy, Childbirth & the Puerperium',
+    'HY Concepts Step 2 CK'
+  ]
+};
+
+function openSystemFilter() {
+  _sfTab = (currentStep === 's2') ? 's2' : 's1';
+  _sfSel = { s1: new Set(), s2: new Set() };
+  _buildSFChips('s1');
+  _buildSFChips('s2');
+  setSFTab(_sfTab);
+  document.getElementById('sf-status').textContent = '';
+  const el = document.getElementById('system-filter-overlay');
+  if(el) el.style.display = 'flex';
+}
+
+function closeSystemFilter() {
+  const el = document.getElementById('system-filter-overlay');
+  if(el) el.style.display = 'none';
+}
+
+function _buildSFChips(step) {
+  const container = document.getElementById('sf-chips-' + step);
+  if(!container) return;
+  container.innerHTML = '';
+  _sfSystems[step].forEach(function(sys) {
+    var btn = document.createElement('button');
+    btn.textContent = sys;
+    btn.dataset.sys = sys;
+    btn.dataset.step = step;
+    btn.style.cssText = 'padding:8px 14px;border-radius:20px;border:1.5px solid var(--border2);background:var(--surface2);font-size:12px;font-weight:600;color:var(--muted);font-family:Sora,sans-serif;cursor:pointer;transition:all .15s;';
+    btn.onclick = function() { _toggleSFChip(btn, step, sys); };
+    container.appendChild(btn);
+  });
+}
+
+function _toggleSFChip(btn, step, sys) {
+  if(_sfSel[step].has(sys)) {
+    _sfSel[step].delete(sys);
+    btn.style.background = 'var(--surface2)';
+    btn.style.borderColor = 'var(--border2)';
+    btn.style.color = 'var(--muted)';
+  } else {
+    _sfSel[step].add(sys);
+    btn.style.background = 'rgba(34,197,94,.15)';
+    btn.style.borderColor = '#22c55e';
+    btn.style.color = '#22c55e';
+  }
+}
+
+function setSFTab(step) {
+  _sfTab = step;
+  document.getElementById('sf-chips-s1').style.display = step === 's1' ? 'flex' : 'none';
+  document.getElementById('sf-chips-s2').style.display = step === 's2' ? 'flex' : 'none';
+  var t1 = document.getElementById('sf-tab-s1');
+  var t2 = document.getElementById('sf-tab-s2');
+  if(step === 's1') {
+    t1.style.borderColor='#22c55e'; t1.style.background='rgba(34,197,94,.15)'; t1.style.color='#22c55e';
+    t2.style.borderColor='var(--border2)'; t2.style.background='var(--surface2)'; t2.style.color='var(--muted)';
+  } else {
+    t2.style.borderColor='#22c55e'; t2.style.background='rgba(34,197,94,.15)'; t2.style.color='#22c55e';
+    t1.style.borderColor='var(--border2)'; t1.style.background='var(--surface2)'; t1.style.color='var(--muted)';
+  }
+}
+
+function clearSFChips() {
+  _sfSel = { s1: new Set(), s2: new Set() };
+  _buildSFChips('s1');
+  _buildSFChips('s2');
+  setSFTab(_sfTab);
+  document.getElementById('sf-status').textContent = '';
+}
+
+function studySystemFilter() {
+  var sel = Array.from(_sfSel[_sfTab]);
+  if(sel.length === 0) {
+    document.getElementById('sf-status').textContent = 'Select at least one system';
+    return;
+  }
+  var allCards = Object.values(window.DECKS||{}).reduce(function(a,b){return a.concat(b);},[]);
+  var pool = allCards.filter(function(c) {
+    return sel.some(function(s) { return (c.system||'').toLowerCase() === s.toLowerCase(); });
+  });
+  if(pool.length === 0) {
+    document.getElementById('sf-status').textContent = 'No cards found for selected systems';
+    return;
+  }
+  closeSystemFilter();
+  pool.sort(function(){return Math.random()-.5;});
+  showToast(pool.length + ' cards found — ' + sel.join(', '));
+  currentDeck = '_search';
+  deck = pool;
+  againQueue = []; idx = 0; revealed = false; sessionRatings = {};
+  document.getElementById('app').classList.add('active');
+  document.getElementById('landing').style.display = 'none';
+  hideDeckHome();
+  document.querySelectorAll('.deck-tab').forEach(function(t){t.classList.remove('active');});
+  ensureStudyUI();
+  renderCard(); updateStats();
+}
+
+// ── DISCIPLINE FILTER ─────────────────────────────────────────────────────────
+var _dfTab = 's1';
+var _dfSel = { s1: new Set(), s2: new Set() };
+var _dfDisciplines = {
+  s1: [
+    'Pathology',
+    'Physiology',
+    'Pharmacology',
+    'Microbiology',
+    'Gross Anatomy & Embryology',
+    'Biochemistry & Nutrition',
+    'Behavioral Sciences',
+    'Histology & Cell Biology',
+    'Immunology',
+    'Genetics'
+  ],
+  s2: [
+    'Medicine',
+    'Surgery',
+    'Pediatrics',
+    'Obstetrics & Gynecology',
+    'Psychiatry'
+  ]
+};
+
+function openDisciplineFilter() {
+  _dfTab = (currentStep === 's2') ? 's2' : 's1';
+  _dfSel = { s1: new Set(), s2: new Set() };
+  _buildDFChips('s1');
+  _buildDFChips('s2');
+  setDFTab(_dfTab);
+  document.getElementById('df-status').textContent = '';
+  const el = document.getElementById('discipline-filter-overlay');
+  if(el) el.style.display = 'flex';
+}
+
+function closeDisciplineFilter() {
+  const el = document.getElementById('discipline-filter-overlay');
+  if(el) el.style.display = 'none';
+}
+
+function _buildDFChips(step) {
+  var container = document.getElementById('df-chips-' + step);
+  if(!container) return;
+  container.innerHTML = '';
+  _dfDisciplines[step].forEach(function(disc) {
+    var btn = document.createElement('button');
+    btn.textContent = disc;
+    btn.dataset.disc = disc;
+    btn.dataset.step = step;
+    btn.style.cssText = 'padding:8px 14px;border-radius:20px;border:1.5px solid var(--border2);background:var(--surface2);font-size:12px;font-weight:600;color:var(--muted);font-family:Sora,sans-serif;cursor:pointer;transition:all .15s;';
+    btn.onclick = function() { _toggleDFChip(btn, step, disc); };
+    container.appendChild(btn);
+  });
+}
+
+function _toggleDFChip(btn, step, disc) {
+  if(_dfSel[step].has(disc)) {
+    _dfSel[step].delete(disc);
+    btn.style.background = 'var(--surface2)';
+    btn.style.borderColor = 'var(--border2)';
+    btn.style.color = 'var(--muted)';
+  } else {
+    _dfSel[step].add(disc);
+    btn.style.background = 'rgba(245,158,11,.15)';
+    btn.style.borderColor = '#f59e0b';
+    btn.style.color = '#f59e0b';
+  }
+}
+
+function setDFTab(step) {
+  _dfTab = step;
+  document.getElementById('df-chips-s1').style.display = step === 's1' ? 'flex' : 'none';
+  document.getElementById('df-chips-s2').style.display = step === 's2' ? 'flex' : 'none';
+  var t1 = document.getElementById('df-tab-s1');
+  var t2 = document.getElementById('df-tab-s2');
+  if(step === 's1') {
+    t1.style.borderColor='#f59e0b'; t1.style.background='rgba(245,158,11,.15)'; t1.style.color='#f59e0b';
+    t2.style.borderColor='var(--border2)'; t2.style.background='var(--surface2)'; t2.style.color='var(--muted)';
+  } else {
+    t2.style.borderColor='#f59e0b'; t2.style.background='rgba(245,158,11,.15)'; t2.style.color='#f59e0b';
+    t1.style.borderColor='var(--border2)'; t1.style.background='var(--surface2)'; t1.style.color='var(--muted)';
+  }
+}
+
+function clearDFChips() {
+  _dfSel = { s1: new Set(), s2: new Set() };
+  _buildDFChips('s1');
+  _buildDFChips('s2');
+  setDFTab(_dfTab);
+  document.getElementById('df-status').textContent = '';
+}
+
+function studyDisciplineFilter() {
+  var sel = Array.from(_dfSel[_dfTab]);
+  if(sel.length === 0) {
+    document.getElementById('df-status').textContent = 'Select at least one discipline';
+    return;
+  }
+  var allCards = Object.values(window.DECKS||{}).reduce(function(a,b){return a.concat(b);},[]);
+  var pool = allCards.filter(function(c) {
+    return sel.some(function(d) { return (c.discipline||'').toLowerCase() === d.toLowerCase(); });
+  });
+  if(pool.length === 0) {
+    document.getElementById('df-status').textContent = 'No cards found for selected disciplines';
+    return;
+  }
+  closeDisciplineFilter();
+  pool.sort(function(){return Math.random()-.5;});
+  showToast(pool.length + ' cards found — ' + sel.join(', '));
+  currentDeck = '_search';
+  deck = pool;
+  againQueue = []; idx = 0; revealed = false; sessionRatings = {};
+  document.getElementById('app').classList.add('active');
+  document.getElementById('landing').style.display = 'none';
+  hideDeckHome();
+  document.querySelectorAll('.deck-tab').forEach(function(t){t.classList.remove('active');});
+  ensureStudyUI();
+  renderCard(); updateStats();
+}
+
 // ── PROFILE EDITOR ──────────────────────────────────────
 function openProfileEditor() {
   const me = JSON.parse(localStorage.getItem(LB_ME_KEY)||'{}');
