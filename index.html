@@ -5360,7 +5360,7 @@ function showDeckHome(){
   const fb=document.getElementById('filter-bar-wrap');
   if(fb) fb.style.display='none';
   const al=document.getElementById('app-layout-wrap');
-  if(al) al.style.display='none';
+  if(al){ al.style.display='none'; al.style.visibility='hidden'; }
   clearLrnTimers();
   buildDeckHomeTable();
 }
