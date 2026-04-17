@@ -6807,10 +6807,17 @@ async function prefetchPubmedAbstracts(card){
   if(!query || _pubmedCache[card.id]) return;
   _pubmedCache[card.id] = { status: 'loading', articles: [], abstracts: [], cochrane: null };
   try {
-    const sr = await fetch('https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed&term='+encodeURIComponent(query.trim())+'&retmax=3&sort=relevance&retmode=json');
-    const sd = await sr.json();
+    const [srRes, cochraneRes] = await Promise.allSettled([
+      fetch('https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed&term='+encodeURIComponent(query.trim())+'&retmax=3&sort=relevance&retmode=json'),
+      card.cochrane_pmid ? fetch('https://hwdcgbcnphkmxaasties.supabase.co/functions/v1/pubmed-abstract', {method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh3ZGNnYmNucGhrbXhhYXN0aWVzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDQyMjU3NTAsImV4cCI6MjA1OTgwMTc1MH0.ygLiMpNVtW2fhRRTCKOaIGEuBCuTnBvpA5T98fQMCy0'},body:JSON.stringify({pmid:card.cochrane_pmid})}) : Promise.resolve(null)
+    ]);
+    let cochraneAbstract = null;
+    if(card.cochrane_pmid && cochraneRes.status==='fulfilled' && cochraneRes.value){
+      try { const cd = await cochraneRes.value.json(); if(cd.abstract||cd.title) cochraneAbstract={pmid:card.cochrane_pmid,title:cd.title||'Cochrane Systematic Review',journal:'Cochrane Database Syst Rev',year:cd.year||'',abstract:(cd.abstract||'').slice(0,600)}; } catch(e){}
+    }
+    const sd = srRes.status==='fulfilled' ? await srRes.value.json() : {};
     const ids = sd.esearchresult?.idlist || [];
-    if(!ids.length){ _pubmedCache[card.id].status = 'empty'; return; }
+    if(!ids.length && !cochraneAbstract){ _pubmedCache[card.id].status = 'empty'; return; }
 
     const smr = await fetch('https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=pubmed&id='+ids.join(',')+'&retmode=json');
     const smd = await smr.json();
@@ -9596,15 +9603,21 @@ EXPLANATION: ${(card.e||'').replace(/<[^>]+>/g,' ').slice(0,300)}${pubmedRefs}`;
   try {
     let responseText = '';
     if(typeof puter !== 'undefined' && puter.ai){
-      // ── RAG: inject PubMed abstracts as context if available ──
+      // ── RAG: inject PubMed + Cochrane abstracts as context ──
       let ragContext = '';
       const cached = _pubmedCache[card.id];
-      if(cached && cached.status === 'ready' && cached.abstracts.length > 0){
-        ragContext = '\n\nRELEVANT PRIMARY LITERATURE (ONLY sources you may cite):\n';
-        cached.abstracts.forEach((a,i) => {
-          if(a.abstract) ragContext += `\n[${i+1}] ${a.title} — ${a.journal} ${a.year}\nAbstract: ${a.abstract}\n`;
-        });
-        ragContext += `\n\nCITATION RULES — ABSOLUTE:\n1. You MUST cite the provided articles inline using [1] [2] [3] wherever relevant in your response.\n2. NEVER write PMID numbers directly in the text.\n3. NEVER cite any article, author, or study not listed above.\n4. NEVER invent references.\n5. At the very end of your response, on a new line, write ONLY: CITED:[1] CITED:[2] etc for each number you used inline. Example: CITED:[1] CITED:[3]\n6. If truly none are relevant, write CITED:[] at the end.`;
+      if(cached && cached.status === 'ready'){
+        const sources = [];
+        if(cached.cochrane && cached.cochrane.abstract) sources.push({ ...cached.cochrane, isCochrane: true });
+        (cached.abstracts||[]).forEach(a => { if(a.abstract) sources.push({ ...a, isCochrane: false }); });
+        if(sources.length > 0){
+          ragContext = '\n\nRELEVANT EVIDENCE (ONLY sources you may cite):\n';
+          sources.forEach((a,i) => {
+            const tag = a.isCochrane ? '[COCHRANE SYSTEMATIC REVIEW — Level 1 Evidence]' : '[PubMed]';
+            ragContext += `\n[${i+1}] ${tag} ${a.title} — ${a.journal} ${a.year}\nAbstract: ${a.abstract}\n`;
+          });
+          ragContext += `\n\nCITATION RULES — ABSOLUTE:\n1. Cite inline using [1] [2] [3] wherever relevant.\n2. Cochrane Reviews = Level 1 evidence — prioritize for treatment/management questions.\n3. NEVER write PMID numbers in text.\n4. NEVER cite anything not listed above.\n5. NEVER invent references.\n6. End with: CITED:[1] CITED:[2] etc. If none relevant: CITED:[].`;
+        }
       }
       const finalPrompt = prompts[type] + ragContext;
       const response = await puter.ai.chat(finalPrompt, { model: 'gemini-2.0-flash' });
