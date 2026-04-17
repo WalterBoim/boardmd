@@ -5964,6 +5964,9 @@ function renderCard(){
   // Reset inline PubMed wrap
   const _pwReset = document.getElementById('card-pubmed-wrap');
   if(_pwReset){ _pwReset.style.display='none'; _pwReset.style.visibility='hidden'; _pwReset.innerHTML=''; }
+  // Reset Cochrane wrap
+  const _cwReset = document.getElementById('card-cochrane-wrap');
+  if(_cwReset){ _cwReset.style.display='none'; _cwReset.innerHTML=''; }
   // Hide FSRS buttons until answer revealed
   const _fsrs=document.getElementById('fsrs-nav');
   const _fsrs2=document.getElementById('fsrs-nav-2');
@@ -10169,7 +10172,8 @@ function fetchCardPubmed(card){
     .then(function(sd){
       const ids = sd.esearchresult ? sd.esearchresult.idlist||[] : [];
       if(!ids.length){
-        container.innerHTML = '<div style="padding:10px 14px;font-size:11px;color:var(--text-faint);">No articles found.</div>';
+        const _pw = document.getElementById('card-pubmed-wrap');
+        if(_pw){ _pw.style.display='none'; _pw.innerHTML=''; }
         return;
       }
       return fetch('https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=pubmed&id='+ids.join(',')+' &retmode=json')
@@ -10193,7 +10197,7 @@ function fetchCardPubmed(card){
           container.innerHTML = html;
         });
     })
-    .catch(function(){ container.innerHTML = '<div style="padding:10px 14px;font-size:11px;color:var(--text-faint);">Could not connect to PubMed.</div>'; });
+    .catch(function(){ const _pw = document.getElementById('card-pubmed-wrap'); if(_pw){ _pw.style.display='none'; _pw.innerHTML=''; } });
 }
 
 function openCardAbstract(uid){
