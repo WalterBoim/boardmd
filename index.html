@@ -2132,38 +2132,117 @@ mark.hb{background:rgba(79,142,247,.28);border-bottom:2px solid rgba(40,100,220,
 </style>
 
 <style id="bmd-study-layout">
-/* ── Study area layout — mobile-first, full width ── */
-.app-layout {
-  width: 100% !important;
-  max-width: 100% !important;
+/* ── Base (todos os tamanhos) ── */
+.app-layout { width:100% !important; max-width:100% !important; }
+.sidebar { display:none !important; }
+.study-main { padding:0 !important; width:100% !important; max-width:100% !important; }
+.study-inner { max-width:100% !important; padding:0 !important; padding-bottom:16px !important; }
+.done-wrap { padding:32px 20px !important; }
+.anki-counter { display:none !important; }
+.filter-bar { display:none !important; }
+.card { background:transparent !important; border:none !important; box-shadow:none !important; padding:0 !important; border-radius:0 !important; max-width:100% !important; }
+
+/* ── MOBILE (<900px): layout normal, rola tudo, ordem: Attending → FSRS → Back/Skip ── */
+@media (max-width: 899px) {
+  /* No mobile o dock fica oculto — elementos inline no study-inner funcionam */
+  #study-footer-dock { display: none !important; }
+  /* Garantir ordem correta no mobile via order */
+  #att-inline-wrap { order: 1; }
+  .fsrs-nav { order: 2; }
+  .plain-nav { order: 3; }
+  #card-el { display: flex; flex-direction: column; }
 }
-.sidebar { display: none !important; }
-.study-main {
-  padding: 0 !important;
-  width: 100% !important;
-  max-width: 100% !important;
-  overflow-x: hidden !important;
+
+/* ── DESKTOP (>=900px): layout fixo estilo UWorld ── */
+@media (min-width: 900px) {
+  body.studying {
+    overflow: hidden !important;
+    height: 100vh !important;
+  }
+  body.studying #app {
+    height: 100vh !important;
+    overflow: hidden !important;
+    display: flex !important;
+    flex-direction: column !important;
+  }
+  body.studying .app-layout {
+    flex: 1 !important;
+    overflow: hidden !important;
+    display: flex !important;
+    min-height: 0 !important;
+  }
+  body.studying .study-main {
+    flex: 1 !important;
+    overflow: hidden !important;
+    display: flex !important;
+    flex-direction: column !important;
+    min-height: 0 !important;
+  }
+  body.studying .study-inner {
+    flex: 1 !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    padding-bottom: 20px !important;
+    scrollbar-width: thin !important;
+    min-height: 0 !important;
+  }
+  /* Dock fixo acima da bottom-nav (67px) */
+  body.studying #study-footer-dock {
+    position: fixed !important;
+    bottom: 81px !important;
+    left: 0 !important;
+    right: 0 !important;
+    z-index: 490 !important;
+    background: var(--bg) !important;
+    border-top: 1px solid var(--border) !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    padding: 8px 16px 6px !important;
+    gap: 4px !important;
+  }
+  body.studying #study-footer-dock.dock-visible {
+    display: flex !important;
+  }
+  /* Esconder elementos inline no desktop — só o dock conta */
+  body.studying #study-inner .fsrs-nav,
+  body.studying #study-inner .plain-nav,
+  body.studying #study-inner .kbd-hint,
+  body.studying #card-el > .fsrs-nav,
+  body.studying #card-el > .plain-nav,
+  body.studying #card-el > .kbd-hint {
+    display: none !important;
+  }
+  /* Dock filhos */
+  #study-footer-dock .fsrs-nav {
+    position: static !important;
+    border-top: none !important;
+    padding: 0 !important;
+    background: transparent !important;
+    width: 100% !important;
+    max-width: 960px !important;
+  }
+  #study-footer-dock .plain-nav {
+    position: static !important;
+    padding: 0 !important;
+    background: transparent !important;
+    width: 100% !important;
+    max-width: 960px !important;
+    justify-content: center !important;
+  }
+  #study-footer-dock .nav-plain-btn {
+    padding: 3px 10px !important;
+    font-size: 10px !important;
+    opacity: 0.45 !important;
+  }
+  #study-footer-dock .nav-plain-btn:hover { opacity: 1 !important; }
+  #study-footer-dock .kbd-hint {
+    margin: 0 !important;
+    font-size: 10px !important;
+    opacity: 0.35 !important;
+  }
 }
-.study-inner {
-  padding: 0 !important;
-  max-width: 100% !important;
-  padding-bottom: calc(80px + 60px + 20px) !important;
-}
-/* Hide old done-wrap decorations */
-.done-wrap { padding: 32px 20px !important; }
-/* Eliminate old anki-counter bar */
-.anki-counter { display: none !important; }
-/* Filter bar */
-.filter-bar { display: none !important; }
-/* Remove old card box-shadow styles that conflict */
-.card {
-  background: transparent !important;
-  border: none !important;
-  box-shadow: none !important;
-  padding: 0 !important;
-  border-radius: 0 !important;
-  max-width: 100% !important;
-}
+/* Dock invisivel fora do estudo */
+body:not(.studying) #study-footer-dock { display: none !important; }
 </style>
 
 <style id="bmd-perf-v2">
@@ -3390,6 +3469,180 @@ html.light .qs-val { color: inherit; }
 <style id="search-picker-css">
 @keyframes slideUp { from{opacity:0;transform:translateY(40px)} to{opacity:1;transform:translateY(0)} }
 </style>
+<style id="bmd-split-screen">
+/* ── Mobile: no split, wrappers invisible ── */
+#bmd-cols-row { display: block; }
+#bmd-q-col    { display: block; padding: 0; position: static; max-height: none; overflow-y: visible; width: auto; border-right: none; }
+#bmd-ans-col  { display: block; }
+#bmd-split-divider { display: none; }
+.bmd-div-handle { display: none; }
+
+/* ── Desktop split: ≥900px, fullscreen UWorld style ── */
+@media (min-width: 900px) {
+  /* Fullscreen — sem padding, sem max-width */
+  .study-main  { padding: 0 !important; }
+  .study-inner {
+    max-width: 100% !important;
+    width: 100% !important;
+    padding: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    flex: 1 !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
+  }
+
+  /* card-el: ocupa toda a altura disponível */
+  #card-el {
+    max-width: 100% !important;
+    width: 100% !important;
+    flex: 1 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    min-height: 0 !important;
+    border: none !important;
+    border-radius: 0 !important;
+    overflow: hidden !important;
+    background: var(--surface) !important;
+    box-shadow: none !important;
+  }
+
+  /* header full width, fixo no topo */
+  #card-el .card-header {
+    flex-shrink: 0 !important;
+    width: 100% !important;
+    border-bottom: 1px solid var(--border) !important;
+    padding: 14px 20px 10px !important;
+  }
+
+  /* cols-row ocupa o restante da altura */
+  #bmd-cols-row {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: stretch !important;
+    flex: 1 !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
+  }
+
+  /* LEFT column — rola independentemente */
+  #bmd-q-col {
+    flex-shrink: 0 !important;
+    width: 50% !important;
+    min-width: 260px !important;
+    max-width: 75% !important;
+    padding: 20px 24px 24px !important;
+    position: static !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    scrollbar-width: thin !important;
+    align-self: stretch !important;
+    border-right: 1px solid var(--border) !important;
+  }
+  #bmd-q-col::-webkit-scrollbar { width: 4px; }
+  #bmd-q-col::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+
+  /* DIVIDER */
+  #bmd-split-divider {
+    display: flex !important;
+    flex-shrink: 0 !important;
+    width: 16px !important;
+    align-self: stretch !important;
+    align-items: center !important;
+    justify-content: center !important;
+    cursor: col-resize !important;
+    position: relative !important;
+    background: transparent !important;
+    user-select: none !important;
+    -webkit-user-select: none !important;
+    z-index: 10 !important;
+    touch-action: none !important;
+  }
+  #bmd-split-divider::before {
+    content: '';
+    position: absolute;
+    top: 0; bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 1px;
+    background: var(--border);
+    transition: width .15s, background .15s;
+    pointer-events: none;
+  }
+  #bmd-split-divider:hover::before,
+  #bmd-split-divider.dragging::before {
+    width: 3px;
+    background: var(--accent);
+  }
+  .bmd-div-handle {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 3px !important;
+    align-items: center !important;
+    position: relative !important;
+    z-index: 1 !important;
+    opacity: 0 !important;
+    transition: opacity .15s !important;
+    pointer-events: none !important;
+    background: var(--surface2) !important;
+    border: 1px solid var(--border2) !important;
+    border-radius: 8px !important;
+    padding: 6px 4px !important;
+  }
+  .bmd-div-handle span {
+    display: block !important;
+    width: 2px !important;
+    height: 10px !important;
+    border-radius: 2px !important;
+    background: var(--muted) !important;
+  }
+  #bmd-split-divider:hover .bmd-div-handle,
+  #bmd-split-divider.dragging .bmd-div-handle { opacity: 1 !important; }
+
+  /* RIGHT column — rola independentemente */
+  #bmd-ans-col {
+    flex: 1 1 0 !important;
+    min-width: 260px !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    max-height: none !important;
+    align-self: stretch !important;
+    scrollbar-width: thin !important;
+  }
+  #bmd-ans-col::-webkit-scrollbar { width: 4px; }
+  #bmd-ans-col::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+
+  /* Explanation padding in right col */
+  #bmd-ans-col #c-exp          { max-width: 100% !important; padding: 18px 24px !important; border-top: none !important; }
+  #bmd-ans-col .card-img-wrap  { margin: 0 24px 14px !important; }
+  #bmd-ans-col #key-point-wrap { padding: 0 24px 14px !important; }
+  #bmd-ans-col #card-pubmed-wrap { padding: 0 24px !important; }
+  #bmd-ans-col .card-footer-counter { border-top: 1px solid var(--border) !important; padding: 10px 24px !important; }
+  #bmd-ans-col #att-inline-wrap { max-width: 100% !important; margin: 0 !important; border-radius: 0 !important; border-left: none !important; border-right: none !important; }
+
+  /* Placeholder before answer revealed */
+  #bmd-ans-col #bmd-ans-placeholder {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    min-height: 200px !important;
+    color: var(--muted) !important;
+    font-size: 13px !important;
+    font-family: 'Sora', sans-serif !important;
+    opacity: .4 !important;
+    flex-direction: column !important;
+    gap: 8px !important;
+    padding: 32px !important;
+  }
+  #bmd-ans-col.has-answer #bmd-ans-placeholder { display: none !important; }
+  #bmd-ans-col:not(.has-answer) #c-exp         { display: none !important; }
+  #bmd-ans-col:not(.has-answer) #key-point-wrap,
+  #bmd-ans-col:not(.has-answer) #card-pubmed-wrap,
+  #bmd-ans-col:not(.has-answer) #att-inline-wrap,
+  #bmd-ans-col:not(.has-answer) .card-footer-counter { display: none !important; }
+}
+</style>
+
 <style id="bmd-deck-stats-css">
 .deck-stats-line {
   font-size: 11px;
@@ -4371,6 +4624,16 @@ html.light .qs-val { color: inherit; }
   <div class="app-layout" id="app-layout-wrap" style="display:none">
     <aside class="sidebar" id="sidebar"></aside>
     <div class="study-main">
+      <div id="study-footer-dock" style="display:none">
+        <div class="fsrs-nav" id="fsrs-nav-dock">
+          <div class="fsrs-row">
+            <button class="fsrs-btn again" onclick="rate(0)"><span class="fsrs-lbl">Again</span><span class="fsrs-int" id="int0-d">&lt;1d</span></button>
+            <button class="fsrs-btn hard"  onclick="rate(1)"><span class="fsrs-lbl">Hard</span><span class="fsrs-int" id="int1-d">1d</span></button>
+            <button class="fsrs-btn good"  onclick="rate(2)"><span class="fsrs-lbl">Good</span><span class="fsrs-int" id="int2-d">3d</span></button>
+            <button class="fsrs-btn easy"  onclick="rate(3)"><span class="fsrs-lbl">Easy</span><span class="fsrs-int" id="int3-d">7d</span></button>
+          </div>
+        </div>
+      </div>
       <div class="study-inner" id="study-inner">
 
         <div class="progress-wrap">
@@ -4421,6 +4684,9 @@ html.light .qs-val { color: inherit; }
               <span class="card-qid" id="c-qid" style="font-size:9px;flex-shrink:0;"></span>
             </div>
           </div>
+          <div id="bmd-cols-row">
+          <div id="bmd-q-col">
+          <div id="bmd-q-inner">
           <div class="card-body">
             <div class="card-question hl-zone" id="c-q">Loading…</div>
             <div class="options" id="c-opts"></div>
@@ -4429,7 +4695,14 @@ html.light .qs-val { color: inherit; }
           <div id="resp-dist-wrap" style="display:none;padding:14px 20px 10px;border-top:1px solid var(--border);">
             <div style="font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text-faint);font-family:'JetBrains Mono',monospace;margin-bottom:10px;">Response Distribution</div>
           </div>
-
+          </div><!-- /bmd-q-inner -->
+          </div><!-- /bmd-q-col -->
+          <div id="bmd-split-divider"><div class="bmd-div-handle"><span></span><span></span></div></div>
+          <div id="bmd-ans-col">
+            <div id="bmd-ans-placeholder">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+              Select your answer to reveal
+            </div>
           <div class="explanation" id="c-exp">
             <div class="exp-section">
               <div class="exp-label"><span class="exp-label-icon" style="background:rgba(34,197,94,.15);color:var(--emerald)"></span>Correct answer</div>
@@ -4464,6 +4737,8 @@ html.light .qs-val { color: inherit; }
             <span class="cfc-sep">+</span>
             <span class="cfc-due" id="cfc-due">0</span>
           </div>
+          </div><!-- /bmd-ans-col -->
+          </div><!-- /bmd-cols-row -->
         </div>
 
         <div class="plain-nav" id="plain-nav">
@@ -5186,7 +5461,6 @@ function buildDeckHomeTable(){
     {id:'boardmd_s2', name:'BoardMD · Step 2 CK',         sub:'Adaptive MCQs · 15,623 cards',    step:'s2'},
     {id:'s2',         name:'Step 2 CK · Rapid Review',    sub:'Clinical Essentials · 522 cards', step:'s2'},
     {id:'core',       name:'Step 2 CK · Core Review',     sub:'Board-Focused · 4,107 cards',     step:'s2'},
-    {id:'daily_review', name:'Daily Review',                  sub:'Step 2 CK · Daily Cards',         step:'s2'},
     {id:'shelf',         name:'BoardMD Shelf · All Rotations',      sub:'Shelf Exams · 180 cards',          step:'s2', shelf:true},
 
     {id:'shelf_im',      name:'BoardMD Shelf · Internal Medicine',   sub:'Shelf Exam · Coming soon',         step:'s2', shelf:true, soon:true},
@@ -5936,6 +6210,11 @@ function renderCard(){
   const fsrsNav2=document.getElementById('fsrs-nav-2');
   if(fsrsNav) fsrsNav.classList.remove('visible');
   if(fsrsNav2) fsrsNav2.classList.remove('visible');
+  // Esconder dock
+  const dockEl=document.getElementById('study-footer-dock');
+  const dockNavEl=document.getElementById('fsrs-nav-dock');
+  if(dockEl) dockEl.classList.remove('dock-visible');
+  if(dockNavEl) dockNavEl.classList.remove('visible');
   const preHint=document.getElementById('pre-hint');
   if(preHint) preHint.style.display='';
   revealed=false;
@@ -6485,6 +6764,9 @@ function revealAnswer(sel,card){
   const rb2=document.getElementById('fsrs-nav-2');
   if(rb) rb.classList.add('visible');
   if(rb2) rb2.classList.add('visible');
+  // Mostrar dock no desktop
+  const dock=document.getElementById('study-footer-dock');
+  if(dock && window.innerWidth>=900) dock.classList.add('dock-visible');
 
   // ── BoardMD Attending — inject inline after answer revealed ──
   injectAttendingInline(card, sel);
@@ -12523,6 +12805,51 @@ function studyDisciplineFilter() {
 </script>
 
 
+<script>
+// ── SPLIT DIVIDER DRAG ────────────────────────────────────────────────────────
+function bmdSetupDrag(){
+  var d = document.getElementById('bmd-split-divider');
+  var q = document.getElementById('bmd-q-col');
+  if(!d || !q || d._ok) return;
+  d._ok = true;
+  var saved = localStorage.getItem('bmd_q_pct');
+  if(saved) q.style.width = parseFloat(saved) + '%';
+  d.addEventListener('mousedown', function(e){
+    e.preventDefault(); e.stopPropagation();
+    var r = document.getElementById('bmd-cols-row');
+    var x0 = e.clientX, w0 = q.offsetWidth, rw = r ? r.offsetWidth : 900;
+    d.classList.add('dragging');
+    document.body.style.cursor = 'col-resize';
+    document.body.style.userSelect = 'none';
+    function onMove(ev){
+      var pct = ((w0 + ev.clientX - x0) / rw) * 100;
+      q.style.width = Math.min(Math.max(pct, 25), 75) + '%';
+    }
+    function onUp(){
+      document.removeEventListener('mousemove', onMove);
+      document.removeEventListener('mouseup', onUp);
+      d.classList.remove('dragging');
+      document.body.style.cursor = '';
+      document.body.style.userSelect = '';
+      var r2 = document.getElementById('bmd-cols-row');
+      if(r2) localStorage.setItem('bmd_q_pct', ((q.offsetWidth/r2.offsetWidth)*100).toFixed(1));
+    }
+    document.addEventListener('mousemove', onMove);
+    document.addEventListener('mouseup', onUp);
+  });
+  d.addEventListener('dblclick', function(){
+    q.style.width = '50%';
+    localStorage.removeItem('bmd_q_pct');
+  });
+}
+
+// Setup drag after cards load
+if(document.readyState === "loading"){
+  document.addEventListener("DOMContentLoaded", bmdSetupDrag);
+} else {
+  setTimeout(bmdSetupDrag, 500);
+}
+</script>
 </body>
 </html>
 <!-- v2 -->
