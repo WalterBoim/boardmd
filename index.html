@@ -10474,7 +10474,7 @@ window.hideDeckHome = function() {
   const al = document.getElementById('app-layout-wrap');
   if(dh) dh.classList.remove('active');
   if(fb) fb.style.display = '';
-  if(al) al.style.display = '';
+  if(al) al.style.display = 'none';
   // study mode: hide dashboard-specific rows
   const sb  = document.querySelector('.app-header .streak-bar');
   const tabs = document.getElementById('bmd-step-tabs');
