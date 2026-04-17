@@ -2264,6 +2264,13 @@ mark.hb{background:rgba(79,142,247,.28);border-bottom:2px solid rgba(40,100,220,
 }
 /* Dock invisivel fora do estudo */
 body:not(.studying) #study-footer-dock { display: none !important; }
+
+/* Compactar header durante estudo no desktop */
+@media (min-width: 900px) {
+  body.studying .streak-bar { display: none !important; }
+  body.studying .bmd-step-pills { display: none !important; }
+  body.studying .hdr { padding: 6px 16px !important; min-height: 0 !important; }
+}
 </style>
 
 <style id="bmd-perf-v2">
