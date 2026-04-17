@@ -132,6 +132,9 @@ body{font-family:'Lato','Helvetica Neue',Arial,sans-serif;background:var(--bg);c
 .btn-deck{display:flex;align-items:center;gap:6px;background:none;border:1px solid var(--border);color:var(--text-dim);padding:8px 16px;border-radius:8px;cursor:pointer;font-size:12px;font-family:'Syne',sans-serif;font-weight:600;transition:all .2s;}
 .deck-card.s1 .btn-deck:hover{border-color:var(--accent);color:var(--accent);}
 .deck-card.s2 .btn-deck:hover{border-color:var(--gold);color:var(--gold);}
+.deck-card.daily_review::before{background:linear-gradient(90deg,#0ea5e9,#6366f1);}
+.deck-card.daily_review .deck-icon{background:rgba(14,165,233,.12);}
+.deck-card.daily_review .btn-deck:hover{border-color:#0ea5e9;color:#0ea5e9;}
 .deck-card.core .btn-deck:hover{border-color:var(--emerald);color:var(--emerald);}
 
 /* ── FEATURES ── */
@@ -3535,6 +3538,13 @@ html.light .qs-val { color: inherit; }
         <div class="deck-tags"><span class="deck-tag">Adaptive</span><span class="deck-tag">Objective-Tagged</span><span class="deck-tag">949 cards</span></div>
         <div class="deck-footer"><div class="deck-count"><strong>949</strong> <span>cards</span></div><button class="btn-deck" onclick="event.stopPropagation();this.closest('[onclick]').onclick()">Study now →</button></div>
       </div>
+      <div class="deck-card daily_review" onclick="openApp('daily_review')">
+        <div class="deck-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="color:#0ea5e9"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></div>
+        <div class="deck-name">Step 2 CK · Daily Review</div><div class="deck-title">Daily Review Cards</div>
+        <div class="deck-desc">High-yield Step 2 CK flashcards for daily review.</div>
+        <div class="deck-tags"><span class="deck-tag">High-Yield</span><span class="deck-tag">Daily</span><span class="deck-tag">Step 2 CK</span></div>
+        <div class="deck-footer"><div class="deck-count"><strong>—</strong> <span>cards</span></div><button class="btn-deck" onclick="event.stopPropagation();this.closest('[onclick]').onclick()">Study now →</button></div>
+      </div>
       <div class="deck-card s2" onclick="switchDeckTab('shelf_em')">
         <div class="deck-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="color:#f57314"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg></div>
         <div class="deck-name">BoardMD Shelf</div><div class="deck-title">All Rotations</div>
@@ -4217,7 +4227,16 @@ html.light .qs-val { color: inherit; }
           <div class="deck-badges"><span class="badge badge-due">7 due</span></div>
           <button class="study-btn" onclick="event.stopPropagation();switchDeckAndStudy('core')">Study</button>
         </div>
-    
+
+        <div class="deck-row" onclick="switchDeckAndStudy('daily_review')" style="cursor:pointer">
+          <div class="deck-icon" style="background:rgba(14,165,233,.12);">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#0ea5e9" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+          </div>
+          <div class="deck-info"><div class="deck-title">Daily Review</div><div class="deck-sub">Step 2 CK · Daily Cards</div><div class="deck-stats-line" id="stats-daily_review"><span class="ds-total">— cards</span></div></div>
+          <div class="deck-badges"></div>
+          <button class="study-btn" onclick="event.stopPropagation();switchDeckAndStudy('daily_review')">Study</button>
+        </div>
+
         <div class="expand-row">
           <div class="expand-header" onclick="toggleExpand('rr-s2')">
             <div class="deck-icon" style="background:rgba(0,212,170,.1);">
@@ -4728,7 +4747,8 @@ const DECK_META = {
   hy:       {label:'HY Concepts Step 2 CK',        short:'HY Concepts Step 2 CK'},
   hy1:      {label:'HY Concepts Step 1',           short:'HY Concepts Step 1'},
   boardmd_s1: {label:'BoardMD Step 1', short:'BoardMD S1'},
-  boardmd_s2: {label:'BoardMD Step 2 CK', short:'BoardMD S2'}
+  boardmd_s2: {label:'BoardMD Step 2 CK', short:'BoardMD S2'},
+  daily_review: {label:'Daily Review', short:'Daily Review'}
 };
 
 // ═══════════════════════════════════════════════════════════════════
@@ -5087,7 +5107,7 @@ function saveHiddenDecks(){try{localStorage.setItem('bmd_hidden_decks',JSON.stri
 
 function buildDeckManage(){
   const s1Ids=['boardmd_s1','s1_core','s1','hy1','fa_step1','fa_s1','arrows','ethics'];
-  const s2Ids=['boardmd_s2','core','s2','shelf_surgery','shelf_em','shelf_fm','shelf_im','shelf_neuro','shelf_obgyn','shelf_peds','shelf_psych'];
+  const s2Ids=['boardmd_s2','core','daily_review','s2','shelf_surgery','shelf_em','shelf_fm','shelf_im','shelf_neuro','shelf_obgyn','shelf_peds','shelf_psych'];
   const s1Decks=[
     {id:'boardmd_s1',name:'BoardMD S1'},{id:'s1_core',name:'Core Review'},
     {id:'s1',name:'Rapid Review'},{id:'hy1',name:'HY Concepts'},
@@ -5332,7 +5352,7 @@ function goHome(){
 // Track which step the user is studying
 let currentStep = localStorage.getItem('bmd_step') || 's1'; // 's1' or 's2'
 const STEP1_DECKS = ['boardmd_s1','s1_core','s1','hy1','fa_step1','fa_s1','arrows','ethics'];
-const STEP2_DECKS = ['boardmd_s2','core','s2','shelf','shelf_surgery','shelf_em','shelf_fm','shelf_im','shelf_neuro','shelf_obgyn','shelf_peds','shelf_psych'];
+const STEP2_DECKS = ['boardmd_s2','core','daily_review','s2','shelf','shelf_surgery','shelf_em','shelf_fm','shelf_im','shelf_neuro','shelf_obgyn','shelf_peds','shelf_psych'];
 const SHELF_DECKS = ['shelf_surgery','shelf_em','shelf'];
 
 function openApp(dk){
