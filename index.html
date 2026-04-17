@@ -169,7 +169,7 @@ body{font-family:'Lato','Helvetica Neue',Arial,sans-serif;background:var(--bg);c
 
 /* ── DECK HOME DASHBOARD (Anki-style) ── */
 .deck-home{display:none;flex:1;flex-direction:column;padding:32px 40px;max-width:900px;margin:0 auto;width:100%;gap:24px;overflow-y:auto;max-height:calc(100vh - 160px);}
-.deck-home.active{display:flex;}
+.deck-home.active{display:flex;position:relative;z-index:10;background:var(--bg);}
 .deck-home-title{font-family:'Instrument Serif',serif;font-size:28px;color:var(--text);margin-bottom:4px;}
 .deck-home-sub{font-size:13px;color:var(--text-faint);font-family:'Lato',sans-serif;}
 .deck-table{width:100%;border-collapse:collapse;background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;}
