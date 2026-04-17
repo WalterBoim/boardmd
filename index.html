@@ -3408,7 +3408,7 @@ html.light .qs-val { color: inherit; }
   body.studying { overflow: hidden !important; height: 100vh !important; }
   body.studying #app { height: 100vh !important; overflow: hidden !important; display: flex !important; flex-direction: column !important; }
   body.studying .app-layout { flex: 1 !important; min-height: 0 !important; overflow: hidden !important; display: flex !important; }
-  body.studying .study-main { flex: 1 !important; min-height: 0 !important; overflow: hidden !important; display: flex !important; flex-direction: column !important; padding: 20px 28px !important; }
+  body.studying .study-main { flex: 1 !important; min-height: 0 !important; overflow: hidden !important; display: flex !important; flex-direction: column !important; padding: 0 !important; }
   body.studying .study-inner { flex: 1 !important; min-height: 0 !important; overflow: hidden !important; display: flex !important; flex-direction: column !important; padding: 0 !important; padding-bottom: 0 !important; }
 
   #card-el {
@@ -5219,9 +5219,9 @@ function hideDeckHome(){
   const dh=document.getElementById('deck-home');
   if(dh) dh.classList.remove('active');
   const fb=document.getElementById('filter-bar-wrap');
-  if(fb) fb.style.display='';
+  if(fb) fb.style.display='none';
   const al=document.getElementById('app-layout-wrap');
-  if(al) al.style.display='';
+  if(al) al.style.display='flex';
 }
 
 // ── DECK VISIBILITY ───────────────────────────────────────────────────
@@ -6617,6 +6617,11 @@ function revealAnswer(sel,card){
   injectAttendingInline(card, sel);
   // Pre-fetch PubMed abstracts in background
   if(card.pubmed_query || card.topic) setTimeout(() => prefetchPubmedAbstracts(card), 500);
+  // ── Auto-Lens: trigger Compare diagnoses automatically after 1.5s ──
+  setTimeout(() => {
+    const wrap = document.getElementById('att-inline-wrap');
+    if(wrap) askAttendingInline('compare', null);
+  }, 1500);
 
   // Update FSRS intervals display — sync both nav elements
   const ivs=getIntervals(getState(card.id));
@@ -9197,6 +9202,18 @@ function injectAttendingInline(card, sel){
         <span class="att-ibtn-label">Surprise me</span>
       </button>
     </div>
+    ${!wasCorrect ? `<div style="padding:0 14px 10px;">
+      <button ${dis} onclick="askAttendingInline('wrong',this)" style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%;background:rgba(244,63,94,.08);border:1.5px solid rgba(244,63,94,.3);border-radius:10px;padding:10px 14px;font-size:12px;font-weight:700;color:#f43f5e;cursor:pointer;font-family:Inter,sans-serif;transition:all .15s;" onmouseover="this.style.background='rgba(244,63,94,.14)'" onmouseout="this.style.background='rgba(244,63,94,.08)'">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#f43f5e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        Why I was wrong
+      </button>
+    </div>` : ''}
+    ${!wasCorrect ? `<div style="padding:0 14px 10px;">
+      <button ${dis} onclick="askAttendingInline('wrong',this)" style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%;background:rgba(255,83,112,.08);border:1.5px solid rgba(255,83,112,.35);border-radius:10px;padding:10px 14px;font-size:12px;font-weight:700;color:#ff5370;cursor:pointer;font-family:Inter,sans-serif;transition:all .15s;" onmouseover="this.style.background='rgba(255,83,112,.14)'" onmouseout="this.style.background='rgba(255,83,112,.08)'">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#ff5370" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        Why I was wrong
+      </button>
+    </div>` : ''}
     <div style="padding:0 14px 10px;">
       <button ${dis} onclick="askAttendingInline('compare',this)" style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%;background:#185FA5;border:none;border-radius:10px;padding:11px 14px;font-size:12px;font-weight:600;color:#fff;cursor:pointer;font-family:Inter,sans-serif;transition:background .15s;" onmouseover="this.style.background='#0c3460'" onmouseout="this.style.background='#185FA5'">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><circle cx="8" cy="12" r="6"/><circle cx="16" cy="12" r="6"/></svg>
@@ -9369,13 +9386,14 @@ EXPLANATION: ${(card.e||'').replace(/<[^>]+>/g,' ').slice(0,300)}${pubmedRefs}`;
     surprise: `You are a brilliant attending. Give ONE unforgettable clinical pearl about:\n\n${ctx}\n\nSomething NOT in the explanation — a real-world connection, classic trick, or board trap that sticks in memory. Be vivid and direct. 2 paragraphs max.\n\nIf REFERENCES are provided above, cite them inline using superscript numbers ¹ ² ³ — only cite references that actually exist in the list. Do NOT invent references. If no references are provided, write without citations.\n\nAt the very end, write:\nPUBMED_QUERY: [6-8 specific medical terms for PubMed search relevant to this topic]`,
     custom: `You are a brilliant attending physician. The student has a question about this USMLE topic:\n\n${ctx}\n\nStudent question: "${document.getElementById('att-ask-input')?.value||''}"\n\nAnswer clearly and clinically in 2-3 paragraphs. Focus on what's relevant for USMLE boards.\n\nFinally, on a new line, write exactly: PUBMED_QUERY: [6-8 specific medical terms for PubMed search relevant to this answer]`,
     compare: `You are a brilliant USMLE attending. The student just answered this question:\n\n${ctx}\n\nIdentify the correct diagnosis AND the single most commonly confused alternative (main distractor).\n\nReturn ONLY valid JSON, no markdown:\n{"left_label":"[correct dx name]","right_label":"[distractor name]","left":["exclusive feature 1","exclusive feature 2","exclusive feature 3","exclusive feature 4"],"shared":["shared feature 1","shared feature 2","shared feature 3"],"right":["exclusive feature 1","exclusive feature 2","exclusive feature 3","exclusive feature 4"],"pubmed_query":"[6-8 terms comparing these two diagnoses]"}`,
+    wrong: `You are a brilliant USMLE attending. The student just answered this question INCORRECTLY:\n\n${ctx}\n\nYour job: explain exactly why the student's wrong answer (${userChoice}) seemed attractive — and why it is wrong. Structure your response in exactly 3 sections:\n\nTHE TRAP: Why "${userChoice}" feels correct — the cognitive trap, the misleading clue, or the partial truth that makes students pick it.\n\nTHE KEY DISTINCTION: The single clinical finding or concept that rules out the student's choice and confirms the correct answer. Be precise and memorable.\n\nLOCK IT IN: One punchy, unforgettable rule or pearl that prevents this mistake forever. Make it stick.\n\nIf REFERENCES are provided above, cite them inline using superscript numbers ¹ ² ³. Do NOT invent references.\n\nAt the very end, write:\nPUBMED_QUERY: [6-8 specific medical terms for PubMed search relevant to this distinction]`,
     translate: `Translate the following medical flashcard content to Brazilian Portuguese. Keep medical terms accurate. Return ONLY the translation in this exact format:\n\nQUESTÃO: [translated question]\nA. [option] B. [option] C. [option] D. [option]\nRESPOSTA CORRETA: [translated answer]\nEXPLICAÇÃO: [translated explanation]\nPONTO-CHAVE: [translated key point]\n\nContent to translate:\nQUESTION: ${card.q}\nOPTIONS: ${(card.w||[]).map((o,i)=>String.fromCharCode(65+i)+'. '+o).join(' ')}\nCORRECT ANSWER: ${card.c}\nEXPLANATION: ${(card.e||'').replace(/<[^>]+>/g,' ').slice(0,500)}\nKEY POINT: ${(card.kp||'')}`,
   };
 
   const typeLabels = {
     why:'Why This Answer', explain:'Deeper Explanation',
     mcq:'Practice Questions', surprise:'Clinical Pearl',
-    custom:'Your Question', translate:'Tradução PT-BR', compare:'Lens'
+    wrong:'Why I Was Wrong', custom:'Your Question', translate:'Tradução PT-BR', compare:'Lens'
   };
 
   try {
