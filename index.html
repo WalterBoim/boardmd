@@ -2399,7 +2399,7 @@ function toggleTheme() {
 </nav>
 
 <script>
-let isDark = true;
+isDark = true;
 
 /* countdown timer */
 function updateTimer() {
@@ -3131,7 +3131,7 @@ function toggleTheme() {
 </nav>
 
 <script>
-let isDark = true;
+isDark = true;
 
 /* ── RING ANIMATION ── */
 window.addEventListener('load', () => {
@@ -3404,7 +3404,7 @@ function toggleTheme() {
 </div>
 
 <script>
-let isDark = true;
+isDark = true;
 let selectedSteps = [];
 let enteredScore = null;
 let pfResult = null;
@@ -3698,13 +3698,13 @@ function showDone(){markStudiedToday();const bar=document.getElementById('fsrsBa
 function exitStudy(){sess.deckId=null;showEl('bottomNav');showScreen('home');updateHomeUI();}
 
 /* ── STATE ── */
-let answered   = false;
-let attOpen    = false;
-let hlMode     = false;
-let rmMode     = false;
-let activeColor= 'hy';
-let isDark     = true;
-let fontIdx    = 2;
+answered   = false;
+attOpen    = false;
+hlMode     = false;
+rmMode     = false;
+activeColor= 'hy';
+isDark     = true;
+fontIdx    = 2;
 const FONTS    = [
   {fs:'13px'}, {fs:'14px'}, {fs:'16px'},
   {fs:'18px'}, {fs:'20px'}, {fs:'22px'}
@@ -3784,7 +3784,7 @@ function setRemove() {
 }
 
 /* touch/mouse events */
-let tStart = null, tTimer = null;
+tStart = null, tTimer = null;
 function attachHL() {
   document.querySelectorAll('.highlightable').forEach(el => {
     el.addEventListener('touchstart', onTS, {passive:true});
@@ -3833,7 +3833,7 @@ function onMarkClick(e) {
   if (m && rmMode) { unwrap(m); saveHL(); }
 }
 function hlWord(x, y) {
-  let range;
+  range;
   if (document.caretRangeFromPoint) range = document.caretRangeFromPoint(x, y);
   else if (document.caretPositionFromPoint) {
     const p = document.caretPositionFromPoint(x, y);
@@ -3846,7 +3846,7 @@ function hlWord(x, y) {
   const node = range.startContainer;
   if (node.nodeType !== Node.TEXT_NODE) return;
   const txt = node.textContent;
-  let s = range.startOffset, e2 = s;
+  s = range.startOffset, e2 = s;
   while (s > 0 && /\S/.test(txt[s-1])) s--;
   while (e2 < txt.length && /\S/.test(txt[e2])) e2++;
   if (s === e2) return;
@@ -3932,7 +3932,7 @@ async function sendAtt() {
   } catch { r.classList.remove('loading'); r.textContent='Connection error.'; }
 }
 function typeText(el, text) {
-  el.textContent = ''; let i = 0;
+  el.textContent = ''; i = 0;
   const t = setInterval(() => { el.textContent += text[i++]; if (i>=text.length) clearInterval(t); }, 11);
 }
 
@@ -3954,7 +3954,7 @@ function toggleTheme() {
 }
 
 
-let isDark = true;
+isDark = true;
 
 /* ── RING ANIMATION ── */
 window.addEventListener('load', () => {
@@ -4007,7 +4007,7 @@ function toggleTheme() {
 }
 
 
-let isDark = true;
+isDark = true;
 
 /* countdown timer */
 function updateTimer() {
@@ -4044,10 +4044,10 @@ function toggleTheme() {
 }
 
 
-let isDark = true;
-let selectedSteps = [];
-let enteredScore = null;
-let pfResult = null;
+isDark = true;
+selectedSteps = [];
+enteredScore = null;
+pfResult = null;
 
 /* ── SCREEN NAV ── */
 function goToScreen(n, notYet) {
@@ -4219,12 +4219,12 @@ function showEl(id){const e=document.getElementById(id);if(e)e.style.display='fl
 function hideEl(id){const e=document.getElementById(id);if(e)e.style.display='none';}
 
 /* THEME */
-let isDark=false;
+isDark=false;
 function toggleTheme(){isDark=!isDark;document.body.setAttribute('data-theme',isDark?'dark':'light');localStorage.setItem('bmd_theme',isDark?'dark':'light');}
 const _t=localStorage.getItem('bmd_theme');if(_t==='dark'){isDark=true;document.body.setAttribute('data-theme','dark');}
 
 /* FONT */
-let fontIdx=parseInt(localStorage.getItem('bmd_font')||'2');
+fontIdx=parseInt(localStorage.getItem('bmd_font')||'2');
 const FONTS=['13px','14px','16px','18px','20px'];
 function applyFont(){document.documentElement.style.setProperty('--fs',FONTS[fontIdx]);localStorage.setItem('bmd_font',fontIdx);}
 function changeFont(d){fontIdx=Math.max(0,Math.min(FONTS.length-1,fontIdx+d));applyFont();}
