@@ -9298,16 +9298,6 @@ async function loadFsrsFromSupabase(){
   // Dispara o app
   window.cardsLoaded = true;
   if(window.pendingInit) window.pendingInit();
-  // Auto-activate app after cards load
-  (function(){
-    const landing = document.getElementById('landing');
-    const app = document.getElementById('app');
-    if(landing && app && !app.classList.contains('active')){
-      landing.style.display = 'none';
-      app.classList.add('active');
-      if(typeof window.showDeckHome === 'function') window.showDeckHome();
-    }
-  })();
 
   (function(){
     try {
