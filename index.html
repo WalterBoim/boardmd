@@ -4731,6 +4731,7 @@ html.light .qs-val { color: inherit; }
           </div>
           <div id="key-point-wrap" style="display:none;padding:0 18px 14px;"></div>
           <div id="card-pubmed-wrap" style="display:none;"></div>
+  <div id="card-cochrane-wrap" style="display:none;"></div>
           </div><!-- /bmd-ans-col -->
           </div><!-- /bmd-cols-row -->
           <div style="display:flex;justify-content:flex-end;padding:4px 18px 2px;">
@@ -6746,6 +6747,17 @@ function revealAnswer(sel,card){
       setTimeout(() => fetchCardPubmed(card), 300);
     } else {
       _pw.style.display = 'none';
+    }
+  }
+
+  // Cochrane badge
+  const _cw = document.getElementById('card-cochrane-wrap');
+  if(_cw){
+    if(card.cochrane_pmid){
+      _cw.style.display = '';
+      _cw.innerHTML = '<div style="padding:0 18px 14px;"><div style="font-size:9px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-faint);font-family:JetBrains Mono,monospace;margin-bottom:10px;">COCHRANE REVIEW</div><div style="border:1px solid rgba(0,184,148,.25);border-radius:8px;background:rgba(0,184,148,.05);padding:10px 14px;display:flex;align-items:center;justify-content:space-between;gap:10px;cursor:pointer;" onclick="window.open('https://pubmed.ncbi.nlm.nih.gov/'+card.cochrane_pmid+'/?otool=cochrane','_blank')"><div style="display:flex;align-items:center;gap:8px;"><div style="width:7px;height:7px;border-radius:50%;background:#00b894;flex-shrink:0;"></div><span style="font-size:11px;color:var(--text);font-family:JetBrains Mono,monospace;">Cochrane Systematic Review</span></div><span style="font-size:10px;color:#00b894;font-weight:700;">Level 1 &#x2197;</span></div></div>';
+    } else {
+      _cw.style.display = 'none';
     }
   }
 
