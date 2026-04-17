@@ -3339,24 +3339,24 @@ html.light .qs-val { color: inherit; }
   /* Live insight full width */
   .live-insight { margin: 0 !important; }
 
-  /* Card study area — max width on desktop */
-  .study-main {
+  /* Card study area — max width on desktop (overridden by body.studying) */
+  body:not(.studying) .study-main {
     display: flex !important;
     justify-content: center !important;
     padding: 24px 32px !important;
   }
-  .study-inner {
+  body:not(.studying) .study-inner {
     max-width: 760px !important;
     width: 100% !important;
   }
-  #card-el {
+  body:not(.studying) #card-el {
     max-width: 760px !important;
     width: 100% !important;
   }
-  .card-body, .card-header {
+  body:not(.studying) .card-body, body:not(.studying) .card-header {
     max-width: 760px !important;
   }
-  .explanation, #c-exp {
+  body:not(.studying) .explanation, body:not(.studying) #c-exp {
     max-width: 760px !important;
   }
   #att-inline-wrap {
