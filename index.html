@@ -9117,7 +9117,7 @@ html.light .att-inline{background:var(--surface);border-color:var(--border);}
 .att-inline-badge{width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,#6366f1,#8b5cf6);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
 .att-inline-badge svg{width:14px;height:14px;stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
 .att-inline-title{font-size:13px;font-weight:700;color:#8b5cf6;font-family:'Inter',sans-serif;letter-spacing:.02em;}
-.att-inline-btns{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:12px 14px;}
+.att-inline-btns{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:12px 14px;}
 .att-ibtn{background:var(--surface2);border:1px solid var(--border);border-radius:9px;padding:10px 6px;cursor:pointer;text-align:center;transition:all .15s;display:flex;flex-direction:column;align-items:center;gap:3px;font-family:'Inter',sans-serif;}
 .att-ibtn:hover{border-color:rgba(139,92,246,.5);background:rgba(99,102,241,.07);transform:translateY(-1px);}
 .att-ibtn:disabled{opacity:.38;cursor:not-allowed;transform:none;}
@@ -9187,9 +9187,6 @@ function injectAttendingInline(card, sel){
       <span style="font-size:10px;font-family:Inter,sans-serif;color:var(--text-faint);">Free</span>
     </div>
     <div class="att-inline-btns">
-      <button class="att-ibtn" ${dis} onclick="askAttendingInline('why',this)">
-        <span class="att-ibtn-label">Why this answer?</span>
-      </button>
       <button class="att-ibtn" ${dis} onclick="askAttendingInline('explain',this)">
         <span class="att-ibtn-label">Explain better</span>
       </button>
@@ -9346,19 +9343,30 @@ async function askAttendingInline(type, btnEl){
     : 'Not recorded';
   const wasCorrect = chosenIdx !== undefined && (card.w||[])[chosenIdx] === card.c;
 
+  // Build real pubmed references with abstracts from cache
+  const _pubCache = window._pubmedCache && window._pubmedCache[card.id];
+  const _pubAbstracts = (_pubCache && _pubCache.status === 'ready') ? _pubCache.abstracts : (window._cardPubmedArticles || []);
+  const pubmedRefs = _pubAbstracts.length
+    ? '\n\nREFERENCES — cite ONLY these by superscript number ¹ ² ³, do NOT invent others:\n' +
+      _pubAbstracts.map((a,i) => {
+        const abs = a.abstract ? `\n   Abstract: ${a.abstract.slice(0,500)}` : '';
+        return `${i+1}. ${a.title} — ${a.journal||''} ${a.year||''} (PMID ${a.uid})${abs}`;
+      }).join('\n')
+    : '';
+
   const ctx = `QUESTION: ${card.q}
 OPTIONS:
 ${opts}
 CORRECT ANSWER: ${card.c}
 STUDENT SELECTED: ${userChoice} (${wasCorrect ? 'CORRECT ✓' : 'INCORRECT ✗'})
 TOPIC: ${card.topic||''} | SYSTEM: ${card.system||''}
-EXPLANATION: ${(card.e||'').replace(/<[^>]+>/g,' ').slice(0,300)}`;
+EXPLANATION: ${(card.e||'').replace(/<[^>]+>/g,' ').slice(0,300)}${pubmedRefs}`;
 
   const prompts = {
     why: `You are a brilliant, warm attending physician. The student just answered this USMLE board question:\n\n${ctx}\n\nIn 2-3 paragraphs: acknowledge right/wrong (one sentence). Explain WHY this is the correct answer using core pathophysiology. Be direct, clinical — like a great attending, not a textbook. End with one punchy clinical pearl.\n\nFinally, on a new line, write exactly: PUBMED_QUERY: [6-8 specific medical terms for PubMed search relevant to this answer]`,
-    explain: `You are a brilliant attending. The student wants deeper understanding:\n\n${ctx}\n\nTeach this concept at the whiteboard. One vivid analogy. Cover: pathophysiology, clinical clues, board trap. 3 paragraphs max.\n\nFinally, on a new line, write exactly: PUBMED_QUERY: [6-8 specific medical terms for PubMed search relevant to this concept]`,
-    mcq: `You are a brilliant USMLE question writer. Based on this topic:\n\n${ctx}\n\nWrite 3 new USMLE-style MCQs on the SAME concept. Return ONLY valid JSON, no markdown, no extra text:\n{"questions":[{"stem":"[clinical vignette]","options":["A. text","B. text","C. text","D. text"],"correct":"A","explanation":"[2-3 sentences why A is correct]","distractors":{"B":"[why B is wrong]","C":"[why C is wrong]","D":"[why D is wrong]"},"keypoint":"[one punchy ≤15 word board pearl]"},{"stem":"[vignette]","options":["A. text","B. text","C. text","D. text"],"correct":"B","explanation":"[2-3 sentences]","distractors":{"A":"[why wrong]","C":"[why wrong]","D":"[why wrong]"},"keypoint":"[≤15 word pearl]"},{"stem":"[vignette]","options":["A. text","B. text","C. text","D. text"],"correct":"C","explanation":"[2-3 sentences]","distractors":{"A":"[why wrong]","B":"[why wrong]","D":"[why wrong]"},"keypoint":"[≤15 word pearl]"}]}`,
-    surprise: `You are a brilliant attending. Give ONE unforgettable clinical pearl about:\n\n${ctx}\n\nSomething NOT in the explanation — a real-world connection, classic trick, or board trap. 2 paragraphs max. Be vivid.\n\nFinally, on a new line, write exactly: PUBMED_QUERY: [6-8 specific medical terms for PubMed search relevant to this pearl]`,
+    explain: `You are a brilliant attending physician teaching at the whiteboard. The student wants deeper understanding of:\n\n${ctx}\n\nIn 3 paragraphs: (1) Core pathophysiology with one vivid analogy. (2) Clinical recognition — key findings and bedside clues. (3) The classic board trap and why students get it wrong.\n\nIf REFERENCES are provided above, cite them inline using superscript numbers ¹ ² ³ — only cite references that actually exist in the list. Do NOT invent references. If no references are provided, write without citations.\n\nAt the very end, write:\nPUBMED_QUERY: [6-8 specific medical terms for PubMed search relevant to this topic]`,
+    mcq: `You are a brilliant USMLE question writer. Based on this topic:\n\n${ctx}\n\nWrite 3 new USMLE-style MCQs on the SAME concept. Return ONLY valid JSON, no markdown, no extra text:\n{"questions":[{"stem":"[clinical vignette]","options":["A. text","B. text","C. text","D. text"],"correct":"A","explanation":"[2-3 sentences why A is correct]","distractors":{"B":"[why B is wrong]","C":"[why C is wrong]","D":"[why D is wrong]"},"keypoint":"[one punchy ≤15 word board pearl]"},{"stem":"[vignette]","options":["A. text","B. text","C. text","D. text"],"correct":"B","explanation":"[2-3 sentences]","distractors":{"A":"[why wrong]","C":"[why wrong]","D":"[why wrong]"},"keypoint":"[≤15 word pearl]"},{"stem":"[vignette]","options":["A. text","B. text","C. text","D. text"],"correct":"C","explanation":"[2-3 sentences]","distractors":{"A":"[why wrong]","B":"[why wrong]","D":"[why wrong]"},"keypoint":"[≤15 word pearl]"}]}\n\nPUBMED_QUERY: [6-8 specific medical terms for PubMed search relevant to these questions]`,
+    surprise: `You are a brilliant attending. Give ONE unforgettable clinical pearl about:\n\n${ctx}\n\nSomething NOT in the explanation — a real-world connection, classic trick, or board trap that sticks in memory. Be vivid and direct. 2 paragraphs max.\n\nIf REFERENCES are provided above, cite them inline using superscript numbers ¹ ² ³ — only cite references that actually exist in the list. Do NOT invent references. If no references are provided, write without citations.\n\nAt the very end, write:\nPUBMED_QUERY: [6-8 specific medical terms for PubMed search relevant to this topic]`,
     custom: `You are a brilliant attending physician. The student has a question about this USMLE topic:\n\n${ctx}\n\nStudent question: "${document.getElementById('att-ask-input')?.value||''}"\n\nAnswer clearly and clinically in 2-3 paragraphs. Focus on what's relevant for USMLE boards.\n\nFinally, on a new line, write exactly: PUBMED_QUERY: [6-8 specific medical terms for PubMed search relevant to this answer]`,
     compare: `You are a brilliant USMLE attending. The student just answered this question:\n\n${ctx}\n\nIdentify the correct diagnosis AND the single most commonly confused alternative (main distractor).\n\nReturn ONLY valid JSON, no markdown:\n{"left_label":"[correct dx name]","right_label":"[distractor name]","left":["exclusive feature 1","exclusive feature 2","exclusive feature 3","exclusive feature 4"],"shared":["shared feature 1","shared feature 2","shared feature 3"],"right":["exclusive feature 1","exclusive feature 2","exclusive feature 3","exclusive feature 4"],"pubmed_query":"[6-8 terms comparing these two diagnoses]"}`,
     translate: `Translate the following medical flashcard content to Brazilian Portuguese. Keep medical terms accurate. Return ONLY the translation in this exact format:\n\nQUESTÃO: [translated question]\nA. [option] B. [option] C. [option] D. [option]\nRESPOSTA CORRETA: [translated answer]\nEXPLICAÇÃO: [translated explanation]\nPONTO-CHAVE: [translated key point]\n\nContent to translate:\nQUESTION: ${card.q}\nOPTIONS: ${(card.w||[]).map((o,i)=>String.fromCharCode(65+i)+'. '+o).join(' ')}\nCORRECT ANSWER: ${card.c}\nEXPLANATION: ${(card.e||'').replace(/<[^>]+>/g,' ').slice(0,500)}\nKEY POINT: ${(card.kp||'')}`,
