@@ -9382,6 +9382,28 @@ async function loadFsrsFromSupabase(){
   try{ Object.assign(window.fsrs || {}, fsrsData); }catch(e){}
 }
 
+// ── RETENTION HEADER SYNC (lightweight — runs on init) ──────────────
+function syncRetentionHeader(){
+  try {
+    var retSum=0, retCnt=0, now=Date.now();
+    Object.values(window.DECKS||{}).forEach(function(cards){
+      (cards||[]).forEach(function(card){
+        var s=getState(card.id);
+        if(s.state!==ST_NEW && s.stability>0){
+          var daysSince=Math.max(0,(now-(s.due-s.interval*86400000))/86400000);
+          var R=Math.exp(-daysSince/Math.max(s.stability,0.1));
+          retSum+=Math.max(0,Math.min(1,R));
+          retCnt++;
+        }
+      });
+    });
+    var pct=retCnt>0?Math.round(retSum/retCnt*100):null;
+    var txt=pct!==null?pct+'%':'—%';
+    var h=document.getElementById('bmd-retention-val'); if(h) h.textContent=txt;
+    var p=document.getElementById('perf-qs-ret'); if(p) p.textContent=txt;
+  } catch(e){}
+}
+
 // ── INIT ─────────────────────────────────────────────────────────────
 (async function init(){
   // Carrega cards (IDB-first: instantâneo se cache existe)
@@ -9434,6 +9456,8 @@ async function loadFsrsFromSupabase(){
   // Dispara o app
   window.cardsLoaded = true;
   if(window.pendingInit) window.pendingInit();
+  // Sync retention no header
+  setTimeout(syncRetentionHeader, 300);
 
   (function(){
     try {
@@ -10729,6 +10753,9 @@ function syncPerfQuickStats() {
     const retPct = retCnt > 0 ? Math.round(retSum/retCnt*100) : null;
     const retEl = document.getElementById('perf-qs-ret');
     if(retEl) retEl.textContent = retPct !== null ? retPct + '%' : '—%';
+    // Sync header retention
+    const retHeader = document.getElementById('bmd-retention-val');
+    if(retHeader) retHeader.textContent = retPct !== null ? retPct + '%' : '—%';
 
     // ── Response Speed ──
     const avgMs = g.avgResponseMs || 0;
