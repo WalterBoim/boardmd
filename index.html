@@ -9055,7 +9055,7 @@ function buildDecks(allCards){
 // ── LOAD ALL CARDS FROM SUPABASE ─────────────────────────────────────
 // ── INDEXEDDB CACHE ──────────────────────────────────────────────────
 const IDB_NAME = 'boardmd_cache';
-const IDB_VERSION = 1;
+const IDB_VERSION = 2;
 const IDB_STORE = 'cards';
 const IDB_META_KEY = 'bmd_idb_meta';
 
@@ -9064,12 +9064,16 @@ function openIDB(){
     const req = indexedDB.open(IDB_NAME, IDB_VERSION);
     req.onupgradeneeded = e => {
       const db = e.target.result;
-      if(!db.objectStoreNames.contains(IDB_STORE)){
-        db.createObjectStore(IDB_STORE, { keyPath: 'id' });
+      if(db.objectStoreNames.contains(IDB_STORE)){
+        db.deleteObjectStore(IDB_STORE);
       }
+      db.createObjectStore(IDB_STORE, { keyPath: 'id' });
     };
     req.onsuccess = e => resolve(e.target.result);
-    req.onerror = () => reject(req.error);
+    req.onerror = () => {
+      try { indexedDB.deleteDatabase(IDB_NAME); } catch(e2){}
+      reject(req.error);
+    };
   });
 }
 
