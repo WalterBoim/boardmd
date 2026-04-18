@@ -5772,32 +5772,28 @@ function buildDeckHomeTable(){
 function startStudyFromHome(){switchDeckAndStudy(currentDeck);}
 function switchDeckAndStudy(dk){
   hideDeckHome();
-  if(SHELF_DECKS.includes(dk) || dk === 'shelf' || dk === 'shelf_em' || dk === 'shelf_surgery'){
+  if(SHELF_DECKS.includes(dk)){
     const D = window.DECKS || {};
-    // Find ALL deck keys that contain 'shelf' in the loaded cards
-    const allDeckKeys = Object.keys(D);
-    const shelfKeys = allDeckKeys.filter(k => k.includes('shelf') || k === 'shelf');
-    console.log('BoardMD shelf: available deck keys with shelf:', shelfKeys);
-    console.log('BoardMD shelf: SHELF_DECKS constant:', SHELF_DECKS);
-    // Combine cards from all shelf-related decks found
-    const keysToUse = shelfKeys.length > 0 ? shelfKeys : SHELF_DECKS;
-    const combined = keysToUse.reduce((acc, d) => {
-      if(D[d] && D[d].length > 0){
-        console.log('BoardMD shelf: adding', D[d].length, 'cards from deck:', d);
-        acc = acc.concat(D[d]);
-      }
-      return acc;
-    }, []);
-    console.log('BoardMD shelf: total combined cards:', combined.length);
-    if(combined.length === 0){
-      console.warn('BoardMD shelf: NO CARDS FOUND. All deck keys:', allDeckKeys);
-      showXpToast('Shelf deck','No cards found. Check console for deck names.','','',null);
+    var cards;
+    if(dk === 'shelf'){
+      // "All Rotations" — combine all shelf decks
+      const shelfKeys = Object.keys(D).filter(k => k.includes('shelf'));
+      cards = shelfKeys.reduce(function(acc, d){ return acc.concat(D[d]||[]); }, []);
+      console.log('BoardMD shelf: all rotations, combined', cards.length, 'cards from', shelfKeys);
+    } else {
+      // Specific subdeck — load only that deck
+      cards = D[dk] || [];
+      console.log('BoardMD shelf:', dk, cards.length, 'cards');
+    }
+    if(cards.length === 0){
+      console.warn('BoardMD shelf: NO CARDS for', dk, '— available keys:', Object.keys(D).filter(k=>k.includes('shelf')));
+      showXpToast('Shelf deck','No cards found for ' + dk,'','',null);
       showDeckHome();
       return;
     }
-    currentStep = 'shelf';
-    currentDeck = '_shelf_combined';
-    window.DECKS['_shelf_combined'] = combined;
+    currentStep = 's2';
+    currentDeck = dk;
+    window.DECKS[dk] = cards;
     againQueue = []; idx = 0; revealed = false; sessionRatings = {};
     ensureStudyUI();
     buildSessionQueue();
@@ -5819,7 +5815,7 @@ function goHome(){
 let currentStep = localStorage.getItem('bmd_step') || 's1'; // 's1' or 's2'
 const STEP1_DECKS = ['boardmd_s1','s1_core','s1','hy1','fa_step1','fa_s1','arrows','ethics'];
 const STEP2_DECKS = ['boardmd_s2','core','daily_review','s2','shelf','shelf_surgery','shelf_em','shelf_fm','shelf_im','shelf_neuro','shelf_obgyn','shelf_peds','shelf_psych'];
-const SHELF_DECKS = ['shelf_surgery','shelf_em','shelf'];
+const SHELF_DECKS = ['shelf','shelf_surgery','shelf_em','shelf_obgyn','shelf_fm','shelf_im','shelf_neuro','shelf_peds','shelf_psych'];
 
 function openApp(dk){
   document.getElementById('landing').style.display='none';
