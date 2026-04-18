@@ -9075,6 +9075,10 @@ function buildDecks(allCards){
     if(!window.DECKS[dk]) window.DECKS[dk] = [];
     window.DECKS[dk].push(card);
   }
+  // Update deck home table after cards are loaded
+  setTimeout(() => {
+    if(typeof buildDeckHomeTable === 'function') buildDeckHomeTable();
+  }, 100);
 }
 
 // ── LOAD ALL CARDS FROM SUPABASE ─────────────────────────────────────
@@ -9157,48 +9161,15 @@ async function fetchAllFromSupabase(onProgress){
 }
 
 async function loadCardsFromSupabase(){
-  console.log('BoardMD: checking IndexedDB cache...');
-
-  const meta = getIDBMeta();
-  const cached = meta ? await getIDBCards() : [];
-
-  if(cached.length > 0){
-    // INSTANT LOAD from IndexedDB
-    console.log(`BoardMD: ${cached.length} cards from IndexedDB cache (instant)`);
-    buildDecks(cached);
-    hideLoadingOverlay();
-
-    // Background check: has Supabase got more/updated cards?
-    setTimeout(async () => {
-      try {
-        const { count } = await _supa.from('cards').select('id', { count: 'exact', head: true });
-        if(count && count !== cached.length){
-          console.log(`BoardMD: background refresh — ${count} on server vs ${cached.length} cached`);
-          const fresh = await fetchAllFromSupabase();
-          if(fresh.length > 0){
-            await setIDBCards(fresh);
-            buildDecks(fresh);
-            console.log(`BoardMD: background refresh done — ${fresh.length} cards`);
-          }
-        } else {
-          console.log(`BoardMD: cache up to date (${cached.length} cards)`);
-        }
-      } catch(e){ console.warn('background refresh failed:', e); }
-    }, 2000);
-
-    return cached.length;
-  }
-
-  // FIRST LOAD — show splash, download everything
-  console.log('BoardMD: no cache — loading from Supabase...');
+  console.log('BoardMD: loading from Supabase...');
   showLoadingOverlay();
   const allCards = await fetchAllFromSupabase((pct, n, chunk) => updateLoadingProgress(pct, n, chunk));
   buildDecks(allCards);
-  console.log(`BoardMD: ${allCards.length} cards loaded`);
+  console.log('BoardMD: ' + allCards.length + ' cards loaded');
   hideLoadingOverlay();
 
-  // Save to IndexedDB for next time
-  setIDBCards(allCards).then(() => console.log('BoardMD: cache saved to IndexedDB'));
+  // Try to save to IDB silently — don't block if it fails
+  try { setIDBCards(allCards); } catch(e){}
 
   return allCards.length;
 }
