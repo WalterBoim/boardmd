@@ -3459,6 +3459,8 @@ html.light .qs-val { color: inherit; }
   /* Thinner header on desktop */
   .app-header-top { height: 36px !important; }
   .hdr { padding: 8px 16px !important; }
+  /* Account for fixed bottom nav height */
+  .study-inner { padding-bottom: 52px !important; }
   /* Full width — no lateral padding, UWorld style */
   .study-main  { padding: 0 !important; justify-content: flex-start !important; }
   .study-inner { max-width: 100% !important; width: 100% !important; align-items: stretch !important; gap: 0 !important; }
@@ -6701,10 +6703,16 @@ function revealAnswer(sel,card){
     else if(t===sel&&t!==card.c) btn.classList.add('wrong');
     else btn.classList.add('other-wrong');
   });
-  // Scroll to correct answer in left column
+  // Scroll to correct answer within left column only (not whole page)
   setTimeout(function(){
     var correctBtn = document.querySelector('.opt-btn.correct') || document.querySelector('.opt-btn.show-correct');
-    if(correctBtn) correctBtn.scrollIntoView({behavior:'smooth',block:'center'});
+    if(correctBtn){
+      var col = document.getElementById('bmd-q-col') || document.getElementById('bmd-cols-row');
+      if(col && col.scrollHeight > col.clientHeight){
+        var btnTop = correctBtn.offsetTop - col.offsetTop;
+        col.scrollTo({top: Math.max(0, btnTop - col.clientHeight/2 + correctBtn.offsetHeight/2), behavior:'smooth'});
+      }
+    }
   }, 300);
 
   // ── PADRÃO McDONALD'S ─────────────────────────────────────────
