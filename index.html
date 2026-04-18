@@ -3462,9 +3462,11 @@ html.light .qs-val { color: inherit; }
   /* Bottom nav: static in flex flow instead of fixed — no gap with FSRS */
   .bmd-bottom-nav {
     position: static !important;
-    padding: 4px 0 8px !important;
+    padding: 4px 0 6px !important;
     border-top: none !important;
     backdrop-filter: none !important;
+    flex-shrink: 0 !important;
+    margin-top: auto !important;
   }
   .bmd-bottom-nav .nav-center { margin-top: -12px !important; }
   .bmd-bottom-nav .nav-center-btn { width: 42px !important; height: 42px !important; border-radius: 12px !important; }
