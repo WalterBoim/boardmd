@@ -9572,22 +9572,13 @@ function injectAttendingInline(card, sel){
     <div style="padding:0 14px 10px;font-size:11px;color:var(--text-faint);font-family:'Inter',sans-serif;line-height:1.4;">For educational purposes only. Not medical advice.</div>
     <div class="att-inline-response" id="att-inline-response"></div>`;
 
-  // Desktop (>=900px): injeta na coluna direita
+  // Injeta no #bmd-ans-col (funciona tanto mobile quanto desktop)
   const ansCol = document.getElementById('bmd-ans-col');
-  if(ansCol && window.innerWidth >= 900){
-    const footerRef = ansCol.querySelector('.card-footer-counter');
+  if(ansCol){
+    const footerRef = ansCol.querySelector('.card-footer-counter')
+                   || ansCol.querySelector('#report-issue-btn')?.parentElement;
     if(footerRef){ ansCol.insertBefore(wrap, footerRef); }
     else { ansCol.appendChild(wrap); }
-  } else {
-    // Mobile: injeta no study-inner antes do fsrs-nav
-    const studyInner = document.getElementById('study-inner');
-    if(studyInner){
-      const ref = studyInner.querySelector('#fsrs-nav')
-               || studyInner.querySelector('#fsrs-nav-2')
-               || studyInner.querySelector('.fsrs-nav');
-      if(ref){ studyInner.insertBefore(wrap, ref); }
-      else { studyInner.appendChild(wrap); }
-    }
   }
 
   // Guarda contexto do card
