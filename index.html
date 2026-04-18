@@ -4810,6 +4810,10 @@ html.dark .hl-btn-active { border-color:#fff!important; }
           <div class="setting-info"><div class="setting-label">Reset deck progress</div><div class="setting-desc">Clear FSRS data for a specific deck</div></div>
           <div style="font-size:12px;font-weight:700;color:#ff5370;cursor:pointer;">Reset</div>
         </div>
+        <div class="setting-row" onclick="forceRefreshCards()" style="cursor:pointer">
+          <div class="setting-info"><div class="setting-label">Force Refresh Cards</div><div class="setting-desc">Clear cache and reload all cards from server</div></div>
+          <div style="font-size:12px;font-weight:700;color:var(--accent);cursor:pointer;">Refresh</div>
+        </div>
       </div>
     </div>
   </div>
@@ -9209,6 +9213,14 @@ function buildDecks(allCards){
   setTimeout(() => {
     if(typeof buildDeckHomeTable === 'function') buildDeckHomeTable();
   }, 100);
+}
+
+// ── FORCE REFRESH ───────────────────────────────────────────────────
+async function forceRefreshCards(){
+  try { indexedDB.deleteDatabase('boardmd_cache'); } catch(e){}
+  try { localStorage.removeItem('bmd_idb_meta'); } catch(e){}
+  showXpToast('Refreshing','Reloading all cards from server...','','',null);
+  setTimeout(function(){ location.reload(); }, 500);
 }
 
 // ── LOAD ALL CARDS FROM SUPABASE ─────────────────────────────────────
