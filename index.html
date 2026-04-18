@@ -9773,9 +9773,22 @@ function renderLens(data, container){
     var lines=[];var line='';
     ctx.font='400 '+fontSize+'px -apple-system,BlinkMacSystemFont,sans-serif';
     for(var i=0;i<words.length;i++){
-      var test=line?line+' '+words[i]:words[i];
+      var word=words[i];
+      // If single word exceeds maxWidth, break it into chunks
+      if(ctx.measureText(word).width>maxWidth){
+        if(line){ lines.push(line); line=''; }
+        var chunk='';
+        for(var c=0;c<word.length;c++){
+          if(ctx.measureText(chunk+word[c]).width>maxWidth && chunk){
+            lines.push(chunk); chunk=word[c];
+          } else { chunk+=word[c]; }
+        }
+        if(chunk) line=chunk;
+        continue;
+      }
+      var test=line?line+' '+word:word;
       if(ctx.measureText(test).width>maxWidth && line){
-        lines.push(line);line=words[i];
+        lines.push(line);line=word;
       } else { line=test; }
     }
     if(line) lines.push(line);
@@ -9804,13 +9817,13 @@ function renderLens(data, container){
   }
   var lL=[{text:data.left_label||'',bold:true,size:14,color:'#0C447C'},{gap:14}];
   (data.left||[]).slice(0,3).forEach(function(b){lL.push({text:b,bold:false,size:12,color:'#185FA5',gap2:14});});
-  drawZone(function(){ctx.beginPath();ctx.arc(cx1,cy,r,0,Math.PI*2);ctx.clip();},lL,xLeft,155);
+  drawZone(function(){ctx.beginPath();ctx.arc(cx1,cy,r,0,Math.PI*2);ctx.clip();},lL,xLeft,170);
   var lM=[{text:'Both',bold:true,size:13,color:'#085041'},{gap:12}];
   (data.shared||[]).slice(0,2).forEach(function(b){lM.push({text:b,bold:false,size:11,color:'#0F6E56',gap2:12});});
-  drawZone(function(){ctx.beginPath();ctx.arc(cx1,cy,r,0,Math.PI*2);ctx.clip();ctx.beginPath();ctx.arc(cx2,cy,r,0,Math.PI*2);ctx.clip();},lM,xMid,105);
+  drawZone(function(){ctx.beginPath();ctx.arc(cx1,cy,r,0,Math.PI*2);ctx.clip();ctx.beginPath();ctx.arc(cx2,cy,r,0,Math.PI*2);ctx.clip();},lM,xMid,110);
   var lR=[{text:data.right_label||'',bold:true,size:14,color:'#633806'},{gap:14}];
   (data.right||[]).slice(0,3).forEach(function(b){lR.push({text:b,bold:false,size:12,color:'#BA7517',gap2:14});});
-  drawZone(function(){ctx.beginPath();ctx.arc(cx2,cy,r,0,Math.PI*2);ctx.clip();},lR,xRight,155);
+  drawZone(function(){ctx.beginPath();ctx.arc(cx2,cy,r,0,Math.PI*2);ctx.clip();},lR,xRight,170);
 }
 
 async function askAttendingInline(type, btnEl){
