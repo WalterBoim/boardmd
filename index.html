@@ -2614,11 +2614,11 @@ mark.hb{background:rgba(79,142,247,.28);border-bottom:2px solid rgba(40,100,220,
 
 /* ── YOUR CARD ── */
 .your-card{
-  margin:14px 14px 0;
+  margin:8px 12px 0;
   background:var(--surface);
   border:1px solid var(--border2);
   border-radius:var(--radius);
-  padding:16px 18px;
+  padding:14px 16px;
   position:relative;overflow:hidden;
 }
 .your-card::before{
@@ -2674,7 +2674,7 @@ mark.hb{background:rgba(79,142,247,.28);border-bottom:2px solid rgba(40,100,220,
 
 /* ── LEAGUE CARD ── */
 .league-card{
-  margin:12px 14px 0;
+  margin:8px 12px 0;
   background:var(--surface);border:1px solid var(--border2);
   border-radius:var(--radius);overflow:hidden;
 }
@@ -2786,7 +2786,7 @@ mark.hb{background:rgba(79,142,247,.28);border-bottom:2px solid rgba(40,100,220,
 
 /* ── SCOPE FILTERS ── */
 .scope-wrap{
-  margin:12px 14px 0;
+  margin:8px 12px 0;
   display:flex;gap:6px;overflow-x:auto;
   scrollbar-width:none;-webkit-overflow-scrolling:touch;
 }
@@ -2805,7 +2805,7 @@ mark.hb{background:rgba(79,142,247,.28);border-bottom:2px solid rgba(40,100,220,
 
 /* ── GLOBAL RANKING ── */
 .global-card{
-  margin:12px 14px 0;
+  margin:8px 12px 0;
   background:var(--surface);border:1px solid var(--border2);
   border-radius:var(--radius);overflow:hidden;
 }
@@ -2880,14 +2880,14 @@ mark.hb{background:rgba(79,142,247,.28);border-bottom:2px solid rgba(40,100,220,
 
 /* section label */
 .section-lbl{
-  padding:14px 18px 8px;
+  padding:10px 14px 6px;
   font-size:11px;font-weight:700;letter-spacing:1px;
   text-transform:uppercase;color:var(--muted);
 }
 
 /* ── UNIVERSITY RANKING ── */
 .uni-card{
-  margin:12px 14px 0;
+  margin:8px 12px 0;
   background:var(--surface);border:1px solid var(--border2);
   border-radius:var(--radius);overflow:hidden;
 }
@@ -3361,7 +3361,7 @@ html.light .qs-val { color: inherit; }
   #profile-panel, #lb-panel {
     max-width: 100% !important;
     width: 100% !important;
-    padding: 28px 40px 80px !important;
+    padding: 16px 24px 80px !important;
   }
   .your-card, .league-card, .global-card,
   .uni-card, .scope-wrap, .section-lbl,
@@ -3384,11 +3384,11 @@ html.light .qs-val { color: inherit; }
 
   /* Ranking cards — no side margin on desktop, full panel width */
   .your-card, .league-card, .global-card, .uni-card {
-    margin: 0 0 16px 0 !important;
+    margin: 0 0 10px 0 !important;
     border-radius: 16px !important;
   }
-  .scope-wrap { margin: 0 !important; }
-  .section-lbl { margin: 8px 0 !important; }
+  .scope-wrap { margin: 0 0 4px !important; }
+  .section-lbl { margin: 6px 0 !important; }
   /* Live insight full width */
   .live-insight { margin: 0 !important; }
 
@@ -4071,102 +4071,127 @@ html.dark .hl-btn-active { border-color:#fff!important; }
 
   <div class="league-progress">
     <div class="lp-label">
-      <span class="lp-you">Your position: <strong style="color:var(--accent)">#8</strong></span>
+      <span class="lp-you">Your position: <strong style="color:var(--accent)">#3</strong></span>
       <span class="lp-target">Top 5 to promote</span>
     </div>
-    <div class="lp-bar"><div class="lp-fill" style="width:62%;background:var(--accent)"></div></div>
-    <div class="lp-note">340 MDCoins needed to reach #5 &mdash; you can do this today</div>
+    <div class="lp-bar"><div class="lp-fill" style="width:88%;background:var(--accent)"></div></div>
+    <div class="lp-note">Keep it up &mdash; you're in the promotion zone!</div>
   </div>
 
   <!-- TOP 5 — promotion zone -->
   <div class="league-row promoted">
     <div class="lr-pos p1">1</div>
-    <div class="lr-avatar">AK</div>
+    <div class="lr-avatar">PS</div>
     <div class="lr-info">
-      <div class="lr-name"><span class="speed-dot sd-green"></span>Ahmed K. <span class="tier-badge tier-fellow" style="font-size:8px;padding:1px 6px">Fellow</span></div>
-      <div class="lr-school"><span style="font-size:14px;line-height:1;vertical-align:middle;margin-right:2px;">🇺🇸</span> Harvard Med</div>
+      <div class="lr-name"><span class="speed-dot sd-green"></span>Priya S. <span class="tier-badge tier-fellow" style="font-size:8px;padding:1px 6px">Fellow</span></div>
+      <div class="lr-school"><span style="font-size:14px;line-height:1;vertical-align:middle;margin-right:2px;">🇮🇳</span> AIIMS Delhi</div>
     </div>
     <div style="display:flex;flex-direction:column;align-items:flex-end">
-      <div class="lr-coins">2,840</div>
-      <div class="lr-delta up">+120</div>
+      <div class="lr-coins">3,210</div>
+      <div class="lr-delta up">+145</div>
     </div>
     <span class="promo-label promo-up">Promote</span>
   </div>
 
   <div class="league-row promoted">
     <div class="lr-pos p2">2</div>
-    <div class="lr-avatar">SL</div>
+    <div class="lr-avatar">DM</div>
     <div class="lr-info">
-      <div class="lr-name"><span class="speed-dot sd-green"></span>Sofia L.</div>
-      <div class="lr-school"><span style="font-size:14px;line-height:1;vertical-align:middle;margin-right:2px;">🇩🇪</span> Charité Berlin</div>
+      <div class="lr-name"><span class="speed-dot sd-green"></span>Daniel M.</div>
+      <div class="lr-school"><span style="font-size:14px;line-height:1;vertical-align:middle;margin-right:2px;">🇺🇸</span> Johns Hopkins SOM</div>
     </div>
     <div style="display:flex;flex-direction:column;align-items:flex-end">
-      <div class="lr-coins">2,510</div>
-      <div class="lr-delta up">+88</div>
+      <div class="lr-coins">2,870</div>
+      <div class="lr-delta up">+92</div>
     </div>
     <span class="promo-label promo-up">Promote</span>
   </div>
 
-  <div class="league-row promoted">
+  <!-- YOU -->
+  <div class="league-row promoted you">
     <div class="lr-pos p3">3</div>
-    <div class="lr-avatar">RN</div>
+    <div class="lr-avatar">W</div>
     <div class="lr-info">
-      <div class="lr-name"><span class="speed-dot sd-amber"></span>Raj N.</div>
-      <div class="lr-school"><span style="font-size:14px;line-height:1;vertical-align:middle;margin-right:2px;">🇮🇳</span> AIIMS Delhi</div>
+      <div class="lr-name" style="color:var(--accent)"><span class="speed-dot sd-green"></span>You <span class="tier-badge tier-attending" style="font-size:8px;padding:1px 6px">ATT</span></div>
+      <div class="lr-school"><span style="font-size:14px;line-height:1;vertical-align:middle;margin-right:2px;">🇧🇷</span> UFPR</div>
     </div>
     <div style="display:flex;flex-direction:column;align-items:flex-end">
-      <div class="lr-coins">2,190</div>
-      <div class="lr-delta up">+44</div>
+      <div class="lr-coins" style="color:var(--accent)">2,740</div>
+      <div class="lr-delta up">+68</div>
     </div>
     <span class="promo-label promo-up">Promote</span>
   </div>
 
   <div class="league-row promoted">
     <div class="lr-pos" style="color:var(--muted)">4</div>
-    <div class="lr-avatar">ML</div>
+    <div class="lr-avatar">SL</div>
     <div class="lr-info">
-      <div class="lr-name"><span class="speed-dot sd-green"></span>Maria L.</div>
-      <div class="lr-school"><span style="font-size:14px;line-height:1;vertical-align:middle;margin-right:2px;">🇧🇷</span> UFRJ</div>
+      <div class="lr-name"><span class="speed-dot sd-amber"></span>Sofia L.</div>
+      <div class="lr-school"><span style="font-size:14px;line-height:1;vertical-align:middle;margin-right:2px;">🇩🇪</span> Charit&eacute; Berlin</div>
     </div>
     <div style="display:flex;flex-direction:column;align-items:flex-end">
-      <div class="lr-coins">1,980</div>
-      <div class="lr-delta up">+31</div>
+      <div class="lr-coins">2,580</div>
+      <div class="lr-delta up">+37</div>
     </div>
     <span class="promo-label promo-up">Promote</span>
   </div>
 
   <div class="league-row promoted">
     <div class="lr-pos" style="color:var(--muted)">5</div>
-    <div class="lr-avatar">JS</div>
+    <div class="lr-avatar">AO</div>
     <div class="lr-info">
-      <div class="lr-name"><span class="speed-dot sd-amber"></span>James S.</div>
-      <div class="lr-school"><span style="font-size:14px;line-height:1;vertical-align:middle;margin-right:2px;">🇺🇸</span> Mayo Clinic</div>
+      <div class="lr-name"><span class="speed-dot sd-green"></span>Amara O.</div>
+      <div class="lr-school"><span style="font-size:14px;line-height:1;vertical-align:middle;margin-right:2px;">🇳🇬</span> Univ. of Lagos COM</div>
     </div>
     <div style="display:flex;flex-direction:column;align-items:flex-end">
-      <div class="lr-coins">1,600</div>
-      <div class="lr-delta dn">-12</div>
+      <div class="lr-coins">2,350</div>
+      <div class="lr-delta up">+19</div>
     </div>
     <span class="promo-label promo-up">Promote</span>
   </div>
 
   <!-- divider -->
   <div style="padding:6px 18px;background:var(--surface2);border-top:1px solid var(--border);border-bottom:1px solid var(--border)">
-    <div style="font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--muted)">340 coins away from promotion zone</div>
+    <div style="font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--muted)">Safe zone</div>
   </div>
 
-  <!-- YOU -->
-  <div class="league-row you">
-    <div class="lr-pos you-c">8</div>
-    <div class="lr-avatar">W</div>
+  <div class="league-row">
+    <div class="lr-pos" style="color:var(--muted)">6</div>
+    <div class="lr-avatar">KT</div>
     <div class="lr-info">
-      <div class="lr-name" style="color:var(--accent)"><span class="speed-dot sd-green"></span>You</div>
-      <div class="lr-school"><span style="font-size:14px;line-height:1;vertical-align:middle;margin-right:2px;">🇧🇷</span> Your University</div>
+      <div class="lr-name"><span class="speed-dot sd-amber"></span>Kenji T.</div>
+      <div class="lr-school"><span style="font-size:14px;line-height:1;vertical-align:middle;margin-right:2px;">🇯🇵</span> Keio Univ. SOM</div>
     </div>
     <div style="display:flex;flex-direction:column;align-items:flex-end">
-      <div class="lr-coins" style="color:var(--accent)">1,260</div>
-      <div class="lr-delta up">+0</div>
+      <div class="lr-coins">2,110</div>
+      <div class="lr-delta dn">-8</div>
     </div>
-    <div class="tier-badge tier-attending" style="font-size:8px;padding:1px 6px">ATT</div>
+  </div>
+
+  <div class="league-row">
+    <div class="lr-pos" style="color:var(--muted)">7</div>
+    <div class="lr-avatar">FR</div>
+    <div class="lr-info">
+      <div class="lr-name"><span class="speed-dot sd-green"></span>Fatima R.</div>
+      <div class="lr-school"><span style="font-size:14px;line-height:1;vertical-align:middle;margin-right:2px;">🇵🇰</span> Aga Khan Univ.</div>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:flex-end">
+      <div class="lr-coins">1,940</div>
+      <div class="lr-delta up">+25</div>
+    </div>
+  </div>
+
+  <div class="league-row">
+    <div class="lr-pos" style="color:var(--muted)">8</div>
+    <div class="lr-avatar">JC</div>
+    <div class="lr-info">
+      <div class="lr-name"><span class="speed-dot sd-amber"></span>James C.</div>
+      <div class="lr-school"><span style="font-size:14px;line-height:1;vertical-align:middle;margin-right:2px;">🇺🇸</span> Mayo Clinic Alix</div>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:flex-end">
+      <div class="lr-coins">1,720</div>
+      <div class="lr-delta dn">-15</div>
+    </div>
   </div>
 
   <!-- rows 9-20 collapsed / locked (Free users) -->
@@ -4177,7 +4202,7 @@ html.dark .hl-btn-active { border-color:#fff!important; }
       <div class="lock-name">&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;</div>
       <svg class="lock-icon" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
     </div>
-    <div class="lock-coins">1,180</div>
+    <div class="lock-coins">1,580</div>
   </div>
   <div class="locked-row">
     <div class="lock-pos">10</div>
@@ -4186,12 +4211,12 @@ html.dark .hl-btn-active { border-color:#fff!important; }
       <div class="lock-name">&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;</div>
       <svg class="lock-icon" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
     </div>
-    <div class="lock-coins">1,050</div>
+    <div class="lock-coins">1,390</div>
   </div>
 
   <!-- relegation zone -->
   <div style="padding:6px 18px;background:var(--surface2);border-top:1px solid var(--border);border-bottom:1px solid var(--border)">
-    <div style="font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--muted)">Relegation zone — bottom 5</div>
+    <div style="font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--muted)">Relegation zone &mdash; bottom 5</div>
   </div>
   <div class="league-row" style="border-left:2px solid rgba(255,83,112,.35)">
     <div class="lock-pos" style="color:var(--muted)">21</div>
@@ -4200,7 +4225,7 @@ html.dark .hl-btn-active { border-color:#fff!important; }
       <div class="lock-name">&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;</div>
       <svg class="lock-icon" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
     </div>
-    <div class="lock-coins">280</div>
+    <div class="lock-coins">340</div>
     <span class="promo-label promo-dn">Relegate</span>
   </div>
 
