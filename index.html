@@ -9207,6 +9207,28 @@ async function fetchAllFromSupabase(onProgress){
 }
 
 async function loadCardsFromSupabase(){
+  // ── IDB-FIRST: tenta cache local antes de bater no Supabase ──
+  const meta = getIDBMeta();
+  if(meta && meta.count > 0){
+    try {
+      const cached = await getIDBCards();
+      if(cached.length > 0){
+        console.log('BoardMD: ' + cached.length + ' cards from cache (instant)');
+        buildDecks(cached);
+        // Refresh silencioso em background — não bloqueia o app
+        fetchAllFromSupabase().then(fresh => {
+          if(fresh && fresh.length > 0){
+            buildDecks(fresh);
+            try { setIDBCards(fresh); } catch(e){}
+            console.log('BoardMD: refreshed ' + fresh.length + ' cards from Supabase');
+          }
+        }).catch(e => console.warn('BoardMD: background refresh failed', e));
+        return cached.length;
+      }
+    } catch(e){ console.warn('BoardMD: IDB read failed, falling back to Supabase'); }
+  }
+
+  // ── Fallback: primeiro acesso ou cache vazio — fetch completo ──
   console.log('BoardMD: loading from Supabase...');
   showLoadingOverlay();
   const allCards = await fetchAllFromSupabase((pct, n, chunk) => updateLoadingProgress(pct, n, chunk));
@@ -9214,7 +9236,7 @@ async function loadCardsFromSupabase(){
   console.log('BoardMD: ' + allCards.length + ' cards loaded');
   hideLoadingOverlay();
 
-  // Try to save to IDB silently — don't block if it fails
+  // Salva no IDB para próximo acesso instantâneo
   try { setIDBCards(allCards); } catch(e){}
 
   return allCards.length;
@@ -9303,11 +9325,13 @@ async function loadFsrsFromSupabase(){
 
 // ── INIT ─────────────────────────────────────────────────────────────
 (async function init(){
-  // Carrega cards
-  await loadCardsFromSupabase();
+  // Carrega cards (IDB-first: instantâneo se cache existe)
+  // Paraleliza com auth check — são independentes
+  const [cardCount, session] = await Promise.all([
+    loadCardsFromSupabase(),
+    getSession()
+  ]);
 
-  // Verifica sessão
-  const session = await getSession();
   if(session){
     _supaUser = session.user;
     // Carrega progresso FSRS da nuvem
