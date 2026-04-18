@@ -9226,6 +9226,9 @@ async function loadCardsFromSupabase(){
       if(cached.length > 0){
         console.log('BoardMD: ' + cached.length + ' cards from cache (instant)');
         buildDecks(cached);
+        // Restaura tema salvo (sem overlay, hideLoadingOverlay não é chamado)
+        if(window._bmdSavedTheme === 'light') document.documentElement.classList.add('light');
+        if(typeof updateThemeIcons === 'function') updateThemeIcons();
         // Refresh silencioso em background — não bloqueia o app
         fetchAllFromSupabase().then(fresh => {
           if(fresh && fresh.length > 0){
