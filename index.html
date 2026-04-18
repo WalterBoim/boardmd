@@ -3265,10 +3265,10 @@ mark.hb{background:rgba(79,142,247,.28);border-bottom:2px solid rgba(40,100,220,
     left: 0 !important;
     right: 0 !important;
     margin: 0 !important;
-    padding: 12px 0 20px !important;
+    padding: 6px 0 10px !important;
     border-radius: 0 !important;
   }
-  .bmd-bottom-nav .nav-item { padding: 4px 28px; }
+  .bmd-bottom-nav .nav-item { padding: 2px 28px; }
   .bmd-bottom-nav .nav-label { font-size: 12px; }
   .bmd-bottom-nav .nav-item svg { width: 24px; height: 24px; }
 }
@@ -3456,6 +3456,9 @@ html.light .qs-val { color: inherit; }
 #bmd-ans-placeholder { display: none !important; }
 
 @media (min-width: 900px) {
+  /* Thinner header on desktop */
+  .app-header-top { height: 36px !important; }
+  .hdr { padding: 8px 16px !important; }
   /* Full width — no lateral padding, UWorld style */
   .study-main  { padding: 0 !important; justify-content: flex-start !important; }
   .study-inner { max-width: 100% !important; width: 100% !important; align-items: stretch !important; gap: 0 !important; }
@@ -3689,10 +3692,10 @@ html.dark .hl-btn-active { border-color:#fff!important; }
     left: 0 !important;
     right: 0 !important;
     margin: 0 !important;
-    padding: 12px 0 20px !important;
+    padding: 6px 0 10px !important;
     border-radius: 0 !important;
   }
-  .bmd-bottom-nav .nav-item { padding: 4px 28px; }
+  .bmd-bottom-nav .nav-item { padding: 2px 28px; }
   .bmd-bottom-nav .nav-label { font-size: 12px; }
   .bmd-bottom-nav .nav-item svg { width: 24px; height: 24px; }
 }
@@ -3775,7 +3778,7 @@ html.dark .hl-btn-active { border-color:#fff!important; }
   #bmd-ans-col #att-inline-wrap { max-width: 100% !important; margin: 0 !important; border-radius: 0 !important; border-left: none !important; border-right: none !important; }
   #card-el > .fsrs-nav {
     flex-shrink: 0 !important; width: 100% !important; border-top: 1px solid var(--border) !important;
-    padding: 8px 16px 10px !important; background: var(--surface) !important;
+    padding: 4px 16px 6px !important; background: var(--surface) !important;
     border-radius: 0 0 16px 16px !important; position: sticky !important; bottom: 0 !important; z-index: 5 !important;
   }
   #card-el > .fsrs-nav .fsrs-row { width: 100% !important; max-width: 100% !important; }
