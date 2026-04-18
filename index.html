@@ -6076,9 +6076,9 @@ function renderCard(){
   // Reset Cochrane wrap
   const _cwReset = document.getElementById('card-cochrane-wrap');
   if(_cwReset){ _cwReset.style.display='none'; _cwReset.innerHTML=''; }
-  // Reset split columns to 50/50
+  // Reset split columns to 50/50 (desktop only)
   const _qCol=document.getElementById('bmd-q-col');
-  if(_qCol) _qCol.style.width='50%';
+  if(_qCol) _qCol.style.width = window.innerWidth >= 900 ? '50%' : '';
   // Hide FSRS buttons until answer revealed
   const _fsrs=document.getElementById('fsrs-nav');
   const _fsrs2=document.getElementById('fsrs-nav-2');
