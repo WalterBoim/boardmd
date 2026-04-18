@@ -459,7 +459,7 @@ html.light .qid-textarea{background:var(--surface2);}
 .badge-modal button{background:var(--accent);color:#fff;border:none;padding:11px 30px;border-radius:9px;font-family:'Lato',sans-serif;font-size:13px;font-weight:700;cursor:pointer;}
 
 /* Leaderboard panel */
-.lb-panel{display:none;flex:1;flex-direction:column;padding:32px 36px;gap:24px;max-width:100%;margin:0 auto;width:100%;}
+.lb-panel{display:none;flex:1;flex-direction:column;padding:12px 12px;gap:0;max-width:100%;margin:0;width:100%;}
 .lb-panel.active{display:flex;}
 
 /* Header */
@@ -2614,19 +2614,20 @@ mark.hb{background:rgba(79,142,247,.28);border-bottom:2px solid rgba(40,100,220,
 
 /* ── YOUR CARD ── */
 .your-card{
-  margin:8px 12px 0;
+  margin:0 0 8px;
   background:var(--surface);
   border:1px solid var(--border2);
   border-radius:var(--radius);
-  padding:14px 16px;
+  padding:14px 18px;
   position:relative;overflow:hidden;
+  width:100%;
 }
 .your-card::before{
   content:'';position:absolute;
   top:0;left:0;right:0;height:3px;
   background:linear-gradient(90deg,var(--accent),var(--green));
 }
-.your-top{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.your-top{display:flex;align-items:center;gap:12px;margin-bottom:10px}
 .your-avatar{
   width:44px;height:44px;border-radius:50%;
   background:rgba(79,142,247,.15);border:2px solid rgba(79,142,247,.3);
@@ -2653,7 +2654,7 @@ mark.hb{background:rgba(79,142,247,.28);border-bottom:2px solid rgba(40,100,220,
 .tier-fellow   {color:var(--tier-fellow);   background:rgba(245,158,11,.1); border:1px solid rgba(245,158,11,.25)}
 .tier-chief    {color:var(--tier-chief);    background:rgba(245,166,35,.12);border:1px solid rgba(245,166,35,.3)}
 
-.your-stats{display:flex;gap:0;border-top:1px solid var(--border);padding-top:12px}
+.your-stats{display:flex;gap:0;border-top:1px solid var(--border);padding-top:10px}
 .your-stat{flex:1;text-align:center;border-right:1px solid var(--border)}
 .your-stat:last-child{border-right:none}
 .your-stat-val{
@@ -2674,9 +2675,10 @@ mark.hb{background:rgba(79,142,247,.28);border-bottom:2px solid rgba(40,100,220,
 
 /* ── LEAGUE CARD ── */
 .league-card{
-  margin:8px 12px 0;
+  margin:0 0 8px;
   background:var(--surface);border:1px solid var(--border2);
   border-radius:var(--radius);overflow:hidden;
+  width:100%;
 }
 .league-header{
   padding:14px 18px;
@@ -2786,7 +2788,7 @@ mark.hb{background:rgba(79,142,247,.28);border-bottom:2px solid rgba(40,100,220,
 
 /* ── SCOPE FILTERS ── */
 .scope-wrap{
-  margin:8px 12px 0;
+  margin:0 0 4px;
   display:flex;gap:6px;overflow-x:auto;
   scrollbar-width:none;-webkit-overflow-scrolling:touch;
 }
@@ -2805,9 +2807,10 @@ mark.hb{background:rgba(79,142,247,.28);border-bottom:2px solid rgba(40,100,220,
 
 /* ── GLOBAL RANKING ── */
 .global-card{
-  margin:8px 12px 0;
+  margin:0 0 8px;
   background:var(--surface);border:1px solid var(--border2);
   border-radius:var(--radius);overflow:hidden;
+  width:100%;
 }
 .global-header{
   padding:13px 18px;display:flex;align-items:center;justify-content:space-between;
@@ -2880,16 +2883,17 @@ mark.hb{background:rgba(79,142,247,.28);border-bottom:2px solid rgba(40,100,220,
 
 /* section label */
 .section-lbl{
-  padding:10px 14px 6px;
+  padding:8px 4px 4px;
   font-size:11px;font-weight:700;letter-spacing:1px;
   text-transform:uppercase;color:var(--muted);
 }
 
 /* ── UNIVERSITY RANKING ── */
 .uni-card{
-  margin:8px 12px 0;
+  margin:0 0 8px;
   background:var(--surface);border:1px solid var(--border2);
   border-radius:var(--radius);overflow:hidden;
+  width:100%;
 }
 .uni-row{
   display:flex;align-items:center;gap:10px;
