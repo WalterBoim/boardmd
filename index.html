@@ -4746,12 +4746,12 @@ html.dark .hl-btn-active { border-color:#fff!important; }
           <span class="badge badge-soon">Soon</span>
         </div>
     
-        <div class="deck-row soon">
-          <div class="deck-icon" style="background:rgba(136,146,176,.1);">
-            <svg viewBox="0 0 24 24" stroke="#8892b0"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+        <div class="deck-row" onclick="switchDeckAndStudy('shelf_obgyn')" style="cursor:pointer">
+          <div class="deck-icon" style="background:rgba(236,72,153,.12);">
+            <svg viewBox="0 0 24 24" stroke="#ec4899" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
           </div>
-          <div class="deck-info"><div class="deck-title">OB-GYN</div><div class="deck-sub">BoardMD Shelf</div></div>
-          <span class="badge badge-soon">Soon</span>
+          <div class="deck-info"><div class="deck-title">OB-GYN</div><div class="deck-sub">BoardMD Shelf</div><div class="deck-stats-line" id="stats-shelf_obgyn"><span class="ds-total">— cards</span></div></div>
+          <button class="study-btn" onclick="event.stopPropagation();switchDeckAndStudy('shelf_obgyn')">Study</button>
         </div>
     
         <div class="deck-row soon">
@@ -5655,7 +5655,7 @@ function buildDeckHomeTable(){
 
     {id:'shelf_im',      name:'BoardMD Shelf · Internal Medicine',   sub:'Shelf Exam · Coming soon',         step:'s2', shelf:true, soon:true},
     {id:'shelf_fm',      name:'BoardMD Shelf · Family Medicine',     sub:'Shelf Exam · Coming soon',         step:'s2', shelf:true, soon:true},
-    {id:'shelf_obgyn',   name:'BoardMD Shelf · OB/GYN',              sub:'Shelf Exam · Coming soon',         step:'s2', shelf:true, soon:true},
+    {id:'shelf_obgyn',   name:'BoardMD Shelf · OB/GYN',              sub:'Shelf Exam',                       step:'s2', shelf:true},
     {id:'shelf_peds',    name:'BoardMD Shelf · Pediatrics',          sub:'Shelf Exam · Coming soon',         step:'s2', shelf:true, soon:true},
     {id:'shelf_psych',   name:'BoardMD Shelf · Psychiatry',          sub:'Shelf Exam · Coming soon',         step:'s2', shelf:true, soon:true},
     {id:'shelf_neuro',   name:'BoardMD Shelf · Neurology',           sub:'Shelf Exam · Coming soon',         step:'s2', shelf:true, soon:true},
@@ -10636,7 +10636,7 @@ function bmdDashSync() {
       if(html) el.innerHTML = html;
     });
     // Deck stats: total cards + accuracy
-    const statDecks = ['boardmd_s1','s1_core','boardmd_s2','core','daily_review','shelf_em','shelf_surgery'];
+    const statDecks = ['boardmd_s1','s1_core','boardmd_s2','core','daily_review','shelf_em','shelf_surgery','shelf_obgyn'];
     statDecks.forEach(id => {
       const el = document.getElementById('stats-' + id);
       if(!el) return;
