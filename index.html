@@ -2168,7 +2168,11 @@ mark.hb{background:rgba(79,142,247,.28);border-bottom:2px solid rgba(40,100,220,
   overflow-y: auto !important;
   min-height: 0 !important;
   -webkit-overflow-scrolling: touch !important;
+  overscroll-behavior-y: contain !important;
+  scrollbar-width: thin !important;
 }
+#bmd-cols-row::-webkit-scrollbar { width: 3px; }
+#bmd-cols-row::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
 #card-el > .fsrs-nav {
   flex-shrink: 0 !important;
   padding: 10px 12px 18px !important;
@@ -3485,12 +3489,11 @@ html.light .qs-val { color: inherit; }
     min-width: 260px !important;
     max-width: 75% !important;
     padding: 20px 24px 24px !important;
-    position: sticky !important;
-    top: 60px !important;
-    max-height: calc(100vh - 72px) !important;
     overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    overscroll-behavior-y: contain !important;
     scrollbar-width: thin !important;
-    align-self: flex-start !important;
+    align-self: stretch !important;
   }
   #bmd-q-col::-webkit-scrollbar { width: 3px; }
   #bmd-q-col::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
@@ -3557,8 +3560,10 @@ html.light .qs-val { color: inherit; }
     flex: 1 1 0 !important;
     min-width: 260px !important;
     overflow-y: auto !important;
-    max-height: calc(100vh - 72px) !important;
-    align-self: flex-start !important;
+    -webkit-overflow-scrolling: touch !important;
+    overscroll-behavior-y: contain !important;
+    align-self: stretch !important;
+    scrollbar-width: thin !important;
   }
 
   /* Explanation padding in right col */
@@ -3718,9 +3723,10 @@ html.dark .hl-btn-active { border-color:#fff!important; }
   #bmd-cols-row { display: flex !important; flex-direction: row !important; align-items: stretch !important; flex: 1 !important; overflow-y: auto !important; min-height: 0 !important; }
   #bmd-q-col {
     flex-shrink: 0 !important; width: 50%; min-width: 260px !important; max-width: 75% !important;
-    padding: 20px 24px 24px !important; position: sticky !important; top: 60px !important;
-    max-height: calc(100vh - 72px) !important; overflow-y: auto !important;
-    scrollbar-width: thin !important; align-self: flex-start !important;
+    padding: 20px 24px 24px !important;
+    overflow-y: auto !important; -webkit-overflow-scrolling: touch !important;
+    overscroll-behavior-y: contain !important;
+    scrollbar-width: thin !important; align-self: stretch !important;
     border-right: 1px solid var(--border) !important;
   }
   #bmd-q-col::-webkit-scrollbar { width: 3px; }
@@ -3748,7 +3754,8 @@ html.dark .hl-btn-active { border-color:#fff!important; }
   #bmd-split-divider:hover .bmd-div-handle, #bmd-split-divider.dragging .bmd-div-handle { opacity: 1 !important; }
   #bmd-ans-col {
     flex: 1 1 0 !important; min-width: 260px !important; overflow-y: auto !important;
-    max-height: calc(100vh - 72px) !important; align-self: flex-start !important;
+    -webkit-overflow-scrolling: touch !important; overscroll-behavior-y: contain !important;
+    align-self: stretch !important; scrollbar-width: thin !important;
   }
   #bmd-ans-col::-webkit-scrollbar { width: 3px; }
   #bmd-ans-col::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
