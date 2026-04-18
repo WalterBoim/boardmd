@@ -6069,6 +6069,9 @@ function renderCard(){
   // Reset Cochrane wrap
   const _cwReset = document.getElementById('card-cochrane-wrap');
   if(_cwReset){ _cwReset.style.display='none'; _cwReset.innerHTML=''; }
+  // Reset split columns to 50/50
+  const _qCol=document.getElementById('bmd-q-col');
+  if(_qCol) _qCol.style.width='50%';
   // Hide FSRS buttons until answer revealed
   const _fsrs=document.getElementById('fsrs-nav');
   const _fsrs2=document.getElementById('fsrs-nav-2');
@@ -13013,8 +13016,6 @@ function bmdSetupDrag(){
   var q = document.getElementById('bmd-q-col');
   if(!d || !q || d._ok) return;
   d._ok = true;
-  var saved = localStorage.getItem('bmd_q_pct');
-  if(saved) q.style.width = parseFloat(saved) + '%';
   d.addEventListener('mousedown', function(e){
     e.preventDefault(); e.stopPropagation();
     var r = document.getElementById('bmd-cols-row');
@@ -13032,15 +13033,12 @@ function bmdSetupDrag(){
       d.classList.remove('dragging');
       document.body.style.cursor = '';
       document.body.style.userSelect = '';
-      var r2 = document.getElementById('bmd-cols-row');
-      if(r2) localStorage.setItem('bmd_q_pct', ((q.offsetWidth/r2.offsetWidth)*100).toFixed(1));
     }
     document.addEventListener('mousemove', onMove);
     document.addEventListener('mouseup', onUp);
   });
   d.addEventListener('dblclick', function(){
     q.style.width = '50%';
-    localStorage.removeItem('bmd_q_pct');
   });
 }
 [0,200,500,1000,2000].forEach(function(t){ setTimeout(bmdSetupDrag, t); });
