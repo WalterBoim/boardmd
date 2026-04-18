@@ -9254,14 +9254,8 @@ async function loadCardsFromSupabase(){
         // Restaura tema salvo (sem overlay, hideLoadingOverlay não é chamado)
         if(window._bmdSavedTheme === 'light') document.documentElement.classList.add('light');
         if(typeof updateThemeIcons === 'function') updateThemeIcons();
-        // Refresh silencioso em background — não bloqueia o app
-        fetchAllFromSupabase().then(fresh => {
-          if(fresh && fresh.length > 0){
-            buildDecks(fresh);
-            try { setIDBCards(fresh); } catch(e){}
-            console.log('BoardMD: refreshed ' + fresh.length + ' cards from Supabase');
-          }
-        }).catch(e => console.warn('BoardMD: background refresh failed', e));
+        // Refresh silencioso em background — sempre sincroniza com Supabase
+        backgroundRefresh(cached.length);
         return cached.length;
       }
     } catch(e){ console.warn('BoardMD: IDB read failed, falling back to Supabase'); }
@@ -9279,6 +9273,30 @@ async function loadCardsFromSupabase(){
   try { setIDBCards(allCards); } catch(e){}
 
   return allCards.length;
+}
+
+// ── Background refresh com retry automático ──
+function backgroundRefresh(cachedCount, attempt){
+  attempt = attempt || 1;
+  fetchAllFromSupabase().then(function(fresh){
+    if(!fresh || fresh.length === 0){
+      console.warn('BoardMD: background refresh returned empty');
+      return;
+    }
+    buildDecks(fresh);
+    try { setIDBCards(fresh); } catch(e){}
+    if(fresh.length !== cachedCount){
+      console.log('BoardMD: cache updated ' + cachedCount + ' → ' + fresh.length + ' cards');
+    } else {
+      console.log('BoardMD: refreshed ' + fresh.length + ' cards (up to date)');
+    }
+  }).catch(function(e){
+    console.warn('BoardMD: background refresh failed (attempt ' + attempt + ')', e);
+    if(attempt < 3){
+      var delay = attempt * 5000; // 5s, 10s
+      setTimeout(function(){ backgroundRefresh(cachedCount, attempt + 1); }, delay);
+    }
+  });
 }
 
 // Safety net — force remove overlay after 60s if stuck
