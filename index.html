@@ -7802,9 +7802,11 @@ function showLeaderboard(){
   const lbb = document.getElementById('lb-btn');
   if(lbb) lbb.classList.add('active');
   setTimeout(syncYourCard, 50);
-  renderLeaderboard();
   // Build country flag chips and render global rank
-  setTimeout(() => { buildCountryScopes(); renderGlobalRankFiltered('Global'); }, 200);
+  setTimeout(function(){
+    try { buildCountryScopes(); } catch(e){ console.warn('buildCountryScopes error', e); }
+    try { renderGlobalRankFiltered('Global'); } catch(e){ console.warn('renderGlobalRankFiltered error', e); }
+  }, 200);
 }
 
 function switchLbTab(tab, el){
@@ -11015,8 +11017,8 @@ function bmdSetActiveNav(id) {
 (function() {
   const _prev = window.showLeaderboard;
   window.showLeaderboard = function() {
-    if (_prev) _prev.call(this);
-    setTimeout(() => bmdSetActiveNav('bnav-rank'), 50);
+    try { if (_prev) _prev.call(this); } catch(e){ console.warn('showLeaderboard prev error', e); }
+    setTimeout(function(){ try { bmdSetActiveNav('bnav-rank'); } catch(e){} }, 50);
   };
 })();
 
@@ -11110,8 +11112,9 @@ function buildCountryScopes() {
 }
 
 async function renderGlobalRankFiltered(scope) {
+  console.log('BoardMD: renderGlobalRankFiltered called, scope=', scope);
   const table = document.getElementById('global-rank-rows');
-  if(!table) return;
+  if(!table){ console.warn('BoardMD: #global-rank-rows not found'); return; }
 
   // Load all leaderboard entries
   let entries = [];
@@ -11172,6 +11175,7 @@ async function renderGlobalRankFiltered(scope) {
 
   // Sort by coins
   filtered.sort((a,b) => (b.coins||0) - (a.coins||0));
+  console.log('BoardMD: global rank entries=', entries.length, 'filtered=', filtered.length);
 
   if(filtered.length === 0){
     table.innerHTML = '<div style="padding:24px;text-align:center;color:var(--muted);font-size:13px">No students found for this filter yet.</div>';
@@ -12605,8 +12609,8 @@ async function renderChallengesList() {
 // Load challenges when leaderboard opens
 const _origShowLb = window.showLeaderboard;
 window.showLeaderboard = function() {
-  _origShowLb && _origShowLb();
-  setTimeout(renderChallengesList, 300);
+  try { _origShowLb && _origShowLb(); } catch(e){ console.warn('showLeaderboard chain error', e); }
+  setTimeout(function(){ try { renderChallengesList(); } catch(e){} }, 300);
 };
 
 function selectProfileStep(step) {
