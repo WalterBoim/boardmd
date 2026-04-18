@@ -9405,6 +9405,26 @@ async function syncFsrsToSupabase(){
   }
 }
 
+// ── LEADERBOARD SYNC TO SUPABASE ────────────────────────────────────
+async function syncLeaderboardToSupabase(){
+  if(!_supaUser) return;
+  try {
+    const g = getGami();
+    const me = JSON.parse(localStorage.getItem(LB_ME_KEY)||'{}');
+    const row = {
+      user_id:    _supaUser.id,
+      name:       me.name || _supaUser.user_metadata?.full_name || _supaUser.email?.split('@')[0] || 'Student',
+      univ:       me.univ || '',
+      country:    me.country || '',
+      step:       me.step || 's2',
+      coins:      g.coins || 0,
+      streak:     g.streak || 0,
+      updated_at: new Date().toISOString()
+    };
+    await _supa.from('leaderboard').upsert([row], { onConflict: 'user_id' });
+  } catch(e){ console.warn('BoardMD: leaderboard sync failed', e); }
+}
+
 async function loadFsrsFromSupabase(){
   if(!_supaUser) return;
   const { data, error } = await _supa
@@ -9472,10 +9492,13 @@ function syncRetentionHeader(){
     if(nameEl && session.user.email){
       nameEl.textContent = session.user.email.split('@')[0];
     }
-    // Sincroniza FSRS para a nuvem a cada 2 minutos
+    // Sincroniza FSRS + leaderboard para a nuvem a cada 2 minutos
     setInterval(syncFsrsToSupabase, 120000);
+    setInterval(syncLeaderboardToSupabase, 120000);
     // Sincroniza ao fechar a aba
-    window.addEventListener('beforeunload', syncFsrsToSupabase);
+    window.addEventListener('beforeunload', function(){ syncFsrsToSupabase(); syncLeaderboardToSupabase(); });
+    // Sync inicial do leaderboard
+    setTimeout(syncLeaderboardToSupabase, 3000);
   }
 
   // Atualiza UI de auth
@@ -11122,21 +11145,20 @@ async function renderGlobalRankFiltered(scope) {
   const table = document.getElementById('global-rank-rows');
   if(!table){ console.warn('BoardMD: #global-rank-rows not found'); return; }
 
-  // Load all leaderboard entries
+  // Load leaderboard from Supabase first
   let entries = [];
   try {
-    if(window.storage && typeof window.storage.list === 'function'){
-      const result = await window.storage.list('lb:');
-      if(result && result.keys){
-        for(const key of result.keys){
-          try{
-            const r = await window.storage.get(key, true);
-            if(r && r.value) entries.push(JSON.parse(r.value));
-          }catch(e){}
-        }
-      }
+    let query = _supa.from('leaderboard').select('*').order('coins', { ascending: false }).limit(50);
+    if(scope === 'United States') query = query.ilike('country', '%united states%');
+    else if(scope === 'Brazil') query = query.ilike('country', '%brazil%');
+    else if(scope === 'Step 1') query = query.or('step.eq.s1,step.eq.step1');
+    else if(scope === 'Step 2 CK') query = query.or('step.eq.s2,step.eq.step2');
+    else if(scope === 'Shelf') query = query.eq('step', 'shelf');
+    const { data } = await query;
+    if(data && data.length > 0){
+      entries = data.map(function(r){ return { id:r.user_id, name:r.name, univ:r.univ, country:r.country, coins:r.coins, streak:r.streak, step:r.step }; });
     }
-  } catch(e){}
+  } catch(e){ console.warn('BoardMD: leaderboard query failed, using demo', e); }
 
   // Demo entries as fallback when no real data
   if(entries.length === 0){
