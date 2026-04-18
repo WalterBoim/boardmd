@@ -1689,8 +1689,8 @@ mark.hb{background:rgba(79,142,247,.28);border-bottom:2px solid rgba(40,100,220,
   display: flex !important;
   flex-direction: column !important;
   align-items: flex-start !important;
-  gap: 8px !important;
-  padding: 14px 16px 12px !important;
+  gap: 4px !important;
+  padding: 8px 14px 6px !important;
   background: var(--surface) !important;
   border: 1px solid var(--border2) !important;
   border-radius: 18px 18px 0 0 !important;
@@ -1701,22 +1701,22 @@ mark.hb{background:rgba(79,142,247,.28);border-bottom:2px solid rgba(40,100,220,
   display: flex !important;
   flex-direction: column !important;
   align-items: flex-start !important;
-  gap: 2px !important;
+  gap: 1px !important;
   width: 100% !important;
 }
 /* Line 2: chips — state + deck badge + edit + QID */
 .card-right {
   display: flex !important;
   align-items: center !important;
-  gap: 6px !important;
+  gap: 5px !important;
   flex-wrap: wrap !important;
   width: 100% !important;
 }
 /* Deck label — prominent */
 #c-deck-label {
-  font-size: 11px !important;
+  font-size: 9px !important;
   font-weight: 800 !important;
-  letter-spacing: 1.2px !important;
+  letter-spacing: 1px !important;
   text-transform: uppercase !important;
   color: var(--accent) !important;
   font-family: 'Sora', sans-serif !important;
@@ -1724,7 +1724,7 @@ mark.hb{background:rgba(79,142,247,.28);border-bottom:2px solid rgba(40,100,220,
 }
 /* System — subdued subtitle */
 .card-system, #c-sys {
-  font-size: 11px !important;
+  font-size: 9px !important;
   font-weight: 600 !important;
   letter-spacing: .8px !important;
   text-transform: uppercase !important;
@@ -1732,7 +1732,7 @@ mark.hb{background:rgba(79,142,247,.28);border-bottom:2px solid rgba(40,100,220,
   font-family: 'Sora', sans-serif !important;
 }
 #c-deck-label {
-  font-size: 10px !important;
+  font-size: 9px !important;
   font-weight: 700 !important;
   letter-spacing: 1px !important;
   text-transform: uppercase !important;
@@ -1741,9 +1741,9 @@ mark.hb{background:rgba(79,142,247,.28);border-bottom:2px solid rgba(40,100,220,
   display: block !important;
 }
 .card-system, .card-topic {
-  font-size: 10px !important;
+  font-size: 9px !important;
   font-weight: 700 !important;
-  letter-spacing: 1.2px !important;
+  letter-spacing: 1px !important;
   text-transform: uppercase !important;
   color: var(--muted) !important;
   font-family: 'Sora', sans-serif !important;
@@ -1751,18 +1751,18 @@ mark.hb{background:rgba(79,142,247,.28);border-bottom:2px solid rgba(40,100,220,
 /* card-right merged above */
 /* State chip — New/Learning/Review */
 .card-state {
-  font-size: 10px !important;
+  font-size: 9px !important;
   font-weight: 700 !important;
-  padding: 3px 8px !important;
+  padding: 2px 6px !important;
   border-radius: 999px !important;
   font-family: 'Sora', sans-serif !important;
   letter-spacing: .3px !important;
 }
 /* QID chip */
 .card-qid {
-  font-size: 10px !important;
+  font-size: 9px !important;
   font-weight: 700 !important;
-  padding: 3px 8px !important;
+  padding: 2px 6px !important;
   border-radius: 999px !important;
   border: 1px solid rgba(79,142,247,.2) !important;
   background: rgba(79,142,247,.06) !important;
@@ -3465,7 +3465,7 @@ html.light .qs-val { color: inherit; }
     width: 100% !important;
     max-width: 100% !important;
     border-bottom: 1px solid var(--border) !important;
-    padding: 16px 24px 12px !important;
+    padding: 8px 20px 6px !important;
   }
 
   /* cols-row: flex row, scrollable */
@@ -3714,7 +3714,7 @@ html.dark .hl-btn-active { border-color:#fff!important; }
     border: 1px solid var(--border) !important; border-radius: 16px !important;
     overflow: hidden !important; background: var(--surface) !important; box-shadow: none !important;
   }
-  #card-el .card-header { flex-shrink: 0 !important; width: 100% !important; border-bottom: 1px solid var(--border) !important; padding: 16px 24px 12px !important; }
+  #card-el .card-header { flex-shrink: 0 !important; width: 100% !important; border-bottom: 1px solid var(--border) !important; padding: 8px 20px 6px !important; }
   #bmd-cols-row { display: flex !important; flex-direction: row !important; align-items: stretch !important; flex: 1 !important; overflow-y: auto !important; min-height: 0 !important; }
   #bmd-q-col {
     flex-shrink: 0 !important; width: 50%; min-width: 260px !important; max-width: 75% !important;
@@ -4781,7 +4781,7 @@ html.dark .hl-btn-active { border-color:#fff!important; }
         <div class="card" id="card-el">
           <div class="card-header">
             <!-- Line 1: system › topic (left) | state + interval (right) -->
-            <div style="width:100%;display:flex;align-items:center;justify-content:space-between;margin-bottom:7px;">
+            <div style="width:100%;display:flex;align-items:center;justify-content:space-between;margin-bottom:3px;">
               <div style="display:flex;align-items:center;gap:5px;min-width:0;flex:1;overflow:hidden;">
                 <span class="card-system" id="c-sys" style="font-size:10px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;color:var(--accent);font-family:'Sora',sans-serif;white-space:nowrap;flex-shrink:0;"></span>
                 <span id="c-top-sep" style="font-size:10px;color:var(--muted);opacity:.4;flex-shrink:0;">›</span>
@@ -6877,6 +6877,10 @@ function revealAnswer(sel,card){
   // Show explanation block
   const expEl=document.getElementById('c-exp');
   if(expEl) expEl.classList.add('visible');
+
+  // Reset scroll to top so student reads explanation first
+  const colsRow=document.getElementById('bmd-cols-row');
+  if(colsRow) colsRow.scrollTop=0;
 
   // Show FSRS buttons — sync both nav elements
   const rb=document.getElementById('fsrs-nav');
@@ -9656,7 +9660,7 @@ async function askAttendingInline(type, btnEl){
       <span>Your Attending is thinking…</span>
     </div>`;
 
-  setTimeout(()=>{ respWrap.scrollIntoView({ behavior:'smooth', block:'nearest' }); }, 100);
+  // scroll removido — aluno precisa ler a explicação primeiro
 
   // Contexto do card
   const opts = (card.w||[]).map((o,i) => String.fromCharCode(65+i) + '. ' + o).join('\n');
@@ -9729,7 +9733,6 @@ EXPLANATION: ${(card.e||'').replace(/<[^>]+>/g,' ').slice(0,300)}${pubmedRefs}`;
         const clean = responseText.replace(/```json|```/g,'').trim();
         const data = JSON.parse(clean);
         renderInteractiveMCQs(data.questions, respWrap);
-        setTimeout(()=>{ respWrap.scrollIntoView({ behavior:'smooth', block:'nearest' }); }, 80);
         wrap.querySelectorAll('.att-ibtn').forEach(b=>{ b.disabled = false; });
         return;
       } catch(e) {
@@ -9745,7 +9748,6 @@ EXPLANATION: ${(card.e||'').replace(/<[^>]+>/g,' ').slice(0,300)}${pubmedRefs}`;
         var lbl = document.getElementById('att-compare-label');
         if(lbl) lbl.textContent = (lensData.left_label||'') + ' vs ' + (lensData.right_label||'');
         renderLens(lensData, respWrap);
-        setTimeout(function(){ respWrap.scrollIntoView({ behavior:'smooth', block:'nearest' }); }, 80);
         wrap.querySelectorAll('.att-ibtn').forEach(function(b){ b.disabled = false; });
         if(lensData.pubmed_query) setTimeout(function(){ fetchAttPubmed(lensData.pubmed_query.trim()); }, 100);
         return;
@@ -9815,7 +9817,6 @@ EXPLANATION: ${(card.e||'').replace(/<[^>]+>/g,' ').slice(0,300)}${pubmedRefs}`;
     b.disabled = !isPro && newLeft <= 0;
   });
 
-  setTimeout(()=>{ respWrap.scrollIntoView({ behavior:'smooth', block:'nearest' }); }, 80);
 }
 
 // ── HIGHLIGHT SYSTEM ─────────────────────────────────────────────────────
