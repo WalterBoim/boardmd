@@ -3459,6 +3459,13 @@ html.light .qs-val { color: inherit; }
   /* Thinner header on desktop */
   .app-header-top { height: 36px !important; }
   .hdr { padding: 8px 16px !important; }
+  /* Kill all padding-bottom that was for fixed nav — nav is now in flow */
+  #app.active { padding-bottom: 0 !important; }
+  .study-inner { padding-bottom: 0 !important; }
+  #app.active .deck-home,
+  #app.active .lb-panel,
+  #app.active #profile-panel { padding-bottom: 20px !important; }
+  #lb-panel { padding-bottom: 20px !important; }
   /* Bottom nav: static in flex flow instead of fixed — no gap with FSRS */
   .bmd-bottom-nav {
     position: static !important;
@@ -3466,7 +3473,6 @@ html.light .qs-val { color: inherit; }
     border-top: none !important;
     backdrop-filter: none !important;
     flex-shrink: 0 !important;
-    margin-top: auto !important;
   }
   .bmd-bottom-nav .nav-center { margin-top: -12px !important; }
   .bmd-bottom-nav .nav-center-btn { width: 42px !important; height: 42px !important; border-radius: 12px !important; }
@@ -3474,11 +3480,6 @@ html.light .qs-val { color: inherit; }
   .bmd-bottom-nav .nav-item { padding: 2px 28px !important; gap: 1px !important; }
   .bmd-bottom-nav .nav-item svg { width: 18px !important; height: 18px !important; }
   .bmd-bottom-nav .nav-label { font-size: 10px !important; }
-  /* No padding-bottom needed — nav is in flow */
-  .study-inner { padding-bottom: 0 !important; }
-  #app.active .deck-home,
-  #app.active .lb-panel,
-  #app.active #profile-panel { padding-bottom: 20px !important; }
   /* Full width — no lateral padding, UWorld style */
   .study-main  { padding: 0 !important; justify-content: flex-start !important; }
   .study-inner { max-width: 100% !important; width: 100% !important; align-items: stretch !important; gap: 0 !important; }
