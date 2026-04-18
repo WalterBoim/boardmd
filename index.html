@@ -6698,6 +6698,11 @@ function revealAnswer(sel,card){
     else if(t===sel&&t!==card.c) btn.classList.add('wrong');
     else btn.classList.add('other-wrong');
   });
+  // Scroll to correct answer in left column
+  setTimeout(function(){
+    var correctBtn = document.querySelector('.opt-btn.correct') || document.querySelector('.opt-btn.show-correct');
+    if(correctBtn) correctBtn.scrollIntoView({behavior:'smooth',block:'center'});
+  }, 300);
 
   // ── PADRÃO McDONALD'S ─────────────────────────────────────────
   // Separar explanation de "Why the Others Are Wrong" inteligentemente
