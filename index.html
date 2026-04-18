@@ -167,7 +167,7 @@ body{font-family:'Lato','Helvetica Neue',Arial,sans-serif;background:var(--bg);c
 .app-logo em{font-size:12px;font-style:normal;color:var(--text-faint);font-family:'Lato',sans-serif;margin-left:8px;}
 
 /* ── DECK HOME DASHBOARD (Anki-style) ── */
-.deck-home{display:none;flex:1;flex-direction:column;padding:32px 40px;max-width:100%;margin:0 auto;width:100%;gap:24px;overflow-y:auto;-webkit-overflow-scrolling:touch;min-height:0;}
+.deck-home{display:none;flex:1;flex-direction:column;padding:24px 24px;max-width:100%;margin:0;width:100%;gap:20px;overflow-y:auto;-webkit-overflow-scrolling:touch;min-height:0;}
 .deck-home.active{display:flex;}
 .deck-home-title{font-family:'Instrument Serif',serif;font-size:28px;color:var(--text);margin-bottom:4px;}
 .deck-home-sub{font-size:13px;color:var(--text-faint);font-family:'Lato',sans-serif;}
@@ -3330,11 +3330,11 @@ html.light .qs-val { color: inherit; }
   }
   .step-pill { font-size: 14px !important; padding: 8px 24px !important; }
 
-  /* Deck home — centered, bigger cards */
+  /* Deck home — full width, minimal lateral padding */
   .deck-home .content {
-    max-width: 860px !important;
-    margin: 0 auto !important;
-    padding: 20px 32px !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 12px 0 !important;
   }
   .deck-row {
     padding: 18px 24px !important;
