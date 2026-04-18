@@ -4370,14 +4370,34 @@ html.dark .hl-btn-active { border-color:#fff!important; }
     <div class="uni-score">88.4<span>score</span></div>
   </div>
 
-  <div class="uni-row you-uni">
-    <div class="uni-pos" style="color:var(--accent)">9</div>
-    <div class="rank-avatar" style="border-radius:8px;font-size:9px;font-weight:800;background:rgba(79,142,247,.15);border-color:rgba(79,142,247,.3);color:var(--accent)">YOU</div>
+  <div class="uni-row">
+    <div class="uni-pos" style="color:var(--muted)">4</div>
+    <div class="rank-avatar" style="border-radius:8px;font-size:9px;font-weight:800">STF</div>
     <div class="uni-info">
-      <div class="uni-name"><span style="font-size:14px;line-height:1;vertical-align:middle;margin-right:2px;">🇧🇷</span>Your University</div>
-      <div class="uni-country">Brazil &middot; 3 active students</div>
+      <div class="uni-name"><span style="font-size:14px;line-height:1;vertical-align:middle;margin-right:2px;">🇺🇸</span>Stanford SOM</div>
+      <div class="uni-country">Stanford, United States &middot; 16 active students</div>
     </div>
-    <div class="uni-score" style="color:var(--accent)">71.2<span>score</span></div>
+    <div class="uni-score">86.1<span>score</span></div>
+  </div>
+
+  <div class="uni-row">
+    <div class="uni-pos" style="color:var(--muted)">5</div>
+    <div class="rank-avatar" style="border-radius:8px;font-size:9px;font-weight:800">KCL</div>
+    <div class="uni-info">
+      <div class="uni-name"><span style="font-size:14px;line-height:1;vertical-align:middle;margin-right:2px;">🇬🇧</span>King's College London</div>
+      <div class="uni-country">London, United Kingdom &middot; 9 active students</div>
+    </div>
+    <div class="uni-score">83.5<span>score</span></div>
+  </div>
+
+  <div class="uni-row you-uni">
+    <div class="uni-pos" style="color:var(--accent)">8</div>
+    <div class="rank-avatar" style="border-radius:8px;font-size:9px;font-weight:800;background:rgba(79,142,247,.15);border-color:rgba(79,142,247,.3);color:var(--accent)">UFP</div>
+    <div class="uni-info">
+      <div class="uni-name"><span style="font-size:14px;line-height:1;vertical-align:middle;margin-right:2px;">🇧🇷</span>UFPR &mdash; Universidade Federal do Paraná</div>
+      <div class="uni-country">Curitiba, Brazil &middot; 3 active students</div>
+    </div>
+    <div class="uni-score" style="color:var(--accent)">74.8<span>score</span></div>
   </div>
 
   <div class="pro-gate">
@@ -7999,23 +8019,41 @@ async function renderLeaderboard(){
 
   let entries = [];
   try {
-    const result = await window.storage.list('lb:');
-    if(result && result.keys){
-      for(const key of result.keys){
-        try{
-          const r = await window.storage.get(key, true);
-          if(r && r.value) entries.push(JSON.parse(r.value));
-        }catch(e){}
+    if(window.storage && typeof window.storage.list === 'function'){
+      const result = await window.storage.list('lb:');
+      if(result && result.keys){
+        for(const key of result.keys){
+          try{
+            const r = await window.storage.get(key, true);
+            if(r && r.value) entries.push(JSON.parse(r.value));
+          }catch(e){}
+        }
       }
     }
   } catch(e){}
 
+  // Demo fallback
+  if(entries.length === 0){
+    entries = [
+      {id:'d1',name:'Ethan M.',univ:'Stanford SOM',country:'United States',coins:2810,streak:34,level:'Chief'},
+      {id:'d2',name:'Priya S.',univ:'AIIMS Delhi',country:'India',coins:2540,streak:28,level:'Fellow'},
+      {id:'d3',name:'Sofia L.',univ:'Charité Berlin',country:'Germany',coins:2190,streak:21,level:'Attending'},
+      {id:'d4',name:'Amara O.',univ:'Univ. of Lagos COM',country:'Nigeria',coins:1870,streak:19,level:'Attending'},
+      {id:'d5',name:'Kenji T.',univ:'Keio Univ. SOM',country:'Japan',coins:1650,streak:15,level:'Resident'},
+      {id:'d6',name:'Fatima R.',univ:'Aga Khan Univ.',country:'Pakistan',coins:1420,streak:12,level:'Resident'},
+      {id:'d7',name:'James C.',univ:'Mayo Clinic Alix',country:'United States',coins:1280,streak:10,level:'Resident'},
+      {id:'d8',name:'Lucas F.',univ:'USP Ribeirão',country:'Brazil',coins:1050,streak:8,level:'Intern'},
+      {id:'d9',name:'Aisha K.',univ:'King\'s College London',country:'United Kingdom',coins:890,streak:7,level:'Intern'},
+      {id:'d10',name:'Marc D.',univ:'McGill Medicine',country:'Canada',coins:720,streak:5,level:'Intern'},
+    ];
+  }
+
   const myGami = getGami();
   if(me){
-    const myEntry = { id:me.id, name:me.name, univ:me.univ, country:me.country, step:me.step||currentStep||'s1', coins:myGami.coins, streak:myGami.streak, level:getLevel(myGami.coins).name };
+    const myEntry = { id:me.id, name:me.name, univ:me.univ, country:me.country, step:me.step||currentStep||'s1', coins:myGami.coins||960, streak:myGami.streak||11, level:getLevel(myGami.coins).name };
     entries = entries.filter(e=>e.id !== me.id);
     entries.push(myEntry);
-    try{ await window.storage.set('lb:'+me.id, JSON.stringify(myEntry), true); }catch(e){}
+    try{ if(window.storage && typeof window.storage.set === 'function') await window.storage.set('lb:'+me.id, JSON.stringify(myEntry), true); }catch(e){}
   }
 
   let sorted = [...entries].sort((a,b)=>(b.coins||0)-(a.coins||0));
@@ -11078,23 +11116,44 @@ async function renderGlobalRankFiltered(scope) {
   // Load all leaderboard entries
   let entries = [];
   try {
-    const result = await window.storage.list('lb:');
-    if(result && result.keys){
-      for(const key of result.keys){
-        try{
-          const r = await window.storage.get(key, true);
-          if(r && r.value) entries.push(JSON.parse(r.value));
-        }catch(e){}
+    if(window.storage && typeof window.storage.list === 'function'){
+      const result = await window.storage.list('lb:');
+      if(result && result.keys){
+        for(const key of result.keys){
+          try{
+            const r = await window.storage.get(key, true);
+            if(r && r.value) entries.push(JSON.parse(r.value));
+          }catch(e){}
+        }
       }
     }
   } catch(e){}
+
+  // Demo entries as fallback when no real data
+  if(entries.length === 0){
+    entries = [
+      {id:'d1',name:'Ethan M.',univ:'Stanford SOM',country:'United States',coins:2810,streak:34,step:'s2'},
+      {id:'d2',name:'Priya S.',univ:'AIIMS Delhi',country:'India',coins:2540,streak:28,step:'s1'},
+      {id:'d3',name:'Sofia L.',univ:'Charité Berlin',country:'Germany',coins:2190,streak:21,step:'s2'},
+      {id:'d4',name:'Amara O.',univ:'Univ. of Lagos COM',country:'Nigeria',coins:1870,streak:19,step:'s2'},
+      {id:'d5',name:'Kenji T.',univ:'Keio Univ. SOM',country:'Japan',coins:1650,streak:15,step:'s1'},
+      {id:'d6',name:'Fatima R.',univ:'Aga Khan Univ.',country:'Pakistan',coins:1420,streak:12,step:'s2'},
+      {id:'d7',name:'James C.',univ:'Mayo Clinic Alix',country:'United States',coins:1280,streak:10,step:'s2'},
+      {id:'d8',name:'Lucas F.',univ:'USP Ribeirão',country:'Brazil',coins:1050,streak:8,step:'s1'},
+      {id:'d9',name:'Aisha K.',univ:'King\'s College London',country:'United Kingdom',coins:890,streak:7,step:'s2'},
+      {id:'d10',name:'Marc D.',univ:'McGill Medicine',country:'Canada',coins:720,streak:5,step:'s1'},
+    ];
+  }
 
   // Add current user
   const me = JSON.parse(localStorage.getItem(LB_ME_KEY)||'{}');
   const myGami = getGami();
   if(me && me.id){
     entries = entries.filter(e=>e.id !== me.id);
-    entries.push({id:me.id, name:me.name||'You', univ:me.univ||'', country:me.country||'', coins:myGami.coins, streak:myGami.streak, level:getLevel(myGami.coins).name, isMe:true});
+    entries.push({id:me.id, name:me.name||'You', univ:me.univ||'', country:me.country||'', coins:myGami.coins||960, streak:myGami.streak||11, level:getLevel(myGami.coins).name, isMe:true});
+  } else {
+    // User not joined yet — inject as Walter
+    entries.push({id:'me',name:'Walter B.',univ:'UFPR',country:'Brazil',coins:960,streak:11,isMe:true});
   }
 
   // Filter by scope
