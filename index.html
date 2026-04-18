@@ -3459,6 +3459,8 @@ html.light .qs-val { color: inherit; }
   /* Thinner header on desktop */
   .app-header-top { height: 36px !important; }
   .hdr { padding: 8px 16px !important; }
+  /* Remove dead-space padding on app container */
+  #app.active { padding-bottom: 0 !important; }
   /* Thinner bottom nav on desktop — no border, flush with FSRS */
   .bmd-bottom-nav { padding: 3px 0 6px !important; border-top: none !important; margin-top: 0 !important; }
   .bmd-bottom-nav .nav-center { margin-top: -14px !important; }
@@ -3788,8 +3790,9 @@ html.dark .hl-btn-active { border-color:#fff!important; }
   #bmd-ans-col #att-inline-wrap { max-width: 100% !important; margin: 0 !important; border-radius: 0 !important; border-left: none !important; border-right: none !important; }
   #card-el > .fsrs-nav {
     flex-shrink: 0 !important; width: 100% !important; border-top: 1px solid var(--border) !important;
-    padding: 4px 16px 6px !important; background: var(--surface) !important;
-    border-radius: 0 0 16px 16px !important; position: sticky !important; bottom: 0 !important; z-index: 5 !important;
+    padding: 4px 16px 2px !important; background: var(--surface) !important;
+    border-radius: 0 !important; position: sticky !important; bottom: 0 !important; z-index: 5 !important;
+    margin-bottom: 0 !important;
   }
   #card-el > .fsrs-nav .fsrs-row { width: 100% !important; max-width: 100% !important; }
   #card-el > .fsrs-nav.visible { display: flex !important; flex-direction: column !important; align-items: center !important; }
