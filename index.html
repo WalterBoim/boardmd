@@ -4886,8 +4886,9 @@ html.dark .hl-btn-active { border-color:#fff!important; }
             <span class="card-state" id="c-state" style="display:none;"></span>
             <span class="card-interval" id="c-int" style="display:none;"></span>
             <span id="c-deck-label" style="display:none;"></span>
-            <!-- Visible: single line — deck badge | controls | QID -->
-            <span id="c-deck-badge" style="font-size:9px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;font-family:'JetBrains Mono',monospace;padding:2px 7px;border-radius:20px;background:var(--accent-dim,rgba(59,127,255,.1));color:var(--accent,#3b7fff);border:1px solid rgba(59,127,255,.2);white-space:nowrap;flex-shrink:0;"></span>
+            <!-- Hidden — deck badge kept for JS -->
+            <span id="c-deck-badge" style="display:none;"></span>
+            <!-- Visible: single line — controls | QID -->
             <button onclick="if(fontSize>11){fontSize--;applyFont();}" title="Smaller text" style="background:none;border:1px solid var(--border);border-radius:6px;padding:1px 6px;cursor:pointer;font-size:11px;font-weight:700;color:var(--text-faint);font-family:'Sora',sans-serif;line-height:1.4;transition:all .15s;" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text-faint)'">A-</button>
             <button onclick="if(fontSize<22){fontSize++;applyFont();}" title="Larger text" style="background:none;border:1px solid var(--border);border-radius:6px;padding:1px 6px;cursor:pointer;font-size:13px;font-weight:700;color:var(--text-faint);font-family:'Sora',sans-serif;line-height:1.4;transition:all .15s;" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text-faint)'">A+</button>
             <button class="hl-btn" id="hl-toggle-btn" onclick="toggleHlToolbar()" title="Highlight" style="background:none;border:1px solid var(--border);border-radius:6px;padding:2px 7px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">
