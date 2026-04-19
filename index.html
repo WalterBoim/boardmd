@@ -3512,12 +3512,12 @@ html.light .qs-val { color: inherit; }
     align-self: stretch !important;
     transition: flex-basis .3s ease !important;
   }
-  /* After answer: shrink to 50% (no !important — drag can override) */
+  /* After answer: shrink to 50% */
   #bmd-ans-col.has-answer ~ #DUMMY_NEVER_MATCH,
   #bmd-cols-row:has(#bmd-ans-col.has-answer) #bmd-q-col {
-    flex: 0 0 50%;
-    max-width: 75%;
-    min-width: 260px;
+    flex: 0 0 50% !important;
+    max-width: 75% !important;
+    min-width: 260px !important;
   }
   #bmd-q-col::-webkit-scrollbar { width: 3px; }
   #bmd-q-col::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
@@ -3747,7 +3747,7 @@ html.dark .hl-btn-active { border-color:#fff!important; }
     transition: flex-basis .3s ease !important;
   }
   #bmd-cols-row:has(#bmd-ans-col.has-answer) #bmd-q-col {
-    flex: 0 0 50%; max-width: 75%; min-width: 260px;
+    flex: 0 0 50% !important; max-width: 75% !important; min-width: 260px !important;
     border-right: 1px solid var(--border) !important;
   }
   #bmd-ans-col:not(.has-answer) { display: none !important; }
@@ -6149,7 +6149,7 @@ function renderCard(){
   if(_cwReset){ _cwReset.style.display='none'; _cwReset.innerHTML=''; }
   // Reset split columns to 50/50 (desktop only)
   const _qCol=document.getElementById('bmd-q-col');
-  if(_qCol){ _qCol.style.flex = ''; _qCol.style.width = ''; _qCol.style.maxWidth = ''; _qCol.style.minWidth = ''; }
+  if(_qCol){ _qCol.style.removeProperty('flex'); _qCol.style.removeProperty('width'); _qCol.style.removeProperty('max-width'); _qCol.style.removeProperty('min-width'); }
   // Hide FSRS buttons until answer revealed
   const _fsrs=document.getElementById('fsrs-nav');
   const _fsrs2=document.getElementById('fsrs-nav-2');
@@ -13266,9 +13266,7 @@ function bmdSetupDrag(){
     document.body.style.userSelect = 'none';
     function onMove(ev){
       var pct = Math.min(Math.max(((w0 + ev.clientX - x0) / rw) * 100, 25), 75);
-      q.style.flex = '0 0 ' + pct + '%';
-      q.style.maxWidth = '75%';
-      q.style.minWidth = '260px';
+      q.style.setProperty('flex', '0 0 ' + pct + '%', 'important');
     }
     function onUp(){
       document.removeEventListener('mousemove', onMove);
@@ -13281,7 +13279,7 @@ function bmdSetupDrag(){
     document.addEventListener('mouseup', onUp);
   });
   d.addEventListener('dblclick', function(){
-    q.style.flex = '0 0 50%';
+    q.style.setProperty('flex', '0 0 50%', 'important');
   });
 }
 [0,200,500,1000,2000].forEach(function(t){ setTimeout(bmdSetupDrag, t); });
