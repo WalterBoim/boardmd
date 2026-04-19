@@ -6994,14 +6994,16 @@ function revealAnswer(sel,card){
   injectAttendingInline(card, sel);
   // Pre-fetch PubMed abstracts in background
   if(card.pubmed_query || card.topic) setTimeout(() => prefetchPubmedAbstracts(card), 500);
-  // Auto-Lens: carrega Compare silenciosamente (sem scroll)
+  // Auto-Lens: carrega Compare silenciosamente, mantém scroll no topo
   setTimeout(() => {
     const wrap = document.getElementById('att-inline-wrap');
-    const ansC = document.getElementById('bmd-ans-col');
-    const savedScroll = ansC ? ansC.scrollTop : 0;
     if(wrap) askAttendingInline('compare', null);
-    // Restaura scroll — impede que o Venn empurre pra baixo
-    if(ansC) setTimeout(() => { ansC.scrollTop = savedScroll; }, 50);
+    // Força scroll no topo repetidamente enquanto conteúdo carrega
+    const ansC = document.getElementById('bmd-ans-col');
+    if(ansC){
+      var _keepTop = setInterval(() => { ansC.scrollTop = 0; }, 100);
+      setTimeout(() => clearInterval(_keepTop), 4000);
+    }
   }, 1500);
 
   // Update FSRS intervals display — sync both nav elements
