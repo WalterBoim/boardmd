@@ -9889,12 +9889,10 @@ async function askAttendingInline(type, btnEl){
   // scroll removido — aluno precisa ler a explicação primeiro
 
   // Contexto do card
-  const opts = (card.w||[]).map((o,i) => String.fromCharCode(65+i) + '. ' + o).join('\n');
-  const chosenIdx = window.lastChosenIdx;
-  const userChoice = chosenIdx !== undefined
-    ? String.fromCharCode(65+chosenIdx) + '. ' + (card.w||[])[chosenIdx]
-    : 'Not recorded';
-  const wasCorrect = chosenIdx !== undefined && (card.w||[])[chosenIdx] === card.c;
+  const allOpts = [card.c, ...(card.w||[])];
+  const opts = allOpts.map((o,i) => String.fromCharCode(65+i) + '. ' + o).join('\n');
+  const userChoice = sel ? sel : 'Not recorded';
+  const wasCorrect = sel === card.c;
 
   // Build real pubmed references with abstracts from cache
   const _pubCache = window._pubmedCache && window._pubmedCache[card.id];
