@@ -6978,6 +6978,8 @@ function revealAnswer(sel,card){
   // Reset scroll to top so student reads explanation first
   const colsRow=document.getElementById('bmd-cols-row');
   if(colsRow) colsRow.scrollTop=0;
+  const ansCol=document.getElementById('bmd-ans-col');
+  if(ansCol) ansCol.scrollTop=0;
 
   // Show FSRS buttons — sync both nav elements
   const rb=document.getElementById('fsrs-nav');
@@ -6992,11 +6994,7 @@ function revealAnswer(sel,card){
   injectAttendingInline(card, sel);
   // Pre-fetch PubMed abstracts in background
   if(card.pubmed_query || card.topic) setTimeout(() => prefetchPubmedAbstracts(card), 500);
-  // ── Auto-Lens: trigger Compare diagnoses automatically after 1.5s ──
-  setTimeout(() => {
-    const wrap = document.getElementById('att-inline-wrap');
-    if(wrap) askAttendingInline('compare', null);
-  }, 1500);
+  // Auto-Lens removido — aluno lê a explicação primeiro, clica Compare quando quiser
 
   // Update FSRS intervals display — sync both nav elements
   const ivs=getIntervals(getState(card.id));
