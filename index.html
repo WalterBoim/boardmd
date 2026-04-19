@@ -3512,10 +3512,10 @@ html.light .qs-val { color: inherit; }
     align-self: stretch !important;
     transition: flex-basis .3s ease !important;
   }
-  /* After answer: shrink to 50% */
+  /* After answer: default 40% question, 60% explanation */
   #bmd-ans-col.has-answer ~ #DUMMY_NEVER_MATCH,
   #bmd-cols-row:has(#bmd-ans-col.has-answer) #bmd-q-col {
-    flex: 0 0 50% !important;
+    flex: 0 0 40% !important;
     max-width: 75% !important;
     min-width: 260px !important;
   }
@@ -3747,7 +3747,7 @@ html.dark .hl-btn-active { border-color:#fff!important; }
     transition: flex-basis .3s ease !important;
   }
   #bmd-cols-row:has(#bmd-ans-col.has-answer) #bmd-q-col {
-    flex: 0 0 50% !important; max-width: 75% !important; min-width: 260px !important;
+    flex: 0 0 40% !important; max-width: 75% !important; min-width: 260px !important;
     border-right: 1px solid var(--border) !important;
   }
   #bmd-ans-col:not(.has-answer) { display: none !important; }
@@ -13239,6 +13239,13 @@ window.addEventListener('load', function(){
     var r = _oRev ? _oRev(sel,card) : undefined;
     var ac = document.getElementById('bmd-ans-col');
     if(ac) ac.classList.add('has-answer');
+    // Restore saved split preference (default 40% if none saved)
+    if(window.innerWidth >= 900){
+      var qc = document.getElementById('bmd-q-col');
+      var saved = null;
+      try{ saved = localStorage.getItem('bmd_split_pct'); }catch(e){}
+      if(qc && saved) qc.style.setProperty('flex', '0 0 '+saved+'%', 'important');
+    }
     return r;
   };
   var _oRen = window.renderCard;
@@ -13274,12 +13281,16 @@ function bmdSetupDrag(){
       d.classList.remove('dragging');
       document.body.style.cursor = '';
       document.body.style.userSelect = '';
+      // Save split preference
+      var r2 = document.getElementById('bmd-cols-row');
+      if(r2) try{ localStorage.setItem('bmd_split_pct', ((q.offsetWidth/r2.offsetWidth)*100).toFixed(1)); }catch(e){}
     }
     document.addEventListener('mousemove', onMove);
     document.addEventListener('mouseup', onUp);
   });
   d.addEventListener('dblclick', function(){
-    q.style.setProperty('flex', '0 0 50%', 'important');
+    q.style.setProperty('flex', '0 0 40%', 'important');
+    try{ localStorage.removeItem('bmd_split_pct'); }catch(e){}
   });
 }
 [0,200,500,1000,2000].forEach(function(t){ setTimeout(bmdSetupDrag, t); });
