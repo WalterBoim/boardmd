@@ -3512,12 +3512,12 @@ html.light .qs-val { color: inherit; }
     align-self: stretch !important;
     transition: flex-basis .3s ease !important;
   }
-  /* After answer: shrink to 50% */
+  /* After answer: shrink to 50% (no !important — drag can override) */
   #bmd-ans-col.has-answer ~ #DUMMY_NEVER_MATCH,
   #bmd-cols-row:has(#bmd-ans-col.has-answer) #bmd-q-col {
-    flex: 0 0 50% !important;
-    max-width: 75% !important;
-    min-width: 260px !important;
+    flex: 0 0 50%;
+    max-width: 75%;
+    min-width: 260px;
   }
   #bmd-q-col::-webkit-scrollbar { width: 3px; }
   #bmd-q-col::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
@@ -3747,7 +3747,7 @@ html.dark .hl-btn-active { border-color:#fff!important; }
     transition: flex-basis .3s ease !important;
   }
   #bmd-cols-row:has(#bmd-ans-col.has-answer) #bmd-q-col {
-    flex: 0 0 50% !important; max-width: 75% !important; min-width: 260px !important;
+    flex: 0 0 50%; max-width: 75%; min-width: 260px;
     border-right: 1px solid var(--border) !important;
   }
   #bmd-ans-col:not(.has-answer) { display: none !important; }
