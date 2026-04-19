@@ -1687,14 +1687,15 @@ mark.hb{background:rgba(79,142,247,.28);border-bottom:2px solid rgba(40,100,220,
 /* ── Card header → topic row ── */
 .card-header {
   display: flex !important;
-  flex-direction: column !important;
-  align-items: flex-start !important;
-  gap: 4px !important;
-  padding: 8px 14px 6px !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  gap: 6px !important;
+  padding: 6px 14px !important;
   background: var(--surface) !important;
   border: 1px solid var(--border2) !important;
   border-radius: 18px 18px 0 0 !important;
   border-bottom: none !important;
+  flex-wrap: nowrap !important;
 }
 /* Line 1: DECK NAME (large) + system (muted, smaller) */
 .card-meta-left {
@@ -4877,38 +4878,29 @@ html.dark .hl-btn-active { border-color:#fff!important; }
         </div>
 
         <div class="card" id="card-el">
-          <div class="card-header">
-            <!-- Line 1: system › topic (left) | state + interval (right) -->
-            <div style="width:100%;display:flex;align-items:center;justify-content:space-between;margin-bottom:3px;">
-              <div style="display:flex;align-items:center;gap:5px;min-width:0;flex:1;overflow:hidden;">
-                <span class="card-system" id="c-sys" style="font-size:10px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;color:var(--accent);font-family:'Sora',sans-serif;white-space:nowrap;flex-shrink:0;"></span>
-                <span id="c-top-sep" style="font-size:10px;color:var(--muted);opacity:.4;flex-shrink:0;">›</span>
-                <span class="card-topic" id="c-top" style="font-size:11px;font-weight:500;color:var(--muted);font-family:'Sora',sans-serif;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"></span>
-              </div>
-              <div style="display:flex;align-items:center;gap:5px;flex-shrink:0;margin-left:8px;">
-                <span class="card-state" id="c-state" style="display:none"></span>
-                <span class="card-interval" id="c-int" style="display:none;font-size:10px;font-weight:700;color:var(--muted);font-family:'JetBrains Mono',monospace;"></span>
-              </div>
+          <div class="card-header" style="display:flex;align-items:center;gap:6px;padding:6px 14px;flex-wrap:nowrap;">
+            <!-- Hidden elements JS still references -->
+            <span class="card-system" id="c-sys" style="display:none;"></span>
+            <span id="c-top-sep" style="display:none;">›</span>
+            <span class="card-topic" id="c-top" style="display:none;"></span>
+            <span class="card-state" id="c-state" style="display:none;"></span>
+            <span class="card-interval" id="c-int" style="display:none;"></span>
+            <span id="c-deck-label" style="display:none;"></span>
+            <!-- Visible: single line — deck badge | controls | QID -->
+            <span id="c-deck-badge" style="font-size:9px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;font-family:'JetBrains Mono',monospace;padding:2px 7px;border-radius:20px;background:var(--accent-dim,rgba(59,127,255,.1));color:var(--accent,#3b7fff);border:1px solid rgba(59,127,255,.2);white-space:nowrap;flex-shrink:0;"></span>
+            <button onclick="if(fontSize>11){fontSize--;applyFont();}" title="Smaller text" style="background:none;border:1px solid var(--border);border-radius:6px;padding:1px 6px;cursor:pointer;font-size:11px;font-weight:700;color:var(--text-faint);font-family:'Sora',sans-serif;line-height:1.4;transition:all .15s;" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text-faint)'">A-</button>
+            <button onclick="if(fontSize<22){fontSize++;applyFont();}" title="Larger text" style="background:none;border:1px solid var(--border);border-radius:6px;padding:1px 6px;cursor:pointer;font-size:13px;font-weight:700;color:var(--text-faint);font-family:'Sora',sans-serif;line-height:1.4;transition:all .15s;" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text-faint)'">A+</button>
+            <button class="hl-btn" id="hl-toggle-btn" onclick="toggleHlToolbar()" title="Highlight" style="background:none;border:1px solid var(--border);border-radius:6px;padding:2px 7px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="var(--text-faint)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+            </button>
+            <div class="hl-swatches" id="hl-swatches-wrap">
+              <div class="sw y" onclick="setHlColor('yellow')" id="sw-y" title="Yellow"></div>
+              <div class="sw g" onclick="setHlColor('green')"  id="sw-g" title="Green"></div>
+              <div class="sw b" onclick="setHlColor('blue')"   id="sw-b" title="Blue"></div>
             </div>
-            <!-- Line 2: deck badge + actions (left) | QID (right) -->
-            <div style="width:100%;display:flex;align-items:center;justify-content:space-between;">
-              <div style="display:flex;align-items:center;gap:5px;flex-wrap:nowrap;">
-                <span id="c-deck-label" style="display:none;"></span>
-                <span id="c-deck-badge" style="font-size:9px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;font-family:'JetBrains Mono',monospace;padding:2px 7px;border-radius:20px;background:var(--accent-dim,rgba(59,127,255,.1));color:var(--accent,#3b7fff);border:1px solid rgba(59,127,255,.2);white-space:nowrap;flex-shrink:0;"></span>
-                <button onclick="if(fontSize>11){fontSize--;applyFont();}" title="Smaller text" style="background:none;border:1px solid var(--border);border-radius:6px;padding:1px 6px;cursor:pointer;font-size:11px;font-weight:700;color:var(--text-faint);font-family:'Sora',sans-serif;line-height:1.4;transition:all .15s;" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text-faint)'">A-</button>
-                <button onclick="if(fontSize<22){fontSize++;applyFont();}" title="Larger text" style="background:none;border:1px solid var(--border);border-radius:6px;padding:1px 6px;cursor:pointer;font-size:13px;font-weight:700;color:var(--text-faint);font-family:'Sora',sans-serif;line-height:1.4;transition:all .15s;" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text-faint)'">A+</button>
-                <button class="hl-btn" id="hl-toggle-btn" onclick="toggleHlToolbar()" title="Highlight" style="background:none;border:1px solid var(--border);border-radius:6px;padding:2px 7px;cursor:pointer;display:flex;align-items:center;justify-content:center;width:auto;height:auto;transition:all .15s;" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">
-                  <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="var(--text-faint)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
-                </button>
-                <div class="hl-swatches" id="hl-swatches-wrap">
-                  <div class="sw y" onclick="setHlColor('yellow')" id="sw-y" title="Yellow"></div>
-                  <div class="sw g" onclick="setHlColor('green')"  id="sw-g" title="Green"></div>
-                  <div class="sw b" onclick="setHlColor('blue')"   id="sw-b" title="Blue"></div>
-                </div>
-                <button id="edit-card-btn" onclick="openCardEditor()" title="Edit" style="background:none;border:1px solid var(--border);border-radius:6px;padding:2px 8px;cursor:pointer;font-size:10px;font-weight:700;color:var(--text-faint);font-family:'JetBrains Mono',monospace;transition:all .15s;" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text-faint)'">Edit</button>
-              </div>
-              <span class="card-qid" id="c-qid" style="font-size:9px;flex-shrink:0;"></span>
-            </div>
+            <button id="edit-card-btn" onclick="openCardEditor()" title="Edit" style="background:none;border:1px solid var(--border);border-radius:6px;padding:2px 8px;cursor:pointer;font-size:10px;font-weight:700;color:var(--text-faint);font-family:'JetBrains Mono',monospace;transition:all .15s;" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text-faint)'">Edit</button>
+            <span style="flex:1;"></span>
+            <span class="card-qid" id="c-qid" style="font-size:9px;flex-shrink:0;"></span>
           </div>
           <div id="bmd-cols-row">
           <div id="bmd-q-col">
