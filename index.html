@@ -3516,18 +3516,25 @@ html.light .qs-val { color: inherit; }
     min-height: 0 !important;
   }
 
-  /* LEFT column */
+  /* LEFT column — full width before answer, 50% after */
   #bmd-q-col {
-    flex-shrink: 0 !important;
-    width: 50%;
-    min-width: 260px !important;
-    max-width: 75% !important;
+    flex: 1 1 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
     padding: 20px 24px 24px !important;
     overflow-y: auto !important;
     -webkit-overflow-scrolling: touch !important;
     overscroll-behavior-y: contain !important;
     scrollbar-width: thin !important;
     align-self: stretch !important;
+    transition: flex-basis .3s ease !important;
+  }
+  /* After answer: shrink to 50% */
+  #bmd-ans-col.has-answer ~ #DUMMY_NEVER_MATCH,
+  #bmd-cols-row:has(#bmd-ans-col.has-answer) #bmd-q-col {
+    flex: 0 0 50% !important;
+    max-width: 75% !important;
+    min-width: 260px !important;
   }
   #bmd-q-col::-webkit-scrollbar { width: 3px; }
   #bmd-q-col::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
@@ -3608,20 +3615,12 @@ html.light .qs-val { color: inherit; }
   #bmd-ans-col .card-footer-counter { border-top: 1px solid var(--border) !important; padding: 10px 24px !important; }
   #bmd-ans-col #att-inline-wrap { max-width: 100% !important; margin: 0 !important; border-radius: 0 !important; border-left: none !important; border-right: none !important; }
 
-  /* Placeholder before answer revealed */
-  #bmd-ans-col #bmd-ans-placeholder {
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    min-height: 200px !important;
-    color: var(--muted) !important;
-    font-size: 13px !important;
-    font-family: 'Sora', sans-serif !important;
-    opacity: .4 !important;
-    flex-direction: column !important;
-    gap: 8px !important;
-    padding: 32px !important;
-  }
+  /* Before answer: hide right column and divider entirely */
+  #bmd-ans-col:not(.has-answer) { display: none !important; }
+  #bmd-cols-row:not(:has(.has-answer)) #bmd-split-divider { display: none !important; }
+  /* After answer: show right column with animation */
+  #bmd-ans-col.has-answer { display: block !important; }
+  #bmd-cols-row:has(.has-answer) #bmd-split-divider { display: flex !important; }
   #bmd-ans-col.has-answer #bmd-ans-placeholder { display: none !important; }
   #bmd-ans-col:not(.has-answer) #c-exp         { display: none !important; }
   #bmd-ans-col:not(.has-answer) #key-point-wrap,
@@ -3756,13 +3755,22 @@ html.dark .hl-btn-active { border-color:#fff!important; }
   #card-el .card-header { flex-shrink: 0 !important; width: 100% !important; border-bottom: 1px solid var(--border) !important; padding: 8px 20px 6px !important; }
   #bmd-cols-row { display: flex !important; flex-direction: row !important; align-items: stretch !important; flex: 1 !important; overflow-y: auto !important; min-height: 0 !important; }
   #bmd-q-col {
-    flex-shrink: 0 !important; width: 50%; min-width: 260px !important; max-width: 75% !important;
+    flex: 1 1 100% !important; min-width: 0 !important; max-width: 100% !important;
     padding: 20px 24px 24px !important;
     overflow-y: auto !important; -webkit-overflow-scrolling: touch !important;
     overscroll-behavior-y: contain !important;
     scrollbar-width: thin !important; align-self: stretch !important;
+    border-right: none !important;
+    transition: flex-basis .3s ease !important;
+  }
+  #bmd-cols-row:has(#bmd-ans-col.has-answer) #bmd-q-col {
+    flex: 0 0 50% !important; max-width: 75% !important; min-width: 260px !important;
     border-right: 1px solid var(--border) !important;
   }
+  #bmd-ans-col:not(.has-answer) { display: none !important; }
+  #bmd-cols-row:not(:has(.has-answer)) #bmd-split-divider { display: none !important; }
+  #bmd-ans-col.has-answer { display: block !important; }
+  #bmd-cols-row:has(.has-answer) #bmd-split-divider { display: flex !important; }
   #bmd-q-col::-webkit-scrollbar { width: 3px; }
   #bmd-q-col::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
   #bmd-split-divider {
@@ -4923,7 +4931,7 @@ html.dark .hl-btn-active { border-color:#fff!important; }
           </div><!-- /bmd-q-col -->
           <div id="bmd-split-divider"><div class="bmd-div-handle"><span></span><span></span></div></div>
           <div id="bmd-ans-col">
-          <div id="bmd-ans-placeholder" style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 20px;color:var(--muted);gap:8px;font-size:12px;font-family:'Sora',sans-serif;"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="opacity:.4"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>Select your answer to reveal</div>
+          <div id="bmd-ans-placeholder" style="display:none;"></div>
           <div class="explanation" id="c-exp">
             <div class="exp-section">
               <div class="exp-label"><span class="exp-label-icon" style="background:rgba(34,197,94,.15);color:var(--emerald)"></span>Correct answer</div>
