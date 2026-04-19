@@ -4881,8 +4881,8 @@ html.dark .hl-btn-active { border-color:#fff!important; }
           <div class="card-header" style="display:flex;align-items:center;gap:6px;padding:6px 14px;flex-wrap:nowrap;">
             <!-- Hidden elements JS still references -->
             <span class="card-system" id="c-sys" style="display:none;"></span>
-            <span id="c-top-sep" style="display:none;">›</span>
-            <span class="card-topic" id="c-top" style="display:none;"></span>
+            <span id="c-top-sep" style="display:none;font-size:10px;color:var(--muted);opacity:.4;flex-shrink:0;">›</span>
+            <span class="card-topic" id="c-top" style="display:none;font-size:10px;font-weight:500;color:var(--muted);font-family:'Sora',sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:250px;flex-shrink:1;"></span>
             <span class="card-state" id="c-state" style="display:none;"></span>
             <span class="card-interval" id="c-int" style="display:none;"></span>
             <span id="c-deck-label" style="display:none;"></span>
@@ -6910,12 +6910,15 @@ function revealAnswer(sel,card){
   };
   const _deckLabel=(_deckNames[card.deck]||'').toLowerCase();
   const _isDeckDuplicate=_deckLabel&&_topicText.toLowerCase().includes(_deckLabel.split(' ')[0]);
+  var _topSep=document.getElementById('c-top-sep');
   if(_topicEl){
     if(_isFARef||_isDeckLabel||_isSystemOnly||_isDeckDuplicate){
       _topicEl.style.display='none';
+      if(_topSep) _topSep.style.display='none';
     } else if(_topicText){
       _topicEl.textContent=_topicText;
       _topicEl.style.display='';
+      if(_topSep) _topSep.style.display='';
     }
   }
 
