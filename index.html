@@ -6149,7 +6149,7 @@ function renderCard(){
   if(_cwReset){ _cwReset.style.display='none'; _cwReset.innerHTML=''; }
   // Reset split columns to 50/50 (desktop only)
   const _qCol=document.getElementById('bmd-q-col');
-  if(_qCol) _qCol.style.width = window.innerWidth >= 900 ? '50%' : '';
+  if(_qCol){ _qCol.style.flex = ''; _qCol.style.width = ''; _qCol.style.maxWidth = ''; _qCol.style.minWidth = ''; }
   // Hide FSRS buttons until answer revealed
   const _fsrs=document.getElementById('fsrs-nav');
   const _fsrs2=document.getElementById('fsrs-nav-2');
@@ -13265,8 +13265,10 @@ function bmdSetupDrag(){
     document.body.style.cursor = 'col-resize';
     document.body.style.userSelect = 'none';
     function onMove(ev){
-      var pct = ((w0 + ev.clientX - x0) / rw) * 100;
-      q.style.width = Math.min(Math.max(pct, 25), 75) + '%';
+      var pct = Math.min(Math.max(((w0 + ev.clientX - x0) / rw) * 100, 25), 75);
+      q.style.flex = '0 0 ' + pct + '%';
+      q.style.maxWidth = '75%';
+      q.style.minWidth = '260px';
     }
     function onUp(){
       document.removeEventListener('mousemove', onMove);
@@ -13279,7 +13281,7 @@ function bmdSetupDrag(){
     document.addEventListener('mouseup', onUp);
   });
   d.addEventListener('dblclick', function(){
-    q.style.width = '50%';
+    q.style.flex = '0 0 50%';
   });
 }
 [0,200,500,1000,2000].forEach(function(t){ setTimeout(bmdSetupDrag, t); });
