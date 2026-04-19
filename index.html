@@ -6960,7 +6960,9 @@ function revealAnswer(sel,card){
   if(_cw){
     if(card.cochrane_pmid){
       _cw.style.display = '';
-      _cw.innerHTML = '<div style="padding:0 18px 14px;"><div style="font-size:9px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-faint);font-family:JetBrains Mono,monospace;margin-bottom:10px;">COCHRANE REVIEW</div><div style="border:1px solid rgba(0,184,148,.25);border-radius:8px;background:rgba(0,184,148,.05);padding:10px 14px;display:flex;align-items:center;justify-content:space-between;gap:10px;cursor:pointer;" onclick="window._currentCard=card;openCochraneAbstract(card.id)"><div style="display:flex;align-items:center;gap:8px;"><div style="width:7px;height:7px;border-radius:50%;background:#00b894;flex-shrink:0;"></div><span style="font-size:11px;color:var(--text);font-family:JetBrains Mono,monospace;">Cochrane Systematic Review</span></div><span style="font-size:10px;color:#00b894;font-weight:700;">Level 1 &#x2197;</span></div></div>';
+      window._currentCard = card;
+      var _cid = card.id;
+      _cw.innerHTML = '<div style="padding:0 18px 14px;"><div style="font-size:9px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-faint);font-family:JetBrains Mono,monospace;margin-bottom:10px;">COCHRANE REVIEW</div><div style="border:1px solid rgba(0,184,148,.25);border-radius:8px;background:rgba(0,184,148,.05);padding:10px 14px;display:flex;align-items:center;justify-content:space-between;gap:10px;cursor:pointer;" onclick="openCochraneAbstract(\''+_cid+'\')"><div style="display:flex;align-items:center;gap:8px;"><div style="width:7px;height:7px;border-radius:50%;background:#00b894;flex-shrink:0;"></div><span style="font-size:11px;color:var(--text);font-family:JetBrains Mono,monospace;">Cochrane Systematic Review</span></div><span style="font-size:10px;color:#00b894;font-weight:700;">Level 1 &#x2197;</span></div></div>';
     } else {
       _cw.style.display = 'none';
     }
