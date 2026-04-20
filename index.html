@@ -2596,306 +2596,246 @@ mark.hb{background:rgba(79,142,247,.28);border-bottom:2px solid rgba(40,100,220,
 .theme-btn{width:30px;height:30px;border-radius:50%;border:1px solid var(--border);background:var(--surface);display:flex;align-items:center;justify-content:center;cursor:pointer}
 .theme-btn svg{width:13px;height:13px;fill:var(--muted)}
 
-/* ── YOUR CARD ── */
-.your-card{
-  margin:12px 0 8px;
-  background:var(--surface);
-  border:1px solid var(--border2);
-  border-radius:var(--radius);
-  padding:14px 18px;
-  position:relative;overflow:hidden;
-  width:100%;
-}
-.your-card::before{
-  content:'';position:absolute;
-  top:0;left:0;right:0;height:3px;
-  background:linear-gradient(90deg,var(--accent),var(--green));
-}
-.your-top{display:flex;align-items:center;gap:12px;margin-bottom:10px}
-.your-avatar{
-  width:44px;height:44px;border-radius:50%;
-  background:rgba(79,142,247,.15);border:2px solid rgba(79,142,247,.3);
-  display:flex;align-items:center;justify-content:center;
-  font-size:16px;font-weight:800;color:var(--accent);flex-shrink:0;
-}
-.your-info{flex:1}
-.your-name{font-size:15px;font-weight:700;margin-bottom:2px}
-.your-school{font-size:11px;color:var(--muted);display:flex;align-items:center;gap:5px}
-.flag{display:inline-block;width:14px;height:10px;border-radius:2px;vertical-align:middle;flex-shrink:0}
-.flag-br{background:linear-gradient(180deg,#009c3b 0%,#009c3b 33%,#fedf00 33%,#fedf00 66%,#009c3b 66%)}
-.flag-us{background:repeating-linear-gradient(180deg,#b22234 0,#b22234 14%,#fff 14%,#fff 28%,#b22234 28%,#b22234 42%,#fff 42%,#fff 56%,#b22234 56%,#b22234 70%,#fff 70%,#fff 84%,#b22234 84%,#b22234 100%)}
-.flag-in{background:linear-gradient(180deg,#ff9933 0,#ff9933 33%,#fff 33%,#fff 66%,#138808 66%)}
-.flag-de{background:linear-gradient(180deg,#000 0,#000 33%,#dd0000 33%,#dd0000 66%,#ffce00 66%)}
-.flag-gb{background:#012169}
+/* ══════════════════════════════════════════════════════════════════════
+   RANKING PAGE CSS — Clean Rebuild
+   ══════════════════════════════════════════════════════════════════════ */
 
+/* ── SHARED UTILITIES ── */
+
+/* Speed dots */
+.speed-dot{
+  display:inline-block;width:8px;height:8px;border-radius:50%;
+  margin-right:4px;vertical-align:middle;flex-shrink:0;
+}
+.sd-green{background:var(--green)}
+.sd-amber{background:var(--amber)}
+.sd-red{background:var(--red)}
+
+/* Tier badges */
 .tier-badge{
   font-size:10px;font-weight:800;letter-spacing:.6px;text-transform:uppercase;
   padding:3px 10px;border-radius:999px;flex-shrink:0;
 }
 .tier-attending{color:var(--tier-attending);background:rgba(0,212,170,.1);border:1px solid rgba(0,212,170,.25)}
-.tier-resident {color:var(--tier-resident); background:rgba(79,142,247,.1); border:1px solid rgba(79,142,247,.25)}
-.tier-intern   {color:var(--tier-intern);   background:rgba(107,114,128,.1);border:1px solid rgba(107,114,128,.2)}
-.tier-fellow   {color:var(--tier-fellow);   background:rgba(245,158,11,.1); border:1px solid rgba(245,158,11,.25)}
-.tier-chief    {color:var(--tier-chief);    background:rgba(245,166,35,.12);border:1px solid rgba(245,166,35,.3)}
+.tier-resident{color:var(--tier-resident);background:rgba(79,142,247,.1);border:1px solid rgba(79,142,247,.25)}
+.tier-intern{color:var(--tier-intern);background:rgba(107,114,128,.1);border:1px solid rgba(107,114,128,.2)}
+.tier-fellow{color:var(--tier-fellow);background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.25)}
+.tier-chief{color:var(--tier-chief);background:rgba(245,166,35,.12);border:1px solid rgba(245,166,35,.3)}
+.tier-student{color:var(--muted);background:rgba(107,114,128,.08);border:1px solid rgba(107,114,128,.15)}
 
-.your-stats{display:flex;gap:0;border-top:1px solid var(--border);padding-top:10px}
-.your-stat{flex:1;text-align:center;border-right:1px solid var(--border)}
-.your-stat:last-child{border-right:none}
-.your-stat-val{
-  font-size:16px;font-weight:800;
-  font-family:'JetBrains Mono',monospace;
-  margin-bottom:2px;
+/* Section labels */
+.rank-section-label{
+  padding:8px 4px 4px;font-size:11px;font-weight:700;letter-spacing:1px;
+  text-transform:uppercase;color:var(--muted);
 }
-.your-stat-lbl{font-size:10px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;color:var(--muted)}
 
-/* speed dot */
-.speed-dot{
-  display:inline-block;width:8px;height:8px;
-  border-radius:50%;margin-right:4px;vertical-align:middle;flex-shrink:0;
-}
-.sd-green{background:var(--green)}
-.sd-amber{background:var(--amber)}
-.sd-red  {background:var(--red)}
+/* Live pill indicator */
+.rank-live-pill{display:flex;align-items:center;gap:5px;font-size:10px;font-weight:700;color:var(--green)}
+.rank-live-dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
 
-/* ── LEAGUE CARD ── */
-.league-card{
-  margin:0 0 8px;
-  background:var(--surface);border:1px solid var(--border2);
-  border-radius:var(--radius);overflow:hidden;
-  width:100%;
+/* Upgrade buttons */
+.upgrade-btn{
+  font-size:12px;font-weight:700;color:#fff;background:var(--accent);border:none;
+  padding:7px 16px;border-radius:999px;cursor:pointer;transition:opacity .15s;
+  white-space:nowrap;font-family:'Sora',sans-serif;
 }
-.league-header{
-  padding:14px 18px;
-  display:flex;align-items:center;justify-content:space-between;
+.upgrade-btn:active{opacity:.8}
+
+/* ── PROFILE CARD ── */
+
+.rank-profile-card{
+  margin:12px 0 8px;background:var(--surface);border:1px solid var(--border2);
+  border-radius:var(--radius);padding:14px 18px;position:relative;overflow:hidden;width:100%;
+}
+.rank-profile-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:3px;
+  background:linear-gradient(90deg,var(--accent),var(--green));
+}
+.rank-profile-header{display:flex;align-items:center;gap:12px;margin-bottom:10px}
+.rank-profile-avatar{
+  width:44px;height:44px;border-radius:50%;background:rgba(79,142,247,.15);
+  border:2px solid rgba(79,142,247,.3);display:flex;align-items:center;justify-content:center;
+  font-size:16px;font-weight:800;color:var(--accent);flex-shrink:0;
+}
+.rank-profile-info{flex:1}
+.rank-profile-name{font-size:15px;font-weight:700;margin-bottom:2px}
+.rank-profile-univ{font-size:11px;color:var(--muted);display:flex;align-items:center;gap:5px}
+.rank-tier-badge{margin-left:auto}
+.rank-speed-indicator{
+  display:flex;align-items:center;gap:4px;font-size:11px;font-weight:600;padding:4px 10px;
+  background:var(--surface2);border-radius:8px;border:1px solid var(--border2);
+}
+.rank-speed-dot{width:6px;height:6px;border-radius:50%}
+.rank-speed-green{background:var(--green)}
+.rank-speed-amber{background:var(--amber)}
+.rank-speed-red{background:var(--red)}
+.rank-speed-text{color:var(--muted)}
+.rank-profile-stats{display:flex;gap:0;border-top:1px solid var(--border);padding-top:10px}
+.rank-profile-stat{flex:1;text-align:center;border-right:1px solid var(--border)}
+.rank-profile-stat:last-child{border-right:none}
+.rank-profile-stat-val{font-size:16px;font-weight:800;font-family:'JetBrains Mono',monospace;margin-bottom:2px}
+.rank-profile-stat-lbl{font-size:10px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;color:var(--muted)}
+.rank-profile-insight{
+  margin-top:10px;padding-top:10px;border-top:1px solid var(--border);
+  font-size:12px;color:var(--text2);line-height:1.5;
+}
+
+/* ── WEEKLY LEAGUE ── */
+
+.rank-weekly-league{
+  margin:0 0 8px;background:var(--surface);border:1px solid var(--border2);
+  border-radius:var(--radius);overflow:hidden;width:100%;
+}
+.rank-weekly-header{
+  padding:14px 18px;display:flex;align-items:center;justify-content:space-between;
   border-bottom:1px solid var(--border);
 }
-.league-left{display:flex;align-items:center;gap:10px}
-.league-icon{
-  width:38px;height:38px;border-radius:10px;
-  display:flex;align-items:center;justify-content:center;
-  font-size:11px;font-weight:800;letter-spacing:.3px;
-}
-.league-name{font-size:14px;font-weight:700}
-.league-sub{font-size:11px;color:var(--muted);margin-top:1px}
-.league-timer{
-  font-size:11px;font-weight:700;
-  font-family:'JetBrains Mono',monospace;
-  color:var(--muted);
-  background:var(--surface2);
-  padding:4px 10px;border-radius:8px;
-  border:1px solid var(--border2);
+.rank-weekly-title{display:flex;align-items:center;gap:10px}
+.rank-weekly-icon{font-size:24px}
+.rank-weekly-name{font-size:14px;font-weight:700}
+.rank-weekly-sub{font-size:11px;color:var(--muted);margin-top:1px}
+.rank-weekly-timer{
+  font-size:11px;font-weight:700;font-family:'JetBrains Mono',monospace;color:var(--muted);
+  background:var(--surface2);padding:4px 10px;border-radius:8px;border:1px solid var(--border2);
 }
 
-/* league progress bar */
-.league-progress{padding:12px 18px;border-bottom:1px solid var(--border)}
-.lp-label{display:flex;justify-content:space-between;margin-bottom:6px}
-.lp-you{font-size:12px;font-weight:600;color:var(--text2)}
-.lp-target{font-size:11px;color:var(--muted)}
-.lp-bar{height:6px;background:var(--surface2);border-radius:999px;overflow:hidden}
-.lp-fill{height:100%;border-radius:999px;transition:width .6s ease}
-.lp-note{font-size:10px;color:var(--muted);margin-top:5px}
-
-/* league rows */
+/* Weekly league rows */
 .league-row{
-  display:flex;align-items:center;gap:10px;
-  padding:10px 18px;border-bottom:1px solid var(--border);
-  transition:background .12s;
+  display:flex;align-items:center;gap:10px;padding:10px 18px;
+  border-bottom:1px solid var(--border);transition:background .12s;
 }
 .league-row:last-child{border-bottom:none}
 .league-row.you{background:rgba(79,142,247,.06)}
-.league-row.promoted{background:rgba(0,212,170,.04)}
-.league-row.danger{background:rgba(255,83,112,.04)}
-
 .lr-pos{
-  font-size:12px;font-weight:800;
-  font-family:'JetBrains Mono',monospace;
+  font-size:12px;font-weight:800;font-family:'JetBrains Mono',monospace;
   width:20px;text-align:center;flex-shrink:0;color:var(--muted);
 }
-.lr-pos.p1{color:var(--lgold)} .lr-pos.p2{color:var(--silver)} .lr-pos.p3{color:var(--bronze)}
-.lr-pos.you-c{color:var(--accent)}
-
+.lr-pos.p1{color:var(--lgold)}
+.lr-pos.p2{color:var(--silver)}
+.lr-pos.p3{color:var(--bronze)}
 .lr-avatar{
-  width:28px;height:28px;border-radius:50%;
-  background:var(--surface2);border:1px solid var(--border2);
-  display:flex;align-items:center;justify-content:center;
-  font-size:11px;font-weight:800;color:var(--muted);flex-shrink:0;
+  width:28px;height:28px;border-radius:50%;background:var(--surface2);border:1px solid var(--border2);
+  display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;
+  color:var(--muted);flex-shrink:0;
 }
 .league-row.you .lr-avatar{background:rgba(79,142,247,.15);border-color:rgba(79,142,247,.3);color:var(--accent)}
-
 .lr-info{flex:1;min-width:0}
 .lr-name{font-size:13px;font-weight:600;display:flex;align-items:center;gap:6px}
 .lr-school{font-size:10px;color:var(--muted)}
 .league-row.you .lr-name{color:var(--accent)}
-
-.lr-coins{
-  font-size:13px;font-weight:700;
-  font-family:'JetBrains Mono',monospace;
-  color:var(--text2);flex-shrink:0;
-}
+.lr-coins{font-size:13px;font-weight:700;font-family:'JetBrains Mono',monospace;color:var(--text2);flex-shrink:0}
 .lr-delta{font-size:10px;font-weight:700;font-family:'JetBrains Mono',monospace;margin-left:4px}
-.lr-delta.up{color:var(--green)} .lr-delta.dn{color:var(--red)}
-
-.promo-label{
-  font-size:9px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;
-  padding:2px 7px;border-radius:999px;flex-shrink:0;
-}
-.promo-up  {color:var(--green);background:rgba(0,212,170,.1);border:1px solid rgba(0,212,170,.2)}
-.promo-dn  {color:var(--red);  background:rgba(255,83,112,.08);border:1px solid rgba(255,83,112,.2)}
-
-.locked-row{
-  display:flex;align-items:center;gap:10px;
-  padding:9px 18px;border-bottom:1px solid var(--border);
-  opacity:.45;
-}
-.locked-row:last-child{border-bottom:none}
-.lock-pos{font-size:12px;font-weight:700;font-family:'JetBrains Mono',monospace;color:var(--muted);width:20px;text-align:center}
-.lock-name{flex:1;font-size:13px;color:var(--muted);letter-spacing:.5px}
-.lock-coins{font-size:12px;font-weight:600;font-family:'JetBrains Mono',monospace;color:var(--muted)}
-.lock-icon{width:14px;height:14px;stroke:var(--muted);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-
-.upgrade-row{
-  padding:12px 18px;
-  display:flex;align-items:center;justify-content:space-between;
-  background:rgba(79,142,247,.05);
-  border-top:1px solid var(--border);
-}
-.upgrade-text{font-size:12px;color:var(--muted)}
-.upgrade-text strong{color:var(--text)}
-.upgrade-btn{
-  font-size:12px;font-weight:700;color:#fff;
-  background:var(--accent);border:none;
-  padding:7px 16px;border-radius:999px;cursor:pointer;
-  transition:opacity .15s;white-space:nowrap;
-  font-family:'Sora',sans-serif;
-}
-.upgrade-btn:active{opacity:.8}
+.lr-delta.up{color:var(--green)}
+.lr-delta.dn{color:var(--red)}
 
 /* ── SCOPE FILTERS ── */
+
 .scope-wrap{
-  margin:0 0 4px;
-  display:flex;gap:6px;overflow-x:auto;
+  margin:0 0 4px;display:flex;gap:6px;overflow-x:auto;
   scrollbar-width:none;-webkit-overflow-scrolling:touch;
 }
 .scope-wrap::-webkit-scrollbar{display:none}
 .scope-chip{
-  flex-shrink:0;padding:6px 14px;
-  background:var(--surface);border:1px solid var(--border2);
-  border-radius:999px;font-size:12px;font-weight:600;
-  color:var(--muted);cursor:pointer;white-space:nowrap;transition:all .18s;
+  flex-shrink:0;padding:6px 14px;background:var(--surface);border:1px solid var(--border2);
+  border-radius:999px;font-size:12px;font-weight:600;color:var(--muted);
+  cursor:pointer;white-space:nowrap;transition:all .18s;
 }
-.scope-chip.active{
-  background:rgba(79,142,247,.12);
-  border-color:rgba(79,142,247,.35);color:var(--accent);
-}
+.scope-chip.active{background:rgba(79,142,247,.12);border-color:rgba(79,142,247,.35);color:var(--accent)}
 .scope-chip:active{transform:scale(.95)}
 
 /* ── GLOBAL RANKING ── */
-.global-card{
-  margin:0 0 8px;
-  background:var(--surface);border:1px solid var(--border2);
-  border-radius:var(--radius);overflow:hidden;
-  width:100%;
+
+.rank-global-card{
+  margin:0 0 8px;background:var(--surface);border:1px solid var(--border2);
+  border-radius:var(--radius);overflow:hidden;width:100%;
 }
-.global-header{
+.rank-global-header{
   padding:13px 18px;display:flex;align-items:center;justify-content:space-between;
   border-bottom:1px solid var(--border);
 }
-.global-title{font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted)}
-.live-pill{display:flex;align-items:center;gap:5px;font-size:10px;font-weight:700;color:var(--green)}
-.live-dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse 2s infinite}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
-
-/* col headers */
-.rank-col-header{
-  display:flex;align-items:center;gap:10px;
-  padding:7px 18px;background:var(--surface2);
-  border-bottom:1px solid var(--border);
+.rank-global-title{font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted)}
+.rank-global-col-header{
+  display:flex;align-items:center;gap:10px;padding:7px 18px;
+  background:var(--surface2);border-bottom:1px solid var(--border);
 }
-.rch-spacer{flex:1}
-.rch-label{font-size:9px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--muted);min-width:44px;text-align:right}
 
-/* global rows */
-.rank-row{
-  display:flex;align-items:center;gap:10px;
-  padding:11px 18px;border-bottom:1px solid var(--border);
-  cursor:pointer;transition:background .12s;
+/* Global ranking rows */
+.rank-global-row{
+  display:flex;align-items:center;gap:10px;padding:11px 18px;
+  border-bottom:1px solid var(--border);transition:background .12s;
 }
-.rank-row:last-child{border-bottom:none}
-.rank-row:hover{background:var(--surface2)}
-.rank-row.you-row{background:rgba(79,142,247,.06)}
-.rank-row.locked{opacity:.4;cursor:default}
-.rank-row.locked:hover{background:transparent}
-
-.rank-pos{
+.rank-global-row:last-child{border-bottom:none}
+.rank-global-row.rank-global-you{background:rgba(79,142,247,.06)}
+.rank-global-row.rank-global-locked{opacity:.5}
+.rank-global-pos{
   font-size:12px;font-weight:800;font-family:'JetBrains Mono',monospace;
-  color:var(--muted);width:22px;text-align:center;flex-shrink:0;
+  color:var(--muted);width:26px;text-align:center;flex-shrink:0;
 }
-.rank-pos.rp1{color:var(--lgold)} .rank-pos.rp2{color:var(--silver)} .rank-pos.rp3{color:var(--bronze)}
-.rank-pos.rpy{color:var(--accent)}
-
-.rank-avatar{
-  width:30px;height:30px;border-radius:50%;
-  background:var(--surface2);border:1px solid var(--border2);
-  display:flex;align-items:center;justify-content:center;
-  font-size:11px;font-weight:800;color:var(--muted);flex-shrink:0;
+.rank-global-row.rank-global-top1 .rank-global-pos{color:var(--lgold)}
+.rank-global-row.rank-global-top2 .rank-global-pos{color:var(--silver)}
+.rank-global-row.rank-global-top3 .rank-global-pos{color:var(--bronze)}
+.rank-global-avatar{
+  width:30px;height:30px;border-radius:50%;background:var(--surface2);border:1px solid var(--border2);
+  display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;
+  color:var(--muted);flex-shrink:0;
 }
-.rank-row.you-row .rank-avatar{background:rgba(79,142,247,.15);border-color:rgba(79,142,247,.3);color:var(--accent)}
+.rank-global-avatar.rank-avatar-locked{opacity:.35}
+.rank-global-info{flex:1;min-width:0}
+.rank-global-name{font-size:13px;font-weight:600;margin-bottom:1px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.rank-global-name.rank-name-hidden{color:var(--muted);letter-spacing:1px}
+.rank-global-school{font-size:10px;color:var(--muted)}
+.rank-global-coins{font-size:12px;font-weight:700;font-family:'JetBrains Mono',monospace;color:var(--text2);width:56px;text-align:right}
+.rank-global-streak{font-size:10px;font-weight:600;font-family:'JetBrains Mono',monospace;color:var(--amber);width:50px;text-align:right}
+.rank-global-delta{font-size:10px;font-weight:700;font-family:'JetBrains Mono',monospace;width:36px;text-align:right}
+.rank-global-delta.rank-delta-up{color:var(--green)}
+.rank-global-delta.rank-delta-dn{color:var(--red)}
+.rank-lock-icon{opacity:.4}
 
-.rank-info{flex:1;min-width:0}
-.rank-name{font-size:13px;font-weight:600;margin-bottom:1px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
-.rank-row.you-row .rank-name{color:var(--accent)}
-.rank-school{font-size:10px;color:var(--muted);display:flex;align-items:center;gap:4px}
-
-.rank-nums{display:flex;flex-direction:column;align-items:flex-end;gap:2px;flex-shrink:0}
-.rank-coins{font-size:12px;font-weight:700;font-family:'JetBrains Mono',monospace;color:var(--text2)}
-.rank-streak{font-size:10px;font-weight:600;font-family:'JetBrains Mono',monospace;color:var(--amber)}
-
-.lock-overlay{
-  display:flex;align-items:center;gap:8px;flex:1;
+/* Pro gate */
+.rank-pro-gate{
+  padding:14px 18px;display:flex;align-items:center;justify-content:space-between;
+  background:rgba(79,142,247,.05);border-top:1px solid var(--border);
 }
-.lock-dashes{font-size:13px;color:var(--muted);letter-spacing:2px;flex:1}
-
-/* pro gate banner */
-.pro-gate{
-  padding:14px 18px;
-  display:flex;align-items:center;justify-content:space-between;
-  background:rgba(79,142,247,.05);
-  border-top:1px solid var(--border);
-}
-.pro-gate-text{font-size:12px;color:var(--muted);line-height:1.5}
-.pro-gate-text strong{color:var(--text);display:block;margin-bottom:1px}
-
-/* section label */
-.section-lbl{
-  padding:8px 4px 4px;
-  font-size:11px;font-weight:700;letter-spacing:1px;
-  text-transform:uppercase;color:var(--muted);
-}
+.rank-pro-gate-text{font-size:12px;color:var(--muted);line-height:1.5}
+.rank-pro-gate-text strong{color:var(--text);display:block;margin-bottom:1px}
 
 /* ── UNIVERSITY RANKING ── */
-.uni-card{
-  margin:0 0 8px;
-  background:var(--surface);border:1px solid var(--border2);
-  border-radius:var(--radius);overflow:hidden;
-  width:100%;
+
+.rank-uni-card{
+  margin:0 0 8px;background:var(--surface);border:1px solid var(--border2);
+  border-radius:var(--radius);overflow:hidden;width:100%;
 }
-.uni-row{
-  display:flex;align-items:center;gap:10px;
-  padding:11px 18px;border-bottom:1px solid var(--border);
+.rank-uni-header{
+  padding:13px 18px;display:flex;align-items:center;justify-content:space-between;
+  border-bottom:1px solid var(--border);
 }
-.uni-row:last-child{border-bottom:none}
-.uni-pos{font-size:12px;font-weight:800;font-family:'JetBrains Mono',monospace;color:var(--muted);width:18px;text-align:center;flex-shrink:0}
-.uni-pos.u1{color:var(--lgold)} .uni-pos.u2{color:var(--silver)} .uni-pos.u3{color:var(--bronze)}
-.uni-info{flex:1;min-width:0}
-.uni-name{font-size:13px;font-weight:600;display:flex;align-items:center;gap:6px;margin-bottom:1px}
-.uni-country{font-size:10px;color:var(--muted)}
-.uni-score{
+.rank-uni-title{font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted)}
+.rank-uni-row{
+  display:flex;align-items:center;gap:10px;padding:11px 18px;
+  border-bottom:1px solid var(--border);
+}
+.rank-uni-row:last-child{border-bottom:none}
+.rank-uni-pos{
+  font-size:12px;font-weight:800;font-family:'JetBrains Mono',monospace;
+  color:var(--muted);width:18px;text-align:center;flex-shrink:0;
+}
+.rank-uni-row.rank-uni-top1 .rank-uni-pos{color:var(--lgold)}
+.rank-uni-row.rank-uni-top2 .rank-uni-pos{color:var(--silver)}
+.rank-uni-row.rank-uni-top3 .rank-uni-pos{color:var(--bronze)}
+.rank-uni-avatar{
+  width:32px;height:32px;border-radius:8px;background:var(--surface2);border:1px solid var(--border2);
+  display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;
+  color:var(--muted);flex-shrink:0;
+}
+.rank-uni-info{flex:1;min-width:0}
+.rank-uni-name{font-size:13px;font-weight:600;display:flex;align-items:center;gap:6px;margin-bottom:1px}
+.rank-uni-sub{font-size:10px;color:var(--muted)}
+.rank-uni-score{
   font-size:12px;font-weight:700;font-family:'JetBrains Mono',monospace;
   color:var(--text2);text-align:right;flex-shrink:0;
 }
-.uni-score span{display:block;font-size:10px;color:var(--muted);font-weight:400}
-.uni-row.you-uni{background:rgba(79,142,247,.06)}
-.uni-row.you-uni .uni-name{color:var(--accent)}
+.rank-uni-score span{display:block;font-size:10px;color:var(--muted);font-weight:400}
 
 /* ── BOTTOM NAV ── */
 .bottom-nav{
@@ -2919,7 +2859,7 @@ mark.hb{background:rgba(79,142,247,.28);border-bottom:2px solid rgba(40,100,220,
 
 /* Ranking panel wrapper */
 #lb-panel {
-  padding: 16px 12px 100px !important;
+  padding: 80px 12px 100px !important;
   font-family: 'Sora', sans-serif !important;
   overflow-y: auto !important;
   -webkit-overflow-scrolling: touch !important;
@@ -3349,10 +3289,10 @@ html.light .qs-val { color: inherit; }
   #profile-panel, #lb-panel {
     max-width: 100% !important;
     width: 100% !important;
-    padding: 16px 24px 80px !important;
+    padding: 80px 24px 80px !important;
   }
-  .your-card, .league-card, .global-card,
-  .uni-card, .scope-wrap, .section-lbl,
+  .rank-profile-card, .rank-weekly-league, .rank-global-card,
+  .rank-uni-card, .scope-wrap, .rank-section-label,
   .overview-hero, .speed-card, .quick-stats,
   .lb-inner, .perf-inner {
     max-width: 100% !important;
@@ -3360,7 +3300,7 @@ html.light .qs-val { color: inherit; }
     margin-right: 0 !important;
   }
   /* Inner content items within ranking — readable width */
-  .lr-row, .rank-row, .league-entry {
+  .lr-row, .rank-global-row, .league-entry {
     max-width: 100% !important;
   }
 
@@ -3371,12 +3311,12 @@ html.light .qs-val { color: inherit; }
   .hdr-desktop-only { display: flex !important; }
 
   /* Ranking cards — no side margin on desktop, full panel width */
-  .your-card, .league-card, .global-card, .uni-card {
+  .rank-profile-card, .rank-weekly-league, .rank-global-card, .rank-uni-card {
     margin: 0 0 10px 0 !important;
     border-radius: 16px !important;
   }
   .scope-wrap { margin: 0 0 4px !important; }
-  .section-lbl { margin: 6px 0 !important; }
+  .rank-section-label { margin: 6px 0 !important; }
   /* Live insight full width */
   .live-insight { margin: 0 !important; }
 
@@ -4041,203 +3981,194 @@ html.dark .hl-btn-active { border-color:#fff!important; }
   <!-- LEADERBOARD PANEL --><!-- shelf-v37 -->
   <div class="lb-panel" id="lb-panel">
 <!-- YOUR PROFILE CARD -->
-<div class="your-card" id="your-card-wrap">
-  <div class="your-top">
-    <div class="your-avatar" id="yc-avatar">W</div>
-    <div class="your-info">
-      <div class="your-name" id="yc-name">Walter B.</div>
-      <div class="your-school" id="yc-school">
-        <span style="font-size:14px;line-height:1;vertical-align:middle;margin-right:2px;">🇧🇷</span>
-        Your University &middot; Brazil
+<div class="rank-profile-card" id="rank-profile-card">
+  <div class="rank-profile-header">
+    <div class="rank-profile-avatar" id="rank-profile-avatar">W</div>
+    <div class="rank-profile-info">
+      <div class="rank-profile-name" id="rank-profile-name">Walter B.</div>
+      <div class="rank-profile-univ" id="rank-profile-univ">
+        <span style="font-size:14px;margin-right:4px;">🇧🇷</span>
+        <span>Universidade Federal do Paraná</span>
       </div>
     </div>
     <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">
-      <div class="tier-badge tier-attending" id="yc-tier">Attending</div>
-      <button onclick="openProfileEditor()" style="background:none;border:1px solid var(--border2);border-radius:8px;padding:3px 10px;font-size:10px;font-weight:600;color:var(--muted);cursor:pointer;font-family:'Sora',sans-serif;transition:all .15s;" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" onmouseout="this.style.borderColor='var(--border2)';this.style.color='var(--muted)'">Edit</button>
+      <div class="rank-tier-badge rank-tier-intern" id="rank-profile-tier">Intern</div>
+      <div class="rank-speed-indicator" id="rank-profile-speed">
+        <span class="rank-speed-dot rank-speed-green"></span>
+        <span class="rank-speed-text">Fast</span>
+      </div>
     </div>
   </div>
-  <div class="your-stats">
-    <div class="your-stat">
-      <div class="your-stat-val" style="color:var(--accent)" id="yc-coins">0</div>
-      <div class="your-stat-lbl">MDCoins</div>
+  <div class="rank-profile-stats">
+    <div class="rank-profile-stat">
+      <div class="rank-profile-stat-val" id="rank-profile-coins">970</div>
+      <div class="rank-profile-stat-lbl">MDCoins</div>
     </div>
-    <div class="your-stat">
-      <div class="your-stat-val" style="color:var(--amber)" id="yc-streak">0</div>
-      <div class="your-stat-lbl">Streak</div>
+    <div class="rank-profile-stat">
+      <div class="rank-profile-stat-val" id="rank-profile-streak">11d</div>
+      <div class="rank-profile-stat-lbl">Streak</div>
     </div>
-    <div class="your-stat">
-      <div class="your-stat-val" style="display:flex;align-items:center;justify-content:center;font-size:14px" id="yc-speed">
-        <span class="speed-dot sd-green"></span>&#8212;
-      </div>
-      <div class="your-stat-lbl">Avg Speed</div>
+    <div class="rank-profile-stat">
+      <div class="rank-profile-stat-val" id="rank-profile-speed-val">31s</div>
+      <div class="rank-profile-stat-lbl">Avg Speed</div>
     </div>
-    <div class="your-stat">
-      <div class="your-stat-val" style="color:var(--muted);font-size:14px" id="yc-rank">#&#8212;</div>
-      <div class="your-stat-lbl">Global</div>
+    <div class="rank-profile-stat">
+      <div class="rank-profile-stat-val" id="rank-profile-rank">#3</div>
+      <div class="rank-profile-stat-lbl">Global</div>
     </div>
+  </div>
+  <div class="rank-profile-insight" id="rank-profile-insight">
+    Seu tempo: <strong>31s</strong> — você está <strong style="color:var(--emerald)">57% mais rápido</strong> que o ritmo do USMLE (72s/questão)
   </div>
 </div>
 
 <!-- WEEKLY LEAGUE -->
-<div class="section-lbl">Weekly League</div>
-<div class="league-card">
-  <div class="league-header">
-    <div class="league-left">
-      <div class="league-icon" style="background:rgba(0,212,170,.12);color:var(--lattn);border:1px solid rgba(0,212,170,.25)">ATT</div>
+<div class="rank-section-label">Weekly League</div>
+<div class="rank-weekly-league">
+  <div class="rank-weekly-header">
+    <div class="rank-weekly-title">
+      <div class="rank-weekly-icon">🏆</div>
       <div>
-        <div class="league-name">Attending League</div>
-        <div class="league-sub">25 students &middot; Top 5 promote to Fellow</div>
+        <div class="rank-weekly-name">Intern League</div>
+        <div class="rank-weekly-sub">10 students &middot; Resets Monday</div>
       </div>
     </div>
-    <div class="league-timer" id="leagueTimer">4d 12h</div>
+    <div class="rank-weekly-timer" id="rank-weekly-timer">3d 8h</div>
   </div>
 
-  <div class="league-progress">
-    <div class="lp-label">
-      <span class="lp-you">Your position: <strong style="color:var(--accent)">#3</strong></span>
-      <span class="lp-target">Top 5 to promote</span>
-    </div>
-    <div class="lp-bar"><div class="lp-fill" style="width:88%;background:var(--accent)"></div></div>
-    <div class="lp-note">Keep it up &mdash; you're in the promotion zone!</div>
-  </div>
-
-  <!-- TOP 5 — promotion zone -->
-  <div class="league-row promoted">
+  <!-- 10 demo users -->
+  <div class="league-row">
     <div class="lr-pos p1">1</div>
-    <div class="lr-avatar">EM</div>
+    <div class="lr-avatar">AR</div>
     <div class="lr-info">
-      <div class="lr-name"><span class="speed-dot sd-green"></span>Ethan M. <span class="tier-badge tier-fellow" style="font-size:8px;padding:1px 6px">Fellow</span></div>
-      <div class="lr-school"><span style="font-size:14px;line-height:1;vertical-align:middle;margin-right:2px;">🇺🇸</span> Stanford SOM</div>
+      <div class="lr-name"><span class="speed-dot sd-green"></span>Arjun R. <span class="tier-badge tier-fellow" style="font-size:8px;padding:1px 6px">Fellow</span></div>
+      <div class="lr-school"><span style="font-size:14px;line-height:1;vertical-align:middle;margin-right:2px;">🇮🇳</span> AIIMS New Delhi</div>
     </div>
     <div style="display:flex;flex-direction:column;align-items:flex-end">
-      <div class="lr-coins">3,210</div>
+      <div class="lr-coins">2,780</div>
+      <div class="lr-delta up">+210</div>
+    </div>
+  </div>
+
+  <div class="league-row">
+    <div class="lr-pos p2">2</div>
+    <div class="lr-avatar">ES</div>
+    <div class="lr-info">
+      <div class="lr-name"><span class="speed-dot sd-green"></span>Emma S. <span class="tier-badge tier-resident" style="font-size:8px;padding:1px 6px">Resident</span></div>
+      <div class="lr-school"><span style="font-size:14px;line-height:1;vertical-align:middle;margin-right:2px;">🇺🇸</span> Harvard Medical</div>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:flex-end">
+      <div class="lr-coins">1,820</div>
       <div class="lr-delta up">+145</div>
     </div>
-    <span class="promo-label promo-up">Promote</span>
-  </div>
-
-  <div class="league-row promoted">
-    <div class="lr-pos p2">2</div>
-    <div class="lr-avatar">PS</div>
-    <div class="lr-info">
-      <div class="lr-name"><span class="speed-dot sd-green"></span>Priya S.</div>
-      <div class="lr-school"><span style="font-size:14px;line-height:1;vertical-align:middle;margin-right:2px;">🇮🇳</span> AIIMS Delhi</div>
-    </div>
-    <div style="display:flex;flex-direction:column;align-items:flex-end">
-      <div class="lr-coins">2,870</div>
-      <div class="lr-delta up">+92</div>
-    </div>
-    <span class="promo-label promo-up">Promote</span>
   </div>
 
   <!-- YOU -->
-  <div class="league-row promoted you">
+  <div class="league-row you">
     <div class="lr-pos p3">3</div>
     <div class="lr-avatar">W</div>
     <div class="lr-info">
-      <div class="lr-name" style="color:var(--accent)"><span class="speed-dot sd-green"></span>You <span class="tier-badge tier-attending" style="font-size:8px;padding:1px 6px">ATT</span></div>
+      <div class="lr-name" style="color:var(--accent)"><span class="speed-dot sd-green"></span>You <span class="tier-badge tier-intern" style="font-size:8px;padding:1px 6px">Intern</span></div>
       <div class="lr-school"><span style="font-size:14px;line-height:1;vertical-align:middle;margin-right:2px;">🇧🇷</span> UFPR</div>
     </div>
     <div style="display:flex;flex-direction:column;align-items:flex-end">
-      <div class="lr-coins" style="color:var(--accent)">2,740</div>
+      <div class="lr-coins" style="color:var(--accent)">970</div>
       <div class="lr-delta up">+68</div>
     </div>
-    <span class="promo-label promo-up">Promote</span>
   </div>
 
-  <div class="league-row promoted">
+  <div class="league-row">
     <div class="lr-pos" style="color:var(--muted)">4</div>
-    <div class="lr-avatar">SL</div>
+    <div class="lr-avatar">LC</div>
     <div class="lr-info">
-      <div class="lr-name"><span class="speed-dot sd-amber"></span>Sofia L.</div>
-      <div class="lr-school"><span style="font-size:14px;line-height:1;vertical-align:middle;margin-right:2px;">🇩🇪</span> Charit&eacute; Berlin</div>
+      <div class="lr-name"><span class="speed-dot sd-amber"></span>Liam C. <span class="tier-badge tier-intern" style="font-size:8px;padding:1px 6px">Intern</span></div>
+      <div class="lr-school"><span style="font-size:14px;line-height:1;vertical-align:middle;margin-right:2px;">🇨🇦</span> McGill Faculty</div>
     </div>
     <div style="display:flex;flex-direction:column;align-items:flex-end">
-      <div class="lr-coins">2,580</div>
-      <div class="lr-delta up">+37</div>
+      <div class="lr-coins">805</div>
+      <div class="lr-delta up">+52</div>
     </div>
-    <span class="promo-label promo-up">Promote</span>
   </div>
 
-  <div class="league-row promoted">
+  <div class="league-row">
     <div class="lr-pos" style="color:var(--muted)">5</div>
-    <div class="lr-avatar">AO</div>
+    <div class="lr-avatar">MK</div>
     <div class="lr-info">
-      <div class="lr-name"><span class="speed-dot sd-green"></span>Amara O.</div>
-      <div class="lr-school"><span style="font-size:14px;line-height:1;vertical-align:middle;margin-right:2px;">🇳🇬</span> Univ. of Lagos COM</div>
+      <div class="lr-name"><span class="speed-dot sd-green"></span>Mei K. <span class="tier-badge tier-student" style="font-size:8px;padding:1px 6px">MS4</span></div>
+      <div class="lr-school"><span style="font-size:14px;line-height:1;vertical-align:middle;margin-right:2px;">🇨🇳</span> Peking Union</div>
     </div>
     <div style="display:flex;flex-direction:column;align-items:flex-end">
-      <div class="lr-coins">2,350</div>
-      <div class="lr-delta up">+19</div>
+      <div class="lr-coins">680</div>
+      <div class="lr-delta up">+34</div>
     </div>
-    <span class="promo-label promo-up">Promote</span>
-  </div>
-
-  <!-- divider -->
-  <div style="padding:6px 18px;background:var(--surface2);border-top:1px solid var(--border);border-bottom:1px solid var(--border)">
-    <div style="font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--muted)">Safe zone</div>
   </div>
 
   <div class="league-row">
     <div class="lr-pos" style="color:var(--muted)">6</div>
-    <div class="lr-avatar">KT</div>
+    <div class="lr-avatar">JH</div>
     <div class="lr-info">
-      <div class="lr-name"><span class="speed-dot sd-amber"></span>Kenji T.</div>
-      <div class="lr-school"><span style="font-size:14px;line-height:1;vertical-align:middle;margin-right:2px;">🇯🇵</span> Keio Univ. SOM</div>
+      <div class="lr-name"><span class="speed-dot sd-amber"></span>James H. <span class="tier-badge tier-student" style="font-size:8px;padding:1px 6px">MS3</span></div>
+      <div class="lr-school"><span style="font-size:14px;line-height:1;vertical-align:middle;margin-right:2px;">🇬🇧</span> Oxford Medicine</div>
     </div>
     <div style="display:flex;flex-direction:column;align-items:flex-end">
-      <div class="lr-coins">2,110</div>
-      <div class="lr-delta dn">-8</div>
+      <div class="lr-coins">540</div>
+      <div class="lr-delta dn">-12</div>
     </div>
   </div>
 
   <div class="league-row">
     <div class="lr-pos" style="color:var(--muted)">7</div>
-    <div class="lr-avatar">FR</div>
+    <div class="lr-avatar">SB</div>
     <div class="lr-info">
-      <div class="lr-name"><span class="speed-dot sd-green"></span>Fatima R.</div>
-      <div class="lr-school"><span style="font-size:14px;line-height:1;vertical-align:middle;margin-right:2px;">🇵🇰</span> Aga Khan Univ.</div>
+      <div class="lr-name"><span class="speed-dot sd-green"></span>Sofia B. <span class="tier-badge tier-student" style="font-size:8px;padding:1px 6px">MS3</span></div>
+      <div class="lr-school"><span style="font-size:14px;line-height:1;vertical-align:middle;margin-right:2px;">🇩🇪</span> Charit&eacute; Berlin</div>
     </div>
     <div style="display:flex;flex-direction:column;align-items:flex-end">
-      <div class="lr-coins">1,940</div>
-      <div class="lr-delta up">+25</div>
+      <div class="lr-coins">425</div>
+      <div class="lr-delta up">+18</div>
     </div>
   </div>
 
   <div class="league-row">
     <div class="lr-pos" style="color:var(--muted)">8</div>
-    <div class="lr-avatar">JC</div>
+    <div class="lr-avatar">AO</div>
     <div class="lr-info">
-      <div class="lr-name"><span class="speed-dot sd-amber"></span>James C.</div>
-      <div class="lr-school"><span style="font-size:14px;line-height:1;vertical-align:middle;margin-right:2px;">🇺🇸</span> Mayo Clinic Alix</div>
+      <div class="lr-name"><span class="speed-dot sd-amber"></span>Aisha O. <span class="tier-badge tier-student" style="font-size:8px;padding:1px 6px">MS2</span></div>
+      <div class="lr-school"><span style="font-size:14px;line-height:1;vertical-align:middle;margin-right:2px;">🇳🇬</span> Univ. of Ibadan</div>
     </div>
     <div style="display:flex;flex-direction:column;align-items:flex-end">
-      <div class="lr-coins">1,720</div>
-      <div class="lr-delta dn">-15</div>
+      <div class="lr-coins">320</div>
+      <div class="lr-delta dn">-8</div>
     </div>
   </div>
 
-  <!-- rows 9-20 collapsed / locked (Free users) -->
-  <div class="locked-row">
-    <div class="lock-pos">9</div>
-    <div class="lr-avatar" style="opacity:.4">??</div>
-    <div class="lock-overlay">
-      <div class="lock-name">&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;</div>
-      <svg class="lock-icon" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+  <div class="league-row">
+    <div class="lr-pos" style="color:var(--muted)">9</div>
+    <div class="lr-avatar">DM</div>
+    <div class="lr-info">
+      <div class="lr-name"><span class="speed-dot sd-red"></span>Diego M. <span class="tier-badge tier-student" style="font-size:8px;padding:1px 6px">MS2</span></div>
+      <div class="lr-school"><span style="font-size:14px;line-height:1;vertical-align:middle;margin-right:2px;">🇲🇽</span> UNAM Medicina</div>
     </div>
-    <div class="lock-coins">1,580</div>
-  </div>
-  <div class="locked-row">
-    <div class="lock-pos">10</div>
-    <div class="lr-avatar" style="opacity:.4">??</div>
-    <div class="lock-overlay">
-      <div class="lock-name">&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;</div>
-      <svg class="lock-icon" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+    <div style="display:flex;flex-direction:column;align-items:flex-end">
+      <div class="lr-coins">245</div>
+      <div class="lr-delta up">+22</div>
     </div>
-    <div class="lock-coins">1,390</div>
   </div>
 
-  <!-- relegation zone -->
+  <div class="league-row">
+    <div class="lr-pos" style="color:var(--muted)">10</div>
+    <div class="lr-avatar">TN</div>
+    <div class="lr-info">
+      <div class="lr-name"><span class="speed-dot sd-red"></span>Thanh N. <span class="tier-badge tier-student" style="font-size:8px;padding:1px 6px">MS1</span></div>
+      <div class="lr-school"><span style="font-size:14px;line-height:1;vertical-align:middle;margin-right:2px;">🇻🇳</span> Hanoi Medical</div>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:flex-end">
+      <div class="lr-coins">190</div>
+      <div class="lr-delta up">+15</div>
+    </div>
+  </div>
+
+  <!-- no relegation zone for weekly league -->
   <div style="padding:6px 18px;background:var(--surface2);border-top:1px solid var(--border);border-bottom:1px solid var(--border)">
     <div style="font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--muted)">Relegation zone &mdash; bottom 5</div>
   </div>
@@ -4260,7 +4191,7 @@ html.dark .hl-btn-active { border-color:#fff!important; }
 
 <!-- SCOPE FILTERS -->
 <!-- CHALLENGES -->
-<div class="section-lbl">Challenges</div>
+<div class="rank-section-label">Challenges</div>
 <div id="challenges-wrap" style="display:flex;flex-direction:column;gap:12px;">
 
   <!-- How it works — always visible -->
@@ -4308,7 +4239,7 @@ html.dark .hl-btn-active { border-color:#fff!important; }
   </div>
 </div>
 
-<div class="section-lbl">Global Ranking</div>
+<div class="rank-section-label">Global Ranking</div>
 <div style="display:flex;flex-direction:column;gap:8px;">
   <!-- Row 1: Global + USA fixed + Step filters -->
   <div class="scope-wrap">
@@ -4325,31 +4256,214 @@ html.dark .hl-btn-active { border-color:#fff!important; }
 </div>
 
 <!-- GLOBAL RANKING TABLE -->
-<div class="global-card">
-  <div class="global-header">
-    <span class="global-title">All time &middot; Global</span>
-    <div class="live-pill"><div class="live-dot"></div>Updated hourly</div>
+<div class="rank-global-card">
+  <div class="rank-global-header">
+    <span class="rank-global-title">All time · Global</span>
+    <div class="rank-live-pill"><div class="rank-live-dot"></div>Updated hourly</div>
   </div>
-  <div class="rank-col-header">
-    <div style="width:22px"></div>
-    <div style="width:30px"></div>
-    <div class="rch-spacer"></div>
-    <div class="rch-label">Coins</div>
-    <div class="rch-label">Streak</div>
+  <div class="rank-global-col-header">
+    <div style="width:26px;text-align:center;font-size:10px;font-weight:700;color:var(--muted);">#</div>
+    <div style="flex:1;font-size:10px;font-weight:700;color:var(--muted);padding-left:6px;">User</div>
+    <div style="width:56px;text-align:right;font-size:10px;font-weight:700;color:var(--muted);">Coins</div>
+    <div style="width:50px;text-align:right;font-size:10px;font-weight:700;color:var(--muted);">Streak</div>
+    <div style="width:36px;text-align:right;font-size:10px;font-weight:700;color:var(--muted);">Δ</div>
   </div>
-  <!-- Rank rows — static demo, overwritten by renderGlobalRankFiltered() if JS runs -->
-  <div id="global-rank-rows">
-    <div class="rank-row"><div class="rank-pos rp1">1</div><div class="rank-avatar" style="background:#3b7fff22;color:#3b7fff">EM</div><div class="rank-info"><div class="rank-name"><span class="speed-dot sd-green"></span>Ethan M.<div class="tier-badge tier-intern" style="font-size:8px;padding:1px 6px">MS4</div></div><div class="rank-school"><span style="font-size:14px;line-height:1;vertical-align:middle;margin-right:2px;">🇺🇸</span>Stanford SOM</div></div><div class="rank-nums"><div class="rank-coins">2,810</div><div class="rank-streak">34d</div></div></div>
-    <div class="rank-row"><div class="rank-pos rp2">2</div><div class="rank-avatar" style="background:#8b5cf622;color:#8b5cf6">PS</div><div class="rank-info"><div class="rank-name"><span class="speed-dot sd-green"></span>Priya S.<div class="tier-badge tier-intern" style="font-size:8px;padding:1px 6px">MS4</div></div><div class="rank-school"><span style="font-size:14px;line-height:1;vertical-align:middle;margin-right:2px;">🇮🇳</span>AIIMS Delhi</div></div><div class="rank-nums"><div class="rank-coins">2,540</div><div class="rank-streak">28d</div></div></div>
-    <div class="rank-row you-row"><div class="rank-pos rp3">3</div><div class="rank-avatar" style="background:rgba(79,142,247,.15);color:var(--accent)">WB</div><div class="rank-info"><div class="rank-name" style="color:var(--accent)"><span class="speed-dot sd-green"></span>Walter B.<div class="tier-badge tier-intern" style="font-size:8px;padding:1px 6px">MS1</div></div><div class="rank-school"><span style="font-size:14px;line-height:1;vertical-align:middle;margin-right:2px;">🇧🇷</span>UFPR</div></div><div class="rank-nums"><div class="rank-coins" style="color:var(--accent)">960</div><div class="rank-streak">11d</div></div></div>
-    <div class="rank-row"><div class="rank-pos">4</div><div class="rank-avatar" style="background:#06b6d422;color:#06b6d4">SL</div><div class="rank-info"><div class="rank-name"><span class="speed-dot sd-green"></span>Sofia L.<div class="tier-badge tier-intern" style="font-size:8px;padding:1px 6px">MS3</div></div><div class="rank-school"><span style="font-size:14px;line-height:1;vertical-align:middle;margin-right:2px;">🇩🇪</span>Charité Berlin</div></div><div class="rank-nums"><div class="rank-coins">890</div><div class="rank-streak">21d</div></div></div>
-    <div class="rank-row"><div class="rank-pos">5</div><div class="rank-avatar" style="background:#10b98122;color:#10b981">AO</div><div class="rank-info"><div class="rank-name"><span class="speed-dot sd-amber"></span>Amara O.<div class="tier-badge tier-intern" style="font-size:8px;padding:1px 6px">MS2</div></div><div class="rank-school"><span style="font-size:14px;line-height:1;vertical-align:middle;margin-right:2px;">🇳🇬</span>Univ. of Lagos COM</div></div><div class="rank-nums"><div class="rank-coins">780</div><div class="rank-streak">19d</div></div></div>
-    <div class="rank-row"><div class="rank-pos">6</div><div class="rank-avatar" style="background:#f59e0b22;color:#f59e0b">KT</div><div class="rank-info"><div class="rank-name"><span class="speed-dot sd-amber"></span>Kenji T.<div class="tier-badge tier-intern" style="font-size:8px;padding:1px 6px">MS2</div></div><div class="rank-school"><span style="font-size:14px;line-height:1;vertical-align:middle;margin-right:2px;">🇯🇵</span>Keio Univ. SOM</div></div><div class="rank-nums"><div class="rank-coins">650</div><div class="rank-streak">15d</div></div></div>
-    <div class="rank-row"><div class="rank-pos">7</div><div class="rank-avatar" style="background:#ec489922;color:#ec4899">AK</div><div class="rank-info"><div class="rank-name"><span class="speed-dot sd-green"></span>Aisha K.<div class="tier-badge tier-intern" style="font-size:8px;padding:1px 6px">MS1</div></div><div class="rank-school"><span style="font-size:14px;line-height:1;vertical-align:middle;margin-right:2px;">🇬🇧</span>King's College London</div></div><div class="rank-nums"><div class="rank-coins">520</div><div class="rank-streak">7d</div></div></div>
+
+  <!-- Top 10 visible -->
+  <div class="rank-global-row rank-global-top1">
+    <div class="rank-global-pos">1</div>
+    <div class="rank-global-avatar">AR</div>
+    <div class="rank-global-info">
+      <div class="rank-global-name">
+        <span class="speed-dot sd-green"></span>
+        Arjun R.
+        <span class="tier-badge tier-fellow" style="font-size:8px;padding:1px 6px;">Fellow</span>
+      </div>
+      <div class="rank-global-school">🇮🇳 AIIMS New Delhi</div>
+    </div>
+    <div class="rank-global-coins">3,240</div>
+    <div class="rank-global-streak">42d</div>
+    <div class="rank-global-delta rank-delta-up">+180</div>
   </div>
-  <div class="pro-gate">
-    <div class="pro-gate-text">
-      <strong>Unlock full ranking</strong>
+
+  <div class="rank-global-row rank-global-top2">
+    <div class="rank-global-pos">2</div>
+    <div class="rank-global-avatar">ES</div>
+    <div class="rank-global-info">
+      <div class="rank-global-name">
+        <span class="speed-dot sd-green"></span>
+        Emma S.
+        <span class="tier-badge tier-resident" style="font-size:8px;padding:1px 6px;">Resident</span>
+      </div>
+      <div class="rank-global-school">🇺🇸 Harvard Medical</div>
+    </div>
+    <div class="rank-global-coins">2,890</div>
+    <div class="rank-global-streak">38d</div>
+    <div class="rank-global-delta rank-delta-up">+145</div>
+  </div>
+
+  <div class="rank-global-row rank-global-top3">
+    <div class="rank-global-pos">3</div>
+    <div class="rank-global-avatar">MK</div>
+    <div class="rank-global-info">
+      <div class="rank-global-name">
+        <span class="speed-dot sd-green"></span>
+        Marcus K.
+        <span class="tier-badge tier-resident" style="font-size:8px;padding:1px 6px;">Resident</span>
+      </div>
+      <div class="rank-global-school">🇺🇸 Johns Hopkins</div>
+    </div>
+    <div class="rank-global-coins">2,650</div>
+    <div class="rank-global-streak">31d</div>
+    <div class="rank-global-delta rank-delta-up">+122</div>
+  </div>
+
+  <div class="rank-global-row">
+    <div class="rank-global-pos">4</div>
+    <div class="rank-global-avatar">LC</div>
+    <div class="rank-global-info">
+      <div class="rank-global-name">
+        <span class="speed-dot sd-amber"></span>
+        Liam C.
+        <span class="tier-badge tier-intern" style="font-size:8px;padding:1px 6px;">Intern</span>
+      </div>
+      <div class="rank-global-school">🇨🇦 McGill Faculty</div>
+    </div>
+    <div class="rank-global-coins">2,210</div>
+    <div class="rank-global-streak">28d</div>
+    <div class="rank-global-delta rank-delta-up">+95</div>
+  </div>
+
+  <div class="rank-global-row">
+    <div class="rank-global-pos">5</div>
+    <div class="rank-global-avatar">SB</div>
+    <div class="rank-global-info">
+      <div class="rank-global-name">
+        <span class="speed-dot sd-green"></span>
+        Sofia B.
+        <span class="tier-badge tier-intern" style="font-size:8px;padding:1px 6px;">Intern</span>
+      </div>
+      <div class="rank-global-school">🇩🇪 Charité Berlin</div>
+    </div>
+    <div class="rank-global-coins">1,980</div>
+    <div class="rank-global-streak">24d</div>
+    <div class="rank-global-delta rank-delta-up">+78</div>
+  </div>
+
+  <!-- Freemium hidden rows (6-10) — locked names but visible MDCoins -->
+  <div class="rank-global-row rank-global-locked">
+    <div class="rank-global-pos">6</div>
+    <div class="rank-global-avatar rank-avatar-locked">??</div>
+    <div class="rank-global-info">
+      <div class="rank-global-name rank-name-hidden">
+        •••••••
+        <svg class="rank-lock-icon" viewBox="0 0 16 16" width="12" height="12" style="vertical-align:middle;margin-left:4px;opacity:0.4;">
+          <rect x="3" y="7" width="10" height="7" rx="1" fill="currentColor"/>
+          <path d="M5 7V5a3 3 0 016 0v2" stroke="currentColor" stroke-width="1.5" fill="none"/>
+        </svg>
+      </div>
+      <div class="rank-global-school" style="opacity:0.35;">••••••••</div>
+    </div>
+    <div class="rank-global-coins">1,750</div>
+    <div class="rank-global-streak" style="opacity:0.4;">—</div>
+    <div class="rank-global-delta" style="opacity:0.4;">—</div>
+  </div>
+
+  <div class="rank-global-row rank-global-locked">
+    <div class="rank-global-pos">7</div>
+    <div class="rank-global-avatar rank-avatar-locked">??</div>
+    <div class="rank-global-info">
+      <div class="rank-global-name rank-name-hidden">
+        •••••••
+        <svg class="rank-lock-icon" viewBox="0 0 16 16" width="12" height="12" style="vertical-align:middle;margin-left:4px;opacity:0.4;">
+          <rect x="3" y="7" width="10" height="7" rx="1" fill="currentColor"/>
+          <path d="M5 7V5a3 3 0 016 0v2" stroke="currentColor" stroke-width="1.5" fill="none"/>
+        </svg>
+      </div>
+      <div class="rank-global-school" style="opacity:0.35;">••••••••</div>
+    </div>
+    <div class="rank-global-coins">1,540</div>
+    <div class="rank-global-streak" style="opacity:0.4;">—</div>
+    <div class="rank-global-delta" style="opacity:0.4;">—</div>
+  </div>
+
+  <div class="rank-global-row rank-global-locked">
+    <div class="rank-global-pos">8</div>
+    <div class="rank-global-avatar rank-avatar-locked">??</div>
+    <div class="rank-global-info">
+      <div class="rank-global-name rank-name-hidden">
+        •••••••
+        <svg class="rank-lock-icon" viewBox="0 0 16 16" width="12" height="12" style="vertical-align:middle;margin-left:4px;opacity:0.4;">
+          <rect x="3" y="7" width="10" height="7" rx="1" fill="currentColor"/>
+          <path d="M5 7V5a3 3 0 016 0v2" stroke="currentColor" stroke-width="1.5" fill="none"/>
+        </svg>
+      </div>
+      <div class="rank-global-school" style="opacity:0.35;">••••••••</div>
+    </div>
+    <div class="rank-global-coins">1,380</div>
+    <div class="rank-global-streak" style="opacity:0.4;">—</div>
+    <div class="rank-global-delta" style="opacity:0.4;">—</div>
+  </div>
+
+  <div class="rank-global-row rank-global-locked">
+    <div class="rank-global-pos">9</div>
+    <div class="rank-global-avatar rank-avatar-locked">??</div>
+    <div class="rank-global-info">
+      <div class="rank-global-name rank-name-hidden">
+        •••••••
+        <svg class="rank-lock-icon" viewBox="0 0 16 16" width="12" height="12" style="vertical-align:middle;margin-left:4px;opacity:0.4;">
+          <rect x="3" y="7" width="10" height="7" rx="1" fill="currentColor"/>
+          <path d="M5 7V5a3 3 0 016 0v2" stroke="currentColor" stroke-width="1.5" fill="none"/>
+        </svg>
+      </div>
+      <div class="rank-global-school" style="opacity:0.35;">••••••••</div>
+    </div>
+    <div class="rank-global-coins">1,210</div>
+    <div class="rank-global-streak" style="opacity:0.4;">—</div>
+    <div class="rank-global-delta" style="opacity:0.4;">—</div>
+  </div>
+
+  <div class="rank-global-row rank-global-locked">
+    <div class="rank-global-pos">10</div>
+    <div class="rank-global-avatar rank-avatar-locked">??</div>
+    <div class="rank-global-info">
+      <div class="rank-global-name rank-name-hidden">
+        •••••••
+        <svg class="rank-lock-icon" viewBox="0 0 16 16" width="12" height="12" style="vertical-align:middle;margin-left:4px;opacity:0.4;">
+          <rect x="3" y="7" width="10" height="7" rx="1" fill="currentColor"/>
+          <path d="M5 7V5a3 3 0 016 0v2" stroke="currentColor" stroke-width="1.5" fill="none"/>
+        </svg>
+      </div>
+      <div class="rank-global-school" style="opacity:0.35;">••••••••</div>
+    </div>
+    <div class="rank-global-coins">1,050</div>
+    <div class="rank-global-streak" style="opacity:0.4;">—</div>
+    <div class="rank-global-delta" style="opacity:0.4;">—</div>
+  </div>
+
+  <!-- Ellipsis separator -->
+  <div style="padding:8px 0;text-align:center;color:var(--muted);font-size:14px;letter-spacing:2px;">⋯</div>
+
+  <!-- Your position (always visible) -->
+  <div class="rank-global-row rank-global-you">
+    <div class="rank-global-pos">47</div>
+    <div class="rank-global-avatar" style="background:rgba(79,142,247,.15);color:var(--accent);">W</div>
+    <div class="rank-global-info">
+      <div class="rank-global-name" style="color:var(--accent);">
+        <span class="speed-dot sd-green"></span>
+        You
+        <span class="tier-badge tier-intern" style="font-size:8px;padding:1px 6px;">Intern</span>
+      </div>
+      <div class="rank-global-school">🇧🇷 UFPR</div>
+    </div>
+    <div class="rank-global-coins" style="color:var(--accent);">970</div>
+    <div class="rank-global-streak">11d</div>
+    <div class="rank-global-delta rank-delta-up">+68</div>
+  </div>
+
+  <div class="rank-pro-gate">
+    <div class="rank-pro-gate-text">
+      <strong>Unlock full ranking</strong><br>
       See all competitors, filters, and history
     </div>
     <button class="upgrade-btn" onclick="showXpToast('BoardMD Pro','Coming soon — founding member pricing available at launch. Join our waitlist at boardmd.app','','',null)">Go Pro</button>
@@ -4357,76 +4471,96 @@ html.dark .hl-btn-active { border-color:#fff!important; }
 </div>
 
 <!-- UNIVERSITY RANKING -->
-<div class="section-lbl">University Ranking</div>
-<div class="uni-card">
-  <div class="global-header">
-    <span class="global-title">Weighted score &middot; Global</span>
-    <div class="live-pill"><div class="live-dot"></div>Live</div>
+<div class="rank-section-label">University Ranking</div>
+<div class="rank-uni-card">
+  <div class="rank-uni-header">
+    <span class="rank-uni-title">Weighted score · Global</span>
+    <div class="rank-live-pill"><div class="rank-live-dot"></div>Live</div>
   </div>
 
-  <div class="uni-row">
-    <div class="uni-pos u1">1</div>
-    <div class="rank-avatar" style="border-radius:8px;font-size:9px;font-weight:800">HVD</div>
-    <div class="uni-info">
-      <div class="uni-name"><span style="font-size:14px;line-height:1;vertical-align:middle;margin-right:2px;">🇺🇸</span>Harvard Medical School</div>
-      <div class="uni-country">Cambridge, United States &middot; 24 active students</div>
+  <div class="rank-uni-row rank-uni-top1">
+    <div class="rank-uni-pos">1</div>
+    <div class="rank-uni-avatar">HVD</div>
+    <div class="rank-uni-info">
+      <div class="rank-uni-name">🇺🇸 Harvard Medical School</div>
+      <div class="rank-uni-sub">Cambridge, United States · 28 active</div>
     </div>
-    <div class="uni-score">94.2<span>score</span></div>
+    <div class="rank-uni-score">94.2<span>score</span></div>
   </div>
 
-  <div class="uni-row">
-    <div class="uni-pos u2">2</div>
-    <div class="rank-avatar" style="border-radius:8px;font-size:9px;font-weight:800">AIM</div>
-    <div class="uni-info">
-      <div class="uni-name"><span style="font-size:14px;line-height:1;vertical-align:middle;margin-right:2px;">🇮🇳</span>AIIMS Delhi</div>
-      <div class="uni-country">New Delhi, India &middot; 18 active students</div>
+  <div class="rank-uni-row rank-uni-top2">
+    <div class="rank-uni-pos">2</div>
+    <div class="rank-uni-avatar">JHU</div>
+    <div class="rank-uni-info">
+      <div class="rank-uni-name">🇺🇸 Johns Hopkins SOM</div>
+      <div class="rank-uni-sub">Baltimore, United States · 24 active</div>
     </div>
-    <div class="uni-score">91.7<span>score</span></div>
+    <div class="rank-uni-score">92.8<span>score</span></div>
   </div>
 
-  <div class="uni-row">
-    <div class="uni-pos u3">3</div>
-    <div class="rank-avatar" style="border-radius:8px;font-size:9px;font-weight:800">CHR</div>
-    <div class="uni-info">
-      <div class="uni-name"><span style="font-size:14px;line-height:1;vertical-align:middle;margin-right:2px;">🇩🇪</span>Charité Berlin</div>
-      <div class="uni-country">Berlin, Germany &middot; 11 active students</div>
+  <div class="rank-uni-row rank-uni-top3">
+    <div class="rank-uni-pos">3</div>
+    <div class="rank-uni-avatar">AIM</div>
+    <div class="rank-uni-info">
+      <div class="rank-uni-name">🇮🇳 AIIMS Delhi</div>
+      <div class="rank-uni-sub">New Delhi, India · 32 active</div>
     </div>
-    <div class="uni-score">88.4<span>score</span></div>
+    <div class="rank-uni-score">91.5<span>score</span></div>
   </div>
 
-  <div class="uni-row">
-    <div class="uni-pos" style="color:var(--muted)">4</div>
-    <div class="rank-avatar" style="border-radius:8px;font-size:9px;font-weight:800">STF</div>
-    <div class="uni-info">
-      <div class="uni-name"><span style="font-size:14px;line-height:1;vertical-align:middle;margin-right:2px;">🇺🇸</span>Stanford SOM</div>
-      <div class="uni-country">Stanford, United States &middot; 16 active students</div>
+  <div class="rank-uni-row">
+    <div class="rank-uni-pos">4</div>
+    <div class="rank-uni-avatar">STF</div>
+    <div class="rank-uni-info">
+      <div class="rank-uni-name">🇺🇸 Stanford SOM</div>
+      <div class="rank-uni-sub">Stanford, United States · 19 active</div>
     </div>
-    <div class="uni-score">86.1<span>score</span></div>
+    <div class="rank-uni-score">89.7<span>score</span></div>
   </div>
 
-  <div class="uni-row">
-    <div class="uni-pos" style="color:var(--muted)">5</div>
-    <div class="rank-avatar" style="border-radius:8px;font-size:9px;font-weight:800">KCL</div>
-    <div class="uni-info">
-      <div class="uni-name"><span style="font-size:14px;line-height:1;vertical-align:middle;margin-right:2px;">🇬🇧</span>King's College London</div>
-      <div class="uni-country">London, United Kingdom &middot; 9 active students</div>
+  <div class="rank-uni-row">
+    <div class="rank-uni-pos">5</div>
+    <div class="rank-uni-avatar">OXF</div>
+    <div class="rank-uni-info">
+      <div class="rank-uni-name">🇬🇧 Oxford Medicine</div>
+      <div class="rank-uni-sub">Oxford, United Kingdom · 15 active</div>
     </div>
-    <div class="uni-score">83.5<span>score</span></div>
+    <div class="rank-uni-score">87.3<span>score</span></div>
   </div>
 
-  <div class="uni-row you-uni">
-    <div class="uni-pos" style="color:var(--accent)">8</div>
-    <div class="rank-avatar" style="border-radius:8px;font-size:9px;font-weight:800;background:rgba(79,142,247,.15);border-color:rgba(79,142,247,.3);color:var(--accent)">UFP</div>
-    <div class="uni-info">
-      <div class="uni-name"><span style="font-size:14px;line-height:1;vertical-align:middle;margin-right:2px;">🇧🇷</span>UFPR &mdash; Universidade Federal do Paraná</div>
-      <div class="uni-country">Curitiba, Brazil &middot; 3 active students</div>
+  <div class="rank-uni-row">
+    <div class="rank-uni-pos">6</div>
+    <div class="rank-uni-avatar">MCG</div>
+    <div class="rank-uni-info">
+      <div class="rank-uni-name">🇨🇦 McGill Faculty</div>
+      <div class="rank-uni-sub">Montreal, Canada · 12 active</div>
     </div>
-    <div class="uni-score" style="color:var(--accent)">74.8<span>score</span></div>
+    <div class="rank-uni-score">85.1<span>score</span></div>
   </div>
 
-  <div class="pro-gate">
-    <div class="pro-gate-text">
-      <strong>Full university ranking</strong>
+  <div class="rank-uni-row">
+    <div class="rank-uni-pos">7</div>
+    <div class="rank-uni-avatar">CHR</div>
+    <div class="rank-uni-info">
+      <div class="rank-uni-name">🇩🇪 Charité Berlin</div>
+      <div class="rank-uni-sub">Berlin, Germany · 14 active</div>
+    </div>
+    <div class="rank-uni-score">83.6<span>score</span></div>
+  </div>
+
+  <div class="rank-uni-row">
+    <div class="rank-uni-pos">8</div>
+    <div class="rank-uni-avatar">USP</div>
+    <div class="rank-uni-info">
+      <div class="rank-uni-name">🇧🇷 USP Faculdade de Medicina</div>
+      <div class="rank-uni-sub">São Paulo, Brazil · 18 active</div>
+    </div>
+    <div class="rank-uni-score">82.4<span>score</span></div>
+  </div>
+
+  <div class="rank-pro-gate">
+    <div class="rank-pro-gate-text">
+      <strong>Full university ranking</strong><br>
       All countries, filters, and history
     </div>
     <button class="upgrade-btn" onclick="showXpToast('BoardMD Pro','Coming soon — founding member pricing available at launch. Join our waitlist at boardmd.app','','',null)">Go Pro</button>
@@ -6682,6 +6816,7 @@ function revealAnswer(sel,card){
   revealed=true;
 
   // Track response time
+  let responseTimeSec = null;
   if(_cardStartTime > 0){
     const responseMs = Date.now() - _cardStartTime;
     if(responseMs > 500 && responseMs < 300000){ // 0.5s–5min = valid
@@ -6692,8 +6827,16 @@ function revealAnswer(sel,card){
       g0.avgResponseMs = Math.round((prev * cnt + responseMs) / (cnt + 1));
       g0.responseCount = cnt + 1;
       saveGami(g0);
+
+      // Calculate response time in seconds with 120s ceiling
+      responseTimeSec = Math.min(Math.round(responseMs / 1000), 120);
     }
     _cardStartTime = 0;
+  }
+
+  // Store response time for later save to Supabase (in rate function)
+  if(responseTimeSec !== null){
+    card._responseTimeSec = responseTimeSec;
   }
 
   // Limpa grifos da pergunta ao revelar — mantém só os da explicação
@@ -7113,6 +7256,22 @@ function rate(r){
   const ns=applyRating(state,rating);
   fsrs[card.id]=ns;
   saveFsrs();
+
+  // Save review to Supabase (async, non-blocking)
+  if(_supaUser && _supa){
+    const responseTimeSec = card._responseTimeSec || null;
+    const reviewData = {
+      user_id: _supaUser.id,
+      card_id: card.id,
+      rating: rating,
+      response_time_sec: responseTimeSec,
+      deck: card.deck || null,
+      reviewed_at: new Date().toISOString()
+    };
+    _supa.from('reviews').insert([reviewData]).then(res => {
+      if(res.error) console.warn('Review save failed:', res.error);
+    }).catch(e => console.warn('Review save error:', e));
+  }
 
   // Track session
   const keys=['again','hard','good','easy'];
