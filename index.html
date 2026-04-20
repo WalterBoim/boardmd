@@ -9034,6 +9034,16 @@ async function saveCardEdit(){
     // Aplicar ao card em memória imediatamente
     Object.assign(card, edits[card.id]);
 
+    // Get user's auth token for Supabase update
+    const session = await _supa.auth.getSession();
+    const accessToken = session?.data?.session?.access_token;
+
+    if (!accessToken) {
+      throw new Error('Not authenticated. Please sign in to save changes.');
+    }
+
+    console.log('Saving card to Supabase:', card.id);
+
     // Salvar direto no Supabase
     const supaUpdate = {
       q: edits[card.id].q,
@@ -9050,7 +9060,7 @@ async function saveCardEdit(){
       method: 'PATCH',
       headers: {
         'apikey': SUPA_KEY,
-        'Authorization': 'Bearer ' + SUPA_KEY,
+        'Authorization': 'Bearer ' + accessToken,
         'Content-Type': 'application/json',
         'Prefer': 'return=minimal'
       },
@@ -9059,10 +9069,11 @@ async function saveCardEdit(){
 
     if (!response.ok) {
       const errorText = await response.text();
-      throw new Error('Supabase update failed: ' + errorText);
+      console.error('Supabase error response:', response.status, errorText);
+      throw new Error('Supabase update failed (' + response.status + '): ' + errorText);
     }
 
-    console.log('Supabase updated:', card.id);
+    console.log('✅ Supabase updated successfully:', card.id);
 
     // Invalida cache IndexedDB para este card
     try {
@@ -9088,7 +9099,7 @@ async function saveCardEdit(){
     }, 1200);
 
   } catch (error) {
-    console.error('Save error:', error);
+    console.error('❌ Save error:', error);
     showErrorToast('Failed to save: ' + (error.message || 'Unknown error'));
     setEditorButtonsState(false);
   }
@@ -9102,16 +9113,25 @@ async function setCardImage(){
   setEditorButtonsState(true);
 
   try {
+    // Get user's auth token
+    const session = await _supa.auth.getSession();
+    const accessToken = session?.data?.session?.access_token;
+
+    if (!accessToken) {
+      throw new Error('Not authenticated. Please sign in to save changes.');
+    }
+
     const imgObj = {url:url, alt:_editingCard.c||'', credit:'Manual', license:'CC BY-SA', source:'Manual'};
     const r = await fetch(SUPA_URL+'/rest/v1/cards?id=eq.'+_editingCard.id, {
       method:'PATCH',
-      headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/json','Prefer':'return=minimal'},
+      headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+accessToken,'Content-Type':'application/json','Prefer':'return=minimal'},
       body:JSON.stringify({img:imgObj})
     });
 
     if(!r.ok){
       const errorText = await r.text();
-      throw new Error('Failed to set image: ' + errorText);
+      console.error('Image set error response:', r.status, errorText);
+      throw new Error('Failed to set image (' + r.status + '): ' + errorText);
     }
 
     _editingCard.img=imgObj;
@@ -9121,7 +9141,7 @@ async function setCardImage(){
     showSuccessToast('Image added successfully');
     renderCard();
   } catch(error) {
-    console.error('Image set error:', error);
+    console.error('❌ Image set error:', error);
     showErrorToast('Failed to set image: ' + (error.message || 'Unknown error'));
   } finally {
     setEditorButtonsState(false);
@@ -9134,15 +9154,24 @@ async function removeCardImage(){
   setEditorButtonsState(true);
 
   try {
+    // Get user's auth token
+    const session = await _supa.auth.getSession();
+    const accessToken = session?.data?.session?.access_token;
+
+    if (!accessToken) {
+      throw new Error('Not authenticated. Please sign in to save changes.');
+    }
+
     const r = await fetch(SUPA_URL+'/rest/v1/cards?id=eq.'+_editingCard.id, {
       method:'PATCH',
-      headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/json','Prefer':'return=minimal'},
+      headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+accessToken,'Content-Type':'application/json','Prefer':'return=minimal'},
       body:JSON.stringify({img:null})
     });
 
     if(!r.ok){
       const errorText = await r.text();
-      throw new Error('Failed to remove image: ' + errorText);
+      console.error('Image remove error response:', r.status, errorText);
+      throw new Error('Failed to remove image (' + r.status + '): ' + errorText);
     }
 
     _editingCard.img=null;
@@ -9150,7 +9179,7 @@ async function removeCardImage(){
     showSuccessToast('Image removed successfully');
     renderCard();
   } catch(error) {
-    console.error('Image remove error:', error);
+    console.error('❌ Image remove error:', error);
     showErrorToast('Failed to remove image: ' + (error.message || 'Unknown error'));
   } finally {
     setEditorButtonsState(false);
