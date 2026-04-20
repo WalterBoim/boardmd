@@ -8717,29 +8717,117 @@ async function deleteCurrentCard(){
   const card = _editingCard;
   if(!confirm(`Delete this card permanently?\n\nQID ${card.qid || card.id}\n"${(card.q||'').slice(0,80)}..."\n\nThis cannot be undone.`)) return;
 
+  setEditorButtonsState(true);
+
   try {
     // Delete from Supabase
     const { error } = await _supa.from('cards').delete().eq('id', card.id);
-    if(error) throw error;
+    if(error) throw new Error(error.message || 'Supabase delete failed');
+
+    // Remove from local edits
+    const edits = getCardEdits();
+    delete edits[card.id];
+    saveCardEdits(edits);
 
     // Remove from local deck
     Object.keys(window.DECKS || {}).forEach(dk => {
       if(DECKS[dk]) DECKS[dk] = DECKS[dk].filter(c => c.id !== card.id);
     });
 
+    // Invalidate IndexedDB cache
+    try {
+      const req = indexedDB.open('boardmd_cache');
+      req.onsuccess = e => {
+        const db = e.target.result;
+        if (db.objectStoreNames.contains('cards')) {
+          const tx = db.transaction('cards', 'readwrite');
+          tx.objectStore('cards').delete(card.id);
+        }
+      };
+    } catch (ex) {
+      console.warn('IndexedDB cache invalidation failed:', ex);
+    }
+
+    showSuccessToast('Card deleted successfully');
     closeCardEditor();
-    showToast('Card deleted');
+
     // Advance to next card
     if(typeof rate === 'function') rate(2);
   } catch(e) {
-    alert('Error deleting card: ' + (e.message || e));
+    console.error('Delete error:', e);
+    showErrorToast('Failed to delete: ' + (e.message || 'Unknown error'));
+    setEditorButtonsState(false);
   }
 }
 
-function saveCardEdit(){
+// Helper: Disable/enable all editor buttons
+function setEditorButtonsState(disabled) {
+  document.querySelectorAll('#card-editor-overlay button').forEach(btn => {
+    const onClick = btn.getAttribute('onclick');
+    if (onClick && (onClick.includes('saveCardEdit') || onClick.includes('deleteCurrentCard') || onClick.includes('resetCardEdit') || onClick.includes('setCardImage') || onClick.includes('removeCardImage'))) {
+      btn.disabled = disabled;
+      btn.style.opacity = disabled ? '0.5' : '1';
+      btn.style.cursor = disabled ? 'not-allowed' : 'pointer';
+    }
+  });
+}
+
+// Helper: Show error toast (red color)
+function showErrorToast(msg) {
+  let t = document.getElementById('bmd-toast');
+  if (!t) {
+    t = document.createElement('div');
+    t.id = 'bmd-toast';
+    t.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--surface);border:1px solid var(--border);color:var(--text);padding:10px 20px;border-radius:8px;font-size:13px;font-family:Lato,sans-serif;font-weight:600;z-index:99999;opacity:0;transition:opacity .3s;pointer-events:none;';
+    document.body.appendChild(t);
+  }
+  t.style.background = 'rgba(244,63,94,.15)';
+  t.style.borderColor = 'var(--rose)';
+  t.style.color = 'var(--rose)';
+  t.textContent = msg;
+  t.style.opacity = '1';
+  setTimeout(() => {
+    t.style.opacity = '0';
+    setTimeout(() => {
+      t.style.background = 'var(--surface)';
+      t.style.borderColor = 'var(--border)';
+      t.style.color = 'var(--text)';
+    }, 300);
+  }, 3000);
+}
+
+// Helper: Show success toast (green color)
+function showSuccessToast(msg) {
+  let t = document.getElementById('bmd-toast');
+  if (!t) {
+    t = document.createElement('div');
+    t.id = 'bmd-toast';
+    t.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--surface);border:1px solid var(--border);color:var(--text);padding:10px 20px;border-radius:8px;font-size:13px;font-family:Lato,sans-serif;font-weight:600;z-index:99999;opacity:0;transition:opacity .3s;pointer-events:none;';
+    document.body.appendChild(t);
+  }
+  t.style.background = 'rgba(34,197,94,.15)';
+  t.style.borderColor = 'var(--emerald)';
+  t.style.color = 'var(--emerald)';
+  t.textContent = msg;
+  t.style.opacity = '1';
+  setTimeout(() => {
+    t.style.opacity = '0';
+    setTimeout(() => {
+      t.style.background = 'var(--surface)';
+      t.style.borderColor = 'var(--border)';
+      t.style.color = 'var(--text)';
+    }, 300);
+  }, 2500);
+}
+
+async function saveCardEdit(){
   if(!_editingCard) return;
   const card = _editingCard;
-  const edits = getCardEdits();
+
+  setEditorButtonsState(true);
+
+  try {
+    const edits = getCardEdits();
 
   const newQ = document.getElementById('editor-q').value.trim();
   const newExp = document.getElementById('editor-exp').value.trim();
@@ -8759,114 +8847,188 @@ function saveCardEdit(){
   const correctText = opts[correctIdx] || opts[0];
   const wrongTexts = opts.filter((_,i)=>i!==correctIdx);
 
-  edits[card.id] = {
-    q: newQ || card.q,
-    c: correctText || card.c,
-    w: wrongTexts.length ? wrongTexts : card.w,
-    d: newDist || card.d,
-    system: newSystem || card.system,
-    topic: newTopic || card.topic,
-    kp: newKp || card.kp,
-    _edited: true,
-    _editedAt: new Date().toISOString()
-  };
+    edits[card.id] = {
+      q: newQ || card.q,
+      c: correctText || card.c,
+      w: wrongTexts.length ? wrongTexts : card.w,
+      e: newExp || card.e,
+      d: newDist || card.d,
+      system: newSystem || card.system,
+      topic: newTopic || card.topic,
+      kp: newKp || card.kp,
+      _edited: true,
+      _editedAt: new Date().toISOString()
+    };
 
-  saveCardEdits(edits);
+    saveCardEdits(edits);
 
-  // Aplicar ao card em memória imediatamente
-  Object.assign(card, edits[card.id]);
+    // Aplicar ao card em memória imediatamente
+    Object.assign(card, edits[card.id]);
 
-  // Salvar direto no Supabase
-  const supaUpdate = {
-    q: edits[card.id].q,
-    c: edits[card.id].c,
-    w: edits[card.id].w,
-    e: edits[card.id].d,
-    system: edits[card.id].system,
-    d: edits[card.id].d,
-    topic: edits[card.id].topic,
-    kp: edits[card.id].kp
-  };
-  fetch(SUPA_URL + '/rest/v1/cards?id=eq.' + card.id, {
-    method: 'PATCH',
-    headers: {
-      'apikey': SUPA_KEY,
-      'Authorization': 'Bearer ' + SUPA_KEY,
-      'Content-Type': 'application/json',
-      'Prefer': 'return=minimal'
-    },
-    body: JSON.stringify(supaUpdate)
-  }).then(r => {
-    if(r.ok){
-      console.log('Supabase updated:', card.id);
-      // Invalida cache IndexedDB para este card
-      try{
-        const req = indexedDB.open('boardmd_cache');
-        req.onsuccess = e => {
-          const db = e.target.result;
-          if(db.objectStoreNames.contains('cards')){
-            const tx = db.transaction('cards','readwrite');
-            tx.objectStore('cards').delete(card.id);
-          }
-        };
-      }catch(ex){}
+    // Salvar direto no Supabase
+    const supaUpdate = {
+      q: edits[card.id].q,
+      c: edits[card.id].c,
+      w: edits[card.id].w,
+      e: edits[card.id].e,
+      d: edits[card.id].d,
+      system: edits[card.id].system,
+      topic: edits[card.id].topic,
+      kp: edits[card.id].kp
+    };
+
+    const response = await fetch(SUPA_URL + '/rest/v1/cards?id=eq.' + card.id, {
+      method: 'PATCH',
+      headers: {
+        'apikey': SUPA_KEY,
+        'Authorization': 'Bearer ' + SUPA_KEY,
+        'Content-Type': 'application/json',
+        'Prefer': 'return=minimal'
+      },
+      body: JSON.stringify(supaUpdate)
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error('Supabase update failed: ' + errorText);
     }
-    else r.text().then(t => console.error('Supabase error:', t));
-  }).catch(e => console.error('Supabase fetch error:', e));
 
-  // Feedback visual
-  const msg = document.getElementById('editor-saved-msg');
-  msg.style.opacity = '1';
-  setTimeout(()=>{ msg.style.opacity='0'; closeCardEditor(); renderCard(); }, 1200);
+    console.log('Supabase updated:', card.id);
+
+    // Invalida cache IndexedDB para este card
+    try {
+      const req = indexedDB.open('boardmd_cache');
+      req.onsuccess = e => {
+        const db = e.target.result;
+        if (db.objectStoreNames.contains('cards')) {
+          const tx = db.transaction('cards', 'readwrite');
+          tx.objectStore('cards').delete(card.id);
+        }
+      };
+    } catch (ex) {
+      console.warn('IndexedDB cache invalidation failed:', ex);
+    }
+
+    // Show success feedback
+    showSuccessToast('Changes saved successfully');
+
+    // Close editor and refresh card after delay
+    setTimeout(() => {
+      closeCardEditor();
+      renderCard();
+    }, 1200);
+
+  } catch (error) {
+    console.error('Save error:', error);
+    showErrorToast('Failed to save: ' + (error.message || 'Unknown error'));
+    setEditorButtonsState(false);
+  }
 }
 
 async function setCardImage(){
   if(!_editingCard) return;
   const url = (document.getElementById('editor-img-url').value||'').trim();
-  if(!url){ alert('Paste an image URL first.'); return; }
-  const imgObj = {url:url, alt:_editingCard.c||'', credit:'Manual', license:'CC BY-SA', source:'Manual'};
-  const r = await fetch(SUPA_URL+'/rest/v1/cards?id=eq.'+_editingCard.id, {
-    method:'PATCH',
-    headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/json','Prefer':'return=minimal'},
-    body:JSON.stringify({img:imgObj})
-  });
-  if(r.ok){
+  if(!url){ showErrorToast('Please paste an image URL first'); return; }
+
+  setEditorButtonsState(true);
+
+  try {
+    const imgObj = {url:url, alt:_editingCard.c||'', credit:'Manual', license:'CC BY-SA', source:'Manual'};
+    const r = await fetch(SUPA_URL+'/rest/v1/cards?id=eq.'+_editingCard.id, {
+      method:'PATCH',
+      headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/json','Prefer':'return=minimal'},
+      body:JSON.stringify({img:imgObj})
+    });
+
+    if(!r.ok){
+      const errorText = await r.text();
+      throw new Error('Failed to set image: ' + errorText);
+    }
+
     _editingCard.img=imgObj;
     document.getElementById('editor-img-preview').src=url;
     document.getElementById('editor-img-current').style.display='flex';
     document.getElementById('editor-img-url').value='';
+    showSuccessToast('Image added successfully');
     renderCard();
+  } catch(error) {
+    console.error('Image set error:', error);
+    showErrorToast('Failed to set image: ' + (error.message || 'Unknown error'));
+  } finally {
+    setEditorButtonsState(false);
   }
 }
 async function removeCardImage(){
   if(!_editingCard) return;
   if(!confirm('Remove image from this card?')) return;
-  const r = await fetch(SUPA_URL+'/rest/v1/cards?id=eq.'+_editingCard.id, {
-    method:'PATCH',
-    headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/json','Prefer':'return=minimal'},
-    body:JSON.stringify({img:null})
-  });
-  if(r.ok){
+
+  setEditorButtonsState(true);
+
+  try {
+    const r = await fetch(SUPA_URL+'/rest/v1/cards?id=eq.'+_editingCard.id, {
+      method:'PATCH',
+      headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/json','Prefer':'return=minimal'},
+      body:JSON.stringify({img:null})
+    });
+
+    if(!r.ok){
+      const errorText = await r.text();
+      throw new Error('Failed to remove image: ' + errorText);
+    }
+
     _editingCard.img=null;
     document.getElementById('editor-img-current').style.display='none';
+    showSuccessToast('Image removed successfully');
     renderCard();
+  } catch(error) {
+    console.error('Image remove error:', error);
+    showErrorToast('Failed to remove image: ' + (error.message || 'Unknown error'));
+  } finally {
+    setEditorButtonsState(false);
   }
 }
-function resetCardEdit(){
+async function resetCardEdit(){
   if(!_editingCard) return;
-  if(!confirm('Reset this card to its original content? Your edits will be lost.')) return;
-  const edits = getCardEdits();
-  delete edits[_editingCard.id];
-  saveCardEdits(edits);
+  if(!confirm('Reset this card to its original content?\n\nYour local edits will be lost.')) return;
 
-  // Restaurar o card original dos DECKS
-  const orig = (DECKS[_editingCard.deck]||[]).find(c=>c.id===_editingCard.id);
-  if(orig){
-    ['q','c','w','d','system','topic','kp','_edited','_editedAt'].forEach(k=>delete _editingCard[k]);
+  setEditorButtonsState(true);
+
+  try {
+    const edits = getCardEdits();
+    delete edits[_editingCard.id];
+    saveCardEdits(edits);
+
+    // Restaurar o card original dos DECKS
+    const orig = (DECKS[_editingCard.deck]||[]).find(c=>c.id===_editingCard.id);
+    if(!orig){
+      throw new Error('Original card data not found');
+    }
+
+    ['q','c','w','e','d','system','topic','kp','_edited','_editedAt'].forEach(k=>delete _editingCard[k]);
     Object.assign(_editingCard, orig);
+
+    // Invalidate IndexedDB cache
+    try {
+      const req = indexedDB.open('boardmd_cache');
+      req.onsuccess = e => {
+        const db = e.target.result;
+        if (db.objectStoreNames.contains('cards')) {
+          const tx = db.transaction('cards', 'readwrite');
+          tx.objectStore('cards').delete(_editingCard.id);
+        }
+      };
+    } catch (ex) {
+      console.warn('IndexedDB cache invalidation failed:', ex);
+    }
+
+    showSuccessToast('Card reset to original');
+    closeCardEditor();
+    renderCard();
+  } catch(error) {
+    console.error('Reset error:', error);
+    showErrorToast('Failed to reset: ' + (error.message || 'Unknown error'));
+    setEditorButtonsState(false);
   }
-  closeCardEditor();
-  renderCard();
 }
 
 function exportCardEdits(){
