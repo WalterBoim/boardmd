@@ -2598,7 +2598,7 @@ mark.hb{background:rgba(79,142,247,.28);border-bottom:2px solid rgba(40,100,220,
 
 /* ── YOUR CARD ── */
 .your-card{
-  margin:0 0 8px;
+  margin:12px 0 8px;
   background:var(--surface);
   border:1px solid var(--border2);
   border-radius:var(--radius);
@@ -2919,11 +2919,10 @@ mark.hb{background:rgba(79,142,247,.28);border-bottom:2px solid rgba(40,100,220,
 
 /* Ranking panel wrapper */
 #lb-panel {
-  padding: 0 !important;
+  padding: 16px 12px 100px !important;
   font-family: 'Sora', sans-serif !important;
   overflow-y: auto !important;
   -webkit-overflow-scrolling: touch !important;
-  padding-bottom: 100px !important;
   min-height: 0 !important;
 }
 
@@ -3431,10 +3430,10 @@ html.light .qs-val { color: inherit; }
 
 
 /* ── Mobile: no split, wrappers invisible ── */
-#bmd-cols-row { display: block; }
-#bmd-q-col    { display: block; padding: 0; position: static; max-height: none; overflow-y: visible; width: auto; border-right: none; }
+#bmd-cols-row { display: block; overflow-y: visible !important; }
+#bmd-q-col    { display: block; padding: 0; position: static; max-height: none; overflow-y: visible !important; width: auto; border-right: none; }
 #bmd-q-inner  { padding: 16px 18px; }
-#bmd-ans-col  { display: block; padding: 0; }
+#bmd-ans-col  { display: block; padding: 0; overflow-y: visible !important; }
 #bmd-split-divider { display: none; }
 .bmd-div-handle { display: none; }
 #bmd-ans-placeholder { display: none !important; }
@@ -3720,10 +3719,10 @@ html.dark .hl-btn-active { border-color:#fff!important; }
 @keyframes slideUp { from{opacity:0;transform:translateY(40px)} to{opacity:1;transform:translateY(0)} }
 
 /* Mobile: no split */
-#bmd-cols-row { display: block; }
-#bmd-q-col    { display: block; padding: 0; position: static; max-height: none; overflow-y: visible; width: auto; border-right: none; }
+#bmd-cols-row { display: block; overflow-y: visible !important; }
+#bmd-q-col    { display: block; padding: 0; position: static; max-height: none; overflow-y: visible !important; width: auto; border-right: none; }
 #bmd-q-inner  { padding: 16px 18px; }
-#bmd-ans-col  { display: block; padding: 0; }
+#bmd-ans-col  { display: block; padding: 0; overflow-y: visible !important; }
 #bmd-split-divider { display: none; }
 .bmd-div-handle { display: none; }
 #bmd-ans-placeholder { display: none !important; }
@@ -6705,14 +6704,24 @@ function revealAnswer(sel,card){
     else if(t===sel&&t!==card.c) btn.classList.add('wrong');
     else btn.classList.add('other-wrong');
   });
-  // Scroll to correct answer within left column only (not whole page)
+  // Scroll to correct answer
   setTimeout(function(){
     var correctBtn = document.querySelector('.opt-btn.correct') || document.querySelector('.opt-btn.show-correct');
     if(correctBtn){
-      var col = document.getElementById('bmd-q-col') || document.getElementById('bmd-cols-row');
-      if(col && col.scrollHeight > col.clientHeight){
-        var btnTop = correctBtn.offsetTop - col.offsetTop;
-        col.scrollTo({top: Math.max(0, btnTop - col.clientHeight/2 + correctBtn.offsetHeight/2), behavior:'smooth'});
+      // Mobile: scroll page to correct answer
+      if(window.innerWidth < 900){
+        var rect = correctBtn.getBoundingClientRect();
+        var scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+        var targetY = rect.top + scrollTop - (window.innerHeight / 2) + (correctBtn.offsetHeight / 2);
+        window.scrollTo({top: Math.max(0, targetY), behavior: 'smooth'});
+      }
+      // Desktop: scroll within left column only
+      else {
+        var col = document.getElementById('bmd-q-col') || document.getElementById('bmd-cols-row');
+        if(col && col.scrollHeight > col.clientHeight){
+          var btnTop = correctBtn.offsetTop - col.offsetTop;
+          col.scrollTo({top: Math.max(0, btnTop - col.clientHeight/2 + correctBtn.offsetHeight/2), behavior:'smooth'});
+        }
       }
     }
   }, 300);
@@ -8619,6 +8628,11 @@ function studySearchResults(){
           <input id="editor-topic" style="width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:'Lato',sans-serif;font-size:13px;padding:10px 12px;outline:none;transition:border-color .15s" onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border)'">
         </div>
       </div>
+
+      <div>
+        <label style="font-size:10px;font-weight:700;letter-spacing:.08em;color:var(--text-faint);font-family:'JetBrains Mono',monospace;text-transform:uppercase;display:block;margin-bottom:6px">Key Point</label>
+        <textarea id="editor-kp" style="width:100%;min-height:70px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:'Lato',sans-serif;font-size:13px;padding:12px;resize:vertical;line-height:1.6;transition:border-color .15s;outline:none" onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border)'"></textarea>
+      </div>
     </div>
 
     <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding-top:8px;border-top:1px solid var(--border)">
@@ -8661,6 +8675,7 @@ function openCardEditor(){
   document.getElementById('editor-dist').value = c.d || '';
   document.getElementById('editor-system').value = c.system || '';
   document.getElementById('editor-topic').value = c.topic || '';
+  document.getElementById('editor-kp').value = c.kp || '';
 
   // Opções A-D
   const opts = c.w ? [c.c, ...(c.w)] : [c.c];
@@ -8731,6 +8746,7 @@ function saveCardEdit(){
   const newDist = document.getElementById('editor-dist').value.trim();
   const newSystem = document.getElementById('editor-system').value.trim();
   const newTopic = document.getElementById('editor-topic').value.trim();
+  const newKp = document.getElementById('editor-kp').value.trim();
 
   // Pegar opções editadas
   const opts = [];
@@ -8750,6 +8766,7 @@ function saveCardEdit(){
     d: newDist || card.d,
     system: newSystem || card.system,
     topic: newTopic || card.topic,
+    kp: newKp || card.kp,
     _edited: true,
     _editedAt: new Date().toISOString()
   };
@@ -8767,7 +8784,8 @@ function saveCardEdit(){
     e: edits[card.id].d,
     system: edits[card.id].system,
     d: edits[card.id].d,
-    topic: edits[card.id].topic
+    topic: edits[card.id].topic,
+    kp: edits[card.id].kp
   };
   fetch(SUPA_URL + '/rest/v1/cards?id=eq.' + card.id, {
     method: 'PATCH',
@@ -8844,7 +8862,7 @@ function resetCardEdit(){
   // Restaurar o card original dos DECKS
   const orig = (DECKS[_editingCard.deck]||[]).find(c=>c.id===_editingCard.id);
   if(orig){
-    ['q','c','w','d','system','topic','_edited','_editedAt'].forEach(k=>delete _editingCard[k]);
+    ['q','c','w','d','system','topic','kp','_edited','_editedAt'].forEach(k=>delete _editingCard[k]);
     Object.assign(_editingCard, orig);
   }
   closeCardEditor();
