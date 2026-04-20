@@ -14,8 +14,7 @@
 <!-- Puter.js for Gemini AI (free tier) -->
 <script src="https://js.puter.com/v2/"></script>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Lato:wght@400;500;700&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,500;0,8..60,600;1,8..60,300;1,8..60,400&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Sora:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-<style id="bmd-all">
-
+<style>
 :root {
   --bg:#080c12; --surface:#0e1420; --surface2:#141c2e;
   --border:#1e2a42; --border-bright:#2a3a58;
@@ -68,8 +67,7 @@ html.light .footer{border-color:var(--border);}
 .theme-toggle:hover{border-color:var(--accent);color:var(--accent);}
 .theme-toggle svg{width:16px;height:16px;}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
-html,body{height:100%;overflow:hidden;margin:0;}
-body{font-family:'Lato','Helvetica Neue',Arial,sans-serif;background:var(--bg);color:var(--text);height:100vh;font-size:var(--font-size);line-height:1.6;overflow:hidden;max-width:100vw;}
+body{font-family:'Lato','Helvetica Neue',Arial,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:var(--font-size);line-height:1.6;overflow-x:hidden;max-width:100vw;}
 
 /* ── NAV ── */
 .nav{display:flex;align-items:center;justify-content:space-between;padding:20px 40px;position:sticky;top:0;z-index:100;background:rgba(8,12,18,.88);backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,.05);}
@@ -134,6 +132,9 @@ body{font-family:'Lato','Helvetica Neue',Arial,sans-serif;background:var(--bg);c
 .btn-deck{display:flex;align-items:center;gap:6px;background:none;border:1px solid var(--border);color:var(--text-dim);padding:8px 16px;border-radius:8px;cursor:pointer;font-size:12px;font-family:'Syne',sans-serif;font-weight:600;transition:all .2s;}
 .deck-card.s1 .btn-deck:hover{border-color:var(--accent);color:var(--accent);}
 .deck-card.s2 .btn-deck:hover{border-color:var(--gold);color:var(--gold);}
+.deck-card.daily_review::before{background:linear-gradient(90deg,#0ea5e9,#6366f1);}
+.deck-card.daily_review .deck-icon{background:rgba(14,165,233,.12);}
+.deck-card.daily_review .btn-deck:hover{border-color:#0ea5e9;color:#0ea5e9;}
 .deck-card.core .btn-deck:hover{border-color:var(--emerald);color:var(--emerald);}
 
 /* ── FEATURES ── */
@@ -150,10 +151,10 @@ body{font-family:'Lato','Helvetica Neue',Arial,sans-serif;background:var(--bg);c
 .footer-copy{font-size:12px;color:var(--text-faint);}
 
 /* ══════════════ APP ══════════════ */
-#app{display:none;height:100vh;flex-direction:column;overflow:hidden;}
+#app{display:none;min-height:100vh;flex-direction:column;}
 #app.active{display:flex;}
 
-.app-header{background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:200;flex-shrink:0;}
+.app-header{background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:200;}
 .app-header-top{padding:0 20px;height:46px;display:flex;align-items:center;justify-content:space-between;gap:12px;}
 .app-header-tabs{padding:0 16px;border-top:1px solid var(--border);overflow-x:auto;scrollbar-width:none;display:flex;align-items:center;gap:0;}
 .app-header-tabs::-webkit-scrollbar{display:none;}
@@ -167,7 +168,7 @@ body{font-family:'Lato','Helvetica Neue',Arial,sans-serif;background:var(--bg);c
 .app-logo em{font-size:12px;font-style:normal;color:var(--text-faint);font-family:'Lato',sans-serif;margin-left:8px;}
 
 /* ── DECK HOME DASHBOARD (Anki-style) ── */
-.deck-home{display:none;flex:1;flex-direction:column;padding:24px 24px;max-width:100%;margin:0;width:100%;gap:20px;overflow-y:auto;-webkit-overflow-scrolling:touch;min-height:0;}
+.deck-home{display:none;flex:1;flex-direction:column;padding:32px 40px;max-width:900px;margin:0 auto;width:100%;gap:24px;}
 .deck-home.active{display:flex;}
 .deck-home-title{font-family:'Instrument Serif',serif;font-size:28px;color:var(--text);margin-bottom:4px;}
 .deck-home-sub{font-size:13px;color:var(--text-faint);font-family:'Lato',sans-serif;}
@@ -411,8 +412,8 @@ html.light .qid-textarea{background:var(--surface2);}
   .stats-row{display:grid;grid-template-columns:repeat(2,1fr);}
   .section{padding:50px 20px;}
   .sidebar{display:none;}
-  .app-layout{display:flex;flex-direction:column;width:100%;overflow-x:hidden;overflow-y:hidden;}
-  .study-main{padding:0;width:100%;box-sizing:border-box;overflow-x:hidden;overflow-y:hidden;}
+  .app-layout{display:block;width:100%;overflow-x:hidden;}
+  .study-main{padding:12px 8px;width:100%;box-sizing:border-box;overflow-x:hidden;}
   .study-inner{max-width:100%;width:100%;padding:0;box-sizing:border-box;}
   #app{overflow-x:hidden;max-width:100vw;}
   .fsrs-btn{max-width:none;}
@@ -459,7 +460,7 @@ html.light .qid-textarea{background:var(--surface2);}
 .badge-modal button{background:var(--accent);color:#fff;border:none;padding:11px 30px;border-radius:9px;font-family:'Lato',sans-serif;font-size:13px;font-weight:700;cursor:pointer;}
 
 /* Leaderboard panel */
-.lb-panel{display:none;flex:1;flex-direction:column;padding:12px 12px;gap:0;max-width:100%;margin:0;width:100%;}
+.lb-panel{display:none;flex:1;flex-direction:column;padding:32px 36px;gap:24px;max-width:100%;margin:0 auto;width:100%;}
 .lb-panel.active{display:flex;}
 
 /* Header */
@@ -706,8 +707,8 @@ html.light .pstat, html.light .badge-item, html.light .lvl-progress{background:v
   .deck-tab{font-size:12px;padding:8px 10px;}
   .qid-modal,.bid-modal{width:95vw;padding:20px 16px;}
 }
-
-
+</style>
+<style id="bmd-fonts">
 :root {
   --font-ui:      'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   --font-serif:   'Source Serif 4', Georgia, serif;
@@ -749,8 +750,7 @@ html.light { --uw-hover:#f0f7ff; --uw-correct:#e8f5e9; --uw-wrong:#fdecea; --uw-
 .exp-text { font-size:15px !important; line-height:1.8 !important; }
 .exp-correct-inner { font-size:15px !important; font-weight:500 !important; }
 .exp-dist { font-size:14px !important; line-height:1.75 !important; }
-
-
+</style><style id="bmd-card-std">
 /* ── Card explanation standardization ── */
 
 /* Explanation text — clean, no rogue margins */
@@ -804,8 +804,9 @@ html.light { --uw-hover:#f0f7ff; --uw-correct:#e8f5e9; --uw-wrong:#fdecea; --uw-
   font-style: italic !important;
   color: var(--text-dim) !important;
 }
+</style>
 
-
+<style id="bmd-exp-extras">
 /* Clean up fa_step1 HTML explanations */
 .exp-text div { margin-bottom: 4px; }
 .exp-text ul { margin: 6px 0 6px 18px; }
@@ -822,8 +823,9 @@ html.light { --uw-hover:#f0f7ff; --uw-correct:#e8f5e9; --uw-wrong:#fdecea; --uw-
   text-transform: uppercase; 
   letter-spacing: .04em; 
 }
+</style>
 
-
+<style>
 /* ── LEVEL UP OVERLAY — Duolingo style ── */
 #levelup-overlay {
   position: fixed; inset: 0; z-index: 9999;
@@ -1025,8 +1027,9 @@ html.light .att-btn{background:var(--surface2);}
   text-transform:uppercase;
   white-space:nowrap;
 }
+</style>
 
-
+<style id="dash-v2">
 :root{--bg:#f2f4fb;--surface:#fff;--surface2:#e8edf8;--border:rgba(0,0,0,.07);--border2:rgba(0,0,0,.12);--text:#0d1021;--text2:#3a4060;--muted:#8892b0;--accent:#4f8ef7;--green:#00d4aa;--amber:#f59e0b;--red:#ff5370;}
 [data-theme="dark"]{--bg:#0a0d14;--surface:#111520;--surface2:#161c2d;--border:rgba(255,255,255,.07);--border2:rgba(255,255,255,.12);--text:#eef1ff;--text2:#c8d0ee;--muted:#556080;}
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -1062,7 +1065,7 @@ html.light .att-btn{background:var(--surface2);}
 .tab-content.active{display:block;}
 
 /* ── DECK ROW ── */
-.deck-row{background:var(--surface);border:1px solid var(--border2);border-radius:12px;padding:10px 16px;margin-bottom:8px;display:flex;align-items:center;gap:12px;width:100%;}
+.deck-row{background:var(--surface);border:1px solid var(--border2);border-radius:12px;padding:12px 14px;margin-bottom:8px;display:flex;align-items:center;gap:12px;}
 .deck-icon{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
 .deck-icon svg{width:18px;height:18px;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
 .deck-info{flex:1;}
@@ -1073,7 +1076,7 @@ html.light .att-btn{background:var(--surface2);}
 .badge-new{color:#4f8ef7;background:rgba(79,142,247,.1);border:1px solid rgba(79,142,247,.25);}
 .badge-due{color:#f59e0b;background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.25);}
 .badge-soon{color:#8892b0;background:rgba(136,146,176,.1);border:1px solid rgba(136,146,176,.2);}
-.study-btn{padding:7px 14px;background:#4f8ef7;border:none;border-radius:8px;font-family:'Sora',sans-serif;font-size:12px;font-weight:700;color:#fff;cursor:pointer;white-space:nowrap;margin-left:auto;flex-shrink:0;transition:opacity .15s;}
+.study-btn{padding:7px 14px;background:#4f8ef7;border:none;border-radius:8px;font-family:'Sora',sans-serif;font-size:12px;font-weight:700;color:#fff;cursor:pointer;white-space:nowrap;margin-left:6px;flex-shrink:0;transition:opacity .15s;}
 .study-btn:active{opacity:.85;}
 
 /* ── EXPANDABLE ── */
@@ -1174,8 +1177,9 @@ html.light .att-btn{background:var(--surface2);}
   color: #4f8ef7;
   background: rgba(79,142,247,.12);
 }
+</style>
 
-
+<style id="bmd-card-v2">
 /* === BOARDMD CARD v2 — copiado literalmente do boardmd_card.html === */
 
 :root {
@@ -1602,8 +1606,8 @@ mark.hb{background:rgba(79,142,247,.28);border-bottom:2px solid rgba(40,100,220,
 [data-theme="light"] .att-response{background:var(--surface2)}
 [data-theme="light"] .why-box{background:var(--surface2)}
 
-
-
+</style>
+<style id="bmd-card-override">
 
 /* ═══════════════════════════════════════════════════════════════
    BOARDMD CARD v2 — Visual override
@@ -1687,47 +1691,63 @@ mark.hb{background:rgba(79,142,247,.28);border-bottom:2px solid rgba(40,100,220,
 /* ── Card header → topic row ── */
 .card-header {
   display: flex !important;
-  flex-direction: row !important;
-  align-items: center !important;
-  gap: 6px !important;
-  padding: 6px 14px !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+  gap: 8px !important;
+  padding: 14px 16px 12px !important;
   background: var(--surface) !important;
   border: 1px solid var(--border2) !important;
   border-radius: 18px 18px 0 0 !important;
   border-bottom: none !important;
-  flex-wrap: nowrap !important;
 }
 /* Line 1: DECK NAME (large) + system (muted, smaller) */
 .card-meta-left {
   display: flex !important;
   flex-direction: column !important;
   align-items: flex-start !important;
-  gap: 1px !important;
+  gap: 2px !important;
   width: 100% !important;
 }
 /* Line 2: chips — state + deck badge + edit + QID */
 .card-right {
   display: flex !important;
   align-items: center !important;
-  gap: 5px !important;
+  gap: 6px !important;
   flex-wrap: wrap !important;
   width: 100% !important;
 }
 /* Deck label — prominent */
 #c-deck-label {
-  display: none !important;
+  font-size: 11px !important;
+  font-weight: 800 !important;
+  letter-spacing: 1.2px !important;
+  text-transform: uppercase !important;
+  color: var(--accent) !important;
+  font-family: 'Sora', sans-serif !important;
+  display: block !important;
 }
-/* System — hidden from card header */
+/* System — subdued subtitle */
 .card-system, #c-sys {
-  display: none !important;
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  letter-spacing: .8px !important;
+  text-transform: uppercase !important;
+  color: var(--muted) !important;
+  font-family: 'Sora', sans-serif !important;
 }
 #c-deck-label {
-  display: none !important;
-}
-.card-system, .card-topic {
-  font-size: 9px !important;
+  font-size: 10px !important;
   font-weight: 700 !important;
   letter-spacing: 1px !important;
+  text-transform: uppercase !important;
+  color: var(--muted) !important;
+  font-family: 'Sora', sans-serif !important;
+  display: block !important;
+}
+.card-system, .card-topic {
+  font-size: 10px !important;
+  font-weight: 700 !important;
+  letter-spacing: 1.2px !important;
   text-transform: uppercase !important;
   color: var(--muted) !important;
   font-family: 'Sora', sans-serif !important;
@@ -1735,18 +1755,18 @@ mark.hb{background:rgba(79,142,247,.28);border-bottom:2px solid rgba(40,100,220,
 /* card-right merged above */
 /* State chip — New/Learning/Review */
 .card-state {
-  font-size: 9px !important;
+  font-size: 10px !important;
   font-weight: 700 !important;
-  padding: 2px 6px !important;
+  padding: 3px 8px !important;
   border-radius: 999px !important;
   font-family: 'Sora', sans-serif !important;
   letter-spacing: .3px !important;
 }
 /* QID chip */
 .card-qid {
-  font-size: 9px !important;
+  font-size: 10px !important;
   font-weight: 700 !important;
-  padding: 2px 6px !important;
+  padding: 3px 8px !important;
   border-radius: 999px !important;
   border: 1px solid rgba(79,142,247,.2) !important;
   background: rgba(79,142,247,.06) !important;
@@ -2015,6 +2035,7 @@ mark.hb{background:rgba(79,142,247,.28);border-bottom:2px solid rgba(40,100,220,
   padding: 12px 0 24px !important;
   background: transparent !important;
   border: none !important;
+  position: static !important;
 }
 .fsrs-nav.visible {
   display: flex !important;
@@ -2108,81 +2129,24 @@ mark.hb{background:rgba(79,142,247,.28);border-bottom:2px solid rgba(40,100,220,
 .att-trigger-icon svg { width: 17px !important; height: 17px !important; stroke: #4f8ef7 !important; fill: none !important; stroke-width: 1.8 !important; }
 .att-trigger-name { font-size: 14px !important; font-weight: 700 !important; color: #4f8ef7 !important; font-family: 'Sora', sans-serif !important; }
 
+</style>
 
-
-/* ── Study area layout — mobile-first, full width ── */
-.app-layout {
-  width: 100% !important;
-  max-width: 100% !important;
-  flex: 1 !important;
-  overflow: hidden !important;
-}
+<style id="bmd-study-layout">
 .sidebar { display: none !important; }
-.study-main {
-  padding: 0 !important;
-  width: 100% !important;
-  max-width: 100% !important;
-  overflow-x: hidden !important;
-  height: 100% !important;
-  flex-direction: column !important;
-  overflow-y: hidden !important;
-}
-.study-inner {
-  padding: 0 !important;
-  max-width: 100% !important;
-  flex: 1 !important;
-  display: flex !important;
-  flex-direction: column !important;
-  overflow: hidden !important;
-  padding-bottom: 0 !important;
-}
-/* ── Flexbox study card: header fixed top, buttons fixed bottom, content scrolls ── */
-#card-el {
-  flex: 1 !important;
-  display: flex !important;
-  flex-direction: column !important;
-  overflow: hidden !important;
-  min-height: 0 !important;
-}
-#card-el > .card-header {
-  flex-shrink: 0 !important;
-}
-#bmd-cols-row {
-  flex: 1 !important;
-  overflow-y: auto !important;
-  min-height: 0 !important;
-  -webkit-overflow-scrolling: touch !important;
-  overscroll-behavior-y: contain !important;
-  scrollbar-width: thin !important;
-}
-#bmd-cols-row::-webkit-scrollbar { width: 3px; }
-#bmd-cols-row::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
-#card-el > .fsrs-nav {
-  flex-shrink: 0 !important;
-  padding: 10px 12px 18px !important;
-  border-top: 1px solid var(--border) !important;
-  background: var(--bg) !important;
-}
-.progress-wrap {
-  flex-shrink: 0 !important;
-}
-/* Hide old done-wrap decorations */
-.done-wrap { padding: 32px 20px !important; }
-/* Eliminate old anki-counter bar */
 .anki-counter { display: none !important; }
-/* Filter bar */
 .filter-bar { display: none !important; }
-/* Remove old card box-shadow styles that conflict */
-.card {
-  background: transparent !important;
-  border: none !important;
-  box-shadow: none !important;
-  padding: 0 !important;
-  border-radius: 0 !important;
-  max-width: 100% !important;
+.card { background: transparent !important; border: none !important; box-shadow: none !important; padding: 0 !important; border-radius: 0 !important; max-width: 100% !important; }
+.done-wrap { padding: 32px 20px !important; }
+@media(min-width:900px){
+  body.studying { overflow: hidden !important; height: 100vh !important; }
+  body.studying #app { height: 100vh !important; overflow: hidden !important; display: flex !important; flex-direction: column !important; min-height: unset !important; padding-bottom: 0 !important; }
+  body.studying .app-layout { flex: 1 !important; min-height: 0 !important; overflow: hidden !important; display: flex !important; width: 100% !important; }
+  body.studying .study-main { flex: 1 !important; min-height: 0 !important; overflow: hidden !important; display: flex !important; flex-direction: column !important; padding: 0 !important; width: 100% !important; justify-content: flex-start !important; }
+  body.studying .study-inner { flex: 1 !important; min-height: 0 !important; overflow: hidden !important; display: flex !important; flex-direction: column !important; padding: 0 !important; width: 100% !important; max-width: none !important; align-items: stretch !important; gap: 0 !important; }
 }
+</style>
 
-
+<style id="bmd-perf-v2">
 /* === BOARDMD PERFORMANCE v2 — copiado do boardmd_performance.html === */
 
 :root {
@@ -2523,15 +2487,14 @@ mark.hb{background:rgba(79,142,247,.28);border-bottom:2px solid rgba(40,100,220,
   gap:0 !important;
   background:var(--bg) !important;
   overflow-y:auto;
-  -webkit-overflow-scrolling:touch;
-  min-height:0;
 }
 #profile-panel.active { display:flex !important; }
 @media(max-width:600px){
   #profile-panel { max-width:100% !important; margin:0 auto !important; padding-bottom:100px !important; }
 }
+</style>
 
-
+<style id="bmd-rank-v2">
 /* === BOARDMD RANKING v2 === */
 
 :root {
@@ -2596,246 +2559,302 @@ mark.hb{background:rgba(79,142,247,.28);border-bottom:2px solid rgba(40,100,220,
 .theme-btn{width:30px;height:30px;border-radius:50%;border:1px solid var(--border);background:var(--surface);display:flex;align-items:center;justify-content:center;cursor:pointer}
 .theme-btn svg{width:13px;height:13px;fill:var(--muted)}
 
-/* ══════════════════════════════════════════════════════════════════════
-   RANKING PAGE CSS — Clean Rebuild
-   ══════════════════════════════════════════════════════════════════════ */
-
-/* ── SHARED UTILITIES ── */
-
-/* Speed dots */
-.speed-dot{
-  display:inline-block;width:8px;height:8px;border-radius:50%;
-  margin-right:4px;vertical-align:middle;flex-shrink:0;
+/* ── YOUR CARD ── */
+.your-card{
+  margin:14px 14px 0;
+  background:var(--surface);
+  border:1px solid var(--border2);
+  border-radius:var(--radius);
+  padding:16px 18px;
+  position:relative;overflow:hidden;
 }
-.sd-green{background:var(--green)}
-.sd-amber{background:var(--amber)}
-.sd-red{background:var(--red)}
+.your-card::before{
+  content:'';position:absolute;
+  top:0;left:0;right:0;height:3px;
+  background:linear-gradient(90deg,var(--accent),var(--green));
+}
+.your-top{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.your-avatar{
+  width:44px;height:44px;border-radius:50%;
+  background:rgba(79,142,247,.15);border:2px solid rgba(79,142,247,.3);
+  display:flex;align-items:center;justify-content:center;
+  font-size:16px;font-weight:800;color:var(--accent);flex-shrink:0;
+}
+.your-info{flex:1}
+.your-name{font-size:15px;font-weight:700;margin-bottom:2px}
+.your-school{font-size:11px;color:var(--muted);display:flex;align-items:center;gap:5px}
+.flag{display:inline-block;width:14px;height:10px;border-radius:2px;vertical-align:middle;flex-shrink:0}
+.flag-br{background:linear-gradient(180deg,#009c3b 0%,#009c3b 33%,#fedf00 33%,#fedf00 66%,#009c3b 66%)}
+.flag-us{background:repeating-linear-gradient(180deg,#b22234 0,#b22234 14%,#fff 14%,#fff 28%,#b22234 28%,#b22234 42%,#fff 42%,#fff 56%,#b22234 56%,#b22234 70%,#fff 70%,#fff 84%,#b22234 84%,#b22234 100%)}
+.flag-in{background:linear-gradient(180deg,#ff9933 0,#ff9933 33%,#fff 33%,#fff 66%,#138808 66%)}
+.flag-de{background:linear-gradient(180deg,#000 0,#000 33%,#dd0000 33%,#dd0000 66%,#ffce00 66%)}
+.flag-gb{background:#012169}
 
-/* Tier badges */
 .tier-badge{
   font-size:10px;font-weight:800;letter-spacing:.6px;text-transform:uppercase;
   padding:3px 10px;border-radius:999px;flex-shrink:0;
 }
 .tier-attending{color:var(--tier-attending);background:rgba(0,212,170,.1);border:1px solid rgba(0,212,170,.25)}
-.tier-resident{color:var(--tier-resident);background:rgba(79,142,247,.1);border:1px solid rgba(79,142,247,.25)}
-.tier-intern{color:var(--tier-intern);background:rgba(107,114,128,.1);border:1px solid rgba(107,114,128,.2)}
-.tier-fellow{color:var(--tier-fellow);background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.25)}
-.tier-chief{color:var(--tier-chief);background:rgba(245,166,35,.12);border:1px solid rgba(245,166,35,.3)}
-.tier-student{color:var(--muted);background:rgba(107,114,128,.08);border:1px solid rgba(107,114,128,.15)}
+.tier-resident {color:var(--tier-resident); background:rgba(79,142,247,.1); border:1px solid rgba(79,142,247,.25)}
+.tier-intern   {color:var(--tier-intern);   background:rgba(107,114,128,.1);border:1px solid rgba(107,114,128,.2)}
+.tier-fellow   {color:var(--tier-fellow);   background:rgba(245,158,11,.1); border:1px solid rgba(245,158,11,.25)}
+.tier-chief    {color:var(--tier-chief);    background:rgba(245,166,35,.12);border:1px solid rgba(245,166,35,.3)}
 
-/* Section labels */
-.rank-section-label{
-  padding:8px 4px 4px;font-size:11px;font-weight:700;letter-spacing:1px;
-  text-transform:uppercase;color:var(--muted);
+.your-stats{display:flex;gap:0;border-top:1px solid var(--border);padding-top:12px}
+.your-stat{flex:1;text-align:center;border-right:1px solid var(--border)}
+.your-stat:last-child{border-right:none}
+.your-stat-val{
+  font-size:16px;font-weight:800;
+  font-family:'JetBrains Mono',monospace;
+  margin-bottom:2px;
 }
+.your-stat-lbl{font-size:10px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;color:var(--muted)}
 
-/* Live pill indicator */
-.rank-live-pill{display:flex;align-items:center;gap:5px;font-size:10px;font-weight:700;color:var(--green)}
-.rank-live-dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse 2s infinite}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+/* speed dot */
+.speed-dot{
+  display:inline-block;width:8px;height:8px;
+  border-radius:50%;margin-right:4px;vertical-align:middle;flex-shrink:0;
+}
+.sd-green{background:var(--green)}
+.sd-amber{background:var(--amber)}
+.sd-red  {background:var(--red)}
 
-/* Upgrade buttons */
-.upgrade-btn{
-  font-size:12px;font-weight:700;color:#fff;background:var(--accent);border:none;
-  padding:7px 16px;border-radius:999px;cursor:pointer;transition:opacity .15s;
-  white-space:nowrap;font-family:'Sora',sans-serif;
+/* ── LEAGUE CARD ── */
+.league-card{
+  margin:12px 14px 0;
+  background:var(--surface);border:1px solid var(--border2);
+  border-radius:var(--radius);overflow:hidden;
 }
-.upgrade-btn:active{opacity:.8}
-
-/* ── PROFILE CARD ── */
-
-.rank-profile-card{
-  margin:12px 0 8px;background:var(--surface);border:1px solid var(--border2);
-  border-radius:var(--radius);padding:14px 18px;position:relative;overflow:hidden;width:100%;
-}
-.rank-profile-card::before{
-  content:'';position:absolute;top:0;left:0;right:0;height:3px;
-  background:linear-gradient(90deg,var(--accent),var(--green));
-}
-.rank-profile-header{display:flex;align-items:center;gap:12px;margin-bottom:10px}
-.rank-profile-avatar{
-  width:44px;height:44px;border-radius:50%;background:rgba(79,142,247,.15);
-  border:2px solid rgba(79,142,247,.3);display:flex;align-items:center;justify-content:center;
-  font-size:16px;font-weight:800;color:var(--accent);flex-shrink:0;
-}
-.rank-profile-info{flex:1}
-.rank-profile-name{font-size:15px;font-weight:700;margin-bottom:2px}
-.rank-profile-univ{font-size:11px;color:var(--muted);display:flex;align-items:center;gap:5px}
-.rank-tier-badge{margin-left:auto}
-.rank-speed-indicator{
-  display:flex;align-items:center;gap:4px;font-size:11px;font-weight:600;padding:4px 10px;
-  background:var(--surface2);border-radius:8px;border:1px solid var(--border2);
-}
-.rank-speed-dot{width:6px;height:6px;border-radius:50%}
-.rank-speed-green{background:var(--green)}
-.rank-speed-amber{background:var(--amber)}
-.rank-speed-red{background:var(--red)}
-.rank-speed-text{color:var(--muted)}
-.rank-profile-stats{display:flex;gap:0;border-top:1px solid var(--border);padding-top:10px}
-.rank-profile-stat{flex:1;text-align:center;border-right:1px solid var(--border)}
-.rank-profile-stat:last-child{border-right:none}
-.rank-profile-stat-val{font-size:16px;font-weight:800;font-family:'JetBrains Mono',monospace;margin-bottom:2px}
-.rank-profile-stat-lbl{font-size:10px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;color:var(--muted)}
-.rank-profile-insight{
-  margin-top:10px;padding-top:10px;border-top:1px solid var(--border);
-  font-size:12px;color:var(--text2);line-height:1.5;
-}
-
-/* ── WEEKLY LEAGUE ── */
-
-.rank-weekly-league{
-  margin:0 0 8px;background:var(--surface);border:1px solid var(--border2);
-  border-radius:var(--radius);overflow:hidden;width:100%;
-}
-.rank-weekly-header{
-  padding:14px 18px;display:flex;align-items:center;justify-content:space-between;
+.league-header{
+  padding:14px 18px;
+  display:flex;align-items:center;justify-content:space-between;
   border-bottom:1px solid var(--border);
 }
-.rank-weekly-title{display:flex;align-items:center;gap:10px}
-.rank-weekly-icon{font-size:24px}
-.rank-weekly-name{font-size:14px;font-weight:700}
-.rank-weekly-sub{font-size:11px;color:var(--muted);margin-top:1px}
-.rank-weekly-timer{
-  font-size:11px;font-weight:700;font-family:'JetBrains Mono',monospace;color:var(--muted);
-  background:var(--surface2);padding:4px 10px;border-radius:8px;border:1px solid var(--border2);
+.league-left{display:flex;align-items:center;gap:10px}
+.league-icon{
+  width:38px;height:38px;border-radius:10px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:11px;font-weight:800;letter-spacing:.3px;
+}
+.league-name{font-size:14px;font-weight:700}
+.league-sub{font-size:11px;color:var(--muted);margin-top:1px}
+.league-timer{
+  font-size:11px;font-weight:700;
+  font-family:'JetBrains Mono',monospace;
+  color:var(--muted);
+  background:var(--surface2);
+  padding:4px 10px;border-radius:8px;
+  border:1px solid var(--border2);
 }
 
-/* Weekly league rows */
+/* league progress bar */
+.league-progress{padding:12px 18px;border-bottom:1px solid var(--border)}
+.lp-label{display:flex;justify-content:space-between;margin-bottom:6px}
+.lp-you{font-size:12px;font-weight:600;color:var(--text2)}
+.lp-target{font-size:11px;color:var(--muted)}
+.lp-bar{height:6px;background:var(--surface2);border-radius:999px;overflow:hidden}
+.lp-fill{height:100%;border-radius:999px;transition:width .6s ease}
+.lp-note{font-size:10px;color:var(--muted);margin-top:5px}
+
+/* league rows */
 .league-row{
-  display:flex;align-items:center;gap:10px;padding:10px 18px;
-  border-bottom:1px solid var(--border);transition:background .12s;
+  display:flex;align-items:center;gap:10px;
+  padding:10px 18px;border-bottom:1px solid var(--border);
+  transition:background .12s;
 }
 .league-row:last-child{border-bottom:none}
 .league-row.you{background:rgba(79,142,247,.06)}
+.league-row.promoted{background:rgba(0,212,170,.04)}
+.league-row.danger{background:rgba(255,83,112,.04)}
+
 .lr-pos{
-  font-size:12px;font-weight:800;font-family:'JetBrains Mono',monospace;
+  font-size:12px;font-weight:800;
+  font-family:'JetBrains Mono',monospace;
   width:20px;text-align:center;flex-shrink:0;color:var(--muted);
 }
-.lr-pos.p1{color:var(--lgold)}
-.lr-pos.p2{color:var(--silver)}
-.lr-pos.p3{color:var(--bronze)}
+.lr-pos.p1{color:var(--lgold)} .lr-pos.p2{color:var(--silver)} .lr-pos.p3{color:var(--bronze)}
+.lr-pos.you-c{color:var(--accent)}
+
 .lr-avatar{
-  width:28px;height:28px;border-radius:50%;background:var(--surface2);border:1px solid var(--border2);
-  display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;
-  color:var(--muted);flex-shrink:0;
+  width:28px;height:28px;border-radius:50%;
+  background:var(--surface2);border:1px solid var(--border2);
+  display:flex;align-items:center;justify-content:center;
+  font-size:11px;font-weight:800;color:var(--muted);flex-shrink:0;
 }
 .league-row.you .lr-avatar{background:rgba(79,142,247,.15);border-color:rgba(79,142,247,.3);color:var(--accent)}
+
 .lr-info{flex:1;min-width:0}
 .lr-name{font-size:13px;font-weight:600;display:flex;align-items:center;gap:6px}
 .lr-school{font-size:10px;color:var(--muted)}
 .league-row.you .lr-name{color:var(--accent)}
-.lr-coins{font-size:13px;font-weight:700;font-family:'JetBrains Mono',monospace;color:var(--text2);flex-shrink:0}
+
+.lr-coins{
+  font-size:13px;font-weight:700;
+  font-family:'JetBrains Mono',monospace;
+  color:var(--text2);flex-shrink:0;
+}
 .lr-delta{font-size:10px;font-weight:700;font-family:'JetBrains Mono',monospace;margin-left:4px}
-.lr-delta.up{color:var(--green)}
-.lr-delta.dn{color:var(--red)}
+.lr-delta.up{color:var(--green)} .lr-delta.dn{color:var(--red)}
+
+.promo-label{
+  font-size:9px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;
+  padding:2px 7px;border-radius:999px;flex-shrink:0;
+}
+.promo-up  {color:var(--green);background:rgba(0,212,170,.1);border:1px solid rgba(0,212,170,.2)}
+.promo-dn  {color:var(--red);  background:rgba(255,83,112,.08);border:1px solid rgba(255,83,112,.2)}
+
+.locked-row{
+  display:flex;align-items:center;gap:10px;
+  padding:9px 18px;border-bottom:1px solid var(--border);
+  opacity:.45;
+}
+.locked-row:last-child{border-bottom:none}
+.lock-pos{font-size:12px;font-weight:700;font-family:'JetBrains Mono',monospace;color:var(--muted);width:20px;text-align:center}
+.lock-name{flex:1;font-size:13px;color:var(--muted);letter-spacing:.5px}
+.lock-coins{font-size:12px;font-weight:600;font-family:'JetBrains Mono',monospace;color:var(--muted)}
+.lock-icon{width:14px;height:14px;stroke:var(--muted);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+
+.upgrade-row{
+  padding:12px 18px;
+  display:flex;align-items:center;justify-content:space-between;
+  background:rgba(79,142,247,.05);
+  border-top:1px solid var(--border);
+}
+.upgrade-text{font-size:12px;color:var(--muted)}
+.upgrade-text strong{color:var(--text)}
+.upgrade-btn{
+  font-size:12px;font-weight:700;color:#fff;
+  background:var(--accent);border:none;
+  padding:7px 16px;border-radius:999px;cursor:pointer;
+  transition:opacity .15s;white-space:nowrap;
+  font-family:'Sora',sans-serif;
+}
+.upgrade-btn:active{opacity:.8}
 
 /* ── SCOPE FILTERS ── */
-
 .scope-wrap{
-  margin:0 0 4px;display:flex;gap:6px;overflow-x:auto;
+  margin:12px 14px 0;
+  display:flex;gap:6px;overflow-x:auto;
   scrollbar-width:none;-webkit-overflow-scrolling:touch;
 }
 .scope-wrap::-webkit-scrollbar{display:none}
 .scope-chip{
-  flex-shrink:0;padding:6px 14px;background:var(--surface);border:1px solid var(--border2);
-  border-radius:999px;font-size:12px;font-weight:600;color:var(--muted);
-  cursor:pointer;white-space:nowrap;transition:all .18s;
+  flex-shrink:0;padding:6px 14px;
+  background:var(--surface);border:1px solid var(--border2);
+  border-radius:999px;font-size:12px;font-weight:600;
+  color:var(--muted);cursor:pointer;white-space:nowrap;transition:all .18s;
 }
-.scope-chip.active{background:rgba(79,142,247,.12);border-color:rgba(79,142,247,.35);color:var(--accent)}
+.scope-chip.active{
+  background:rgba(79,142,247,.12);
+  border-color:rgba(79,142,247,.35);color:var(--accent);
+}
 .scope-chip:active{transform:scale(.95)}
 
 /* ── GLOBAL RANKING ── */
-
-.rank-global-card{
-  margin:0 0 8px;background:var(--surface);border:1px solid var(--border2);
-  border-radius:var(--radius);overflow:hidden;width:100%;
+.global-card{
+  margin:12px 14px 0;
+  background:var(--surface);border:1px solid var(--border2);
+  border-radius:var(--radius);overflow:hidden;
 }
-.rank-global-header{
+.global-header{
   padding:13px 18px;display:flex;align-items:center;justify-content:space-between;
   border-bottom:1px solid var(--border);
 }
-.rank-global-title{font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted)}
-.rank-global-col-header{
-  display:flex;align-items:center;gap:10px;padding:7px 18px;
-  background:var(--surface2);border-bottom:1px solid var(--border);
-}
+.global-title{font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted)}
+.live-pill{display:flex;align-items:center;gap:5px;font-size:10px;font-weight:700;color:var(--green)}
+.live-dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
 
-/* Global ranking rows */
-.rank-global-row{
-  display:flex;align-items:center;gap:10px;padding:11px 18px;
-  border-bottom:1px solid var(--border);transition:background .12s;
+/* col headers */
+.rank-col-header{
+  display:flex;align-items:center;gap:10px;
+  padding:7px 18px;background:var(--surface2);
+  border-bottom:1px solid var(--border);
 }
-.rank-global-row:last-child{border-bottom:none}
-.rank-global-row.rank-global-you{background:rgba(79,142,247,.06)}
-.rank-global-row.rank-global-locked{opacity:.5}
-.rank-global-pos{
+.rch-spacer{flex:1}
+.rch-label{font-size:9px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--muted);min-width:44px;text-align:right}
+
+/* global rows */
+.rank-row{
+  display:flex;align-items:center;gap:10px;
+  padding:11px 18px;border-bottom:1px solid var(--border);
+  cursor:pointer;transition:background .12s;
+}
+.rank-row:last-child{border-bottom:none}
+.rank-row:hover{background:var(--surface2)}
+.rank-row.you-row{background:rgba(79,142,247,.06)}
+.rank-row.locked{opacity:.4;cursor:default}
+.rank-row.locked:hover{background:transparent}
+
+.rank-pos{
   font-size:12px;font-weight:800;font-family:'JetBrains Mono',monospace;
-  color:var(--muted);width:26px;text-align:center;flex-shrink:0;
+  color:var(--muted);width:22px;text-align:center;flex-shrink:0;
 }
-.rank-global-row.rank-global-top1 .rank-global-pos{color:var(--lgold)}
-.rank-global-row.rank-global-top2 .rank-global-pos{color:var(--silver)}
-.rank-global-row.rank-global-top3 .rank-global-pos{color:var(--bronze)}
-.rank-global-avatar{
-  width:30px;height:30px;border-radius:50%;background:var(--surface2);border:1px solid var(--border2);
-  display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;
-  color:var(--muted);flex-shrink:0;
-}
-.rank-global-avatar.rank-avatar-locked{opacity:.35}
-.rank-global-info{flex:1;min-width:0}
-.rank-global-name{font-size:13px;font-weight:600;margin-bottom:1px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
-.rank-global-name.rank-name-hidden{color:var(--muted);letter-spacing:1px}
-.rank-global-school{font-size:10px;color:var(--muted)}
-.rank-global-coins{font-size:12px;font-weight:700;font-family:'JetBrains Mono',monospace;color:var(--text2);width:56px;text-align:right}
-.rank-global-streak{font-size:10px;font-weight:600;font-family:'JetBrains Mono',monospace;color:var(--amber);width:50px;text-align:right}
-.rank-global-delta{font-size:10px;font-weight:700;font-family:'JetBrains Mono',monospace;width:36px;text-align:right}
-.rank-global-delta.rank-delta-up{color:var(--green)}
-.rank-global-delta.rank-delta-dn{color:var(--red)}
-.rank-lock-icon{opacity:.4}
+.rank-pos.rp1{color:var(--lgold)} .rank-pos.rp2{color:var(--silver)} .rank-pos.rp3{color:var(--bronze)}
+.rank-pos.rpy{color:var(--accent)}
 
-/* Pro gate */
-.rank-pro-gate{
-  padding:14px 18px;display:flex;align-items:center;justify-content:space-between;
-  background:rgba(79,142,247,.05);border-top:1px solid var(--border);
+.rank-avatar{
+  width:30px;height:30px;border-radius:50%;
+  background:var(--surface2);border:1px solid var(--border2);
+  display:flex;align-items:center;justify-content:center;
+  font-size:11px;font-weight:800;color:var(--muted);flex-shrink:0;
 }
-.rank-pro-gate-text{font-size:12px;color:var(--muted);line-height:1.5}
-.rank-pro-gate-text strong{color:var(--text);display:block;margin-bottom:1px}
+.rank-row.you-row .rank-avatar{background:rgba(79,142,247,.15);border-color:rgba(79,142,247,.3);color:var(--accent)}
+
+.rank-info{flex:1;min-width:0}
+.rank-name{font-size:13px;font-weight:600;margin-bottom:1px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.rank-row.you-row .rank-name{color:var(--accent)}
+.rank-school{font-size:10px;color:var(--muted);display:flex;align-items:center;gap:4px}
+
+.rank-nums{display:flex;flex-direction:column;align-items:flex-end;gap:2px;flex-shrink:0}
+.rank-coins{font-size:12px;font-weight:700;font-family:'JetBrains Mono',monospace;color:var(--text2)}
+.rank-streak{font-size:10px;font-weight:600;font-family:'JetBrains Mono',monospace;color:var(--amber)}
+
+.lock-overlay{
+  display:flex;align-items:center;gap:8px;flex:1;
+}
+.lock-dashes{font-size:13px;color:var(--muted);letter-spacing:2px;flex:1}
+
+/* pro gate banner */
+.pro-gate{
+  padding:14px 18px;
+  display:flex;align-items:center;justify-content:space-between;
+  background:rgba(79,142,247,.05);
+  border-top:1px solid var(--border);
+}
+.pro-gate-text{font-size:12px;color:var(--muted);line-height:1.5}
+.pro-gate-text strong{color:var(--text);display:block;margin-bottom:1px}
+
+/* section label */
+.section-lbl{
+  padding:14px 18px 8px;
+  font-size:11px;font-weight:700;letter-spacing:1px;
+  text-transform:uppercase;color:var(--muted);
+}
 
 /* ── UNIVERSITY RANKING ── */
-
-.rank-uni-card{
-  margin:0 0 8px;background:var(--surface);border:1px solid var(--border2);
-  border-radius:var(--radius);overflow:hidden;width:100%;
+.uni-card{
+  margin:12px 14px 0;
+  background:var(--surface);border:1px solid var(--border2);
+  border-radius:var(--radius);overflow:hidden;
 }
-.rank-uni-header{
-  padding:13px 18px;display:flex;align-items:center;justify-content:space-between;
-  border-bottom:1px solid var(--border);
+.uni-row{
+  display:flex;align-items:center;gap:10px;
+  padding:11px 18px;border-bottom:1px solid var(--border);
 }
-.rank-uni-title{font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted)}
-.rank-uni-row{
-  display:flex;align-items:center;gap:10px;padding:11px 18px;
-  border-bottom:1px solid var(--border);
-}
-.rank-uni-row:last-child{border-bottom:none}
-.rank-uni-pos{
-  font-size:12px;font-weight:800;font-family:'JetBrains Mono',monospace;
-  color:var(--muted);width:18px;text-align:center;flex-shrink:0;
-}
-.rank-uni-row.rank-uni-top1 .rank-uni-pos{color:var(--lgold)}
-.rank-uni-row.rank-uni-top2 .rank-uni-pos{color:var(--silver)}
-.rank-uni-row.rank-uni-top3 .rank-uni-pos{color:var(--bronze)}
-.rank-uni-avatar{
-  width:32px;height:32px;border-radius:8px;background:var(--surface2);border:1px solid var(--border2);
-  display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;
-  color:var(--muted);flex-shrink:0;
-}
-.rank-uni-info{flex:1;min-width:0}
-.rank-uni-name{font-size:13px;font-weight:600;display:flex;align-items:center;gap:6px;margin-bottom:1px}
-.rank-uni-sub{font-size:10px;color:var(--muted)}
-.rank-uni-score{
+.uni-row:last-child{border-bottom:none}
+.uni-pos{font-size:12px;font-weight:800;font-family:'JetBrains Mono',monospace;color:var(--muted);width:18px;text-align:center;flex-shrink:0}
+.uni-pos.u1{color:var(--lgold)} .uni-pos.u2{color:var(--silver)} .uni-pos.u3{color:var(--bronze)}
+.uni-info{flex:1;min-width:0}
+.uni-name{font-size:13px;font-weight:600;display:flex;align-items:center;gap:6px;margin-bottom:1px}
+.uni-country{font-size:10px;color:var(--muted)}
+.uni-score{
   font-size:12px;font-weight:700;font-family:'JetBrains Mono',monospace;
   color:var(--text2);text-align:right;flex-shrink:0;
 }
-.rank-uni-score span{display:block;font-size:10px;color:var(--muted);font-weight:400}
+.uni-score span{display:block;font-size:10px;color:var(--muted);font-weight:400}
+.uni-row.you-uni{background:rgba(79,142,247,.06)}
+.uni-row.you-uni .uni-name{color:var(--accent)}
 
 /* ── BOTTOM NAV ── */
 .bottom-nav{
@@ -2859,14 +2878,13 @@ mark.hb{background:rgba(79,142,247,.28);border-bottom:2px solid rgba(40,100,220,
 
 /* Ranking panel wrapper */
 #lb-panel {
-  padding: 16px 12px 100px !important;
+  padding: 0 !important;
   font-family: 'Sora', sans-serif !important;
   overflow-y: auto !important;
-  -webkit-overflow-scrolling: touch !important;
-  min-height: 0 !important;
+  padding-bottom: 100px !important;
 }
-
-
+</style>
+<style id="bmd-post-v2">
 /* === BOARDMD POSTSTEP v2 === */
 
 :root {
@@ -3161,8 +3179,8 @@ mark.hb{background:rgba(79,142,247,.28);border-bottom:2px solid rgba(40,100,220,
   box-shadow: 0 0 80px rgba(0,0,0,.3);
 }
 #poststep-panel.active { display: flex; }
-
-
+</style>
+<style id="bmd-bottom-nav">
 /* === BOTTOM NAV === */
 .bmd-bottom-nav {
   position: fixed;
@@ -3188,10 +3206,10 @@ mark.hb{background:rgba(79,142,247,.28);border-bottom:2px solid rgba(40,100,220,
     left: 0 !important;
     right: 0 !important;
     margin: 0 !important;
-    padding: 6px 0 10px !important;
+    padding: 12px 0 20px !important;
     border-radius: 0 !important;
   }
-  .bmd-bottom-nav .nav-item { padding: 2px 28px; }
+  .bmd-bottom-nav .nav-item { padding: 4px 28px; }
   .bmd-bottom-nav .nav-label { font-size: 12px; }
   .bmd-bottom-nav .nav-item svg { width: 24px; height: 24px; }
 }
@@ -3208,8 +3226,8 @@ mark.hb{background:rgba(79,142,247,.28);border-bottom:2px solid rgba(40,100,220,
 #app.active .deck-home,
 #app.active .lb-panel,
 #app.active #profile-panel { padding-bottom: 100px !important; }
-
-
+</style>
+<style id="bmd-light-card-fix">
 /* ── Light mode: all card text dark and legible ── */
 html.light #c-q,
 html.light .card-question { color: #0d1021 !important; }
@@ -3234,8 +3252,10 @@ html.light .key-point-line * { color: #0d1021 !important; }
 html.light .att-response-text { color: #3a4060 !important; }
 html.light .speed-num { color: #00b894 !important; }
 html.light .qs-val { color: inherit; }
+</style>
 
 
+<style id="bmd-desktop-fix">
 /* ── Desktop: full layout ── */
 @media(min-width: 601px) {
   /* Bottom nav — show on desktop too */
@@ -3257,18 +3277,17 @@ html.light .qs-val { color: inherit; }
   }
   .step-pill { font-size: 14px !important; padding: 8px 24px !important; }
 
-  /* Deck home — full width, minimal lateral padding */
+  /* Deck home — centered, bigger cards */
   .deck-home .content {
-    max-width: 100% !important;
-    margin: 0 !important;
-    padding: 12px 0 !important;
+    max-width: 760px !important;
+    margin: 0 auto !important;
+    padding: 20px 32px !important;
   }
   .deck-row {
-    padding: 10px 24px !important;
+    padding: 18px 24px !important;
     border-radius: 16px !important;
-    margin-bottom: 8px !important;
+    margin-bottom: 12px !important;
     cursor: pointer !important;
-    width: 100% !important;
   }
   .deck-row:hover {
     border-color: rgba(79,142,247,.4) !important;
@@ -3289,10 +3308,10 @@ html.light .qs-val { color: inherit; }
   #profile-panel, #lb-panel {
     max-width: 100% !important;
     width: 100% !important;
-    padding: 80px 24px 80px !important;
+    padding: 28px 40px 80px !important;
   }
-  .rank-profile-card, .rank-weekly-league, .rank-global-card,
-  .rank-uni-card, .scope-wrap, .rank-section-label,
+  .your-card, .league-card, .global-card,
+  .uni-card, .scope-wrap, .section-lbl,
   .overview-hero, .speed-card, .quick-stats,
   .lb-inner, .perf-inner {
     max-width: 100% !important;
@@ -3300,7 +3319,7 @@ html.light .qs-val { color: inherit; }
     margin-right: 0 !important;
   }
   /* Inner content items within ranking — readable width */
-  .lr-row, .rank-global-row, .league-entry {
+  .lr-row, .rank-row, .league-entry {
     max-width: 100% !important;
   }
 
@@ -3311,33 +3330,33 @@ html.light .qs-val { color: inherit; }
   .hdr-desktop-only { display: flex !important; }
 
   /* Ranking cards — no side margin on desktop, full panel width */
-  .rank-profile-card, .rank-weekly-league, .rank-global-card, .rank-uni-card {
-    margin: 0 0 10px 0 !important;
+  .your-card, .league-card, .global-card, .uni-card {
+    margin: 0 0 16px 0 !important;
     border-radius: 16px !important;
   }
-  .scope-wrap { margin: 0 0 4px !important; }
-  .rank-section-label { margin: 6px 0 !important; }
+  .scope-wrap { margin: 0 !important; }
+  .section-lbl { margin: 8px 0 !important; }
   /* Live insight full width */
   .live-insight { margin: 0 !important; }
 
-  /* Card study area — max width on desktop */
-  .study-main {
+  /* Card study area — max width on desktop (overridden by body.studying) */
+  body:not(.studying) .study-main {
     display: flex !important;
     justify-content: center !important;
     padding: 24px 32px !important;
   }
-  .study-inner {
+  body:not(.studying) .study-inner {
     max-width: 760px !important;
     width: 100% !important;
   }
-  #card-el {
+  body:not(.studying) #card-el {
     max-width: 760px !important;
     width: 100% !important;
   }
-  .card-body, .card-header {
+  body:not(.studying) .card-body, body:not(.studying) .card-header {
     max-width: 760px !important;
   }
-  .explanation, #c-exp {
+  body:not(.studying) .explanation, body:not(.studying) #c-exp {
     max-width: 760px !important;
   }
   #att-inline-wrap {
@@ -3346,360 +3365,62 @@ html.light .qs-val { color: inherit; }
     margin-right: auto !important;
   }
 }
+</style>
 
-
+<style id="search-picker-css">
 @keyframes slideUp { from{opacity:0;transform:translateY(40px)} to{opacity:1;transform:translateY(0)} }
-
-
-.deck-stats-line {
-  font-size: 11px;
-  color: var(--muted);
-  margin-top: 4px;
-  font-family: 'Sora', sans-serif;
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  flex-wrap: wrap;
-}
-.ds-total { color: var(--muted); }
-.ds-div { opacity: .35; }
-.ds-new { color: #4f8ef7; font-weight: 700; }
-.ds-lrn { color: #f59e0b; font-weight: 700; }
-.ds-due { color: #00d4aa; font-weight: 700; }
-.ds-label { color: var(--muted); font-weight: 400; }
-
-
-/* ── Mobile: no split, wrappers invisible ── */
-#bmd-cols-row { display: block; overflow-y: visible !important; }
-#bmd-q-col    { display: block; padding: 0; position: static; max-height: none; overflow-y: visible !important; width: auto; border-right: none; }
-#bmd-q-inner  { padding: 16px 18px; }
-#bmd-ans-col  { display: block; padding: 0; overflow-y: visible !important; }
+</style>
+<style id="bmd-split-screen">
+/* Mobile: single column */
+#bmd-cols-row { display: block; }
+#bmd-q-col    { display: block; padding: 0; position: static; max-height: none; overflow-y: visible; width: auto; border-right: none; }
+#bmd-ans-col  { display: block; }
 #bmd-split-divider { display: none; }
 .bmd-div-handle { display: none; }
-#bmd-ans-placeholder { display: none !important; }
 
+/* Desktop: page locked, columns fill all space */
 @media (min-width: 900px) {
-  /* Thinner header on desktop */
-  .app-header-top { height: 36px !important; }
-  .hdr { padding: 8px 16px !important; }
-  /* Kill all padding-bottom that was for fixed nav — nav is now in flow */
-  #app.active { padding-bottom: 0 !important; }
-  .study-inner { padding-bottom: 0 !important; }
-  #app.active .deck-home,
-  #app.active .lb-panel,
-  #app.active #profile-panel { padding-bottom: 20px !important; }
-  #lb-panel { padding-bottom: 20px !important; }
-  /* Bottom nav: static in flex flow instead of fixed — no gap with FSRS */
-  .bmd-bottom-nav {
-    position: static !important;
-    padding: 4px 0 6px !important;
-    border-top: none !important;
-    backdrop-filter: none !important;
-    flex-shrink: 0 !important;
-  }
-  .bmd-bottom-nav .nav-center { margin-top: -12px !important; }
-  .bmd-bottom-nav .nav-center-btn { width: 42px !important; height: 42px !important; border-radius: 12px !important; }
-  .bmd-bottom-nav .nav-center-btn svg { width: 16px !important; height: 16px !important; }
-  .bmd-bottom-nav .nav-item { padding: 2px 28px !important; gap: 1px !important; }
-  .bmd-bottom-nav .nav-item svg { width: 18px !important; height: 18px !important; }
-  .bmd-bottom-nav .nav-label { font-size: 10px !important; }
-  /* Full width — no lateral padding, UWorld style */
-  .study-main  { padding: 0 !important; justify-content: flex-start !important; }
-  .study-inner { max-width: 100% !important; width: 100% !important; align-items: stretch !important; gap: 0 !important; }
 
-  /* card-el: flex column — header top, cols-row below */
   #card-el {
-    max-width: 100% !important;
-    display: flex !important;
-    flex-direction: column !important;
-    border: 1px solid var(--border) !important;
-    border-radius: 16px !important;
-    overflow: hidden !important;
-    background: var(--surface) !important;
-    box-shadow: none !important;
-  }
-
-  /* header spans full width */
-  #card-el .card-header {
-    flex-shrink: 0 !important;
-    width: 100% !important;
-    max-width: 100% !important;
-    border-bottom: 1px solid var(--border) !important;
-    padding: 8px 20px 6px !important;
-  }
-
-  /* cols-row: flex row, scrollable */
-  #bmd-cols-row {
-    display: flex !important;
-    flex-direction: row !important;
-    align-items: stretch !important;
-    flex: 1 !important;
-    overflow-y: auto !important;
-    min-height: 0 !important;
-  }
-
-  /* LEFT column — full width before answer, 50% after */
-  #bmd-q-col {
-    flex: 1 1 100% !important;
-    min-width: 0 !important;
-    max-width: 100% !important;
-    padding: 20px 24px 24px !important;
-    overflow-y: auto !important;
-    -webkit-overflow-scrolling: touch !important;
-    overscroll-behavior-y: contain !important;
-    scrollbar-width: thin !important;
-    align-self: stretch !important;
-    transition: flex-basis .3s ease !important;
-  }
-  /* After answer: default 40% question, 60% explanation */
-  #bmd-ans-col.has-answer ~ #DUMMY_NEVER_MATCH,
-  #bmd-cols-row:has(#bmd-ans-col.has-answer) #bmd-q-col {
-    flex: 0 0 50% !important;
-    max-width: 75% !important;
-    min-width: 260px !important;
-  }
-  #bmd-q-col::-webkit-scrollbar { width: 3px; }
-  #bmd-q-col::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
-
-  /* DIVIDER */
-  #bmd-split-divider {
-    display: flex !important;
-    flex-shrink: 0 !important;
-    width: 16px !important;
-    align-self: stretch !important;
-    align-items: center !important;
-    justify-content: center !important;
-    cursor: col-resize !important;
-    position: relative !important;
-    background: transparent !important;
-    user-select: none !important;
-    -webkit-user-select: none !important;
-    z-index: 10 !important;
-    touch-action: none !important;
-  }
-  #bmd-split-divider::before {
-    content: '';
-    position: absolute;
-    top: 0; bottom: 0;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 1px;
-    background: var(--border);
-    transition: width .15s, background .15s;
-    pointer-events: none;
-  }
-  #bmd-split-divider:hover::before,
-  #bmd-split-divider.dragging::before {
-    width: 3px;
-    background: var(--accent);
-  }
-  .bmd-div-handle {
-    display: flex !important;
-    flex-direction: column !important;
-    gap: 3px !important;
-    align-items: center !important;
-    position: relative !important;
-    z-index: 1 !important;
-    opacity: 0 !important;
-    transition: opacity .15s !important;
-    pointer-events: none !important;
-    background: var(--surface2) !important;
-    border: 1px solid var(--border2) !important;
-    border-radius: 8px !important;
-    padding: 6px 4px !important;
-  }
-  .bmd-div-handle span {
-    display: block !important;
-    width: 2px !important;
-    height: 10px !important;
-    border-radius: 2px !important;
-    background: var(--muted) !important;
-  }
-  #bmd-split-divider:hover .bmd-div-handle,
-  #bmd-split-divider.dragging .bmd-div-handle { opacity: 1 !important; }
-
-  /* RIGHT column */
-  #bmd-ans-col {
-    flex: 1 1 0 !important;
-    min-width: 260px !important;
-    overflow-y: auto !important;
-    -webkit-overflow-scrolling: touch !important;
-    overscroll-behavior-y: contain !important;
-    align-self: stretch !important;
-    scrollbar-width: thin !important;
-  }
-
-  /* Explanation padding in right col */
-  #bmd-ans-col #c-exp          { max-width: 100% !important; padding: 18px 24px !important; border-top: none !important; }
-  #bmd-ans-col .card-img-wrap  { margin: 0 24px 14px !important; }
-  #bmd-ans-col #key-point-wrap { padding: 0 24px 14px !important; }
-  #bmd-ans-col #card-pubmed-wrap { padding: 0 24px !important; }
-  #bmd-ans-col .card-footer-counter { border-top: 1px solid var(--border) !important; padding: 10px 24px !important; }
-  #bmd-ans-col #att-inline-wrap { max-width: 100% !important; margin: 0 !important; border-radius: 0 !important; border-left: none !important; border-right: none !important; }
-
-  /* Before answer: hide right column and divider entirely */
-  #bmd-ans-col:not(.has-answer) { display: none !important; }
-  #bmd-cols-row:not(:has(.has-answer)) #bmd-split-divider { display: none !important; }
-  /* After answer: show right column with animation */
-  #bmd-ans-col.has-answer { display: block !important; }
-  #bmd-cols-row:has(.has-answer) #bmd-split-divider { display: flex !important; }
-  #bmd-ans-col.has-answer #bmd-ans-placeholder { display: none !important; }
-  #bmd-ans-col:not(.has-answer) #c-exp         { display: none !important; }
-  #bmd-ans-col:not(.has-answer) #key-point-wrap,
-  #bmd-ans-col:not(.has-answer) #card-pubmed-wrap,
-  #bmd-ans-col:not(.has-answer) #att-inline-wrap,
-  #bmd-ans-col:not(.has-answer) .card-footer-counter { display: none !important; }
-}
-
-
-#report-modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:9999;align-items:center;justify-content:center;}
-#report-modal-overlay.visible{display:flex;}
-#report-modal{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:24px;width:90%;max-width:400px;font-family:"Lato",sans-serif;}
-#report-modal h3{margin:0 0 16px;font-size:15px;font-weight:700;color:var(--text);}
-.report-option{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:8px;cursor:pointer;transition:background .15s;margin-bottom:6px;border:1px solid var(--border);}
-.report-option:hover{background:var(--surface2);border-color:var(--accent);}
-.report-option input{accent-color:var(--accent);width:16px;height:16px;cursor:pointer;}
-.report-option label{font-size:13px;color:var(--text);cursor:pointer;flex:1;}
-#report-other-text{width:100%;margin-top:8px;padding:8px 10px;border-radius:8px;border:1px solid var(--border);background:var(--surface2);color:var(--text);font-family:"Lato",sans-serif;font-size:13px;resize:none;display:none;box-sizing:border-box;}
-.report-modal-btns{display:flex;gap:10px;margin-top:16px;justify-content:flex-end;}
-.report-cancel-btn{padding:8px 16px;border-radius:8px;border:1px solid var(--border);background:none;color:var(--text-dim);cursor:pointer;font-size:13px;font-weight:600;}
-.report-submit-btn{padding:8px 16px;border-radius:8px;border:none;background:var(--accent);color:#fff;cursor:pointer;font-size:13px;font-weight:700;}
-
-
-/* ── BOARDMD ATTENDING inline ── */
-.att-inline{margin:0 0 20px;border:1.5px solid var(--border);border-radius:var(--radius);overflow:hidden;background:var(--surface);}
-html.light .att-inline{background:var(--surface);border-color:var(--border);}
-.att-inline-header{display:flex;align-items:center;justify-content:space-between;padding:12px 16px 10px;border-bottom:1px solid var(--border);}
-.att-inline-left{display:flex;align-items:center;gap:8px;}
-.att-inline-badge{width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,#6366f1,#8b5cf6);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
-.att-inline-badge svg{width:14px;height:14px;stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
-.att-inline-title{font-size:13px;font-weight:700;color:#8b5cf6;font-family:'Inter',sans-serif;letter-spacing:.02em;}
-.att-inline-btns{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:12px 14px;}
-.att-ibtn{background:var(--surface2);border:1px solid var(--border);border-radius:9px;padding:10px 6px;cursor:pointer;text-align:center;transition:all .15s;display:flex;flex-direction:column;align-items:center;gap:3px;font-family:'Inter',sans-serif;}
-.att-ibtn:hover{border-color:rgba(139,92,246,.5);background:rgba(99,102,241,.07);transform:translateY(-1px);}
-.att-ibtn:disabled{opacity:.38;cursor:not-allowed;transform:none;}
-.att-ibtn-emoji{display:none;}
-.att-ibtn-label{font-size:11px;font-weight:700;color:var(--text-dim);line-height:1.2;}
-html.light .att-ibtn{background:var(--surface2);}
-.att-inline-response{padding:0 14px 14px;display:none;}
-.att-inline-response.visible{display:block;}
-.att-thinking{display:flex;align-items:center;gap:8px;padding:10px 2px;color:var(--text-faint);font-size:13px;font-family:'Inter',sans-serif;}
-.att-thinking-dots{display:flex;gap:3px;}
-.att-thinking-dot{width:5px;height:5px;border-radius:50%;background:rgba(139,92,246,.6);animation:attDot 1.2s ease infinite;}
-.att-thinking-dot:nth-child(2){animation-delay:.2s;}
-.att-thinking-dot:nth-child(3){animation-delay:.4s;}
-@keyframes attDot{0%,80%,100%{transform:scale(.8);opacity:.5}40%{transform:scale(1.2);opacity:1}}
-.att-response-msg{background:rgba(99,102,241,.06);border:1px solid rgba(99,102,241,.15);border-radius:10px;padding:14px 16px;}
-.att-response-label{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#8b5cf6;margin-bottom:8px;font-family:'Inter',sans-serif;display:flex;align-items:center;gap:5px;}
-.att-response-text{font-size:14px;color:var(--text);line-height:1.78;font-family:'Inter',sans-serif;}
-.att-response-text strong{font-weight:600;color:var(--text);}
-.att-response-text em{font-style:italic;color:var(--text-dim);}
-.att-response-text p{margin:0 0 10px;}
-.att-response-text p:last-child{margin:0;}
-@media(max-width:600px){.att-inline-btns{grid-template-columns:repeat(2,1fr);}}
-
-
-/* ── HIGHLIGHT SYSTEM — cores calibradas estilo UWorld ── */
-mark.hl-yellow, .hl-yellow { background:#ffe066; color:inherit; border-radius:2px; cursor:pointer; }
-mark.hl-green,  .hl-green  { background:#86efac; color:inherit; border-radius:2px; cursor:pointer; }
-mark.hl-blue,   .hl-blue   { background:#7dd3fc; color:inherit; border-radius:2px; cursor:pointer; }
-html.dark mark.hl-yellow, html.dark .hl-yellow { background:none !important; color:#fde047 !important; }
-html.dark mark.hl-green,  html.dark .hl-green  { background:none !important; color:#86efac !important; }
-html.dark mark.hl-blue,   html.dark .hl-blue   { background:none !important; color:#7dd3fc !important; }
-.hl-btn-active { border-color:#374151!important; box-shadow:0 0 0 2px rgba(0,0,0,.3); transform:scale(1.15); }
-html.dark .hl-btn-active { border-color:#fff!important; }
-
-
-/* === BOTTOM NAV === */
-.bmd-bottom-nav {
-  position: fixed;
-  bottom: 0; left: 0; right: 0;
-  background: var(--bg);
-  border-top: 1px solid var(--border);
-  padding: 10px 0 26px;
-  display: none;
-  justify-content: space-around;
-  align-items: center;
-  z-index: 200;
-  backdrop-filter: blur(20px);
-}
-/* Mobile: show at full width */
-@media(max-width:600px){
-  #app.active .bmd-bottom-nav { display: flex; max-width: 100%; margin: 0 auto; }
-}
-/* Desktop: full width, same as mobile */
-@media(min-width:601px){
-  #app.active .bmd-bottom-nav {
-    display: flex !important;
-    max-width: 100% !important;
-    left: 0 !important;
-    right: 0 !important;
-    margin: 0 !important;
-    padding: 6px 0 10px !important;
-    border-radius: 0 !important;
-  }
-  .bmd-bottom-nav .nav-item { padding: 2px 28px; }
-  .bmd-bottom-nav .nav-label { font-size: 12px; }
-  .bmd-bottom-nav .nav-item svg { width: 24px; height: 24px; }
-}
-.bmd-bottom-nav .nav-item { display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;padding:4px 14px; }
-.bmd-bottom-nav .nav-item svg { width:21px;height:21px;stroke:var(--muted);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;transition:all .2s; }
-.bmd-bottom-nav .nav-item.active svg { stroke:var(--accent);transform:scale(1.1); }
-.bmd-bottom-nav .nav-label { font-size:10px;font-weight:600;color:var(--muted);font-family:'Sora',sans-serif; }
-.bmd-bottom-nav .nav-item.active .nav-label { color:var(--accent);font-weight:700; }
-.bmd-bottom-nav .nav-center { position:relative;margin-top:-22px; }
-.bmd-bottom-nav .nav-center-btn { width:52px;height:52px;background:var(--accent);border-radius:15px;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 22px rgba(79,142,247,.4);cursor:pointer;border:3px solid var(--bg); }
-.bmd-bottom-nav .nav-center-btn:active { transform:scale(.91); }
-.bmd-bottom-nav .nav-center-btn svg { width:19px;height:19px;fill:#fff;stroke:none; }
-/* Padding bottom for pages with bottom nav */
-#app.active .deck-home,
-#app.active .lb-panel,
-#app.active #profile-panel { padding-bottom: 100px !important; }
-
-@keyframes slideUp { from{opacity:0;transform:translateY(40px)} to{opacity:1;transform:translateY(0)} }
-
-/* Mobile: no split */
-#bmd-cols-row { display: block; overflow-y: visible !important; }
-#bmd-q-col    { display: block; padding: 0; position: static; max-height: none; overflow-y: visible !important; width: auto; border-right: none; }
-#bmd-q-inner  { padding: 16px 18px; }
-#bmd-ans-col  { display: block; padding: 0; overflow-y: visible !important; }
-#bmd-split-divider { display: none; }
-.bmd-div-handle { display: none; }
-#bmd-ans-placeholder { display: none !important; }
-
-@media (min-width: 900px) {
-  .study-inner { max-width: 100% !important; width: 100% !important; align-items: stretch !important; gap: 0 !important; }
-  #card-el {
-    max-width: 100% !important; display: flex !important; flex-direction: column !important;
-    border: 1px solid var(--border) !important; border-radius: 16px !important;
+    max-width: 100% !important; width: 100% !important;
+    flex: 1 !important; min-height: 0 !important;
+    display: flex !important; flex-direction: column !important;
+    border: none !important; border-radius: 0 !important;
     overflow: hidden !important; background: var(--surface) !important; box-shadow: none !important;
   }
-  #card-el .card-header { flex-shrink: 0 !important; width: 100% !important; border-bottom: 1px solid var(--border) !important; padding: 8px 20px 6px !important; }
-  #bmd-cols-row { display: flex !important; flex-direction: row !important; align-items: stretch !important; flex: 1 !important; overflow-y: auto !important; min-height: 0 !important; }
+  #card-el .card-header {
+    flex-shrink: 0 !important; width: 100% !important;
+    border-bottom: 1px solid var(--border) !important;
+    border-radius: 0 !important; padding: 14px 24px 10px !important;
+  }
+  #bmd-cols-row {
+    display: flex !important; flex-direction: row !important;
+    align-items: stretch !important; flex: 1 !important;
+    min-height: 0 !important; overflow: hidden !important;
+  }
   #bmd-q-col {
-    flex: 1 1 100% !important; min-width: 0 !important; max-width: 100% !important;
-    padding: 20px 24px 24px !important;
-    overflow-y: auto !important; -webkit-overflow-scrolling: touch !important;
-    overscroll-behavior-y: contain !important;
-    scrollbar-width: thin !important; align-self: stretch !important;
-    border-right: none !important;
-    transition: flex-basis .3s ease !important;
+    flex-shrink: 0 !important; width: 50% !important;
+    min-width: 260px !important; max-width: 75% !important;
+    display: flex !important; flex-direction: column !important;
+    overflow: hidden !important; border-right: 1px solid var(--border) !important;
+    position: static !important;
   }
-  #bmd-cols-row:has(#bmd-ans-col.has-answer) #bmd-q-col {
-    flex: 0 0 50% !important; max-width: 75% !important; min-width: 260px !important;
-    border-right: 1px solid var(--border) !important;
+  #bmd-q-inner {
+    flex: 1 !important; min-height: 0 !important;
+    overflow-y: auto !important; scrollbar-width: thin !important;
+    padding: 20px 24px 8px !important;
   }
-  #bmd-ans-col:not(.has-answer) { display: none !important; }
-  #bmd-cols-row:not(:has(.has-answer)) #bmd-split-divider { display: none !important; }
-  #bmd-ans-col.has-answer { display: block !important; }
-  #bmd-cols-row:has(.has-answer) #bmd-split-divider { display: flex !important; }
-  #bmd-q-col::-webkit-scrollbar { width: 3px; }
-  #bmd-q-col::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+  #bmd-q-inner::-webkit-scrollbar { width: 3px; }
+  #bmd-q-inner::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+  #bmd-q-col .card-footer-counter {
+    flex-shrink: 0 !important; border-top: 1px solid var(--border) !important;
+    padding: 8px 24px !important; background: var(--surface) !important;
+  }
   #bmd-split-divider {
     display: flex !important; flex-shrink: 0 !important; width: 16px !important;
     align-self: stretch !important; align-items: center !important; justify-content: center !important;
     cursor: col-resize !important; position: relative !important; background: transparent !important;
-    user-select: none !important; -webkit-user-select: none !important; z-index: 10 !important;
+    user-select: none !important; -webkit-user-select: none !important; z-index: 10 !important; touch-action: none !important;
   }
   #bmd-split-divider::before {
     content: ''; position: absolute; top: 0; bottom: 0; left: 50%;
@@ -3717,32 +3438,38 @@ html.dark .hl-btn-active { border-color:#fff!important; }
   .bmd-div-handle span { display: block !important; width: 2px !important; height: 10px !important; border-radius: 2px !important; background: var(--muted) !important; }
   #bmd-split-divider:hover .bmd-div-handle, #bmd-split-divider.dragging .bmd-div-handle { opacity: 1 !important; }
   #bmd-ans-col {
-    flex: 1 1 0 !important; min-width: 260px !important; overflow-y: auto !important;
-    -webkit-overflow-scrolling: touch !important; overscroll-behavior-y: contain !important;
-    align-self: stretch !important; scrollbar-width: thin !important;
+    flex: 1 1 0 !important; min-width: 260px !important; min-height: 0 !important;
+    overflow-y: auto !important; scrollbar-width: thin !important; align-self: stretch !important;
   }
   #bmd-ans-col::-webkit-scrollbar { width: 3px; }
   #bmd-ans-col::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
-  #bmd-ans-col #c-exp { max-width: 100% !important; padding: 18px 24px !important; border-top: none !important; }
-  #bmd-ans-col .card-img-wrap { margin: 0 24px 14px !important; }
+  #bmd-ans-col #c-exp          { max-width: 100% !important; padding: 18px 24px !important; border-top: none !important; }
+  #bmd-ans-col .card-img-wrap  { margin: 0 24px 14px !important; }
   #bmd-ans-col #key-point-wrap { padding: 0 24px 14px !important; }
   #bmd-ans-col #card-pubmed-wrap { padding: 0 24px !important; }
   #bmd-ans-col #att-inline-wrap { max-width: 100% !important; margin: 0 !important; border-radius: 0 !important; border-left: none !important; border-right: none !important; }
-  #card-el > .fsrs-nav {
-    flex-shrink: 0 !important; width: 100% !important; border-top: 1px solid var(--border) !important;
-    padding: 4px 16px 6px !important; background: var(--surface) !important;
-    border-radius: 0 0 16px 16px !important; position: sticky !important; bottom: 0 !important; z-index: 5 !important;
-  }
-  #card-el > .fsrs-nav .fsrs-row { width: 100% !important; max-width: 100% !important; }
-  #card-el > .fsrs-nav.visible { display: flex !important; flex-direction: column !important; align-items: center !important; }
   #bmd-ans-col.has-answer #bmd-ans-placeholder { display: none !important; }
-  #bmd-ans-col:not(.has-answer) #c-exp,
+  #bmd-ans-col:not(.has-answer) #c-exp { display: none !important; }
+  #bmd-ans-col.has-answer #c-exp { display: block !important; }
   #bmd-ans-col:not(.has-answer) #key-point-wrap,
   #bmd-ans-col:not(.has-answer) #card-pubmed-wrap,
   #bmd-ans-col:not(.has-answer) #att-inline-wrap { display: none !important; }
-  #bmd-ans-col.has-answer #c-exp { display: block !important; }
-}
 
+  /* FSRS inside card-el: flex-shrink:0, always visible */
+  #card-el > .fsrs-nav {
+    flex-shrink: 0 !important;
+    width: 100% !important;
+    border-top: 1px solid var(--border) !important;
+    padding: 8px 16px 10px !important;
+    background: var(--surface) !important;
+    border-radius: 0 !important;
+  }
+  #card-el > .fsrs-nav .fsrs-row { width: 100% !important; max-width: 100% !important; }
+  #card-el > .fsrs-nav.visible { display: flex !important; flex-direction: column !important; align-items: center !important; }
+}
+</style>
+
+<style id="bmd-deck-stats-css">
 .deck-stats-line {
   font-size: 11px;
   color: var(--muted);
@@ -3938,9 +3665,6 @@ html.dark .hl-btn-active { border-color:#fff!important; }
         <svg id="theme-icon" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
       </button>
 
-      <button class="hdr-action-btn" onclick="forceRefreshCards()" title="Refresh cards">
-        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg>
-      </button>
       <button class="hdr-action-btn" onclick="openSettings()" title="Settings">
         <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
       </button>
@@ -3981,196 +3705,180 @@ html.dark .hl-btn-active { border-color:#fff!important; }
   <!-- LEADERBOARD PANEL --><!-- shelf-v37 -->
   <div class="lb-panel" id="lb-panel">
 <!-- YOUR PROFILE CARD -->
-<div class="rank-profile-card" id="rank-profile-card">
-  <div class="rank-profile-header">
-    <div class="rank-profile-avatar" id="rank-profile-avatar">W</div>
-    <div class="rank-profile-info">
-      <div class="rank-profile-name" id="rank-profile-name">Walter B.</div>
-      <div class="rank-profile-univ" id="rank-profile-univ">
-        <span style="font-size:14px;margin-right:4px;">🇧🇷</span>
-        <span>Universidade Federal do Paraná</span>
+<div class="your-card" id="your-card-wrap">
+  <div class="your-top">
+    <div class="your-avatar" id="yc-avatar">W</div>
+    <div class="your-info">
+      <div class="your-name" id="yc-name">Walter B.</div>
+      <div class="your-school" id="yc-school">
+        <span style="font-size:14px;line-height:1;vertical-align:middle;margin-right:2px;">🇧🇷</span>
+        Your University &middot; Brazil
       </div>
     </div>
     <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">
-      <div class="rank-tier-badge rank-tier-intern" id="rank-profile-tier">Intern</div>
-      <div class="rank-speed-indicator" id="rank-profile-speed">
-        <span class="rank-speed-dot rank-speed-green"></span>
-        <span class="rank-speed-text">Fast</span>
+      <div class="tier-badge tier-attending" id="yc-tier">Attending</div>
+      <button onclick="openProfileEditor()" style="background:none;border:1px solid var(--border2);border-radius:8px;padding:3px 10px;font-size:10px;font-weight:600;color:var(--muted);cursor:pointer;font-family:'Sora',sans-serif;transition:all .15s;" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" onmouseout="this.style.borderColor='var(--border2)';this.style.color='var(--muted)'">Edit</button>
+    </div>
+  </div>
+  <div class="your-stats">
+    <div class="your-stat">
+      <div class="your-stat-val" style="color:var(--accent)" id="yc-coins">0</div>
+      <div class="your-stat-lbl">MDCoins</div>
+    </div>
+    <div class="your-stat">
+      <div class="your-stat-val" style="color:var(--amber)" id="yc-streak">0</div>
+      <div class="your-stat-lbl">Streak</div>
+    </div>
+    <div class="your-stat">
+      <div class="your-stat-val" style="display:flex;align-items:center;justify-content:center;font-size:14px" id="yc-speed">
+        <span class="speed-dot sd-green"></span>&#8212;
       </div>
+      <div class="your-stat-lbl">Avg Speed</div>
     </div>
-  </div>
-  <div class="rank-profile-stats">
-    <div class="rank-profile-stat">
-      <div class="rank-profile-stat-val" id="rank-profile-coins">970</div>
-      <div class="rank-profile-stat-lbl">MDCoins</div>
+    <div class="your-stat">
+      <div class="your-stat-val" style="color:var(--muted);font-size:14px" id="yc-rank">#&#8212;</div>
+      <div class="your-stat-lbl">Global</div>
     </div>
-    <div class="rank-profile-stat">
-      <div class="rank-profile-stat-val" id="rank-profile-streak">11d</div>
-      <div class="rank-profile-stat-lbl">Streak</div>
-    </div>
-    <div class="rank-profile-stat">
-      <div class="rank-profile-stat-val" id="rank-profile-speed-val">31s</div>
-      <div class="rank-profile-stat-lbl">Avg Speed</div>
-    </div>
-    <div class="rank-profile-stat">
-      <div class="rank-profile-stat-val" id="rank-profile-rank">#3</div>
-      <div class="rank-profile-stat-lbl">Global</div>
-    </div>
-  </div>
-  <div class="rank-profile-insight" id="rank-profile-insight">
-    Seu tempo: <strong>31s</strong> — você está <strong style="color:var(--emerald)">57% mais rápido</strong> que o ritmo do USMLE (72s/questão)
   </div>
 </div>
 
 <!-- WEEKLY LEAGUE -->
-<div class="rank-section-label">Weekly League</div>
-<div class="rank-weekly-league">
-  <div class="rank-weekly-header">
-    <div class="rank-weekly-title">
-      <div class="rank-weekly-icon">🏆</div>
+<div class="section-lbl">Weekly League</div>
+<div class="league-card">
+  <div class="league-header">
+    <div class="league-left">
+      <div class="league-icon" style="background:rgba(0,212,170,.12);color:var(--lattn);border:1px solid rgba(0,212,170,.25)">ATT</div>
       <div>
-        <div class="rank-weekly-name">Intern League</div>
-        <div class="rank-weekly-sub">10 students &middot; Resets Monday</div>
+        <div class="league-name">Attending League</div>
+        <div class="league-sub">25 students &middot; Top 5 promote to Fellow</div>
       </div>
     </div>
-    <div class="rank-weekly-timer" id="rank-weekly-timer">3d 8h</div>
+    <div class="league-timer" id="leagueTimer">4d 12h</div>
   </div>
 
-  <!-- 10 demo users -->
-  <div class="league-row">
+  <div class="league-progress">
+    <div class="lp-label">
+      <span class="lp-you">Your position: <strong style="color:var(--accent)">#8</strong></span>
+      <span class="lp-target">Top 5 to promote</span>
+    </div>
+    <div class="lp-bar"><div class="lp-fill" style="width:62%;background:var(--accent)"></div></div>
+    <div class="lp-note">340 MDCoins needed to reach #5 &mdash; you can do this today</div>
+  </div>
+
+  <!-- TOP 5 — promotion zone -->
+  <div class="league-row promoted">
     <div class="lr-pos p1">1</div>
-    <div class="lr-avatar">AR</div>
+    <div class="lr-avatar">AK</div>
     <div class="lr-info">
-      <div class="lr-name"><span class="speed-dot sd-green"></span>Arjun R. <span class="tier-badge tier-fellow" style="font-size:8px;padding:1px 6px">Fellow</span></div>
-      <div class="lr-school"><span style="font-size:14px;line-height:1;vertical-align:middle;margin-right:2px;">🇮🇳</span> AIIMS New Delhi</div>
+      <div class="lr-name"><span class="speed-dot sd-green"></span>Ahmed K. <span class="tier-badge tier-fellow" style="font-size:8px;padding:1px 6px">Fellow</span></div>
+      <div class="lr-school"><span style="font-size:14px;line-height:1;vertical-align:middle;margin-right:2px;">🇺🇸</span> Harvard Med</div>
     </div>
     <div style="display:flex;flex-direction:column;align-items:flex-end">
-      <div class="lr-coins">2,780</div>
-      <div class="lr-delta up">+210</div>
+      <div class="lr-coins">2,840</div>
+      <div class="lr-delta up">+120</div>
     </div>
+    <span class="promo-label promo-up">Promote</span>
   </div>
 
-  <div class="league-row">
+  <div class="league-row promoted">
     <div class="lr-pos p2">2</div>
-    <div class="lr-avatar">ES</div>
+    <div class="lr-avatar">SL</div>
     <div class="lr-info">
-      <div class="lr-name"><span class="speed-dot sd-green"></span>Emma S. <span class="tier-badge tier-resident" style="font-size:8px;padding:1px 6px">Resident</span></div>
-      <div class="lr-school"><span style="font-size:14px;line-height:1;vertical-align:middle;margin-right:2px;">🇺🇸</span> Harvard Medical</div>
+      <div class="lr-name"><span class="speed-dot sd-green"></span>Sofia L.</div>
+      <div class="lr-school"><span style="font-size:14px;line-height:1;vertical-align:middle;margin-right:2px;">🇩🇪</span> Charité Berlin</div>
     </div>
     <div style="display:flex;flex-direction:column;align-items:flex-end">
-      <div class="lr-coins">1,820</div>
-      <div class="lr-delta up">+145</div>
+      <div class="lr-coins">2,510</div>
+      <div class="lr-delta up">+88</div>
     </div>
+    <span class="promo-label promo-up">Promote</span>
+  </div>
+
+  <div class="league-row promoted">
+    <div class="lr-pos p3">3</div>
+    <div class="lr-avatar">RN</div>
+    <div class="lr-info">
+      <div class="lr-name"><span class="speed-dot sd-amber"></span>Raj N.</div>
+      <div class="lr-school"><span style="font-size:14px;line-height:1;vertical-align:middle;margin-right:2px;">🇮🇳</span> AIIMS Delhi</div>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:flex-end">
+      <div class="lr-coins">2,190</div>
+      <div class="lr-delta up">+44</div>
+    </div>
+    <span class="promo-label promo-up">Promote</span>
+  </div>
+
+  <div class="league-row promoted">
+    <div class="lr-pos" style="color:var(--muted)">4</div>
+    <div class="lr-avatar">ML</div>
+    <div class="lr-info">
+      <div class="lr-name"><span class="speed-dot sd-green"></span>Maria L.</div>
+      <div class="lr-school"><span style="font-size:14px;line-height:1;vertical-align:middle;margin-right:2px;">🇧🇷</span> UFRJ</div>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:flex-end">
+      <div class="lr-coins">1,980</div>
+      <div class="lr-delta up">+31</div>
+    </div>
+    <span class="promo-label promo-up">Promote</span>
+  </div>
+
+  <div class="league-row promoted">
+    <div class="lr-pos" style="color:var(--muted)">5</div>
+    <div class="lr-avatar">JS</div>
+    <div class="lr-info">
+      <div class="lr-name"><span class="speed-dot sd-amber"></span>James S.</div>
+      <div class="lr-school"><span style="font-size:14px;line-height:1;vertical-align:middle;margin-right:2px;">🇺🇸</span> Mayo Clinic</div>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:flex-end">
+      <div class="lr-coins">1,600</div>
+      <div class="lr-delta dn">-12</div>
+    </div>
+    <span class="promo-label promo-up">Promote</span>
+  </div>
+
+  <!-- divider -->
+  <div style="padding:6px 18px;background:var(--surface2);border-top:1px solid var(--border);border-bottom:1px solid var(--border)">
+    <div style="font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--muted)">340 coins away from promotion zone</div>
   </div>
 
   <!-- YOU -->
   <div class="league-row you">
-    <div class="lr-pos p3">3</div>
+    <div class="lr-pos you-c">8</div>
     <div class="lr-avatar">W</div>
     <div class="lr-info">
-      <div class="lr-name" style="color:var(--accent)"><span class="speed-dot sd-green"></span>You <span class="tier-badge tier-intern" style="font-size:8px;padding:1px 6px">Intern</span></div>
-      <div class="lr-school"><span style="font-size:14px;line-height:1;vertical-align:middle;margin-right:2px;">🇧🇷</span> UFPR</div>
+      <div class="lr-name" style="color:var(--accent)"><span class="speed-dot sd-green"></span>You</div>
+      <div class="lr-school"><span style="font-size:14px;line-height:1;vertical-align:middle;margin-right:2px;">🇧🇷</span> Your University</div>
     </div>
     <div style="display:flex;flex-direction:column;align-items:flex-end">
-      <div class="lr-coins" style="color:var(--accent)">970</div>
-      <div class="lr-delta up">+68</div>
+      <div class="lr-coins" style="color:var(--accent)">1,260</div>
+      <div class="lr-delta up">+0</div>
     </div>
+    <div class="tier-badge tier-attending" style="font-size:8px;padding:1px 6px">ATT</div>
   </div>
 
-  <div class="league-row">
-    <div class="lr-pos" style="color:var(--muted)">4</div>
-    <div class="lr-avatar">LC</div>
-    <div class="lr-info">
-      <div class="lr-name"><span class="speed-dot sd-amber"></span>Liam C. <span class="tier-badge tier-intern" style="font-size:8px;padding:1px 6px">Intern</span></div>
-      <div class="lr-school"><span style="font-size:14px;line-height:1;vertical-align:middle;margin-right:2px;">🇨🇦</span> McGill Faculty</div>
+  <!-- rows 9-20 collapsed / locked (Free users) -->
+  <div class="locked-row">
+    <div class="lock-pos">9</div>
+    <div class="lr-avatar" style="opacity:.4">??</div>
+    <div class="lock-overlay">
+      <div class="lock-name">&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;</div>
+      <svg class="lock-icon" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
     </div>
-    <div style="display:flex;flex-direction:column;align-items:flex-end">
-      <div class="lr-coins">805</div>
-      <div class="lr-delta up">+52</div>
+    <div class="lock-coins">1,180</div>
+  </div>
+  <div class="locked-row">
+    <div class="lock-pos">10</div>
+    <div class="lr-avatar" style="opacity:.4">??</div>
+    <div class="lock-overlay">
+      <div class="lock-name">&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;</div>
+      <svg class="lock-icon" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
     </div>
+    <div class="lock-coins">1,050</div>
   </div>
 
-  <div class="league-row">
-    <div class="lr-pos" style="color:var(--muted)">5</div>
-    <div class="lr-avatar">MK</div>
-    <div class="lr-info">
-      <div class="lr-name"><span class="speed-dot sd-green"></span>Mei K. <span class="tier-badge tier-student" style="font-size:8px;padding:1px 6px">MS4</span></div>
-      <div class="lr-school"><span style="font-size:14px;line-height:1;vertical-align:middle;margin-right:2px;">🇨🇳</span> Peking Union</div>
-    </div>
-    <div style="display:flex;flex-direction:column;align-items:flex-end">
-      <div class="lr-coins">680</div>
-      <div class="lr-delta up">+34</div>
-    </div>
-  </div>
-
-  <div class="league-row">
-    <div class="lr-pos" style="color:var(--muted)">6</div>
-    <div class="lr-avatar">JH</div>
-    <div class="lr-info">
-      <div class="lr-name"><span class="speed-dot sd-amber"></span>James H. <span class="tier-badge tier-student" style="font-size:8px;padding:1px 6px">MS3</span></div>
-      <div class="lr-school"><span style="font-size:14px;line-height:1;vertical-align:middle;margin-right:2px;">🇬🇧</span> Oxford Medicine</div>
-    </div>
-    <div style="display:flex;flex-direction:column;align-items:flex-end">
-      <div class="lr-coins">540</div>
-      <div class="lr-delta dn">-12</div>
-    </div>
-  </div>
-
-  <div class="league-row">
-    <div class="lr-pos" style="color:var(--muted)">7</div>
-    <div class="lr-avatar">SB</div>
-    <div class="lr-info">
-      <div class="lr-name"><span class="speed-dot sd-green"></span>Sofia B. <span class="tier-badge tier-student" style="font-size:8px;padding:1px 6px">MS3</span></div>
-      <div class="lr-school"><span style="font-size:14px;line-height:1;vertical-align:middle;margin-right:2px;">🇩🇪</span> Charit&eacute; Berlin</div>
-    </div>
-    <div style="display:flex;flex-direction:column;align-items:flex-end">
-      <div class="lr-coins">425</div>
-      <div class="lr-delta up">+18</div>
-    </div>
-  </div>
-
-  <div class="league-row">
-    <div class="lr-pos" style="color:var(--muted)">8</div>
-    <div class="lr-avatar">AO</div>
-    <div class="lr-info">
-      <div class="lr-name"><span class="speed-dot sd-amber"></span>Aisha O. <span class="tier-badge tier-student" style="font-size:8px;padding:1px 6px">MS2</span></div>
-      <div class="lr-school"><span style="font-size:14px;line-height:1;vertical-align:middle;margin-right:2px;">🇳🇬</span> Univ. of Ibadan</div>
-    </div>
-    <div style="display:flex;flex-direction:column;align-items:flex-end">
-      <div class="lr-coins">320</div>
-      <div class="lr-delta dn">-8</div>
-    </div>
-  </div>
-
-  <div class="league-row">
-    <div class="lr-pos" style="color:var(--muted)">9</div>
-    <div class="lr-avatar">DM</div>
-    <div class="lr-info">
-      <div class="lr-name"><span class="speed-dot sd-red"></span>Diego M. <span class="tier-badge tier-student" style="font-size:8px;padding:1px 6px">MS2</span></div>
-      <div class="lr-school"><span style="font-size:14px;line-height:1;vertical-align:middle;margin-right:2px;">🇲🇽</span> UNAM Medicina</div>
-    </div>
-    <div style="display:flex;flex-direction:column;align-items:flex-end">
-      <div class="lr-coins">245</div>
-      <div class="lr-delta up">+22</div>
-    </div>
-  </div>
-
-  <div class="league-row">
-    <div class="lr-pos" style="color:var(--muted)">10</div>
-    <div class="lr-avatar">TN</div>
-    <div class="lr-info">
-      <div class="lr-name"><span class="speed-dot sd-red"></span>Thanh N. <span class="tier-badge tier-student" style="font-size:8px;padding:1px 6px">MS1</span></div>
-      <div class="lr-school"><span style="font-size:14px;line-height:1;vertical-align:middle;margin-right:2px;">🇻🇳</span> Hanoi Medical</div>
-    </div>
-    <div style="display:flex;flex-direction:column;align-items:flex-end">
-      <div class="lr-coins">190</div>
-      <div class="lr-delta up">+15</div>
-    </div>
-  </div>
-
-  <!-- no relegation zone for weekly league -->
+  <!-- relegation zone -->
   <div style="padding:6px 18px;background:var(--surface2);border-top:1px solid var(--border);border-bottom:1px solid var(--border)">
-    <div style="font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--muted)">Relegation zone &mdash; bottom 5</div>
+    <div style="font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--muted)">Relegation zone — bottom 5</div>
   </div>
   <div class="league-row" style="border-left:2px solid rgba(255,83,112,.35)">
     <div class="lock-pos" style="color:var(--muted)">21</div>
@@ -4179,7 +3887,7 @@ html.dark .hl-btn-active { border-color:#fff!important; }
       <div class="lock-name">&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;</div>
       <svg class="lock-icon" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
     </div>
-    <div class="lock-coins">340</div>
+    <div class="lock-coins">280</div>
     <span class="promo-label promo-dn">Relegate</span>
   </div>
 
@@ -4191,7 +3899,7 @@ html.dark .hl-btn-active { border-color:#fff!important; }
 
 <!-- SCOPE FILTERS -->
 <!-- CHALLENGES -->
-<div class="rank-section-label">Challenges</div>
+<div class="section-lbl">Challenges</div>
 <div id="challenges-wrap" style="display:flex;flex-direction:column;gap:12px;">
 
   <!-- How it works — always visible -->
@@ -4239,7 +3947,7 @@ html.dark .hl-btn-active { border-color:#fff!important; }
   </div>
 </div>
 
-<div class="rank-section-label">Global Ranking</div>
+<div class="section-lbl">Global Ranking</div>
 <div style="display:flex;flex-direction:column;gap:8px;">
   <!-- Row 1: Global + USA fixed + Step filters -->
   <div class="scope-wrap">
@@ -4256,214 +3964,25 @@ html.dark .hl-btn-active { border-color:#fff!important; }
 </div>
 
 <!-- GLOBAL RANKING TABLE -->
-<div class="rank-global-card">
-  <div class="rank-global-header">
-    <span class="rank-global-title">All time · Global</span>
-    <div class="rank-live-pill"><div class="rank-live-dot"></div>Updated hourly</div>
+<div class="global-card">
+  <div class="global-header">
+    <span class="global-title">All time &middot; Global</span>
+    <div class="live-pill"><div class="live-dot"></div>Updated hourly</div>
   </div>
-  <div class="rank-global-col-header">
-    <div style="width:26px;text-align:center;font-size:10px;font-weight:700;color:var(--muted);">#</div>
-    <div style="flex:1;font-size:10px;font-weight:700;color:var(--muted);padding-left:6px;">User</div>
-    <div style="width:56px;text-align:right;font-size:10px;font-weight:700;color:var(--muted);">Coins</div>
-    <div style="width:50px;text-align:right;font-size:10px;font-weight:700;color:var(--muted);">Streak</div>
-    <div style="width:36px;text-align:right;font-size:10px;font-weight:700;color:var(--muted);">Δ</div>
+  <div class="rank-col-header">
+    <div style="width:22px"></div>
+    <div style="width:30px"></div>
+    <div class="rch-spacer"></div>
+    <div class="rch-label">Coins</div>
+    <div class="rch-label">Streak</div>
   </div>
-
-  <!-- Top 10 visible -->
-  <div class="rank-global-row rank-global-top1">
-    <div class="rank-global-pos">1</div>
-    <div class="rank-global-avatar">AR</div>
-    <div class="rank-global-info">
-      <div class="rank-global-name">
-        <span class="speed-dot sd-green"></span>
-        Arjun R.
-        <span class="tier-badge tier-fellow" style="font-size:8px;padding:1px 6px;">Fellow</span>
-      </div>
-      <div class="rank-global-school">🇮🇳 AIIMS New Delhi</div>
-    </div>
-    <div class="rank-global-coins">3,240</div>
-    <div class="rank-global-streak">42d</div>
-    <div class="rank-global-delta rank-delta-up">+180</div>
+  <!-- Dynamic rank rows — populated by renderGlobalRankFiltered() -->
+  <div id="global-rank-rows">
+    <div style="padding:24px;text-align:center;color:var(--muted);font-size:13px">Loading ranking...</div>
   </div>
-
-  <div class="rank-global-row rank-global-top2">
-    <div class="rank-global-pos">2</div>
-    <div class="rank-global-avatar">ES</div>
-    <div class="rank-global-info">
-      <div class="rank-global-name">
-        <span class="speed-dot sd-green"></span>
-        Emma S.
-        <span class="tier-badge tier-resident" style="font-size:8px;padding:1px 6px;">Resident</span>
-      </div>
-      <div class="rank-global-school">🇺🇸 Harvard Medical</div>
-    </div>
-    <div class="rank-global-coins">2,890</div>
-    <div class="rank-global-streak">38d</div>
-    <div class="rank-global-delta rank-delta-up">+145</div>
-  </div>
-
-  <div class="rank-global-row rank-global-top3">
-    <div class="rank-global-pos">3</div>
-    <div class="rank-global-avatar">MK</div>
-    <div class="rank-global-info">
-      <div class="rank-global-name">
-        <span class="speed-dot sd-green"></span>
-        Marcus K.
-        <span class="tier-badge tier-resident" style="font-size:8px;padding:1px 6px;">Resident</span>
-      </div>
-      <div class="rank-global-school">🇺🇸 Johns Hopkins</div>
-    </div>
-    <div class="rank-global-coins">2,650</div>
-    <div class="rank-global-streak">31d</div>
-    <div class="rank-global-delta rank-delta-up">+122</div>
-  </div>
-
-  <div class="rank-global-row">
-    <div class="rank-global-pos">4</div>
-    <div class="rank-global-avatar">LC</div>
-    <div class="rank-global-info">
-      <div class="rank-global-name">
-        <span class="speed-dot sd-amber"></span>
-        Liam C.
-        <span class="tier-badge tier-intern" style="font-size:8px;padding:1px 6px;">Intern</span>
-      </div>
-      <div class="rank-global-school">🇨🇦 McGill Faculty</div>
-    </div>
-    <div class="rank-global-coins">2,210</div>
-    <div class="rank-global-streak">28d</div>
-    <div class="rank-global-delta rank-delta-up">+95</div>
-  </div>
-
-  <div class="rank-global-row">
-    <div class="rank-global-pos">5</div>
-    <div class="rank-global-avatar">SB</div>
-    <div class="rank-global-info">
-      <div class="rank-global-name">
-        <span class="speed-dot sd-green"></span>
-        Sofia B.
-        <span class="tier-badge tier-intern" style="font-size:8px;padding:1px 6px;">Intern</span>
-      </div>
-      <div class="rank-global-school">🇩🇪 Charité Berlin</div>
-    </div>
-    <div class="rank-global-coins">1,980</div>
-    <div class="rank-global-streak">24d</div>
-    <div class="rank-global-delta rank-delta-up">+78</div>
-  </div>
-
-  <!-- Freemium hidden rows (6-10) — locked names but visible MDCoins -->
-  <div class="rank-global-row rank-global-locked">
-    <div class="rank-global-pos">6</div>
-    <div class="rank-global-avatar rank-avatar-locked">??</div>
-    <div class="rank-global-info">
-      <div class="rank-global-name rank-name-hidden">
-        •••••••
-        <svg class="rank-lock-icon" viewBox="0 0 16 16" width="12" height="12" style="vertical-align:middle;margin-left:4px;opacity:0.4;">
-          <rect x="3" y="7" width="10" height="7" rx="1" fill="currentColor"/>
-          <path d="M5 7V5a3 3 0 016 0v2" stroke="currentColor" stroke-width="1.5" fill="none"/>
-        </svg>
-      </div>
-      <div class="rank-global-school" style="opacity:0.35;">••••••••</div>
-    </div>
-    <div class="rank-global-coins">1,750</div>
-    <div class="rank-global-streak" style="opacity:0.4;">—</div>
-    <div class="rank-global-delta" style="opacity:0.4;">—</div>
-  </div>
-
-  <div class="rank-global-row rank-global-locked">
-    <div class="rank-global-pos">7</div>
-    <div class="rank-global-avatar rank-avatar-locked">??</div>
-    <div class="rank-global-info">
-      <div class="rank-global-name rank-name-hidden">
-        •••••••
-        <svg class="rank-lock-icon" viewBox="0 0 16 16" width="12" height="12" style="vertical-align:middle;margin-left:4px;opacity:0.4;">
-          <rect x="3" y="7" width="10" height="7" rx="1" fill="currentColor"/>
-          <path d="M5 7V5a3 3 0 016 0v2" stroke="currentColor" stroke-width="1.5" fill="none"/>
-        </svg>
-      </div>
-      <div class="rank-global-school" style="opacity:0.35;">••••••••</div>
-    </div>
-    <div class="rank-global-coins">1,540</div>
-    <div class="rank-global-streak" style="opacity:0.4;">—</div>
-    <div class="rank-global-delta" style="opacity:0.4;">—</div>
-  </div>
-
-  <div class="rank-global-row rank-global-locked">
-    <div class="rank-global-pos">8</div>
-    <div class="rank-global-avatar rank-avatar-locked">??</div>
-    <div class="rank-global-info">
-      <div class="rank-global-name rank-name-hidden">
-        •••••••
-        <svg class="rank-lock-icon" viewBox="0 0 16 16" width="12" height="12" style="vertical-align:middle;margin-left:4px;opacity:0.4;">
-          <rect x="3" y="7" width="10" height="7" rx="1" fill="currentColor"/>
-          <path d="M5 7V5a3 3 0 016 0v2" stroke="currentColor" stroke-width="1.5" fill="none"/>
-        </svg>
-      </div>
-      <div class="rank-global-school" style="opacity:0.35;">••••••••</div>
-    </div>
-    <div class="rank-global-coins">1,380</div>
-    <div class="rank-global-streak" style="opacity:0.4;">—</div>
-    <div class="rank-global-delta" style="opacity:0.4;">—</div>
-  </div>
-
-  <div class="rank-global-row rank-global-locked">
-    <div class="rank-global-pos">9</div>
-    <div class="rank-global-avatar rank-avatar-locked">??</div>
-    <div class="rank-global-info">
-      <div class="rank-global-name rank-name-hidden">
-        •••••••
-        <svg class="rank-lock-icon" viewBox="0 0 16 16" width="12" height="12" style="vertical-align:middle;margin-left:4px;opacity:0.4;">
-          <rect x="3" y="7" width="10" height="7" rx="1" fill="currentColor"/>
-          <path d="M5 7V5a3 3 0 016 0v2" stroke="currentColor" stroke-width="1.5" fill="none"/>
-        </svg>
-      </div>
-      <div class="rank-global-school" style="opacity:0.35;">••••••••</div>
-    </div>
-    <div class="rank-global-coins">1,210</div>
-    <div class="rank-global-streak" style="opacity:0.4;">—</div>
-    <div class="rank-global-delta" style="opacity:0.4;">—</div>
-  </div>
-
-  <div class="rank-global-row rank-global-locked">
-    <div class="rank-global-pos">10</div>
-    <div class="rank-global-avatar rank-avatar-locked">??</div>
-    <div class="rank-global-info">
-      <div class="rank-global-name rank-name-hidden">
-        •••••••
-        <svg class="rank-lock-icon" viewBox="0 0 16 16" width="12" height="12" style="vertical-align:middle;margin-left:4px;opacity:0.4;">
-          <rect x="3" y="7" width="10" height="7" rx="1" fill="currentColor"/>
-          <path d="M5 7V5a3 3 0 016 0v2" stroke="currentColor" stroke-width="1.5" fill="none"/>
-        </svg>
-      </div>
-      <div class="rank-global-school" style="opacity:0.35;">••••••••</div>
-    </div>
-    <div class="rank-global-coins">1,050</div>
-    <div class="rank-global-streak" style="opacity:0.4;">—</div>
-    <div class="rank-global-delta" style="opacity:0.4;">—</div>
-  </div>
-
-  <!-- Ellipsis separator -->
-  <div style="padding:8px 0;text-align:center;color:var(--muted);font-size:14px;letter-spacing:2px;">⋯</div>
-
-  <!-- Your position (always visible) -->
-  <div class="rank-global-row rank-global-you">
-    <div class="rank-global-pos">47</div>
-    <div class="rank-global-avatar" style="background:rgba(79,142,247,.15);color:var(--accent);">W</div>
-    <div class="rank-global-info">
-      <div class="rank-global-name" style="color:var(--accent);">
-        <span class="speed-dot sd-green"></span>
-        You
-        <span class="tier-badge tier-intern" style="font-size:8px;padding:1px 6px;">Intern</span>
-      </div>
-      <div class="rank-global-school">🇧🇷 UFPR</div>
-    </div>
-    <div class="rank-global-coins" style="color:var(--accent);">970</div>
-    <div class="rank-global-streak">11d</div>
-    <div class="rank-global-delta rank-delta-up">+68</div>
-  </div>
-
-  <div class="rank-pro-gate">
-    <div class="rank-pro-gate-text">
-      <strong>Unlock full ranking</strong><br>
+  <div class="pro-gate">
+    <div class="pro-gate-text">
+      <strong>Unlock full ranking</strong>
       See all competitors, filters, and history
     </div>
     <button class="upgrade-btn" onclick="showXpToast('BoardMD Pro','Coming soon — founding member pricing available at launch. Join our waitlist at boardmd.app','','',null)">Go Pro</button>
@@ -4471,96 +3990,56 @@ html.dark .hl-btn-active { border-color:#fff!important; }
 </div>
 
 <!-- UNIVERSITY RANKING -->
-<div class="rank-section-label">University Ranking</div>
-<div class="rank-uni-card">
-  <div class="rank-uni-header">
-    <span class="rank-uni-title">Weighted score · Global</span>
-    <div class="rank-live-pill"><div class="rank-live-dot"></div>Live</div>
+<div class="section-lbl">University Ranking</div>
+<div class="uni-card">
+  <div class="global-header">
+    <span class="global-title">Weighted score &middot; Global</span>
+    <div class="live-pill"><div class="live-dot"></div>Live</div>
   </div>
 
-  <div class="rank-uni-row rank-uni-top1">
-    <div class="rank-uni-pos">1</div>
-    <div class="rank-uni-avatar">HVD</div>
-    <div class="rank-uni-info">
-      <div class="rank-uni-name">🇺🇸 Harvard Medical School</div>
-      <div class="rank-uni-sub">Cambridge, United States · 28 active</div>
+  <div class="uni-row">
+    <div class="uni-pos u1">1</div>
+    <div class="rank-avatar" style="border-radius:8px;font-size:9px;font-weight:800">HVD</div>
+    <div class="uni-info">
+      <div class="uni-name"><span style="font-size:14px;line-height:1;vertical-align:middle;margin-right:2px;">🇺🇸</span>Harvard Medical School</div>
+      <div class="uni-country">Cambridge, United States &middot; 24 active students</div>
     </div>
-    <div class="rank-uni-score">94.2<span>score</span></div>
+    <div class="uni-score">94.2<span>score</span></div>
   </div>
 
-  <div class="rank-uni-row rank-uni-top2">
-    <div class="rank-uni-pos">2</div>
-    <div class="rank-uni-avatar">JHU</div>
-    <div class="rank-uni-info">
-      <div class="rank-uni-name">🇺🇸 Johns Hopkins SOM</div>
-      <div class="rank-uni-sub">Baltimore, United States · 24 active</div>
+  <div class="uni-row">
+    <div class="uni-pos u2">2</div>
+    <div class="rank-avatar" style="border-radius:8px;font-size:9px;font-weight:800">AIM</div>
+    <div class="uni-info">
+      <div class="uni-name"><span style="font-size:14px;line-height:1;vertical-align:middle;margin-right:2px;">🇮🇳</span>AIIMS Delhi</div>
+      <div class="uni-country">New Delhi, India &middot; 18 active students</div>
     </div>
-    <div class="rank-uni-score">92.8<span>score</span></div>
+    <div class="uni-score">91.7<span>score</span></div>
   </div>
 
-  <div class="rank-uni-row rank-uni-top3">
-    <div class="rank-uni-pos">3</div>
-    <div class="rank-uni-avatar">AIM</div>
-    <div class="rank-uni-info">
-      <div class="rank-uni-name">🇮🇳 AIIMS Delhi</div>
-      <div class="rank-uni-sub">New Delhi, India · 32 active</div>
+  <div class="uni-row">
+    <div class="uni-pos u3">3</div>
+    <div class="rank-avatar" style="border-radius:8px;font-size:9px;font-weight:800">CHR</div>
+    <div class="uni-info">
+      <div class="uni-name"><span style="font-size:14px;line-height:1;vertical-align:middle;margin-right:2px;">🇩🇪</span>Charité Berlin</div>
+      <div class="uni-country">Berlin, Germany &middot; 11 active students</div>
     </div>
-    <div class="rank-uni-score">91.5<span>score</span></div>
+    <div class="uni-score">88.4<span>score</span></div>
   </div>
 
-  <div class="rank-uni-row">
-    <div class="rank-uni-pos">4</div>
-    <div class="rank-uni-avatar">STF</div>
-    <div class="rank-uni-info">
-      <div class="rank-uni-name">🇺🇸 Stanford SOM</div>
-      <div class="rank-uni-sub">Stanford, United States · 19 active</div>
+  <div class="uni-row you-uni">
+    <div class="uni-pos" style="color:var(--accent)">9</div>
+    <div class="rank-avatar" style="border-radius:8px;font-size:9px;font-weight:800;background:rgba(79,142,247,.15);border-color:rgba(79,142,247,.3);color:var(--accent)">YOU</div>
+    <div class="uni-info">
+      <div class="uni-name"><span style="font-size:14px;line-height:1;vertical-align:middle;margin-right:2px;">🇧🇷</span>Your University</div>
+      <div class="uni-country">Brazil &middot; 3 active students</div>
     </div>
-    <div class="rank-uni-score">89.7<span>score</span></div>
+    <div class="uni-score" style="color:var(--accent)">71.2<span>score</span></div>
   </div>
 
-  <div class="rank-uni-row">
-    <div class="rank-uni-pos">5</div>
-    <div class="rank-uni-avatar">OXF</div>
-    <div class="rank-uni-info">
-      <div class="rank-uni-name">🇬🇧 Oxford Medicine</div>
-      <div class="rank-uni-sub">Oxford, United Kingdom · 15 active</div>
-    </div>
-    <div class="rank-uni-score">87.3<span>score</span></div>
-  </div>
-
-  <div class="rank-uni-row">
-    <div class="rank-uni-pos">6</div>
-    <div class="rank-uni-avatar">MCG</div>
-    <div class="rank-uni-info">
-      <div class="rank-uni-name">🇨🇦 McGill Faculty</div>
-      <div class="rank-uni-sub">Montreal, Canada · 12 active</div>
-    </div>
-    <div class="rank-uni-score">85.1<span>score</span></div>
-  </div>
-
-  <div class="rank-uni-row">
-    <div class="rank-uni-pos">7</div>
-    <div class="rank-uni-avatar">CHR</div>
-    <div class="rank-uni-info">
-      <div class="rank-uni-name">🇩🇪 Charité Berlin</div>
-      <div class="rank-uni-sub">Berlin, Germany · 14 active</div>
-    </div>
-    <div class="rank-uni-score">83.6<span>score</span></div>
-  </div>
-
-  <div class="rank-uni-row">
-    <div class="rank-uni-pos">8</div>
-    <div class="rank-uni-avatar">USP</div>
-    <div class="rank-uni-info">
-      <div class="rank-uni-name">🇧🇷 USP Faculdade de Medicina</div>
-      <div class="rank-uni-sub">São Paulo, Brazil · 18 active</div>
-    </div>
-    <div class="rank-uni-score">82.4<span>score</span></div>
-  </div>
-
-  <div class="rank-pro-gate">
-    <div class="rank-pro-gate-text">
-      <strong>Full university ranking</strong><br>
+  <div class="pro-gate">
+    <div class="pro-gate-text">
+      <strong>Full university ranking</strong>
       All countries, filters, and history
     </div>
     <button class="upgrade-btn" onclick="showXpToast('BoardMD Pro','Coming soon — founding member pricing available at launch. Join our waitlist at boardmd.app','','',null)">Go Pro</button>
@@ -4898,12 +4377,12 @@ html.dark .hl-btn-active { border-color:#fff!important; }
           <span class="badge badge-soon">Soon</span>
         </div>
     
-        <div class="deck-row" onclick="switchDeckAndStudy('shelf_obgyn')" style="cursor:pointer">
-          <div class="deck-icon" style="background:rgba(236,72,153,.12);">
-            <svg viewBox="0 0 24 24" stroke="#ec4899" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+        <div class="deck-row soon">
+          <div class="deck-icon" style="background:rgba(136,146,176,.1);">
+            <svg viewBox="0 0 24 24" stroke="#8892b0"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
           </div>
-          <div class="deck-info"><div class="deck-title">OB-GYN</div><div class="deck-sub">BoardMD Shelf</div><div class="deck-stats-line" id="stats-shelf_obgyn"><span class="ds-total">— cards</span></div></div>
-          <button class="study-btn" onclick="event.stopPropagation();switchDeckAndStudy('shelf_obgyn')">Study</button>
+          <div class="deck-info"><div class="deck-title">OB-GYN</div><div class="deck-sub">BoardMD Shelf</div></div>
+          <span class="badge badge-soon">Soon</span>
         </div>
     
         <div class="deck-row soon">
@@ -4962,10 +4441,6 @@ html.dark .hl-btn-active { border-color:#fff!important; }
           <div class="setting-info"><div class="setting-label">Reset deck progress</div><div class="setting-desc">Clear FSRS data for a specific deck</div></div>
           <div style="font-size:12px;font-weight:700;color:#ff5370;cursor:pointer;">Reset</div>
         </div>
-        <div class="setting-row" onclick="forceRefreshCards()" style="cursor:pointer">
-          <div class="setting-info"><div class="setting-label">Force Refresh Cards</div><div class="setting-desc">Clear cache and reload all cards from server</div></div>
-          <div style="font-size:12px;font-weight:700;color:var(--accent);cursor:pointer;">Refresh</div>
-        </div>
       </div>
     </div>
   </div>
@@ -5002,29 +4477,38 @@ html.dark .hl-btn-active { border-color:#fff!important; }
         </div>
 
         <div class="card" id="card-el">
-          <div class="card-header" style="display:flex;align-items:center;gap:6px;padding:6px 14px;flex-wrap:nowrap;">
-            <!-- Hidden elements JS still references -->
-            <span class="card-system" id="c-sys" style="display:none;"></span>
-            <span id="c-top-sep" style="display:none;font-size:10px;color:var(--muted);opacity:.4;flex-shrink:0;">›</span>
-            <span class="card-topic" id="c-top" style="display:none;font-size:10px;font-weight:500;color:var(--muted);font-family:'Sora',sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:250px;flex-shrink:1;"></span>
-            <span class="card-state" id="c-state" style="display:none;"></span>
-            <span class="card-interval" id="c-int" style="display:none;"></span>
-            <span id="c-deck-label" style="display:none;"></span>
-            <!-- Visible: deck badge + controls | QID -->
-            <span id="c-deck-badge" style="font-size:9px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;font-family:'JetBrains Mono',monospace;padding:2px 7px;border-radius:20px;background:var(--accent-dim,rgba(59,127,255,.1));color:var(--accent,#3b7fff);border:1px solid rgba(59,127,255,.2);white-space:nowrap;flex-shrink:0;"></span>
-            <button onclick="if(fontSize>11){fontSize--;applyFont();}" title="Smaller text" style="background:none;border:1px solid var(--border);border-radius:6px;padding:1px 6px;cursor:pointer;font-size:11px;font-weight:700;color:var(--text-faint);font-family:'Sora',sans-serif;line-height:1.4;transition:all .15s;" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text-faint)'">A-</button>
-            <button onclick="if(fontSize<22){fontSize++;applyFont();}" title="Larger text" style="background:none;border:1px solid var(--border);border-radius:6px;padding:1px 6px;cursor:pointer;font-size:13px;font-weight:700;color:var(--text-faint);font-family:'Sora',sans-serif;line-height:1.4;transition:all .15s;" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text-faint)'">A+</button>
-            <button class="hl-btn" id="hl-toggle-btn" onclick="toggleHlToolbar()" title="Highlight" style="background:none;border:1px solid var(--border);border-radius:6px;padding:2px 7px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">
-              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="var(--text-faint)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
-            </button>
-            <div class="hl-swatches" id="hl-swatches-wrap">
-              <div class="sw y" onclick="setHlColor('yellow')" id="sw-y" title="Yellow"></div>
-              <div class="sw g" onclick="setHlColor('green')"  id="sw-g" title="Green"></div>
-              <div class="sw b" onclick="setHlColor('blue')"   id="sw-b" title="Blue"></div>
+          <div class="card-header">
+            <!-- Line 1: system › topic (left) | state + interval (right) -->
+            <div style="width:100%;display:flex;align-items:center;justify-content:space-between;margin-bottom:7px;">
+              <div style="display:flex;align-items:center;gap:5px;min-width:0;flex:1;overflow:hidden;">
+                <span class="card-system" id="c-sys" style="font-size:10px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;color:var(--accent);font-family:'Sora',sans-serif;white-space:nowrap;flex-shrink:0;"></span>
+                <span id="c-top-sep" style="font-size:10px;color:var(--muted);opacity:.4;flex-shrink:0;">›</span>
+                <span class="card-topic" id="c-top" style="font-size:11px;font-weight:500;color:var(--muted);font-family:'Sora',sans-serif;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"></span>
+              </div>
+              <div style="display:flex;align-items:center;gap:5px;flex-shrink:0;margin-left:8px;">
+                <span class="card-state" id="c-state" style="display:none"></span>
+                <span class="card-interval" id="c-int" style="display:none;font-size:10px;font-weight:700;color:var(--muted);font-family:'JetBrains Mono',monospace;"></span>
+              </div>
             </div>
-            <button id="edit-card-btn" onclick="openCardEditor()" title="Edit" style="background:none;border:1px solid var(--border);border-radius:6px;padding:2px 8px;cursor:pointer;font-size:10px;font-weight:700;color:var(--text-faint);font-family:'JetBrains Mono',monospace;transition:all .15s;" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text-faint)'">Edit</button>
-            <span style="flex:1;"></span>
-            <span class="card-qid" id="c-qid" style="font-size:9px;flex-shrink:0;"></span>
+            <!-- Line 2: deck badge + actions (left) | QID (right) -->
+            <div style="width:100%;display:flex;align-items:center;justify-content:space-between;">
+              <div style="display:flex;align-items:center;gap:5px;flex-wrap:nowrap;">
+                <span id="c-deck-label" style="display:none;"></span>
+                <span id="c-deck-badge" style="font-size:9px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;font-family:'JetBrains Mono',monospace;padding:2px 7px;border-radius:20px;background:var(--accent-dim,rgba(59,127,255,.1));color:var(--accent,#3b7fff);border:1px solid rgba(59,127,255,.2);white-space:nowrap;flex-shrink:0;"></span>
+                <button onclick="if(fontSize>11){fontSize--;applyFont();}" title="Smaller text" style="background:none;border:1px solid var(--border);border-radius:6px;padding:1px 6px;cursor:pointer;font-size:11px;font-weight:700;color:var(--text-faint);font-family:'Sora',sans-serif;line-height:1.4;transition:all .15s;" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text-faint)'">A-</button>
+                <button onclick="if(fontSize<22){fontSize++;applyFont();}" title="Larger text" style="background:none;border:1px solid var(--border);border-radius:6px;padding:1px 6px;cursor:pointer;font-size:13px;font-weight:700;color:var(--text-faint);font-family:'Sora',sans-serif;line-height:1.4;transition:all .15s;" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text-faint)'">A+</button>
+                <button class="hl-btn" id="hl-toggle-btn" onclick="toggleHlToolbar()" title="Highlight" style="background:none;border:1px solid var(--border);border-radius:6px;padding:2px 7px;cursor:pointer;display:flex;align-items:center;justify-content:center;width:auto;height:auto;transition:all .15s;" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">
+                  <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="var(--text-faint)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+                </button>
+                <div class="hl-swatches" id="hl-swatches-wrap">
+                  <div class="sw y" onclick="setHlColor('yellow')" id="sw-y" title="Yellow"></div>
+                  <div class="sw g" onclick="setHlColor('green')"  id="sw-g" title="Green"></div>
+                  <div class="sw b" onclick="setHlColor('blue')"   id="sw-b" title="Blue"></div>
+                </div>
+                <button id="edit-card-btn" onclick="openCardEditor()" title="Edit" style="background:none;border:1px solid var(--border);border-radius:6px;padding:2px 8px;cursor:pointer;font-size:10px;font-weight:700;color:var(--text-faint);font-family:'JetBrains Mono',monospace;transition:all .15s;" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text-faint)'">Edit</button>
+              </div>
+              <span class="card-qid" id="c-qid" style="font-size:9px;flex-shrink:0;"></span>
+            </div>
           </div>
           <div id="bmd-cols-row">
           <div id="bmd-q-col">
@@ -5044,20 +4528,9 @@ html.dark .hl-btn-active { border-color:#fff!important; }
             <span class="cfc-sep">+</span>
             <span class="cfc-due" id="cfc-due">0</span>
           </div>
-          <div id="skip-nav-wrap" style="display:flex;align-items:center;justify-content:center;gap:24px;padding:6px 0 4px;border-top:1px solid var(--border);opacity:.35;transition:opacity .2s;" onmouseenter="this.style.opacity='1'" onmouseleave="this.style.opacity='.35'">
-            <button onclick="skipBack()" title="Previous card (←)" style="background:none;border:none;color:var(--text-faint);cursor:pointer;font-size:10px;font-weight:500;font-family:'JetBrains Mono',monospace;padding:2px 8px;border-radius:4px;transition:all .15s;display:flex;align-items:center;gap:4px;" onmouseover="this.style.color='var(--accent)';this.style.background='rgba(59,127,255,.08)'" onmouseout="this.style.color='var(--text-faint)';this.style.background='none'">
-              <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
-              Back
-            </button>
-            <button onclick="skipFwd()" title="Next card (→)" style="background:none;border:none;color:var(--text-faint);cursor:pointer;font-size:10px;font-weight:500;font-family:'JetBrains Mono',monospace;padding:2px 8px;border-radius:4px;transition:all .15s;display:flex;align-items:center;gap:4px;" onmouseover="this.style.color='var(--accent)';this.style.background='rgba(59,127,255,.08)'" onmouseout="this.style.color='var(--text-faint)';this.style.background='none'">
-              Skip
-              <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
-            </button>
-          </div>
           </div><!-- /bmd-q-col -->
           <div id="bmd-split-divider"><div class="bmd-div-handle"><span></span><span></span></div></div>
           <div id="bmd-ans-col">
-          <div id="bmd-ans-placeholder" style="display:none;"></div>
           <div class="explanation" id="c-exp">
             <div class="exp-section">
               <div class="exp-label"><span class="exp-label-icon" style="background:rgba(34,197,94,.15);color:var(--emerald)"></span>Correct answer</div>
@@ -5079,7 +4552,7 @@ html.dark .hl-btn-active { border-color:#fff!important; }
               <div class="exp-dist hl-zone" id="exp-dist"></div>
             </div>
           </div>
-          <div id="key-point-wrap" style="padding:0 18px 14px;"></div>
+          <div id="key-point-wrap" style="display:none;padding:0 18px 14px;"></div>
           <div id="card-pubmed-wrap" style="display:none;"></div>
           <div id="card-cochrane-wrap" style="display:none;"></div>
           <div style="display:flex;justify-content:flex-end;padding:4px 18px 6px;">
@@ -5807,12 +5280,11 @@ function buildDeckHomeTable(){
     {id:'boardmd_s2', name:'BoardMD · Step 2 CK',         sub:'Adaptive MCQs · 15,623 cards',    step:'s2'},
     {id:'s2',         name:'Step 2 CK · Rapid Review',    sub:'Clinical Essentials · 522 cards', step:'s2'},
     {id:'core',       name:'Step 2 CK · Core Review',     sub:'Board-Focused · 4,107 cards',     step:'s2'},
-    {id:'daily_review',name:'Step 2 CK · Daily Review',    sub:'Daily Review Cards',               step:'s2'},
     {id:'shelf',         name:'BoardMD Shelf · All Rotations',      sub:'Shelf Exams · 180 cards',          step:'s2', shelf:true},
 
     {id:'shelf_im',      name:'BoardMD Shelf · Internal Medicine',   sub:'Shelf Exam · Coming soon',         step:'s2', shelf:true, soon:true},
     {id:'shelf_fm',      name:'BoardMD Shelf · Family Medicine',     sub:'Shelf Exam · Coming soon',         step:'s2', shelf:true, soon:true},
-    {id:'shelf_obgyn',   name:'BoardMD Shelf · OB/GYN',              sub:'Shelf Exam',                       step:'s2', shelf:true},
+    {id:'shelf_obgyn',   name:'BoardMD Shelf · OB/GYN',              sub:'Shelf Exam · Coming soon',         step:'s2', shelf:true, soon:true},
     {id:'shelf_peds',    name:'BoardMD Shelf · Pediatrics',          sub:'Shelf Exam · Coming soon',         step:'s2', shelf:true, soon:true},
     {id:'shelf_psych',   name:'BoardMD Shelf · Psychiatry',          sub:'Shelf Exam · Coming soon',         step:'s2', shelf:true, soon:true},
     {id:'shelf_neuro',   name:'BoardMD Shelf · Neurology',           sub:'Shelf Exam · Coming soon',         step:'s2', shelf:true, soon:true},
@@ -5929,28 +5401,32 @@ function buildDeckHomeTable(){
 function startStudyFromHome(){switchDeckAndStudy(currentDeck);}
 function switchDeckAndStudy(dk){
   hideDeckHome();
-  if(SHELF_DECKS.includes(dk)){
+  if(SHELF_DECKS.includes(dk) || dk === 'shelf' || dk === 'shelf_em' || dk === 'shelf_surgery'){
     const D = window.DECKS || {};
-    var cards;
-    if(dk === 'shelf'){
-      // "All Rotations" — combine all shelf decks
-      const shelfKeys = Object.keys(D).filter(k => k.includes('shelf'));
-      cards = shelfKeys.reduce(function(acc, d){ return acc.concat(D[d]||[]); }, []);
-      console.log('BoardMD shelf: all rotations, combined', cards.length, 'cards from', shelfKeys);
-    } else {
-      // Specific subdeck — load only that deck
-      cards = D[dk] || [];
-      console.log('BoardMD shelf:', dk, cards.length, 'cards');
-    }
-    if(cards.length === 0){
-      console.warn('BoardMD shelf: NO CARDS for', dk, '— available keys:', Object.keys(D).filter(k=>k.includes('shelf')));
-      showXpToast('Shelf deck','No cards found for ' + dk,'','',null);
+    // Find ALL deck keys that contain 'shelf' in the loaded cards
+    const allDeckKeys = Object.keys(D);
+    const shelfKeys = allDeckKeys.filter(k => k.includes('shelf') || k === 'shelf');
+    console.log('BoardMD shelf: available deck keys with shelf:', shelfKeys);
+    console.log('BoardMD shelf: SHELF_DECKS constant:', SHELF_DECKS);
+    // Combine cards from all shelf-related decks found
+    const keysToUse = shelfKeys.length > 0 ? shelfKeys : SHELF_DECKS;
+    const combined = keysToUse.reduce((acc, d) => {
+      if(D[d] && D[d].length > 0){
+        console.log('BoardMD shelf: adding', D[d].length, 'cards from deck:', d);
+        acc = acc.concat(D[d]);
+      }
+      return acc;
+    }, []);
+    console.log('BoardMD shelf: total combined cards:', combined.length);
+    if(combined.length === 0){
+      console.warn('BoardMD shelf: NO CARDS FOUND. All deck keys:', allDeckKeys);
+      showXpToast('Shelf deck','No cards found. Check console for deck names.','','',null);
       showDeckHome();
       return;
     }
-    currentStep = 's2';
-    currentDeck = dk;
-    window.DECKS[dk] = cards;
+    currentStep = 'shelf';
+    currentDeck = '_shelf_combined';
+    window.DECKS['_shelf_combined'] = combined;
     againQueue = []; idx = 0; revealed = false; sessionRatings = {};
     ensureStudyUI();
     buildSessionQueue();
@@ -5972,7 +5448,7 @@ function goHome(){
 let currentStep = localStorage.getItem('bmd_step') || 's1'; // 's1' or 's2'
 const STEP1_DECKS = ['boardmd_s1','s1_core','s1','hy1','fa_step1','fa_s1','arrows','ethics'];
 const STEP2_DECKS = ['boardmd_s2','core','daily_review','s2','shelf','shelf_surgery','shelf_em','shelf_fm','shelf_im','shelf_neuro','shelf_obgyn','shelf_peds','shelf_psych'];
-const SHELF_DECKS = ['shelf','shelf_surgery','shelf_em','shelf_obgyn','shelf_fm','shelf_im','shelf_neuro','shelf_peds','shelf_psych'];
+const SHELF_DECKS = ['shelf_surgery','shelf_em','shelf'];
 
 function openApp(dk){
   document.getElementById('landing').style.display='none';
@@ -6290,9 +5766,6 @@ function renderCard(){
   // Reset Cochrane wrap
   const _cwReset = document.getElementById('card-cochrane-wrap');
   if(_cwReset){ _cwReset.style.display='none'; _cwReset.innerHTML=''; }
-  // Reset split columns to 50/50 (desktop only)
-  const _qCol=document.getElementById('bmd-q-col');
-  if(_qCol){ _qCol.style.removeProperty('flex'); _qCol.style.removeProperty('width'); _qCol.style.removeProperty('max-width'); _qCol.style.removeProperty('min-width'); }
   // Hide FSRS buttons until answer revealed
   const _fsrs=document.getElementById('fsrs-nav');
   const _fsrs2=document.getElementById('fsrs-nav-2');
@@ -6816,7 +6289,6 @@ function revealAnswer(sel,card){
   revealed=true;
 
   // Track response time
-  let responseTimeSec = null;
   if(_cardStartTime > 0){
     const responseMs = Date.now() - _cardStartTime;
     if(responseMs > 500 && responseMs < 300000){ // 0.5s–5min = valid
@@ -6827,16 +6299,8 @@ function revealAnswer(sel,card){
       g0.avgResponseMs = Math.round((prev * cnt + responseMs) / (cnt + 1));
       g0.responseCount = cnt + 1;
       saveGami(g0);
-
-      // Calculate response time in seconds with 120s ceiling
-      responseTimeSec = Math.min(Math.round(responseMs / 1000), 120);
     }
     _cardStartTime = 0;
-  }
-
-  // Store response time for later save to Supabase (in rate function)
-  if(responseTimeSec !== null){
-    card._responseTimeSec = responseTimeSec;
   }
 
   // Limpa grifos da pergunta ao revelar — mantém só os da explicação
@@ -6857,27 +6321,6 @@ function revealAnswer(sel,card){
     else if(t===sel&&t!==card.c) btn.classList.add('wrong');
     else btn.classList.add('other-wrong');
   });
-  // Scroll to correct answer
-  setTimeout(function(){
-    var correctBtn = document.querySelector('.opt-btn.correct') || document.querySelector('.opt-btn.show-correct');
-    if(correctBtn){
-      // Mobile: scroll page to correct answer
-      if(window.innerWidth < 900){
-        var rect = correctBtn.getBoundingClientRect();
-        var scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-        var targetY = rect.top + scrollTop - (window.innerHeight / 2) + (correctBtn.offsetHeight / 2);
-        window.scrollTo({top: Math.max(0, targetY), behavior: 'smooth'});
-      }
-      // Desktop: scroll within left column only
-      else {
-        var col = document.getElementById('bmd-q-col') || document.getElementById('bmd-cols-row');
-        if(col && col.scrollHeight > col.clientHeight){
-          var btnTop = correctBtn.offsetTop - col.offsetTop;
-          col.scrollTo({top: Math.max(0, btnTop - col.clientHeight/2 + correctBtn.offsetHeight/2), behavior:'smooth'});
-        }
-      }
-    }
-  }, 300);
 
   // ── PADRÃO McDONALD'S ─────────────────────────────────────────
   // Separar explanation de "Why the Others Are Wrong" inteligentemente
@@ -7063,15 +6506,12 @@ function revealAnswer(sel,card){
   };
   const _deckLabel=(_deckNames[card.deck]||'').toLowerCase();
   const _isDeckDuplicate=_deckLabel&&_topicText.toLowerCase().includes(_deckLabel.split(' ')[0]);
-  var _topSep=document.getElementById('c-top-sep');
   if(_topicEl){
     if(_isFARef||_isDeckLabel||_isSystemOnly||_isDeckDuplicate){
       _topicEl.style.display='none';
-      if(_topSep) _topSep.style.display='none';
     } else if(_topicText){
       _topicEl.textContent=_topicText;
       _topicEl.style.display='';
-      if(_topSep) _topSep.style.display='';
     }
   }
 
@@ -7122,9 +6562,7 @@ function revealAnswer(sel,card){
   if(_cw){
     if(card.cochrane_pmid){
       _cw.style.display = '';
-      window._currentCard = card;
-      var _cid = card.id;
-      _cw.innerHTML = '<div style="padding:0 18px 14px;"><div style="font-size:9px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-faint);font-family:JetBrains Mono,monospace;margin-bottom:10px;">COCHRANE REVIEW</div><div style="border:1px solid rgba(0,184,148,.25);border-radius:8px;background:rgba(0,184,148,.05);padding:10px 14px;display:flex;align-items:center;justify-content:space-between;gap:10px;cursor:pointer;" onclick="openCochraneAbstract(\''+_cid+'\')"><div style="display:flex;align-items:center;gap:8px;"><div style="width:7px;height:7px;border-radius:50%;background:#00b894;flex-shrink:0;"></div><span style="font-size:11px;color:var(--text);font-family:JetBrains Mono,monospace;">Cochrane Systematic Review</span></div><span style="font-size:10px;color:#00b894;font-weight:700;">Level 1 &#x2197;</span></div></div>';
+      _cw.innerHTML = '<div style="padding:0 18px 14px;"><div style="font-size:9px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-faint);font-family:JetBrains Mono,monospace;margin-bottom:10px;">COCHRANE REVIEW</div><div style="border:1px solid rgba(0,184,148,.25);border-radius:8px;background:rgba(0,184,148,.05);padding:10px 14px;display:flex;align-items:center;justify-content:space-between;gap:10px;cursor:pointer;" onclick="window._currentCard=card;openCochraneAbstract(card.id)"><div style="display:flex;align-items:center;gap:8px;"><div style="width:7px;height:7px;border-radius:50%;background:#00b894;flex-shrink:0;"></div><span style="font-size:11px;color:var(--text);font-family:JetBrains Mono,monospace;">Cochrane Systematic Review</span></div><span style="font-size:10px;color:#00b894;font-weight:700;">Level 1 &#x2197;</span></div></div>';
     } else {
       _cw.style.display = 'none';
     }
@@ -7136,12 +6574,6 @@ function revealAnswer(sel,card){
   // Show explanation block
   const expEl=document.getElementById('c-exp');
   if(expEl) expEl.classList.add('visible');
-
-  // Reset scroll to top so student reads explanation first
-  const colsRow=document.getElementById('bmd-cols-row');
-  if(colsRow) colsRow.scrollTop=0;
-  const ansCol=document.getElementById('bmd-ans-col');
-  if(ansCol) ansCol.scrollTop=0;
 
   // Show FSRS buttons — sync both nav elements
   const rb=document.getElementById('fsrs-nav');
@@ -7156,7 +6588,7 @@ function revealAnswer(sel,card){
   injectAttendingInline(card, sel);
   // Pre-fetch PubMed abstracts in background
   if(card.pubmed_query || card.topic) setTimeout(() => prefetchPubmedAbstracts(card), 500);
-  // Auto-Lens: carrega Compare após 1.5s (Attending já está no final do ans-col, não empurra)
+  // ── Auto-Lens: trigger Compare diagnoses automatically after 1.5s ──
   setTimeout(() => {
     const wrap = document.getElementById('att-inline-wrap');
     if(wrap) askAttendingInline('compare', null);
@@ -7256,22 +6688,6 @@ function rate(r){
   const ns=applyRating(state,rating);
   fsrs[card.id]=ns;
   saveFsrs();
-
-  // Save review to Supabase (async, non-blocking)
-  if(_supaUser && _supa){
-    const responseTimeSec = card._responseTimeSec || null;
-    const reviewData = {
-      user_id: _supaUser.id,
-      card_id: card.id,
-      rating: rating,
-      response_time_sec: responseTimeSec,
-      deck: card.deck || null,
-      reviewed_at: new Date().toISOString()
-    };
-    _supa.from('reviews').insert([reviewData]).then(res => {
-      if(res.error) console.warn('Review save failed:', res.error);
-    }).catch(e => console.warn('Review save error:', e));
-  }
 
   // Track session
   const keys=['again','hard','good','easy'];
@@ -8014,11 +7430,9 @@ function showLeaderboard(){
   const lbb = document.getElementById('lb-btn');
   if(lbb) lbb.classList.add('active');
   setTimeout(syncYourCard, 50);
+  renderLeaderboard();
   // Build country flag chips and render global rank
-  setTimeout(function(){
-    try { buildCountryScopes(); } catch(e){ console.warn('buildCountryScopes error', e); }
-    try { renderGlobalRankFiltered('Global'); } catch(e){ console.warn('renderGlobalRankFiltered error', e); }
-  }, 200);
+  setTimeout(() => { buildCountryScopes(); renderGlobalRankFiltered('Global'); }, 200);
 }
 
 function switchLbTab(tab, el){
@@ -8233,41 +7647,23 @@ async function renderLeaderboard(){
 
   let entries = [];
   try {
-    if(window.storage && typeof window.storage.list === 'function'){
-      const result = await window.storage.list('lb:');
-      if(result && result.keys){
-        for(const key of result.keys){
-          try{
-            const r = await window.storage.get(key, true);
-            if(r && r.value) entries.push(JSON.parse(r.value));
-          }catch(e){}
-        }
+    const result = await window.storage.list('lb:');
+    if(result && result.keys){
+      for(const key of result.keys){
+        try{
+          const r = await window.storage.get(key, true);
+          if(r && r.value) entries.push(JSON.parse(r.value));
+        }catch(e){}
       }
     }
   } catch(e){}
 
-  // Demo fallback
-  if(entries.length === 0){
-    entries = [
-      {id:'d1',name:'Ethan M.',univ:'Stanford SOM',country:'United States',coins:2810,streak:34,level:'Chief'},
-      {id:'d2',name:'Priya S.',univ:'AIIMS Delhi',country:'India',coins:2540,streak:28,level:'Fellow'},
-      {id:'d3',name:'Sofia L.',univ:'Charité Berlin',country:'Germany',coins:2190,streak:21,level:'Attending'},
-      {id:'d4',name:'Amara O.',univ:'Univ. of Lagos COM',country:'Nigeria',coins:1870,streak:19,level:'Attending'},
-      {id:'d5',name:'Kenji T.',univ:'Keio Univ. SOM',country:'Japan',coins:1650,streak:15,level:'Resident'},
-      {id:'d6',name:'Fatima R.',univ:'Aga Khan Univ.',country:'Pakistan',coins:1420,streak:12,level:'Resident'},
-      {id:'d7',name:'James C.',univ:'Mayo Clinic Alix',country:'United States',coins:1280,streak:10,level:'Resident'},
-      {id:'d8',name:'Lucas F.',univ:'USP Ribeirão',country:'Brazil',coins:1050,streak:8,level:'Intern'},
-      {id:'d9',name:'Aisha K.',univ:'King\'s College London',country:'United Kingdom',coins:890,streak:7,level:'Intern'},
-      {id:'d10',name:'Marc D.',univ:'McGill Medicine',country:'Canada',coins:720,streak:5,level:'Intern'},
-    ];
-  }
-
   const myGami = getGami();
   if(me){
-    const myEntry = { id:me.id, name:me.name, univ:me.univ, country:me.country, step:me.step||currentStep||'s1', coins:myGami.coins||960, streak:myGami.streak||11, level:getLevel(myGami.coins).name };
+    const myEntry = { id:me.id, name:me.name, univ:me.univ, country:me.country, step:me.step||currentStep||'s1', coins:myGami.coins, streak:myGami.streak, level:getLevel(myGami.coins).name };
     entries = entries.filter(e=>e.id !== me.id);
     entries.push(myEntry);
-    try{ if(window.storage && typeof window.storage.set === 'function') await window.storage.set('lb:'+me.id, JSON.stringify(myEntry), true); }catch(e){}
+    try{ await window.storage.set('lb:'+me.id, JSON.stringify(myEntry), true); }catch(e){}
   }
 
   let sorted = [...entries].sort((a,b)=>(b.coins||0)-(a.coins||0));
@@ -8797,18 +8193,12 @@ function studySearchResults(){
           <input id="editor-topic" style="width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:'Lato',sans-serif;font-size:13px;padding:10px 12px;outline:none;transition:border-color .15s" onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border)'">
         </div>
       </div>
-
-      <div>
-        <label style="font-size:10px;font-weight:700;letter-spacing:.08em;color:var(--text-faint);font-family:'JetBrains Mono',monospace;text-transform:uppercase;display:block;margin-bottom:6px">Key Point</label>
-        <textarea id="editor-kp" style="width:100%;min-height:70px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:'Lato',sans-serif;font-size:13px;padding:12px;resize:vertical;line-height:1.6;transition:border-color .15s;outline:none" onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border)'"></textarea>
-      </div>
     </div>
 
     <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding-top:8px;border-top:1px solid var(--border)">
       <div id="editor-img-section" style="width:100%;margin-bottom:12px;padding:12px;background:var(--surface2);border-radius:10px;border:1px solid var(--border)"><div style="font-size:10px;font-weight:700;letter-spacing:.08em;color:var(--text-faint);font-family:JetBrains Mono,monospace;text-transform:uppercase;margin-bottom:8px">Image</div><div id="editor-img-current" style="display:none;align-items:center;gap:12px;margin-bottom:10px"><img id="editor-img-preview" src="" style="width:80px;height:60px;object-fit:cover;border-radius:6px;border:1px solid var(--border)"><button onclick="removeCardImage()" style="background:rgba(244,63,94,.1);border:1px solid rgba(244,63,94,.3);color:var(--rose);padding:7px 14px;border-radius:7px;cursor:pointer;font-size:12px;font-weight:700;font-family:Lato,sans-serif">Remove image</button></div><div style="font-size:10px;color:var(--text-faint);margin-bottom:6px;font-family:JetBrains Mono,monospace">New image URL (Wikimedia CC BY-SA)</div><div style="display:flex;gap:8px"><input id="editor-img-url" type="text" placeholder="https://upload.wikimedia.org/..." style="flex:1;background:var(--surface);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:Lato,sans-serif;font-size:12px;padding:7px 10px;outline:none"><button onclick="setCardImage()" style="background:rgba(59,127,255,.1);border:1px solid rgba(59,127,255,.3);color:var(--accent);padding:7px 14px;border-radius:7px;cursor:pointer;font-size:12px;font-weight:700;font-family:Lato,sans-serif">Set</button></div></div>
       <button onclick="saveCardEdit()" style="background:var(--accent);color:#fff;border:none;border-radius:9px;padding:11px 26px;font-family:'Lato',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:all .15s" onmouseover="this.style.background='#5a8fff'" onmouseout="this.style.background='var(--accent)'">Save Changes</button>
       <button onclick="resetCardEdit()" style="background:none;color:var(--rose);border:1px solid rgba(244,63,94,.3);border-radius:9px;padding:11px 18px;font-family:'Lato',sans-serif;font-size:13px;cursor:pointer;transition:all .15s" onmouseover="this.style.background='rgba(244,63,94,.08)'" onmouseout="this.style.background='none'">Reset</button>
-      <button onclick="deleteCurrentCard()" style="background:none;color:var(--rose);border:1px solid rgba(244,63,94,.5);border-radius:9px;padding:11px 18px;font-family:'Lato',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:all .15s" onmouseover="this.style.background='rgba(244,63,94,.12)'" onmouseout="this.style.background='none'">Delete Card</button>
       <button onclick="closeCardEditor();showEditsManager()" style="background:none;color:var(--text-faint);border:1px solid var(--border);border-radius:9px;padding:11px 18px;font-family:'Lato',sans-serif;font-size:13px;cursor:pointer;transition:all .15s;margin-left:auto" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text-faint)'">My Edits →</button>
       <span id="editor-saved-msg" style="font-size:12px;color:var(--emerald);font-weight:700;opacity:0;transition:opacity .3s">Saved ✓</span>
     </div>
@@ -8844,7 +8234,6 @@ function openCardEditor(){
   document.getElementById('editor-dist').value = c.d || '';
   document.getElementById('editor-system').value = c.system || '';
   document.getElementById('editor-topic').value = c.topic || '';
-  document.getElementById('editor-kp').value = c.kp || '';
 
   // Opções A-D
   const opts = c.w ? [c.c, ...(c.w)] : [c.c];
@@ -8881,129 +8270,16 @@ function closeCardEditor(){
   _editingCard = null;
 }
 
-async function deleteCurrentCard(){
+function saveCardEdit(){
   if(!_editingCard) return;
   const card = _editingCard;
-  if(!confirm(`Delete this card permanently?\n\nQID ${card.qid || card.id}\n"${(card.q||'').slice(0,80)}..."\n\nThis cannot be undone.`)) return;
-
-  setEditorButtonsState(true);
-
-  try {
-    // Delete from Supabase
-    const { error } = await _supa.from('cards').delete().eq('id', card.id);
-    if(error) throw new Error(error.message || 'Supabase delete failed');
-
-    // Remove from local edits
-    const edits = getCardEdits();
-    delete edits[card.id];
-    saveCardEdits(edits);
-
-    // Remove from local deck
-    Object.keys(window.DECKS || {}).forEach(dk => {
-      if(DECKS[dk]) DECKS[dk] = DECKS[dk].filter(c => c.id !== card.id);
-    });
-
-    // Invalidate IndexedDB cache
-    try {
-      const req = indexedDB.open('boardmd_cache');
-      req.onsuccess = e => {
-        const db = e.target.result;
-        if (db.objectStoreNames.contains('cards')) {
-          const tx = db.transaction('cards', 'readwrite');
-          tx.objectStore('cards').delete(card.id);
-        }
-      };
-    } catch (ex) {
-      console.warn('IndexedDB cache invalidation failed:', ex);
-    }
-
-    showSuccessToast('Card deleted successfully');
-    closeCardEditor();
-
-    // Advance to next card
-    if(typeof rate === 'function') rate(2);
-  } catch(e) {
-    console.error('Delete error:', e);
-    showErrorToast('Failed to delete: ' + (e.message || 'Unknown error'));
-    setEditorButtonsState(false);
-  }
-}
-
-// Helper: Disable/enable all editor buttons
-function setEditorButtonsState(disabled) {
-  document.querySelectorAll('#card-editor-overlay button').forEach(btn => {
-    const onClick = btn.getAttribute('onclick');
-    if (onClick && (onClick.includes('saveCardEdit') || onClick.includes('deleteCurrentCard') || onClick.includes('resetCardEdit') || onClick.includes('setCardImage') || onClick.includes('removeCardImage'))) {
-      btn.disabled = disabled;
-      btn.style.opacity = disabled ? '0.5' : '1';
-      btn.style.cursor = disabled ? 'not-allowed' : 'pointer';
-    }
-  });
-}
-
-// Helper: Show error toast (red color)
-function showErrorToast(msg) {
-  let t = document.getElementById('bmd-toast');
-  if (!t) {
-    t = document.createElement('div');
-    t.id = 'bmd-toast';
-    t.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--surface);border:1px solid var(--border);color:var(--text);padding:10px 20px;border-radius:8px;font-size:13px;font-family:Lato,sans-serif;font-weight:600;z-index:99999;opacity:0;transition:opacity .3s;pointer-events:none;';
-    document.body.appendChild(t);
-  }
-  t.style.background = 'rgba(244,63,94,.15)';
-  t.style.borderColor = 'var(--rose)';
-  t.style.color = 'var(--rose)';
-  t.textContent = msg;
-  t.style.opacity = '1';
-  setTimeout(() => {
-    t.style.opacity = '0';
-    setTimeout(() => {
-      t.style.background = 'var(--surface)';
-      t.style.borderColor = 'var(--border)';
-      t.style.color = 'var(--text)';
-    }, 300);
-  }, 3000);
-}
-
-// Helper: Show success toast (green color)
-function showSuccessToast(msg) {
-  let t = document.getElementById('bmd-toast');
-  if (!t) {
-    t = document.createElement('div');
-    t.id = 'bmd-toast';
-    t.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--surface);border:1px solid var(--border);color:var(--text);padding:10px 20px;border-radius:8px;font-size:13px;font-family:Lato,sans-serif;font-weight:600;z-index:99999;opacity:0;transition:opacity .3s;pointer-events:none;';
-    document.body.appendChild(t);
-  }
-  t.style.background = 'rgba(34,197,94,.15)';
-  t.style.borderColor = 'var(--emerald)';
-  t.style.color = 'var(--emerald)';
-  t.textContent = msg;
-  t.style.opacity = '1';
-  setTimeout(() => {
-    t.style.opacity = '0';
-    setTimeout(() => {
-      t.style.background = 'var(--surface)';
-      t.style.borderColor = 'var(--border)';
-      t.style.color = 'var(--text)';
-    }, 300);
-  }, 2500);
-}
-
-async function saveCardEdit(){
-  if(!_editingCard) return;
-  const card = _editingCard;
-
-  setEditorButtonsState(true);
-
-  try {
-    const edits = getCardEdits();
+  const edits = getCardEdits();
 
   const newQ = document.getElementById('editor-q').value.trim();
   const newExp = document.getElementById('editor-exp').value.trim();
   const newDist = document.getElementById('editor-dist').value.trim();
   const newSystem = document.getElementById('editor-system').value.trim();
   const newTopic = document.getElementById('editor-topic').value.trim();
-  const newKp = document.getElementById('editor-kp').value.trim();
 
   // Pegar opções editadas
   const opts = [];
@@ -9016,217 +8292,112 @@ async function saveCardEdit(){
   const correctText = opts[correctIdx] || opts[0];
   const wrongTexts = opts.filter((_,i)=>i!==correctIdx);
 
-    edits[card.id] = {
-      q: newQ || card.q,
-      c: correctText || card.c,
-      w: wrongTexts.length ? wrongTexts : card.w,
-      e: newExp || card.e,
-      d: newDist || card.d,
-      system: newSystem || card.system,
-      topic: newTopic || card.topic,
-      kp: newKp || card.kp,
-      _edited: true,
-      _editedAt: new Date().toISOString()
-    };
+  edits[card.id] = {
+    q: newQ || card.q,
+    c: correctText || card.c,
+    w: wrongTexts.length ? wrongTexts : card.w,
+    d: newDist || card.d,
+    system: newSystem || card.system,
+    topic: newTopic || card.topic,
+    _edited: true,
+    _editedAt: new Date().toISOString()
+  };
 
-    saveCardEdits(edits);
+  saveCardEdits(edits);
 
-    // Aplicar ao card em memória imediatamente
-    Object.assign(card, edits[card.id]);
+  // Aplicar ao card em memória imediatamente
+  Object.assign(card, edits[card.id]);
 
-    // Get user's auth token for Supabase update
-    const session = await _supa.auth.getSession();
-    const accessToken = session?.data?.session?.access_token;
-
-    if (!accessToken) {
-      throw new Error('Not authenticated. Please sign in to save changes.');
+  // Salvar direto no Supabase
+  const supaUpdate = {
+    q: edits[card.id].q,
+    c: edits[card.id].c,
+    w: edits[card.id].w,
+    e: edits[card.id].d,
+    system: edits[card.id].system,
+    d: edits[card.id].d,
+    topic: edits[card.id].topic
+  };
+  fetch(SUPA_URL + '/rest/v1/cards?id=eq.' + card.id, {
+    method: 'PATCH',
+    headers: {
+      'apikey': SUPA_KEY,
+      'Authorization': 'Bearer ' + SUPA_KEY,
+      'Content-Type': 'application/json',
+      'Prefer': 'return=minimal'
+    },
+    body: JSON.stringify(supaUpdate)
+  }).then(r => {
+    if(r.ok){
+      console.log('Supabase updated:', card.id);
+      // Invalida cache IndexedDB para este card
+      try{
+        const req = indexedDB.open('boardmd_cache');
+        req.onsuccess = e => {
+          const db = e.target.result;
+          if(db.objectStoreNames.contains('cards')){
+            const tx = db.transaction('cards','readwrite');
+            tx.objectStore('cards').delete(card.id);
+          }
+        };
+      }catch(ex){}
     }
+    else r.text().then(t => console.error('Supabase error:', t));
+  }).catch(e => console.error('Supabase fetch error:', e));
 
-    console.log('Saving card to Supabase:', card.id);
-
-    // Salvar direto no Supabase
-    const supaUpdate = {
-      q: edits[card.id].q,
-      c: edits[card.id].c,
-      w: edits[card.id].w,
-      e: edits[card.id].e,
-      d: edits[card.id].d,
-      system: edits[card.id].system,
-      topic: edits[card.id].topic,
-      kp: edits[card.id].kp
-    };
-
-    const response = await fetch(SUPA_URL + '/rest/v1/cards?id=eq.' + card.id, {
-      method: 'PATCH',
-      headers: {
-        'apikey': SUPA_KEY,
-        'Authorization': 'Bearer ' + accessToken,
-        'Content-Type': 'application/json',
-        'Prefer': 'return=minimal'
-      },
-      body: JSON.stringify(supaUpdate)
-    });
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error('Supabase error response:', response.status, errorText);
-      throw new Error('Supabase update failed (' + response.status + '): ' + errorText);
-    }
-
-    console.log('✅ Supabase updated successfully:', card.id);
-
-    // Invalida cache IndexedDB para este card
-    try {
-      const req = indexedDB.open('boardmd_cache');
-      req.onsuccess = e => {
-        const db = e.target.result;
-        if (db.objectStoreNames.contains('cards')) {
-          const tx = db.transaction('cards', 'readwrite');
-          tx.objectStore('cards').delete(card.id);
-        }
-      };
-    } catch (ex) {
-      console.warn('IndexedDB cache invalidation failed:', ex);
-    }
-
-    // Show success feedback
-    showSuccessToast('Changes saved successfully');
-
-    // Close editor and refresh card after delay
-    setTimeout(() => {
-      closeCardEditor();
-      renderCard();
-    }, 1200);
-
-  } catch (error) {
-    console.error('❌ Save error:', error);
-    showErrorToast('Failed to save: ' + (error.message || 'Unknown error'));
-    setEditorButtonsState(false);
-  }
+  // Feedback visual
+  const msg = document.getElementById('editor-saved-msg');
+  msg.style.opacity = '1';
+  setTimeout(()=>{ msg.style.opacity='0'; closeCardEditor(); renderCard(); }, 1200);
 }
 
 async function setCardImage(){
   if(!_editingCard) return;
   const url = (document.getElementById('editor-img-url').value||'').trim();
-  if(!url){ showErrorToast('Please paste an image URL first'); return; }
-
-  setEditorButtonsState(true);
-
-  try {
-    // Get user's auth token
-    const session = await _supa.auth.getSession();
-    const accessToken = session?.data?.session?.access_token;
-
-    if (!accessToken) {
-      throw new Error('Not authenticated. Please sign in to save changes.');
-    }
-
-    const imgObj = {url:url, alt:_editingCard.c||'', credit:'Manual', license:'CC BY-SA', source:'Manual'};
-    const r = await fetch(SUPA_URL+'/rest/v1/cards?id=eq.'+_editingCard.id, {
-      method:'PATCH',
-      headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+accessToken,'Content-Type':'application/json','Prefer':'return=minimal'},
-      body:JSON.stringify({img:imgObj})
-    });
-
-    if(!r.ok){
-      const errorText = await r.text();
-      console.error('Image set error response:', r.status, errorText);
-      throw new Error('Failed to set image (' + r.status + '): ' + errorText);
-    }
-
+  if(!url){ alert('Paste an image URL first.'); return; }
+  const imgObj = {url:url, alt:_editingCard.c||'', credit:'Manual', license:'CC BY-SA', source:'Manual'};
+  const r = await fetch(SUPA_URL+'/rest/v1/cards?id=eq.'+_editingCard.id, {
+    method:'PATCH',
+    headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/json','Prefer':'return=minimal'},
+    body:JSON.stringify({img:imgObj})
+  });
+  if(r.ok){
     _editingCard.img=imgObj;
     document.getElementById('editor-img-preview').src=url;
     document.getElementById('editor-img-current').style.display='flex';
     document.getElementById('editor-img-url').value='';
-    showSuccessToast('Image added successfully');
     renderCard();
-  } catch(error) {
-    console.error('❌ Image set error:', error);
-    showErrorToast('Failed to set image: ' + (error.message || 'Unknown error'));
-  } finally {
-    setEditorButtonsState(false);
   }
 }
 async function removeCardImage(){
   if(!_editingCard) return;
   if(!confirm('Remove image from this card?')) return;
-
-  setEditorButtonsState(true);
-
-  try {
-    // Get user's auth token
-    const session = await _supa.auth.getSession();
-    const accessToken = session?.data?.session?.access_token;
-
-    if (!accessToken) {
-      throw new Error('Not authenticated. Please sign in to save changes.');
-    }
-
-    const r = await fetch(SUPA_URL+'/rest/v1/cards?id=eq.'+_editingCard.id, {
-      method:'PATCH',
-      headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+accessToken,'Content-Type':'application/json','Prefer':'return=minimal'},
-      body:JSON.stringify({img:null})
-    });
-
-    if(!r.ok){
-      const errorText = await r.text();
-      console.error('Image remove error response:', r.status, errorText);
-      throw new Error('Failed to remove image (' + r.status + '): ' + errorText);
-    }
-
+  const r = await fetch(SUPA_URL+'/rest/v1/cards?id=eq.'+_editingCard.id, {
+    method:'PATCH',
+    headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/json','Prefer':'return=minimal'},
+    body:JSON.stringify({img:null})
+  });
+  if(r.ok){
     _editingCard.img=null;
     document.getElementById('editor-img-current').style.display='none';
-    showSuccessToast('Image removed successfully');
     renderCard();
-  } catch(error) {
-    console.error('❌ Image remove error:', error);
-    showErrorToast('Failed to remove image: ' + (error.message || 'Unknown error'));
-  } finally {
-    setEditorButtonsState(false);
   }
 }
-async function resetCardEdit(){
+function resetCardEdit(){
   if(!_editingCard) return;
-  if(!confirm('Reset this card to its original content?\n\nYour local edits will be lost.')) return;
+  if(!confirm('Reset this card to its original content? Your edits will be lost.')) return;
+  const edits = getCardEdits();
+  delete edits[_editingCard.id];
+  saveCardEdits(edits);
 
-  setEditorButtonsState(true);
-
-  try {
-    const edits = getCardEdits();
-    delete edits[_editingCard.id];
-    saveCardEdits(edits);
-
-    // Restaurar o card original dos DECKS
-    const orig = (DECKS[_editingCard.deck]||[]).find(c=>c.id===_editingCard.id);
-    if(!orig){
-      throw new Error('Original card data not found');
-    }
-
-    ['q','c','w','e','d','system','topic','kp','_edited','_editedAt'].forEach(k=>delete _editingCard[k]);
+  // Restaurar o card original dos DECKS
+  const orig = (DECKS[_editingCard.deck]||[]).find(c=>c.id===_editingCard.id);
+  if(orig){
+    ['q','c','w','d','system','topic','_edited','_editedAt'].forEach(k=>delete _editingCard[k]);
     Object.assign(_editingCard, orig);
-
-    // Invalidate IndexedDB cache
-    try {
-      const req = indexedDB.open('boardmd_cache');
-      req.onsuccess = e => {
-        const db = e.target.result;
-        if (db.objectStoreNames.contains('cards')) {
-          const tx = db.transaction('cards', 'readwrite');
-          tx.objectStore('cards').delete(_editingCard.id);
-        }
-      };
-    } catch (ex) {
-      console.warn('IndexedDB cache invalidation failed:', ex);
-    }
-
-    showSuccessToast('Card reset to original');
-    closeCardEditor();
-    renderCard();
-  } catch(error) {
-    console.error('Reset error:', error);
-    showErrorToast('Failed to reset: ' + (error.message || 'Unknown error'));
-    setEditorButtonsState(false);
   }
+  closeCardEditor();
+  renderCard();
 }
 
 function exportCardEdits(){
@@ -9615,24 +8786,12 @@ function buildDecks(allCards){
     if(!window.DECKS[dk]) window.DECKS[dk] = [];
     window.DECKS[dk].push(card);
   }
-  // Update deck home table after cards are loaded
-  setTimeout(() => {
-    if(typeof buildDeckHomeTable === 'function') buildDeckHomeTable();
-  }, 100);
-}
-
-// ── FORCE REFRESH ───────────────────────────────────────────────────
-async function forceRefreshCards(){
-  try { indexedDB.deleteDatabase('boardmd_cache'); } catch(e){}
-  try { localStorage.removeItem('bmd_idb_meta'); } catch(e){}
-  showXpToast('Refreshing','Reloading all cards from server...','','',null);
-  setTimeout(function(){ location.reload(); }, 500);
 }
 
 // ── LOAD ALL CARDS FROM SUPABASE ─────────────────────────────────────
 // ── INDEXEDDB CACHE ──────────────────────────────────────────────────
 const IDB_NAME = 'boardmd_cache';
-const IDB_VERSION = 2;
+const IDB_VERSION = 1;
 const IDB_STORE = 'cards';
 const IDB_META_KEY = 'bmd_idb_meta';
 
@@ -9641,16 +8800,12 @@ function openIDB(){
     const req = indexedDB.open(IDB_NAME, IDB_VERSION);
     req.onupgradeneeded = e => {
       const db = e.target.result;
-      if(db.objectStoreNames.contains(IDB_STORE)){
-        db.deleteObjectStore(IDB_STORE);
+      if(!db.objectStoreNames.contains(IDB_STORE)){
+        db.createObjectStore(IDB_STORE, { keyPath: 'id' });
       }
-      db.createObjectStore(IDB_STORE, { keyPath: 'id' });
     };
     req.onsuccess = e => resolve(e.target.result);
-    req.onerror = () => {
-      try { indexedDB.deleteDatabase(IDB_NAME); } catch(e2){}
-      reject(req.error);
-    };
+    req.onerror = () => reject(req.error);
   });
 }
 
@@ -9709,60 +8864,50 @@ async function fetchAllFromSupabase(onProgress){
 }
 
 async function loadCardsFromSupabase(){
-  // ── IDB-FIRST: tenta cache local antes de bater no Supabase ──
+  console.log('BoardMD: checking IndexedDB cache...');
+
   const meta = getIDBMeta();
-  if(meta && meta.count > 0){
-    try {
-      const cached = await getIDBCards();
-      if(cached.length > 0){
-        console.log('BoardMD: ' + cached.length + ' cards from cache (instant)');
-        buildDecks(cached);
-        // Restaura tema salvo (sem overlay, hideLoadingOverlay não é chamado)
-        if(window._bmdSavedTheme === 'light') document.documentElement.classList.add('light');
-        if(typeof updateThemeIcons === 'function') updateThemeIcons();
-        // Refresh silencioso em background — sempre sincroniza com Supabase
-        backgroundRefresh(cached.length);
-        return cached.length;
-      }
-    } catch(e){ console.warn('BoardMD: IDB read failed, falling back to Supabase'); }
+  const cached = meta ? await getIDBCards() : [];
+
+  if(cached.length > 0){
+    // INSTANT LOAD from IndexedDB
+    console.log(`BoardMD: ${cached.length} cards from IndexedDB cache (instant)`);
+    buildDecks(cached);
+    hideLoadingOverlay();
+
+    // Background check: has Supabase got more/updated cards?
+    setTimeout(async () => {
+      try {
+        const { count } = await _supa.from('cards').select('id', { count: 'exact', head: true });
+        if(count && count !== cached.length){
+          console.log(`BoardMD: background refresh — ${count} on server vs ${cached.length} cached`);
+          const fresh = await fetchAllFromSupabase();
+          if(fresh.length > 0){
+            await setIDBCards(fresh);
+            buildDecks(fresh);
+            console.log(`BoardMD: background refresh done — ${fresh.length} cards`);
+          }
+        } else {
+          console.log(`BoardMD: cache up to date (${cached.length} cards)`);
+        }
+      } catch(e){ console.warn('background refresh failed:', e); }
+    }, 2000);
+
+    return cached.length;
   }
 
-  // ── Fallback: primeiro acesso ou cache vazio — fetch completo ──
-  console.log('BoardMD: loading from Supabase...');
+  // FIRST LOAD — show splash, download everything
+  console.log('BoardMD: no cache — loading from Supabase...');
   showLoadingOverlay();
   const allCards = await fetchAllFromSupabase((pct, n, chunk) => updateLoadingProgress(pct, n, chunk));
   buildDecks(allCards);
-  console.log('BoardMD: ' + allCards.length + ' cards loaded');
+  console.log(`BoardMD: ${allCards.length} cards loaded`);
   hideLoadingOverlay();
 
-  // Salva no IDB para próximo acesso instantâneo
-  try { setIDBCards(allCards); } catch(e){}
+  // Save to IndexedDB for next time
+  setIDBCards(allCards).then(() => console.log('BoardMD: cache saved to IndexedDB'));
 
   return allCards.length;
-}
-
-// ── Background refresh com retry automático ──
-function backgroundRefresh(cachedCount, attempt){
-  attempt = attempt || 1;
-  fetchAllFromSupabase().then(function(fresh){
-    if(!fresh || fresh.length === 0){
-      console.warn('BoardMD: background refresh returned empty');
-      return;
-    }
-    buildDecks(fresh);
-    try { setIDBCards(fresh); } catch(e){}
-    if(fresh.length !== cachedCount){
-      console.log('BoardMD: cache updated ' + cachedCount + ' → ' + fresh.length + ' cards');
-    } else {
-      console.log('BoardMD: refreshed ' + fresh.length + ' cards (up to date)');
-    }
-  }).catch(function(e){
-    console.warn('BoardMD: background refresh failed (attempt ' + attempt + ')', e);
-    if(attempt < 3){
-      var delay = attempt * 5000; // 5s, 10s
-      setTimeout(function(){ backgroundRefresh(cachedCount, attempt + 1); }, delay);
-    }
-  });
 }
 
 // Safety net — force remove overlay after 60s if stuck
@@ -9819,26 +8964,6 @@ async function syncFsrsToSupabase(){
   }
 }
 
-// ── LEADERBOARD SYNC TO SUPABASE ────────────────────────────────────
-async function syncLeaderboardToSupabase(){
-  if(!_supaUser) return;
-  try {
-    const g = getGami();
-    const me = JSON.parse(localStorage.getItem(LB_ME_KEY)||'{}');
-    const row = {
-      user_id:    _supaUser.id,
-      name:       me.name || _supaUser.user_metadata?.full_name || _supaUser.email?.split('@')[0] || 'Student',
-      univ:       me.univ || '',
-      country:    me.country || '',
-      step:       me.step || 's2',
-      coins:      g.coins || 0,
-      streak:     g.streak || 0,
-      updated_at: new Date().toISOString()
-    };
-    await _supa.from('leaderboard').upsert([row], { onConflict: 'user_id' });
-  } catch(e){ console.warn('BoardMD: leaderboard sync failed', e); }
-}
-
 async function loadFsrsFromSupabase(){
   if(!_supaUser) return;
   const { data, error } = await _supa
@@ -9866,37 +8991,13 @@ async function loadFsrsFromSupabase(){
   try{ Object.assign(window.fsrs || {}, fsrsData); }catch(e){}
 }
 
-// ── RETENTION HEADER SYNC (lightweight — runs on init) ──────────────
-function syncRetentionHeader(){
-  try {
-    var retSum=0, retCnt=0, now=Date.now();
-    Object.values(window.DECKS||{}).forEach(function(cards){
-      (cards||[]).forEach(function(card){
-        var s=getState(card.id);
-        if(s.state!==ST_NEW && s.stability>0){
-          var daysSince=Math.max(0,(now-(s.due-s.interval*86400000))/86400000);
-          var R=Math.exp(-daysSince/Math.max(s.stability,0.1));
-          retSum+=Math.max(0,Math.min(1,R));
-          retCnt++;
-        }
-      });
-    });
-    var pct=retCnt>0?Math.round(retSum/retCnt*100):null;
-    var txt=pct!==null?pct+'%':'—%';
-    var h=document.getElementById('bmd-retention-val'); if(h) h.textContent=txt;
-    var p=document.getElementById('perf-qs-ret'); if(p) p.textContent=txt;
-  } catch(e){}
-}
-
 // ── INIT ─────────────────────────────────────────────────────────────
 (async function init(){
-  // Carrega cards (IDB-first: instantâneo se cache existe)
-  // Paraleliza com auth check — são independentes
-  const [cardCount, session] = await Promise.all([
-    loadCardsFromSupabase(),
-    getSession()
-  ]);
+  // Carrega cards
+  await loadCardsFromSupabase();
 
+  // Verifica sessão
+  const session = await getSession();
   if(session){
     _supaUser = session.user;
     // Carrega progresso FSRS da nuvem
@@ -9906,13 +9007,10 @@ function syncRetentionHeader(){
     if(nameEl && session.user.email){
       nameEl.textContent = session.user.email.split('@')[0];
     }
-    // Sincroniza FSRS + leaderboard para a nuvem a cada 2 minutos
+    // Sincroniza FSRS para a nuvem a cada 2 minutos
     setInterval(syncFsrsToSupabase, 120000);
-    setInterval(syncLeaderboardToSupabase, 120000);
     // Sincroniza ao fechar a aba
-    window.addEventListener('beforeunload', function(){ syncFsrsToSupabase(); syncLeaderboardToSupabase(); });
-    // Sync inicial do leaderboard
-    setTimeout(syncLeaderboardToSupabase, 3000);
+    window.addEventListener('beforeunload', syncFsrsToSupabase);
   }
 
   // Atualiza UI de auth
@@ -9943,8 +9041,6 @@ function syncRetentionHeader(){
   // Dispara o app
   window.cardsLoaded = true;
   if(window.pendingInit) window.pendingInit();
-  // Sync retention no header
-  setTimeout(syncRetentionHeader, 300);
 
   (function(){
     try {
@@ -10108,8 +9204,8 @@ function injectAttendingInline(card, sel){
       <button class="att-ibtn" ${dis} onclick="askAttendingInline('explain',this)">
         <span class="att-ibtn-label">Explain better</span>
       </button>
-      <button class="att-ibtn" ${dis} onclick="askAttendingInline('mcq',this)" style="background:rgba(79,142,247,.1);border-color:rgba(79,142,247,.35);">
-        <span class="att-ibtn-label" style="color:#3b7fff;font-weight:800;">More MCQs</span>
+      <button class="att-ibtn" ${dis} onclick="askAttendingInline('mcq',this)">
+        <span class="att-ibtn-label">More MCQs</span>
       </button>
       <button class="att-ibtn" ${dis} onclick="askAttendingInline('surprise',this)">
         <span class="att-ibtn-label">Surprise me</span>
@@ -10135,13 +9231,22 @@ function injectAttendingInline(card, sel){
     <div style="padding:0 14px 10px;font-size:11px;color:var(--text-faint);font-family:'Inter',sans-serif;line-height:1.4;">For educational purposes only. Not medical advice.</div>
     <div class="att-inline-response" id="att-inline-response"></div>`;
 
-  // Injeta no #bmd-ans-col (funciona tanto mobile quanto desktop)
+  // Desktop (>=900px): injeta na coluna direita
   const ansCol = document.getElementById('bmd-ans-col');
-  if(ansCol){
-    const footerRef = ansCol.querySelector('.card-footer-counter')
-                   || ansCol.querySelector('#report-issue-btn')?.parentElement;
+  if(ansCol && window.innerWidth >= 900){
+    const footerRef = ansCol.querySelector('.card-footer-counter');
     if(footerRef){ ansCol.insertBefore(wrap, footerRef); }
     else { ansCol.appendChild(wrap); }
+  } else {
+    // Mobile: injeta no study-inner antes do fsrs-nav
+    const studyInner = document.getElementById('study-inner');
+    if(studyInner){
+      const ref = studyInner.querySelector('#fsrs-nav')
+               || studyInner.querySelector('#fsrs-nav-2')
+               || studyInner.querySelector('.fsrs-nav');
+      if(ref){ studyInner.insertBefore(wrap, ref); }
+      else { studyInner.appendChild(wrap); }
+    }
   }
 
   // Guarda contexto do card
@@ -10176,22 +9281,9 @@ function renderLens(data, container){
     var lines=[];var line='';
     ctx.font='400 '+fontSize+'px -apple-system,BlinkMacSystemFont,sans-serif';
     for(var i=0;i<words.length;i++){
-      var word=words[i];
-      // If single word exceeds maxWidth, break it into chunks
-      if(ctx.measureText(word).width>maxWidth){
-        if(line){ lines.push(line); line=''; }
-        var chunk='';
-        for(var c=0;c<word.length;c++){
-          if(ctx.measureText(chunk+word[c]).width>maxWidth && chunk){
-            lines.push(chunk); chunk=word[c];
-          } else { chunk+=word[c]; }
-        }
-        if(chunk) line=chunk;
-        continue;
-      }
-      var test=line?line+' '+word:word;
+      var test=line?line+' '+words[i]:words[i];
       if(ctx.measureText(test).width>maxWidth && line){
-        lines.push(line);line=word;
+        lines.push(line);line=words[i];
       } else { line=test; }
     }
     if(line) lines.push(line);
@@ -10220,13 +9312,13 @@ function renderLens(data, container){
   }
   var lL=[{text:data.left_label||'',bold:true,size:14,color:'#0C447C'},{gap:14}];
   (data.left||[]).slice(0,3).forEach(function(b){lL.push({text:b,bold:false,size:12,color:'#185FA5',gap2:14});});
-  drawZone(function(){ctx.beginPath();ctx.arc(cx1,cy,r,0,Math.PI*2);ctx.clip();},lL,xLeft,170);
+  drawZone(function(){ctx.beginPath();ctx.arc(cx1,cy,r,0,Math.PI*2);ctx.clip();},lL,xLeft,155);
   var lM=[{text:'Both',bold:true,size:13,color:'#085041'},{gap:12}];
   (data.shared||[]).slice(0,2).forEach(function(b){lM.push({text:b,bold:false,size:11,color:'#0F6E56',gap2:12});});
-  drawZone(function(){ctx.beginPath();ctx.arc(cx1,cy,r,0,Math.PI*2);ctx.clip();ctx.beginPath();ctx.arc(cx2,cy,r,0,Math.PI*2);ctx.clip();},lM,xMid,110);
+  drawZone(function(){ctx.beginPath();ctx.arc(cx1,cy,r,0,Math.PI*2);ctx.clip();ctx.beginPath();ctx.arc(cx2,cy,r,0,Math.PI*2);ctx.clip();},lM,xMid,105);
   var lR=[{text:data.right_label||'',bold:true,size:14,color:'#633806'},{gap:14}];
   (data.right||[]).slice(0,3).forEach(function(b){lR.push({text:b,bold:false,size:12,color:'#BA7517',gap2:14});});
-  drawZone(function(){ctx.beginPath();ctx.arc(cx2,cy,r,0,Math.PI*2);ctx.clip();},lR,xRight,170);
+  drawZone(function(){ctx.beginPath();ctx.arc(cx2,cy,r,0,Math.PI*2);ctx.clip();},lR,xRight,155);
 }
 
 async function askAttendingInline(type, btnEl){
@@ -10248,10 +9340,8 @@ async function askAttendingInline(type, btnEl){
   // Desabilita botões
   wrap.querySelectorAll('.att-ibtn').forEach(b => b.disabled = true);
 
-  // Mostra thinking (preserva scroll position da coluna)
+  // Mostra thinking
   const respWrap = document.getElementById('att-inline-response');
-  const _ansCol = document.getElementById('bmd-ans-col');
-  const _savedScroll = _ansCol ? _ansCol.scrollTop : 0;
   respWrap.classList.add('visible');
   respWrap.innerHTML = `
     <div class="att-thinking">
@@ -10262,15 +9352,16 @@ async function askAttendingInline(type, btnEl){
       </div>
       <span>Your Attending is thinking…</span>
     </div>`;
-  if(_ansCol) _ansCol.scrollTop = _savedScroll;
 
-  // scroll removido — aluno precisa ler a explicação primeiro
+  setTimeout(()=>{ respWrap.scrollIntoView({ behavior:'smooth', block:'nearest' }); }, 100);
 
   // Contexto do card
-  const allOpts = [card.c, ...(card.w||[])];
-  const opts = allOpts.map((o,i) => String.fromCharCode(65+i) + '. ' + o).join('\n');
-  const userChoice = sel ? sel : 'Not recorded';
-  const wasCorrect = sel === card.c;
+  const opts = (card.w||[]).map((o,i) => String.fromCharCode(65+i) + '. ' + o).join('\n');
+  const chosenIdx = window.lastChosenIdx;
+  const userChoice = chosenIdx !== undefined
+    ? String.fromCharCode(65+chosenIdx) + '. ' + (card.w||[])[chosenIdx]
+    : 'Not recorded';
+  const wasCorrect = chosenIdx !== undefined && (card.w||[])[chosenIdx] === card.c;
 
   // Build real pubmed references with abstracts from cache
   const _pubCache = window._pubmedCache && window._pubmedCache[card.id];
@@ -10298,7 +9389,7 @@ EXPLANATION: ${(card.e||'').replace(/<[^>]+>/g,' ').slice(0,300)}${pubmedRefs}`;
     surprise: `You are a brilliant attending. Give ONE unforgettable clinical pearl about:\n\n${ctx}\n\nSomething NOT in the explanation — a real-world connection, classic trick, or board trap that sticks in memory. Be vivid and direct. 2 paragraphs max.\n\nIf REFERENCES are provided above, cite them inline using superscript numbers ¹ ² ³ — only cite references that actually exist in the list. Do NOT invent references. If no references are provided, write without citations.\n\nAt the very end, write:\nPUBMED_QUERY: [6-8 specific medical terms for PubMed search relevant to this topic]`,
     custom: `You are a brilliant attending physician. The student has a question about this USMLE topic:\n\n${ctx}\n\nStudent question: "${document.getElementById('att-ask-input')?.value||''}"\n\nAnswer clearly and clinically in 2-3 paragraphs. Focus on what's relevant for USMLE boards.\n\nFinally, on a new line, write exactly: PUBMED_QUERY: [6-8 specific medical terms for PubMed search relevant to this answer]`,
     compare: `You are a brilliant USMLE attending. The student just answered this question:\n\n${ctx}\n\nIdentify the correct diagnosis AND the single most commonly confused alternative (main distractor).\n\nReturn ONLY valid JSON, no markdown:\n{"left_label":"[correct dx name]","right_label":"[distractor name]","left":["exclusive feature 1","exclusive feature 2","exclusive feature 3","exclusive feature 4"],"shared":["shared feature 1","shared feature 2","shared feature 3"],"right":["exclusive feature 1","exclusive feature 2","exclusive feature 3","exclusive feature 4"],"pubmed_query":"[6-8 terms comparing these two diagnoses]"}`,
-    wrong: `You are a brilliant USMLE attending talking directly to the student (use "you", never "the student"). The student just answered this question INCORRECTLY:\n\n${ctx}\n\nYour job: explain exactly why their wrong answer (${userChoice}) seemed attractive — and why it is wrong. Structure your response in exactly 3 sections:\n\nTHE TRAP: Why "${userChoice}" feels correct — the cognitive trap, the misleading clue, or the partial truth that made you pick it.\n\nTHE KEY DISTINCTION: The single clinical finding or concept that rules out your choice and confirms the correct answer. Be precise and memorable.\n\nLOCK IT IN: One punchy, unforgettable rule or pearl that prevents this mistake forever. Make it stick.\n\nIf REFERENCES are provided above, cite them inline using superscript numbers ¹ ² ³. Do NOT invent references.\n\nAt the very end, write:\nPUBMED_QUERY: [6-8 specific medical terms for PubMed search relevant to this distinction]`,
+    wrong: `You are a brilliant USMLE attending. The student just answered this question INCORRECTLY:\n\n${ctx}\n\nYour job: explain exactly why the student's wrong answer (${userChoice}) seemed attractive — and why it is wrong. Structure your response in exactly 3 sections:\n\nTHE TRAP: Why "${userChoice}" feels correct — the cognitive trap, the misleading clue, or the partial truth that makes students pick it.\n\nTHE KEY DISTINCTION: The single clinical finding or concept that rules out the student's choice and confirms the correct answer. Be precise and memorable.\n\nLOCK IT IN: One punchy, unforgettable rule or pearl that prevents this mistake forever. Make it stick.\n\nIf REFERENCES are provided above, cite them inline using superscript numbers ¹ ² ³. Do NOT invent references.\n\nAt the very end, write:\nPUBMED_QUERY: [6-8 specific medical terms for PubMed search relevant to this distinction]`,
     translate: `Translate the following medical flashcard content to Brazilian Portuguese. Keep medical terms accurate. Return ONLY the translation in this exact format:\n\nQUESTÃO: [translated question]\nA. [option] B. [option] C. [option] D. [option]\nRESPOSTA CORRETA: [translated answer]\nEXPLICAÇÃO: [translated explanation]\nPONTO-CHAVE: [translated key point]\n\nContent to translate:\nQUESTION: ${card.q}\nOPTIONS: ${(card.w||[]).map((o,i)=>String.fromCharCode(65+i)+'. '+o).join(' ')}\nCORRECT ANSWER: ${card.c}\nEXPLANATION: ${(card.e||'').replace(/<[^>]+>/g,' ').slice(0,500)}\nKEY POINT: ${(card.kp||'')}`,
   };
 
@@ -10335,6 +9426,7 @@ EXPLANATION: ${(card.e||'').replace(/<[^>]+>/g,' ').slice(0,300)}${pubmedRefs}`;
         const clean = responseText.replace(/```json|```/g,'').trim();
         const data = JSON.parse(clean);
         renderInteractiveMCQs(data.questions, respWrap);
+        setTimeout(()=>{ respWrap.scrollIntoView({ behavior:'smooth', block:'nearest' }); }, 80);
         wrap.querySelectorAll('.att-ibtn').forEach(b=>{ b.disabled = false; });
         return;
       } catch(e) {
@@ -10350,6 +9442,7 @@ EXPLANATION: ${(card.e||'').replace(/<[^>]+>/g,' ').slice(0,300)}${pubmedRefs}`;
         var lbl = document.getElementById('att-compare-label');
         if(lbl) lbl.textContent = (lensData.left_label||'') + ' vs ' + (lensData.right_label||'');
         renderLens(lensData, respWrap);
+        setTimeout(function(){ respWrap.scrollIntoView({ behavior:'smooth', block:'nearest' }); }, 80);
         wrap.querySelectorAll('.att-ibtn').forEach(function(b){ b.disabled = false; });
         if(lensData.pubmed_query) setTimeout(function(){ fetchAttPubmed(lensData.pubmed_query.trim()); }, 100);
         return;
@@ -10419,6 +9512,7 @@ EXPLANATION: ${(card.e||'').replace(/<[^>]+>/g,' ').slice(0,300)}${pubmedRefs}`;
     b.disabled = !isPro && newLeft <= 0;
   });
 
+  setTimeout(()=>{ respWrap.scrollIntoView({ behavior:'smooth', block:'nearest' }); }, 80);
 }
 
 // ── HIGHLIGHT SYSTEM ─────────────────────────────────────────────────────
@@ -11064,7 +10158,7 @@ function bmdDashSync() {
       if(html) el.innerHTML = html;
     });
     // Deck stats: total cards + accuracy
-    const statDecks = ['boardmd_s1','s1_core','boardmd_s2','core','daily_review','shelf_em','shelf_surgery','shelf_obgyn','shelf_im','shelf_fm','shelf_peds','shelf_psych','shelf_neuro'];
+    const statDecks = ['boardmd_s1','s1_core','boardmd_s2','core','shelf_em','shelf_surgery'];
     statDecks.forEach(id => {
       const el = document.getElementById('stats-' + id);
       if(!el) return;
@@ -11254,9 +10348,6 @@ function syncPerfQuickStats() {
     const retPct = retCnt > 0 ? Math.round(retSum/retCnt*100) : null;
     const retEl = document.getElementById('perf-qs-ret');
     if(retEl) retEl.textContent = retPct !== null ? retPct + '%' : '—%';
-    // Sync header retention
-    const retHeader = document.getElementById('bmd-retention-val');
-    if(retHeader) retHeader.textContent = retPct !== null ? retPct + '%' : '—%';
 
     // ── Response Speed ──
     const avgMs = g.avgResponseMs || 0;
@@ -11474,8 +10565,8 @@ function bmdSetActiveNav(id) {
 (function() {
   const _prev = window.showLeaderboard;
   window.showLeaderboard = function() {
-    try { if (_prev) _prev.call(this); } catch(e){ console.warn('showLeaderboard prev error', e); }
-    setTimeout(function(){ try { bmdSetActiveNav('bnav-rank'); } catch(e){} }, 50);
+    if (_prev) _prev.call(this);
+    setTimeout(() => bmdSetActiveNav('bnav-rank'), 50);
   };
 })();
 
@@ -11569,50 +10660,29 @@ function buildCountryScopes() {
 }
 
 async function renderGlobalRankFiltered(scope) {
-  console.log('BoardMD: renderGlobalRankFiltered called, scope=', scope);
   const table = document.getElementById('global-rank-rows');
-  if(!table){ console.warn('BoardMD: #global-rank-rows not found'); return; }
+  if(!table) return;
 
-  // Load leaderboard from Supabase first
+  // Load all leaderboard entries
   let entries = [];
   try {
-    let query = _supa.from('leaderboard').select('*').order('coins', { ascending: false }).limit(50);
-    if(scope === 'United States') query = query.ilike('country', '%united states%');
-    else if(scope === 'Brazil') query = query.ilike('country', '%brazil%');
-    else if(scope === 'Step 1') query = query.or('step.eq.s1,step.eq.step1');
-    else if(scope === 'Step 2 CK') query = query.or('step.eq.s2,step.eq.step2');
-    else if(scope === 'Shelf') query = query.eq('step', 'shelf');
-    const { data } = await query;
-    if(data && data.length > 0){
-      entries = data.map(function(r){ return { id:r.user_id, name:r.name, univ:r.univ, country:r.country, coins:r.coins, streak:r.streak, step:r.step }; });
+    const result = await window.storage.list('lb:');
+    if(result && result.keys){
+      for(const key of result.keys){
+        try{
+          const r = await window.storage.get(key, true);
+          if(r && r.value) entries.push(JSON.parse(r.value));
+        }catch(e){}
+      }
     }
-  } catch(e){ console.warn('BoardMD: leaderboard query failed, using demo', e); }
-
-  // Demo entries as fallback when no real data
-  if(entries.length === 0){
-    entries = [
-      {id:'d1',name:'Ethan M.',univ:'Stanford SOM',country:'United States',coins:2810,streak:34,step:'s2'},
-      {id:'d2',name:'Priya S.',univ:'AIIMS Delhi',country:'India',coins:2540,streak:28,step:'s1'},
-      {id:'d3',name:'Sofia L.',univ:'Charité Berlin',country:'Germany',coins:2190,streak:21,step:'s2'},
-      {id:'d4',name:'Amara O.',univ:'Univ. of Lagos COM',country:'Nigeria',coins:1870,streak:19,step:'s2'},
-      {id:'d5',name:'Kenji T.',univ:'Keio Univ. SOM',country:'Japan',coins:1650,streak:15,step:'s1'},
-      {id:'d6',name:'Fatima R.',univ:'Aga Khan Univ.',country:'Pakistan',coins:1420,streak:12,step:'s2'},
-      {id:'d7',name:'James C.',univ:'Mayo Clinic Alix',country:'United States',coins:1280,streak:10,step:'s2'},
-      {id:'d8',name:'Lucas F.',univ:'USP Ribeirão',country:'Brazil',coins:1050,streak:8,step:'s1'},
-      {id:'d9',name:'Aisha K.',univ:'King\'s College London',country:'United Kingdom',coins:890,streak:7,step:'s2'},
-      {id:'d10',name:'Marc D.',univ:'McGill Medicine',country:'Canada',coins:720,streak:5,step:'s1'},
-    ];
-  }
+  } catch(e){}
 
   // Add current user
   const me = JSON.parse(localStorage.getItem(LB_ME_KEY)||'{}');
   const myGami = getGami();
   if(me && me.id){
     entries = entries.filter(e=>e.id !== me.id);
-    entries.push({id:me.id, name:me.name||'You', univ:me.univ||'', country:me.country||'', coins:myGami.coins||960, streak:myGami.streak||11, level:getLevel(myGami.coins).name, isMe:true});
-  } else {
-    // User not joined yet — inject as Walter
-    entries.push({id:'me',name:'Walter B.',univ:'UFPR',country:'Brazil',coins:960,streak:11,isMe:true});
+    entries.push({id:me.id, name:me.name||'You', univ:me.univ||'', country:me.country||'', coins:myGami.coins, streak:myGami.streak, level:getLevel(myGami.coins).name, isMe:true});
   }
 
   // Filter by scope
@@ -11631,7 +10701,6 @@ async function renderGlobalRankFiltered(scope) {
 
   // Sort by coins
   filtered.sort((a,b) => (b.coins||0) - (a.coins||0));
-  console.log('BoardMD: global rank entries=', entries.length, 'filtered=', filtered.length);
 
   if(filtered.length === 0){
     table.innerHTML = '<div style="padding:24px;text-align:center;color:var(--muted);font-size:13px">No students found for this filter yet.</div>';
@@ -13065,8 +12134,8 @@ async function renderChallengesList() {
 // Load challenges when leaderboard opens
 const _origShowLb = window.showLeaderboard;
 window.showLeaderboard = function() {
-  try { _origShowLb && _origShowLb(); } catch(e){ console.warn('showLeaderboard chain error', e); }
-  setTimeout(function(){ try { renderChallengesList(); } catch(e){} }, 300);
+  _origShowLb && _origShowLb();
+  setTimeout(renderChallengesList, 300);
 };
 
 function selectProfileStep(step) {
@@ -13622,13 +12691,6 @@ window.addEventListener('load', function(){
     var r = _oRev ? _oRev(sel,card) : undefined;
     var ac = document.getElementById('bmd-ans-col');
     if(ac) ac.classList.add('has-answer');
-    // Restore saved split preference (default 40% if none saved)
-    if(window.innerWidth >= 900){
-      var qc = document.getElementById('bmd-q-col');
-      var saved = null;
-      try{ saved = localStorage.getItem('bmd_split_pct'); }catch(e){}
-      if(qc && saved) qc.style.setProperty('flex', '0 0 '+saved+'%', 'important');
-    }
     return r;
   };
   var _oRen = window.renderCard;
@@ -13647,16 +12709,18 @@ function bmdSetupDrag(){
   var q = document.getElementById('bmd-q-col');
   if(!d || !q || d._ok) return;
   d._ok = true;
+  var saved = localStorage.getItem('bmd_q_pct');
+  if(saved) q.style.width = parseFloat(saved) + '%';
   d.addEventListener('mousedown', function(e){
     e.preventDefault(); e.stopPropagation();
     var r = document.getElementById('bmd-cols-row');
-    var x0 = e.clientX; var w0 = q.offsetWidth; var rw = r ? r.offsetWidth : 900;
+    var x0 = e.clientX, w0 = q.offsetWidth, rw = r ? r.offsetWidth : 900;
     d.classList.add('dragging');
     document.body.style.cursor = 'col-resize';
     document.body.style.userSelect = 'none';
     function onMove(ev){
-      var pct = Math.min(Math.max(((w0 + ev.clientX - x0) / rw) * 100, 25), 75);
-      q.style.setProperty('flex', '0 0 ' + pct + '%', 'important');
+      var pct = ((w0 + ev.clientX - x0) / rw) * 100;
+      q.style.width = Math.min(Math.max(pct, 25), 75) + '%';
     }
     function onUp(){
       document.removeEventListener('mousemove', onMove);
@@ -13664,21 +12728,24 @@ function bmdSetupDrag(){
       d.classList.remove('dragging');
       document.body.style.cursor = '';
       document.body.style.userSelect = '';
-      // Save split preference
       var r2 = document.getElementById('bmd-cols-row');
-      if(r2) try{ localStorage.setItem('bmd_split_pct', ((q.offsetWidth/r2.offsetWidth)*100).toFixed(1)); }catch(e){}
+      if(r2) localStorage.setItem('bmd_q_pct', ((q.offsetWidth/r2.offsetWidth)*100).toFixed(1));
     }
     document.addEventListener('mousemove', onMove);
     document.addEventListener('mouseup', onUp);
   });
   d.addEventListener('dblclick', function(){
-    q.style.setProperty('flex', '0 0 50%', 'important');
-    try{ localStorage.removeItem('bmd_split_pct'); }catch(e){}
+    q.style.width = '50%';
+    localStorage.removeItem('bmd_q_pct');
   });
 }
-[0,200,500,1000,2000].forEach(function(t){ setTimeout(bmdSetupDrag, t); });
+
 // Setup drag after cards load
-[0,200,500,1000,2000].forEach(function(t){ setTimeout(bmdSetupDrag,t); });
+if(document.readyState === "loading"){
+  document.addEventListener("DOMContentLoaded", bmdSetupDrag);
+} else {
+  setTimeout(bmdSetupDrag, 500);
+}
 </script>
 </body>
 </html>
