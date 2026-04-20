@@ -4910,6 +4910,16 @@ html.dark .hl-btn-active { border-color:#fff!important; }
             <span class="cfc-sep">+</span>
             <span class="cfc-due" id="cfc-due">0</span>
           </div>
+          <div id="skip-nav-wrap" style="display:flex;align-items:center;justify-content:center;gap:24px;padding:6px 0 4px;border-top:1px solid var(--border);opacity:.35;transition:opacity .2s;" onmouseenter="this.style.opacity='1'" onmouseleave="this.style.opacity='.35'">
+            <button onclick="skipBack()" title="Previous card (←)" style="background:none;border:none;color:var(--text-faint);cursor:pointer;font-size:10px;font-weight:500;font-family:'JetBrains Mono',monospace;padding:2px 8px;border-radius:4px;transition:all .15s;display:flex;align-items:center;gap:4px;" onmouseover="this.style.color='var(--accent)';this.style.background='rgba(59,127,255,.08)'" onmouseout="this.style.color='var(--text-faint)';this.style.background='none'">
+              <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+              Back
+            </button>
+            <button onclick="skipFwd()" title="Next card (→)" style="background:none;border:none;color:var(--text-faint);cursor:pointer;font-size:10px;font-weight:500;font-family:'JetBrains Mono',monospace;padding:2px 8px;border-radius:4px;transition:all .15s;display:flex;align-items:center;gap:4px;" onmouseover="this.style.color='var(--accent)';this.style.background='rgba(59,127,255,.08)'" onmouseout="this.style.color='var(--text-faint)';this.style.background='none'">
+              Skip
+              <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+            </button>
+          </div>
           </div><!-- /bmd-q-col -->
           <div id="bmd-split-divider"><div class="bmd-div-handle"><span></span><span></span></div></div>
           <div id="bmd-ans-col">
