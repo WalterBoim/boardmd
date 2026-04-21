@@ -9495,7 +9495,7 @@ async function adminLogin(){
     const { error } = await _supa.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: window.location.origin + '/#admin-return'
+        redirectTo: window.location.origin
       }
     });
     if(error){
@@ -9556,10 +9556,9 @@ async function updateAdminStatus(){
   }
 }
 
-// Magic link return handler + admin auth listener
+// OAuth/magic link return handler + admin auth listener
 (function(){
   try {
-    // 1. Handle magic link code in URL
     async function handleAuthReturn(){
       try {
         // PKCE flow: ?code=...
@@ -9569,18 +9568,27 @@ async function updateAdminStatus(){
           const { error } = await _supa.auth.exchangeCodeForSession(window.location.href);
           if(!error){
             history.replaceState(null, '', window.location.pathname);
+          } else {
+            console.warn('BoardMD: exchangeCodeForSession error', error);
           }
+          return;
         }
-        // Implicit flow (fallback): #access_token=...
+        // Implicit OAuth flow: #access_token=... (Google OAuth returns this)
         if(window.location.hash.includes('access_token')){
-          // supabase-js v2 auto-processes hash on init, but clean URL
-          setTimeout(() => history.replaceState(null, '', window.location.pathname), 500);
+          // Force SDK to process hash: getSession() triggers token parsing
+          await _supa.auth.getSession();
+          // Give SDK extra time, then clean URL
+          setTimeout(() => {
+            if(window.location.hash.includes('access_token')){
+              history.replaceState(null, '', window.location.pathname);
+            }
+          }, 1500);
         }
       } catch(e){ console.warn('BoardMD: auth return handler', e); }
     }
     handleAuthReturn();
 
-    // 2. React to auth state changes
+    // React to auth state changes
     _supa.auth.onAuthStateChange(async (event, session) => {
       if(event === 'SIGNED_IN' && session){
         const isAdmin = await checkIsAdmin();
@@ -9589,8 +9597,9 @@ async function updateAdminStatus(){
           showAdminBadge(true);
           showToast('Signed in as admin ✓ — edits save to server');
         } else {
-          // Non-admin user signed in by accident; sign them out silently
-          await _supa.auth.signOut();
+          // Non-admin user: keep signed in for now so we can show message
+          showToast('This Google account is not authorized as admin.');
+          setTimeout(async () => { await _supa.auth.signOut(); }, 2500);
         }
       } else if(event === 'SIGNED_OUT'){
         window._isBoardMDAdmin = false;
@@ -9599,9 +9608,12 @@ async function updateAdminStatus(){
       try { updateAdminStatus(); } catch(e){}
     });
 
-    // 3. /#admin shortcut opens admin login
+    // /#admin shortcut reveals admin option + opens login
     function checkAdminHash(){
+      // Don't interfere with OAuth return (access_token)
+      if(window.location.hash.includes('access_token')) return;
       if(window.location.hash === '#admin'){
+        window._adminMenuRevealed = true; // Permanent reveal for this session
         history.replaceState(null, '', window.location.pathname);
         setTimeout(() => showAdminLogin(), 400);
       }
@@ -9611,22 +9623,22 @@ async function updateAdminStatus(){
   } catch(e){ console.warn('Auth listener setup failed', e); }
 })();
 
-// Show/hide discreet admin badge
+// Show/hide admin indicator on user pill (green outline when admin)
 function showAdminBadge(show){
-  let badge = document.getElementById('admin-badge');
+  const pill = document.getElementById('app-user-pill');
+  if(!pill) return;
   if(show){
-    if(!badge){
-      badge = document.createElement('div');
-      badge.id = 'admin-badge';
-      badge.title = 'Admin mode — click to sign out';
-      badge.style.cssText = 'position:fixed;bottom:12px;left:12px;z-index:9998;background:rgba(0,212,170,.12);color:var(--green);border:1px solid rgba(0,212,170,.35);border-radius:999px;padding:4px 10px;font-family:JetBrains Mono,monospace;font-size:10px;font-weight:700;letter-spacing:.5px;cursor:pointer;user-select:none;';
-      badge.textContent = 'ADMIN';
-      badge.onclick = adminLogout;
-      document.body.appendChild(badge);
-    }
+    pill.style.borderColor = 'var(--green)';
+    pill.style.boxShadow = '0 0 0 2px rgba(0,212,170,.15)';
+    pill.title = 'Admin mode active — click for menu';
   } else {
-    if(badge) badge.remove();
+    pill.style.borderColor = '';
+    pill.style.boxShadow = '';
+    pill.title = '';
   }
+  // Remove old floating badge if exists
+  const old = document.getElementById('admin-badge');
+  if(old) old.remove();
 }
 
 // On load, set badge if already admin
@@ -9824,7 +9836,7 @@ function syncRetentionHeader(){
 })();
 
 // ── APP AUTH MENU ─────────────────────────────────────────────────────
-function showAppAuthMenu(){
+async function showAppAuthMenu(){
   // Toggle — close if already open
   const existing = document.getElementById('app-auth-menu');
   if(existing){ existing.remove(); return; }
@@ -9837,6 +9849,36 @@ function showAppAuthMenu(){
   const pill = document.getElementById('app-user-pill');
   const fullEmail = pill?.title === 'Account' ? (window._supaUser?.email || session_email) : session_email;
 
+  // Check admin status
+  let isAdmin = false;
+  let adminEmail = '';
+  try {
+    const { data: sess } = await _supa.auth.getSession();
+    if(sess?.session){
+      adminEmail = sess.session.user.email || '';
+      isAdmin = await checkIsAdmin();
+    }
+  } catch(e){}
+
+  const adminBlock = isAdmin
+    ? `<div class="aam-email" style="border-top:1px solid var(--border);border-bottom:none;margin-top:6px;margin-bottom:0;padding-top:10px">
+         <div class="aam-email-label" style="color:var(--green)">Admin mode active</div>
+         <div class="aam-email-val" style="font-size:11px;color:var(--muted)">${adminEmail}</div>
+       </div>`
+    : '';
+
+  const adminButton = isAdmin
+    ? `<button onclick="adminLogout();document.getElementById('app-auth-menu')?.remove()" style="color:var(--amber)">
+         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18.36 6.64a9 9 0 1 1-12.73 0"/><line x1="12" y1="2" x2="12" y2="12"/></svg>
+         Sign out of admin
+       </button>`
+    : (window._adminMenuRevealed
+        ? `<button onclick="showAdminLogin();document.getElementById('app-auth-menu')?.remove()" style="color:var(--muted)">
+             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+             Admin Login
+           </button>`
+        : '');
+
   menu.innerHTML = `
     <div class="aam-email">
       <div class="aam-email-label">Signed in as</div>
@@ -9846,6 +9888,7 @@ function showAppAuthMenu(){
         FSRS synced to cloud
       </div>
     </div>
+    ${adminBlock}
     <button onclick="syncFsrsToSupabase().then(()=>showToast('Progress synced!'));document.getElementById('app-auth-menu')?.remove()">
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
       Sync now
@@ -9858,6 +9901,7 @@ function showAppAuthMenu(){
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
       Ranking
     </button>
+    ${adminButton}
     <button class="aam-signout" onclick="signOut()">
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
       Sign out
