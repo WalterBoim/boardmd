@@ -7270,6 +7270,8 @@ function openSettings(){
   if(lbl) lbl.textContent = editsCount === 0
     ? 'No edits yet — use the Edit button on any card'
     : editsCount + ' card' + (editsCount!==1?'s':'') + ' edited · ready to export';
+  // Atualizar status admin
+  try { updateAdminStatus(); } catch(e){}
   document.getElementById('settings-overlay').style.display='flex';
 }
 function closeSettings(){document.getElementById('settings-overlay').style.display='none';}
@@ -7590,6 +7592,40 @@ applyFont();
       </div>
     </div>
 
+    <!-- ADMIN SECTION -->
+    <div style="margin-top:20px;padding-top:20px;border-top:1px solid var(--border)">
+      <div class="settings-label">Admin</div>
+      <div class="settings-row" style="align-items:center">
+        <div>
+          <div class="settings-row-label" id="admin-status-label">Not logged in</div>
+          <div class="settings-row-sub" id="admin-status-sub">Sign in to save card edits to the server</div>
+        </div>
+        <div style="display:flex;gap:8px;flex-shrink:0">
+          <button id="admin-login-btn" onclick="closeSettings();showAdminLogin()" style="background:var(--accent);border:none;border-radius:8px;padding:7px 14px;font-family:'Lato',sans-serif;font-size:12px;font-weight:700;color:#fff;cursor:pointer;transition:all .15s" onmouseover="this.style.background='#5a8fff'" onmouseout="this.style.background='var(--accent)'">Admin Login</button>
+          <button id="admin-logout-btn" onclick="adminLogout()" style="display:none;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:7px 14px;font-family:'Lato',sans-serif;font-size:12px;font-weight:700;color:var(--text-dim);cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor='var(--red)';this.style.color='var(--red)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text-dim)'">Sign out</button>
+        </div>
+      </div>
+    </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ADMIN LOGIN MODAL (Magic Link) -->
+<div id="admin-login-overlay" class="settings-overlay" style="display:none" onclick="if(event.target===this)closeAdminLogin()">
+  <div class="settings-modal" style="max-width:400px">
+    <h3 style="margin-bottom:6px">Admin Login</h3>
+    <div style="font-size:12px;color:var(--muted);margin-bottom:20px;font-family:'Lato',sans-serif">We'll send you a one-time sign-in link. Click it from your email and you'll be signed in as admin automatically.</div>
+    <div class="settings-group">
+      <div class="settings-row" style="flex-direction:column;align-items:stretch;gap:6px">
+        <div class="settings-row-label">Admin email</div>
+        <input class="settings-input" type="email" id="admin-email" placeholder="wboim@hotmail.com" style="width:100%" onkeydown="if(event.key==='Enter')adminLogin()">
+      </div>
+      <div id="admin-login-status" style="font-size:12px;color:var(--muted);min-height:16px;font-family:'Lato',sans-serif;margin-top:4px"></div>
+    </div>
+    <div class="settings-footer">
+      <button class="btn-settings-cancel" onclick="closeAdminLogin()">Cancel</button>
+      <button class="btn-settings-save" onclick="adminLogin()">Send magic link</button>
     </div>
   </div>
 </div>
@@ -8763,7 +8799,7 @@ function saveCardEdit(){
   // Aplicar ao card em memória imediatamente
   Object.assign(card, edits[card.id]);
 
-  // Salvar direto no Supabase
+  // Salvar direto no Supabase (usa token da sessão autenticada)
   const supaUpdate = {
     q: edits[card.id].q,
     c: edits[card.id].c,
@@ -8773,32 +8809,53 @@ function saveCardEdit(){
     d: edits[card.id].d,
     topic: edits[card.id].topic
   };
-  fetch(SUPA_URL + '/rest/v1/cards?id=eq.' + card.id, {
-    method: 'PATCH',
-    headers: {
-      'apikey': SUPA_KEY,
-      'Authorization': 'Bearer ' + SUPA_KEY,
-      'Content-Type': 'application/json',
-      'Prefer': 'return=minimal'
-    },
-    body: JSON.stringify(supaUpdate)
-  }).then(r => {
-    if(r.ok){
-      console.log('Supabase updated:', card.id);
-      // Invalida cache IndexedDB para este card
-      try{
-        const req = indexedDB.open('boardmd_cache');
-        req.onsuccess = e => {
-          const db = e.target.result;
-          if(db.objectStoreNames.contains('cards')){
-            const tx = db.transaction('cards','readwrite');
-            tx.objectStore('cards').delete(card.id);
-          }
-        };
-      }catch(ex){}
+  (async () => {
+    const { data: sess } = await _supa.auth.getSession();
+    const token = sess?.session?.access_token;
+    if(!token){
+      console.warn('BoardMD: not logged in — edit saved only locally');
+      showToast('Edição salva localmente. Faça login admin para salvar no servidor.');
+      return;
     }
-    else r.text().then(t => console.error('Supabase error:', t));
-  }).catch(e => console.error('Supabase fetch error:', e));
+    try {
+      const r = await fetch(SUPA_URL + '/rest/v1/cards?id=eq.' + card.id, {
+        method: 'PATCH',
+        headers: {
+          'apikey': SUPA_KEY,
+          'Authorization': 'Bearer ' + token,
+          'Content-Type': 'application/json',
+          'Prefer': 'return=minimal'
+        },
+        body: JSON.stringify(supaUpdate)
+      });
+      if(r.ok){
+        console.log('BoardMD: Supabase updated', card.id);
+        showToast('Card salvo no Supabase ✓');
+        // Invalida cache IndexedDB
+        try{
+          const req = indexedDB.open('boardmd_cache');
+          req.onsuccess = e => {
+            const db = e.target.result;
+            if(db.objectStoreNames.contains('cards')){
+              const tx = db.transaction('cards','readwrite');
+              tx.objectStore('cards').delete(card.id);
+            }
+          };
+        }catch(ex){}
+      } else {
+        const t = await r.text();
+        console.error('BoardMD: Supabase error', r.status, t);
+        if(r.status === 401 || r.status === 403){
+          showToast('Sem permissão. Você não é admin.');
+        } else {
+          showToast('Erro ao salvar: ' + r.status);
+        }
+      }
+    } catch(e){
+      console.error('BoardMD: Supabase fetch error', e);
+      showToast('Erro de rede ao salvar.');
+    }
+  })();
 
   // Feedback visual
   const msg = document.getElementById('editor-saved-msg');
@@ -8810,10 +8867,13 @@ async function setCardImage(){
   if(!_editingCard) return;
   const url = (document.getElementById('editor-img-url').value||'').trim();
   if(!url){ alert('Paste an image URL first.'); return; }
+  const { data: sess } = await _supa.auth.getSession();
+  const token = sess?.session?.access_token;
+  if(!token){ showToast('Faça login admin para salvar imagens.'); return; }
   const imgObj = {url:url, alt:_editingCard.c||'', credit:'Manual', license:'CC BY-SA', source:'Manual'};
   const r = await fetch(SUPA_URL+'/rest/v1/cards?id=eq.'+_editingCard.id, {
     method:'PATCH',
-    headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/json','Prefer':'return=minimal'},
+    headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+token,'Content-Type':'application/json','Prefer':'return=minimal'},
     body:JSON.stringify({img:imgObj})
   });
   if(r.ok){
@@ -8822,20 +8882,27 @@ async function setCardImage(){
     document.getElementById('editor-img-current').style.display='flex';
     document.getElementById('editor-img-url').value='';
     renderCard();
+  } else {
+    showToast('Erro ao salvar imagem: '+r.status);
   }
 }
 async function removeCardImage(){
   if(!_editingCard) return;
   if(!confirm('Remove image from this card?')) return;
+  const { data: sess } = await _supa.auth.getSession();
+  const token = sess?.session?.access_token;
+  if(!token){ showToast('Faça login admin para remover imagens.'); return; }
   const r = await fetch(SUPA_URL+'/rest/v1/cards?id=eq.'+_editingCard.id, {
     method:'PATCH',
-    headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/json','Prefer':'return=minimal'},
+    headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+token,'Content-Type':'application/json','Prefer':'return=minimal'},
     body:JSON.stringify({img:null})
   });
   if(r.ok){
     _editingCard.img=null;
     document.getElementById('editor-img-current').style.display='none';
     renderCard();
+  } else {
+    showToast('Erro ao remover imagem: '+r.status);
   }
 }
 function resetCardEdit(){
@@ -9414,6 +9481,115 @@ async function signOut(){
   await _supa.auth.signOut();
   location.reload();
 }
+
+// ── ADMIN LOGIN ─────────────────────────────────────────────────────
+function showAdminLogin(){
+  const el = document.getElementById('admin-login-overlay');
+  if(!el) return;
+  document.getElementById('admin-email').value = '';
+  document.getElementById('admin-login-status').textContent = '';
+  el.style.display = 'flex';
+  setTimeout(()=>document.getElementById('admin-email').focus(), 50);
+}
+
+function closeAdminLogin(){
+  const el = document.getElementById('admin-login-overlay');
+  if(el) el.style.display = 'none';
+}
+
+async function adminLogin(){
+  const email = document.getElementById('admin-email').value.trim();
+  const status = document.getElementById('admin-login-status');
+  if(!email){ status.style.color='var(--red)'; status.textContent = 'Enter your admin email.'; return; }
+  status.style.color = 'var(--muted)';
+  status.textContent = 'Sending magic link...';
+  try {
+    const { error } = await _supa.auth.signInWithOtp({
+      email,
+      options: {
+        emailRedirectTo: window.location.origin,
+        shouldCreateUser: false
+      }
+    });
+    if(error){
+      status.style.color = 'var(--red)';
+      status.textContent = error.message || 'Failed to send link.';
+      return;
+    }
+    status.style.color = 'var(--green)';
+    status.textContent = 'Link sent. Check your email and click it to sign in.';
+  } catch(e){
+    status.style.color = 'var(--red)';
+    status.textContent = 'Error: ' + (e.message||e);
+  }
+}
+
+async function adminLogout(){
+  if(!confirm('Sign out of admin?')) return;
+  await _supa.auth.signOut();
+  updateAdminStatus();
+  showToast('Signed out.');
+}
+
+async function checkIsAdmin(){
+  try {
+    const { data: sess } = await _supa.auth.getSession();
+    const uid = sess?.session?.user?.id;
+    if(!uid) return false;
+    const { data, error } = await _supa.from('admins').select('user_id').eq('user_id', uid).maybeSingle();
+    if(error) return false;
+    return !!data;
+  } catch(e){ return false; }
+}
+
+async function updateAdminStatus(){
+  const lbl = document.getElementById('admin-status-label');
+  const sub = document.getElementById('admin-status-sub');
+  const loginBtn = document.getElementById('admin-login-btn');
+  const logoutBtn = document.getElementById('admin-logout-btn');
+  if(!lbl) return;
+  const isAdmin = await checkIsAdmin();
+  if(isAdmin){
+    const { data: sess } = await _supa.auth.getSession();
+    const email = sess?.session?.user?.email || '';
+    lbl.textContent = 'Admin mode active';
+    lbl.style.color = 'var(--green)';
+    sub.textContent = 'Signed in as ' + email + ' · edits save to server';
+    loginBtn.style.display = 'none';
+    logoutBtn.style.display = 'inline-block';
+    window._isBoardMDAdmin = true;
+  } else {
+    lbl.textContent = 'Not logged in';
+    lbl.style.color = '';
+    sub.textContent = 'Sign in to save card edits to the server';
+    loginBtn.style.display = 'inline-block';
+    logoutBtn.style.display = 'none';
+    window._isBoardMDAdmin = false;
+  }
+}
+
+// Detect magic-link return on page load and show admin toast
+(function(){
+  try {
+    _supa.auth.onAuthStateChange(async (event, session) => {
+      if(event === 'SIGNED_IN' && session){
+        // Check if user is admin and show appropriate toast
+        const isAdmin = await checkIsAdmin();
+        if(isAdmin){
+          showToast('Signed in as admin ✓');
+        }
+        updateAdminStatus();
+        // Clean URL fragment from magic link
+        if(window.location.hash.includes('access_token') || window.location.hash.includes('error')){
+          history.replaceState(null, '', window.location.pathname);
+        }
+      }
+    });
+  } catch(e){ console.warn('Auth listener setup failed', e); }
+})();
+
+// Check admin status on load
+setTimeout(() => { try { updateAdminStatus(); } catch(e){} }, 2000);
 
 // ── FSRS SYNC ────────────────────────────────────────────────────────
 let _supaUser = null;
