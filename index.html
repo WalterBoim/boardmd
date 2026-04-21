@@ -11630,7 +11630,12 @@ function studySystemFilter() {
   }
   var allCards = Object.values(window.DECKS||{}).reduce(function(a,b){return a.concat(b);},[]);
   var pool = allCards.filter(function(c) {
-    return sel.some(function(s) { return (c.system||'').toLowerCase() === s.toLowerCase(); });
+    var fieldVal = ((c.system||'')+'').toLowerCase().trim();
+    if(!fieldVal) return false;
+    return sel.some(function(s) {
+      var sv = s.toLowerCase().trim();
+      return fieldVal === sv || fieldVal.indexOf(sv) !== -1 || sv.indexOf(fieldVal) !== -1;
+    });
   });
   if(pool.length === 0) {
     document.getElementById('sf-status').textContent = 'No cards found for selected systems';
@@ -11751,7 +11756,12 @@ function studyDisciplineFilter() {
   }
   var allCards = Object.values(window.DECKS||{}).reduce(function(a,b){return a.concat(b);},[]);
   var pool = allCards.filter(function(c) {
-    return sel.some(function(d) { return (c.discipline||'').toLowerCase() === d.toLowerCase(); });
+    var fieldVal = ((c.subject||c.discipline||'')+'').toLowerCase().trim();
+    if(!fieldVal) return false;
+    return sel.some(function(d) {
+      var dv = d.toLowerCase().trim();
+      return fieldVal === dv || fieldVal.indexOf(dv) !== -1 || dv.indexOf(fieldVal) !== -1;
+    });
   });
   if(pool.length === 0) {
     document.getElementById('df-status').textContent = 'No cards found for selected disciplines';
@@ -12933,6 +12943,29 @@ html.dark .hl-btn-active { border-color:#fff!important; }
 }
 .lb-panel .your-card .your-info { flex-direction: column !important; }
 .lb-panel .your-card .your-stat { flex-direction: column !important; }
+
+/* ── RANKING FIX: league-card always fully visible ── */
+.lb-panel .league-card {
+  display: block !important;
+  min-height: auto !important;
+  height: auto !important;
+  max-height: none !important;
+  overflow: visible !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+.lb-panel .league-card .league-header,
+.lb-panel .league-card .league-progress,
+.lb-panel .league-card .league-row,
+.lb-panel .league-card .locked-row,
+.lb-panel .league-card .upgrade-row {
+  display: flex !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  height: auto !important;
+  min-height: auto !important;
+}
+.lb-panel .league-card .league-progress { display: block !important; }
 </style>
 
 <div id="sys-overlay" class="qid-overlay" style="display:none" onclick="if(event.target===this)closeSysFilter()">
@@ -13115,7 +13148,12 @@ function studySystemFilter() {
   }
   var allCards = Object.values(window.DECKS||{}).reduce(function(a,b){return a.concat(b);},[]);
   var pool = allCards.filter(function(c) {
-    return sel.some(function(s) { return (c.system||'').toLowerCase() === s.toLowerCase(); });
+    var fieldVal = ((c.system||'')+'').toLowerCase().trim();
+    if(!fieldVal) return false;
+    return sel.some(function(s) {
+      var sv = s.toLowerCase().trim();
+      return fieldVal === sv || fieldVal.indexOf(sv) !== -1 || sv.indexOf(fieldVal) !== -1;
+    });
   });
   if(pool.length === 0) {
     document.getElementById('sf-status').textContent = 'No cards found for selected systems';
@@ -13236,7 +13274,12 @@ function studyDisciplineFilter() {
   }
   var allCards = Object.values(window.DECKS||{}).reduce(function(a,b){return a.concat(b);},[]);
   var pool = allCards.filter(function(c) {
-    return sel.some(function(d) { return (c.discipline||'').toLowerCase() === d.toLowerCase(); });
+    var fieldVal = ((c.subject||c.discipline||'')+'').toLowerCase().trim();
+    if(!fieldVal) return false;
+    return sel.some(function(d) {
+      var dv = d.toLowerCase().trim();
+      return fieldVal === dv || fieldVal.indexOf(dv) !== -1 || dv.indexOf(fieldVal) !== -1;
+    });
   });
   if(pool.length === 0) {
     document.getElementById('df-status').textContent = 'No cards found for selected disciplines';
