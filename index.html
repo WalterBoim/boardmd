@@ -12913,6 +12913,26 @@ html.dark .hl-btn-active { border-color:#fff!important; }
 .sys-chip:hover{border-color:var(--emerald);color:var(--text);}
 .sys-chip.selected{border-color:var(--emerald);background:rgba(34,197,94,.12);color:var(--emerald);}
 .sys-chip input{display:none;}
+
+/* ── RANKING FIX: your-card always fully visible ── */
+.lb-panel .your-card {
+  display: block !important;
+  min-height: auto !important;
+  height: auto !important;
+  max-height: none !important;
+  overflow: visible !important;
+}
+.lb-panel .your-card .your-top,
+.lb-panel .your-card .your-stats,
+.lb-panel .your-card .your-info,
+.lb-panel .your-card .your-avatar,
+.lb-panel .your-card .your-stat {
+  display: flex !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+.lb-panel .your-card .your-info { flex-direction: column !important; }
+.lb-panel .your-card .your-stat { flex-direction: column !important; }
 </style>
 
 <div id="sys-overlay" class="qid-overlay" style="display:none" onclick="if(event.target===this)closeSysFilter()">
