@@ -7592,19 +7592,13 @@ applyFont();
       </div>
     </div>
 
-    <!-- ADMIN SECTION -->
-    <div style="margin-top:20px;padding-top:20px;border-top:1px solid var(--border)">
-      <div class="settings-label">Admin</div>
-      <div class="settings-row" style="align-items:center">
-        <div>
-          <div class="settings-row-label" id="admin-status-label">Not logged in</div>
-          <div class="settings-row-sub" id="admin-status-sub">Sign in to save card edits to the server</div>
-        </div>
-        <div style="display:flex;gap:8px;flex-shrink:0">
-          <button id="admin-login-btn" onclick="closeSettings();showAdminLogin()" style="background:var(--accent);border:none;border-radius:8px;padding:7px 14px;font-family:'Lato',sans-serif;font-size:12px;font-weight:700;color:#fff;cursor:pointer;transition:all .15s" onmouseover="this.style.background='#5a8fff'" onmouseout="this.style.background='var(--accent)'">Admin Login</button>
-          <button id="admin-logout-btn" onclick="adminLogout()" style="display:none;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:7px 14px;font-family:'Lato',sans-serif;font-size:12px;font-weight:700;color:var(--text-dim);cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor='var(--red)';this.style.color='var(--red)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text-dim)'">Sign out</button>
-        </div>
-      </div>
+    <!-- Admin section removed from Settings UI (accessible via /#admin) -->
+    <!-- Hidden refs kept so JS updateAdminStatus() doesn't error -->
+    <div style="display:none">
+      <span id="admin-status-label"></span>
+      <span id="admin-status-sub"></span>
+      <button id="admin-login-btn"></button>
+      <button id="admin-logout-btn" onclick="adminLogout()"></button>
     </div>
 
     </div>
@@ -9568,25 +9562,87 @@ async function updateAdminStatus(){
   }
 }
 
-// Detect magic-link return on page load and show admin toast
+// Magic link return handler + admin auth listener
 (function(){
   try {
+    // 1. Handle magic link code in URL
+    async function handleAuthReturn(){
+      try {
+        // PKCE flow: ?code=...
+        const params = new URLSearchParams(window.location.search);
+        const code = params.get('code');
+        if(code){
+          const { error } = await _supa.auth.exchangeCodeForSession(window.location.href);
+          if(!error){
+            history.replaceState(null, '', window.location.pathname);
+          }
+        }
+        // Implicit flow (fallback): #access_token=...
+        if(window.location.hash.includes('access_token')){
+          // supabase-js v2 auto-processes hash on init, but clean URL
+          setTimeout(() => history.replaceState(null, '', window.location.pathname), 500);
+        }
+      } catch(e){ console.warn('BoardMD: auth return handler', e); }
+    }
+    handleAuthReturn();
+
+    // 2. React to auth state changes
     _supa.auth.onAuthStateChange(async (event, session) => {
       if(event === 'SIGNED_IN' && session){
-        // Check if user is admin and show appropriate toast
         const isAdmin = await checkIsAdmin();
         if(isAdmin){
-          showToast('Signed in as admin ✓');
+          window._isBoardMDAdmin = true;
+          showAdminBadge(true);
+          showToast('Signed in as admin ✓ — edits save to server');
+        } else {
+          // Non-admin user signed in by accident; sign them out silently
+          await _supa.auth.signOut();
         }
-        updateAdminStatus();
-        // Clean URL fragment from magic link
-        if(window.location.hash.includes('access_token') || window.location.hash.includes('error')){
-          history.replaceState(null, '', window.location.pathname);
-        }
+      } else if(event === 'SIGNED_OUT'){
+        window._isBoardMDAdmin = false;
+        showAdminBadge(false);
       }
+      try { updateAdminStatus(); } catch(e){}
     });
+
+    // 3. /#admin shortcut opens admin login
+    function checkAdminHash(){
+      if(window.location.hash === '#admin'){
+        history.replaceState(null, '', window.location.pathname);
+        setTimeout(() => showAdminLogin(), 400);
+      }
+    }
+    checkAdminHash();
+    window.addEventListener('hashchange', checkAdminHash);
   } catch(e){ console.warn('Auth listener setup failed', e); }
 })();
+
+// Show/hide discreet admin badge
+function showAdminBadge(show){
+  let badge = document.getElementById('admin-badge');
+  if(show){
+    if(!badge){
+      badge = document.createElement('div');
+      badge.id = 'admin-badge';
+      badge.title = 'Admin mode — click to sign out';
+      badge.style.cssText = 'position:fixed;bottom:12px;left:12px;z-index:9998;background:rgba(0,212,170,.12);color:var(--green);border:1px solid rgba(0,212,170,.35);border-radius:999px;padding:4px 10px;font-family:JetBrains Mono,monospace;font-size:10px;font-weight:700;letter-spacing:.5px;cursor:pointer;user-select:none;';
+      badge.textContent = 'ADMIN';
+      badge.onclick = adminLogout;
+      document.body.appendChild(badge);
+    }
+  } else {
+    if(badge) badge.remove();
+  }
+}
+
+// On load, set badge if already admin
+setTimeout(async () => {
+  try {
+    const isAdmin = await checkIsAdmin();
+    window._isBoardMDAdmin = isAdmin;
+    showAdminBadge(isAdmin);
+  } catch(e){}
+}, 2500);
 
 // Check admin status on load
 setTimeout(() => { try { updateAdminStatus(); } catch(e){} }, 2000);
