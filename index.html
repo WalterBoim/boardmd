@@ -14,7 +14,8 @@
 <!-- Puter.js for Gemini AI (free tier) -->
 <script src="https://js.puter.com/v2/"></script>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Lato:wght@400;500;700&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,500;0,8..60,600;1,8..60,300;1,8..60,400&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Sora:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-<style>
+<style id="bmd-all">
+
 :root {
   --bg:#080c12; --surface:#0e1420; --surface2:#141c2e;
   --border:#1e2a42; --border-bright:#2a3a58;
@@ -67,7 +68,8 @@ html.light .footer{border-color:var(--border);}
 .theme-toggle:hover{border-color:var(--accent);color:var(--accent);}
 .theme-toggle svg{width:16px;height:16px;}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:'Lato','Helvetica Neue',Arial,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:var(--font-size);line-height:1.6;overflow-x:hidden;max-width:100vw;}
+html,body{height:100%;overflow:hidden;margin:0;}
+body{font-family:'Lato','Helvetica Neue',Arial,sans-serif;background:var(--bg);color:var(--text);height:100vh;font-size:var(--font-size);line-height:1.6;overflow:hidden;max-width:100vw;}
 
 /* ── NAV ── */
 .nav{display:flex;align-items:center;justify-content:space-between;padding:20px 40px;position:sticky;top:0;z-index:100;background:rgba(8,12,18,.88);backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,.05);}
@@ -132,9 +134,6 @@ body{font-family:'Lato','Helvetica Neue',Arial,sans-serif;background:var(--bg);c
 .btn-deck{display:flex;align-items:center;gap:6px;background:none;border:1px solid var(--border);color:var(--text-dim);padding:8px 16px;border-radius:8px;cursor:pointer;font-size:12px;font-family:'Syne',sans-serif;font-weight:600;transition:all .2s;}
 .deck-card.s1 .btn-deck:hover{border-color:var(--accent);color:var(--accent);}
 .deck-card.s2 .btn-deck:hover{border-color:var(--gold);color:var(--gold);}
-.deck-card.daily_review::before{background:linear-gradient(90deg,#0ea5e9,#6366f1);}
-.deck-card.daily_review .deck-icon{background:rgba(14,165,233,.12);}
-.deck-card.daily_review .btn-deck:hover{border-color:#0ea5e9;color:#0ea5e9;}
 .deck-card.core .btn-deck:hover{border-color:var(--emerald);color:var(--emerald);}
 
 /* ── FEATURES ── */
@@ -151,10 +150,10 @@ body{font-family:'Lato','Helvetica Neue',Arial,sans-serif;background:var(--bg);c
 .footer-copy{font-size:12px;color:var(--text-faint);}
 
 /* ══════════════ APP ══════════════ */
-#app{display:none;min-height:100vh;flex-direction:column;}
+#app{display:none;height:100vh;flex-direction:column;overflow:hidden;}
 #app.active{display:flex;}
 
-.app-header{background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:200;}
+.app-header{background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:200;flex-shrink:0;}
 .app-header-top{padding:0 20px;height:46px;display:flex;align-items:center;justify-content:space-between;gap:12px;}
 .app-header-tabs{padding:0 16px;border-top:1px solid var(--border);overflow-x:auto;scrollbar-width:none;display:flex;align-items:center;gap:0;}
 .app-header-tabs::-webkit-scrollbar{display:none;}
@@ -168,7 +167,7 @@ body{font-family:'Lato','Helvetica Neue',Arial,sans-serif;background:var(--bg);c
 .app-logo em{font-size:12px;font-style:normal;color:var(--text-faint);font-family:'Lato',sans-serif;margin-left:8px;}
 
 /* ── DECK HOME DASHBOARD (Anki-style) ── */
-.deck-home{display:none;flex:1;flex-direction:column;padding:32px 40px;max-width:900px;margin:0 auto;width:100%;gap:24px;}
+.deck-home{display:none;flex:1;flex-direction:column;padding:24px 24px;max-width:100%;margin:0;width:100%;gap:20px;overflow-y:auto;-webkit-overflow-scrolling:touch;min-height:0;}
 .deck-home.active{display:flex;}
 .deck-home-title{font-family:'Instrument Serif',serif;font-size:28px;color:var(--text);margin-bottom:4px;}
 .deck-home-sub{font-size:13px;color:var(--text-faint);font-family:'Lato',sans-serif;}
@@ -412,8 +411,8 @@ html.light .qid-textarea{background:var(--surface2);}
   .stats-row{display:grid;grid-template-columns:repeat(2,1fr);}
   .section{padding:50px 20px;}
   .sidebar{display:none;}
-  .app-layout{display:block;width:100%;overflow-x:hidden;}
-  .study-main{padding:12px 8px;width:100%;box-sizing:border-box;overflow-x:hidden;}
+  .app-layout{display:flex;flex-direction:column;width:100%;overflow-x:hidden;overflow-y:hidden;}
+  .study-main{padding:0;width:100%;box-sizing:border-box;overflow-x:hidden;overflow-y:hidden;}
   .study-inner{max-width:100%;width:100%;padding:0;box-sizing:border-box;}
   #app{overflow-x:hidden;max-width:100vw;}
   .fsrs-btn{max-width:none;}
@@ -460,7 +459,7 @@ html.light .qid-textarea{background:var(--surface2);}
 .badge-modal button{background:var(--accent);color:#fff;border:none;padding:11px 30px;border-radius:9px;font-family:'Lato',sans-serif;font-size:13px;font-weight:700;cursor:pointer;}
 
 /* Leaderboard panel */
-.lb-panel{display:none;flex:1;flex-direction:column;padding:32px 36px;gap:24px;max-width:100%;margin:0 auto;width:100%;}
+.lb-panel{display:none;flex:1;flex-direction:column;padding:12px 12px;gap:0;max-width:100%;margin:0;width:100%;}
 .lb-panel.active{display:flex;}
 
 /* Header */
@@ -707,8 +706,8 @@ html.light .pstat, html.light .badge-item, html.light .lvl-progress{background:v
   .deck-tab{font-size:12px;padding:8px 10px;}
   .qid-modal,.bid-modal{width:95vw;padding:20px 16px;}
 }
-</style>
-<style id="bmd-fonts">
+
+
 :root {
   --font-ui:      'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   --font-serif:   'Source Serif 4', Georgia, serif;
@@ -750,7 +749,8 @@ html.light { --uw-hover:#f0f7ff; --uw-correct:#e8f5e9; --uw-wrong:#fdecea; --uw-
 .exp-text { font-size:15px !important; line-height:1.8 !important; }
 .exp-correct-inner { font-size:15px !important; font-weight:500 !important; }
 .exp-dist { font-size:14px !important; line-height:1.75 !important; }
-</style><style id="bmd-card-std">
+
+
 /* ── Card explanation standardization ── */
 
 /* Explanation text — clean, no rogue margins */
@@ -804,9 +804,8 @@ html.light { --uw-hover:#f0f7ff; --uw-correct:#e8f5e9; --uw-wrong:#fdecea; --uw-
   font-style: italic !important;
   color: var(--text-dim) !important;
 }
-</style>
 
-<style id="bmd-exp-extras">
+
 /* Clean up fa_step1 HTML explanations */
 .exp-text div { margin-bottom: 4px; }
 .exp-text ul { margin: 6px 0 6px 18px; }
@@ -823,9 +822,8 @@ html.light { --uw-hover:#f0f7ff; --uw-correct:#e8f5e9; --uw-wrong:#fdecea; --uw-
   text-transform: uppercase; 
   letter-spacing: .04em; 
 }
-</style>
 
-<style>
+
 /* ── LEVEL UP OVERLAY — Duolingo style ── */
 #levelup-overlay {
   position: fixed; inset: 0; z-index: 9999;
@@ -1027,9 +1025,8 @@ html.light .att-btn{background:var(--surface2);}
   text-transform:uppercase;
   white-space:nowrap;
 }
-</style>
 
-<style id="dash-v2">
+
 :root{--bg:#f2f4fb;--surface:#fff;--surface2:#e8edf8;--border:rgba(0,0,0,.07);--border2:rgba(0,0,0,.12);--text:#0d1021;--text2:#3a4060;--muted:#8892b0;--accent:#4f8ef7;--green:#00d4aa;--amber:#f59e0b;--red:#ff5370;}
 [data-theme="dark"]{--bg:#0a0d14;--surface:#111520;--surface2:#161c2d;--border:rgba(255,255,255,.07);--border2:rgba(255,255,255,.12);--text:#eef1ff;--text2:#c8d0ee;--muted:#556080;}
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -1065,7 +1062,7 @@ html.light .att-btn{background:var(--surface2);}
 .tab-content.active{display:block;}
 
 /* ── DECK ROW ── */
-.deck-row{background:var(--surface);border:1px solid var(--border2);border-radius:12px;padding:12px 14px;margin-bottom:8px;display:flex;align-items:center;gap:12px;}
+.deck-row{background:var(--surface);border:1px solid var(--border2);border-radius:12px;padding:10px 16px;margin-bottom:8px;display:flex;align-items:center;gap:12px;width:100%;}
 .deck-icon{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
 .deck-icon svg{width:18px;height:18px;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
 .deck-info{flex:1;}
@@ -1076,7 +1073,7 @@ html.light .att-btn{background:var(--surface2);}
 .badge-new{color:#4f8ef7;background:rgba(79,142,247,.1);border:1px solid rgba(79,142,247,.25);}
 .badge-due{color:#f59e0b;background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.25);}
 .badge-soon{color:#8892b0;background:rgba(136,146,176,.1);border:1px solid rgba(136,146,176,.2);}
-.study-btn{padding:7px 14px;background:#4f8ef7;border:none;border-radius:8px;font-family:'Sora',sans-serif;font-size:12px;font-weight:700;color:#fff;cursor:pointer;white-space:nowrap;margin-left:6px;flex-shrink:0;transition:opacity .15s;}
+.study-btn{padding:7px 14px;background:#4f8ef7;border:none;border-radius:8px;font-family:'Sora',sans-serif;font-size:12px;font-weight:700;color:#fff;cursor:pointer;white-space:nowrap;margin-left:auto;flex-shrink:0;transition:opacity .15s;}
 .study-btn:active{opacity:.85;}
 
 /* ── EXPANDABLE ── */
@@ -1177,9 +1174,8 @@ html.light .att-btn{background:var(--surface2);}
   color: #4f8ef7;
   background: rgba(79,142,247,.12);
 }
-</style>
 
-<style id="bmd-card-v2">
+
 /* === BOARDMD CARD v2 — copiado literalmente do boardmd_card.html === */
 
 :root {
@@ -1606,8 +1602,8 @@ mark.hb{background:rgba(79,142,247,.28);border-bottom:2px solid rgba(40,100,220,
 [data-theme="light"] .att-response{background:var(--surface2)}
 [data-theme="light"] .why-box{background:var(--surface2)}
 
-</style>
-<style id="bmd-card-override">
+
+
 
 /* ═══════════════════════════════════════════════════════════════
    BOARDMD CARD v2 — Visual override
@@ -1691,63 +1687,47 @@ mark.hb{background:rgba(79,142,247,.28);border-bottom:2px solid rgba(40,100,220,
 /* ── Card header → topic row ── */
 .card-header {
   display: flex !important;
-  flex-direction: column !important;
-  align-items: flex-start !important;
-  gap: 8px !important;
-  padding: 14px 16px 12px !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  gap: 6px !important;
+  padding: 6px 14px !important;
   background: var(--surface) !important;
   border: 1px solid var(--border2) !important;
   border-radius: 18px 18px 0 0 !important;
   border-bottom: none !important;
+  flex-wrap: nowrap !important;
 }
 /* Line 1: DECK NAME (large) + system (muted, smaller) */
 .card-meta-left {
   display: flex !important;
   flex-direction: column !important;
   align-items: flex-start !important;
-  gap: 2px !important;
+  gap: 1px !important;
   width: 100% !important;
 }
 /* Line 2: chips — state + deck badge + edit + QID */
 .card-right {
   display: flex !important;
   align-items: center !important;
-  gap: 6px !important;
+  gap: 5px !important;
   flex-wrap: wrap !important;
   width: 100% !important;
 }
 /* Deck label — prominent */
 #c-deck-label {
-  font-size: 11px !important;
-  font-weight: 800 !important;
-  letter-spacing: 1.2px !important;
-  text-transform: uppercase !important;
-  color: var(--accent) !important;
-  font-family: 'Sora', sans-serif !important;
-  display: block !important;
+  display: none !important;
 }
-/* System — subdued subtitle */
+/* System — hidden from card header */
 .card-system, #c-sys {
-  font-size: 11px !important;
-  font-weight: 600 !important;
-  letter-spacing: .8px !important;
-  text-transform: uppercase !important;
-  color: var(--muted) !important;
-  font-family: 'Sora', sans-serif !important;
+  display: none !important;
 }
 #c-deck-label {
-  font-size: 10px !important;
-  font-weight: 700 !important;
-  letter-spacing: 1px !important;
-  text-transform: uppercase !important;
-  color: var(--muted) !important;
-  font-family: 'Sora', sans-serif !important;
-  display: block !important;
+  display: none !important;
 }
 .card-system, .card-topic {
-  font-size: 10px !important;
+  font-size: 9px !important;
   font-weight: 700 !important;
-  letter-spacing: 1.2px !important;
+  letter-spacing: 1px !important;
   text-transform: uppercase !important;
   color: var(--muted) !important;
   font-family: 'Sora', sans-serif !important;
@@ -1755,18 +1735,18 @@ mark.hb{background:rgba(79,142,247,.28);border-bottom:2px solid rgba(40,100,220,
 /* card-right merged above */
 /* State chip — New/Learning/Review */
 .card-state {
-  font-size: 10px !important;
+  font-size: 9px !important;
   font-weight: 700 !important;
-  padding: 3px 8px !important;
+  padding: 2px 6px !important;
   border-radius: 999px !important;
   font-family: 'Sora', sans-serif !important;
   letter-spacing: .3px !important;
 }
 /* QID chip */
 .card-qid {
-  font-size: 10px !important;
+  font-size: 9px !important;
   font-weight: 700 !important;
-  padding: 3px 8px !important;
+  padding: 2px 6px !important;
   border-radius: 999px !important;
   border: 1px solid rgba(79,142,247,.2) !important;
   background: rgba(79,142,247,.06) !important;
@@ -2035,7 +2015,6 @@ mark.hb{background:rgba(79,142,247,.28);border-bottom:2px solid rgba(40,100,220,
   padding: 12px 0 24px !important;
   background: transparent !important;
   border: none !important;
-  position: static !important;
 }
 .fsrs-nav.visible {
   display: flex !important;
@@ -2129,24 +2108,81 @@ mark.hb{background:rgba(79,142,247,.28);border-bottom:2px solid rgba(40,100,220,
 .att-trigger-icon svg { width: 17px !important; height: 17px !important; stroke: #4f8ef7 !important; fill: none !important; stroke-width: 1.8 !important; }
 .att-trigger-name { font-size: 14px !important; font-weight: 700 !important; color: #4f8ef7 !important; font-family: 'Sora', sans-serif !important; }
 
-</style>
 
-<style id="bmd-study-layout">
-.sidebar { display: none !important; }
-.anki-counter { display: none !important; }
-.filter-bar { display: none !important; }
-.card { background: transparent !important; border: none !important; box-shadow: none !important; padding: 0 !important; border-radius: 0 !important; max-width: 100% !important; }
-.done-wrap { padding: 32px 20px !important; }
-@media(min-width:900px){
-  body.studying { overflow: hidden !important; height: 100vh !important; }
-  body.studying #app { height: 100vh !important; overflow: hidden !important; display: flex !important; flex-direction: column !important; min-height: unset !important; padding-bottom: 0 !important; }
-  body.studying .app-layout { flex: 1 !important; min-height: 0 !important; overflow: hidden !important; display: flex !important; width: 100% !important; }
-  body.studying .study-main { flex: 1 !important; min-height: 0 !important; overflow: hidden !important; display: flex !important; flex-direction: column !important; padding: 0 !important; width: 100% !important; justify-content: flex-start !important; }
-  body.studying .study-inner { flex: 1 !important; min-height: 0 !important; overflow: hidden !important; display: flex !important; flex-direction: column !important; padding: 0 !important; width: 100% !important; max-width: none !important; align-items: stretch !important; gap: 0 !important; }
+
+/* ── Study area layout — mobile-first, full width ── */
+.app-layout {
+  width: 100% !important;
+  max-width: 100% !important;
+  flex: 1 !important;
+  overflow: hidden !important;
 }
-</style>
+.sidebar { display: none !important; }
+.study-main {
+  padding: 0 !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  overflow-x: hidden !important;
+  height: 100% !important;
+  flex-direction: column !important;
+  overflow-y: hidden !important;
+}
+.study-inner {
+  padding: 0 !important;
+  max-width: 100% !important;
+  flex: 1 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+  padding-bottom: 0 !important;
+}
+/* ── Flexbox study card: header fixed top, buttons fixed bottom, content scrolls ── */
+#card-el {
+  flex: 1 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+  min-height: 0 !important;
+}
+#card-el > .card-header {
+  flex-shrink: 0 !important;
+}
+#bmd-cols-row {
+  flex: 1 !important;
+  overflow-y: auto !important;
+  min-height: 0 !important;
+  -webkit-overflow-scrolling: touch !important;
+  overscroll-behavior-y: contain !important;
+  scrollbar-width: thin !important;
+}
+#bmd-cols-row::-webkit-scrollbar { width: 3px; }
+#bmd-cols-row::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+#card-el > .fsrs-nav {
+  flex-shrink: 0 !important;
+  padding: 10px 12px 18px !important;
+  border-top: 1px solid var(--border) !important;
+  background: var(--bg) !important;
+}
+.progress-wrap {
+  flex-shrink: 0 !important;
+}
+/* Hide old done-wrap decorations */
+.done-wrap { padding: 32px 20px !important; }
+/* Eliminate old anki-counter bar */
+.anki-counter { display: none !important; }
+/* Filter bar */
+.filter-bar { display: none !important; }
+/* Remove old card box-shadow styles that conflict */
+.card {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
+  max-width: 100% !important;
+}
 
-<style id="bmd-perf-v2">
+
 /* === BOARDMD PERFORMANCE v2 — copiado do boardmd_performance.html === */
 
 :root {
@@ -2487,14 +2523,15 @@ mark.hb{background:rgba(79,142,247,.28);border-bottom:2px solid rgba(40,100,220,
   gap:0 !important;
   background:var(--bg) !important;
   overflow-y:auto;
+  -webkit-overflow-scrolling:touch;
+  min-height:0;
 }
 #profile-panel.active { display:flex !important; }
 @media(max-width:600px){
   #profile-panel { max-width:100% !important; margin:0 auto !important; padding-bottom:100px !important; }
 }
-</style>
 
-<style id="bmd-rank-v2">
+
 /* === BOARDMD RANKING v2 === */
 
 :root {
@@ -2561,19 +2598,20 @@ mark.hb{background:rgba(79,142,247,.28);border-bottom:2px solid rgba(40,100,220,
 
 /* ── YOUR CARD ── */
 .your-card{
-  margin:14px 14px 0;
+  margin:0 0 8px;
   background:var(--surface);
   border:1px solid var(--border2);
   border-radius:var(--radius);
-  padding:16px 18px;
+  padding:14px 18px;
   position:relative;overflow:hidden;
+  width:100%;
 }
 .your-card::before{
   content:'';position:absolute;
   top:0;left:0;right:0;height:3px;
   background:linear-gradient(90deg,var(--accent),var(--green));
 }
-.your-top{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.your-top{display:flex;align-items:center;gap:12px;margin-bottom:10px}
 .your-avatar{
   width:44px;height:44px;border-radius:50%;
   background:rgba(79,142,247,.15);border:2px solid rgba(79,142,247,.3);
@@ -2600,7 +2638,7 @@ mark.hb{background:rgba(79,142,247,.28);border-bottom:2px solid rgba(40,100,220,
 .tier-fellow   {color:var(--tier-fellow);   background:rgba(245,158,11,.1); border:1px solid rgba(245,158,11,.25)}
 .tier-chief    {color:var(--tier-chief);    background:rgba(245,166,35,.12);border:1px solid rgba(245,166,35,.3)}
 
-.your-stats{display:flex;gap:0;border-top:1px solid var(--border);padding-top:12px}
+.your-stats{display:flex;gap:0;border-top:1px solid var(--border);padding-top:10px}
 .your-stat{flex:1;text-align:center;border-right:1px solid var(--border)}
 .your-stat:last-child{border-right:none}
 .your-stat-val{
@@ -2621,9 +2659,10 @@ mark.hb{background:rgba(79,142,247,.28);border-bottom:2px solid rgba(40,100,220,
 
 /* ── LEAGUE CARD ── */
 .league-card{
-  margin:12px 14px 0;
+  margin:0 0 8px;
   background:var(--surface);border:1px solid var(--border2);
   border-radius:var(--radius);overflow:hidden;
+  width:100%;
 }
 .league-header{
   padding:14px 18px;
@@ -2733,7 +2772,7 @@ mark.hb{background:rgba(79,142,247,.28);border-bottom:2px solid rgba(40,100,220,
 
 /* ── SCOPE FILTERS ── */
 .scope-wrap{
-  margin:12px 14px 0;
+  margin:0 0 4px;
   display:flex;gap:6px;overflow-x:auto;
   scrollbar-width:none;-webkit-overflow-scrolling:touch;
 }
@@ -2752,9 +2791,10 @@ mark.hb{background:rgba(79,142,247,.28);border-bottom:2px solid rgba(40,100,220,
 
 /* ── GLOBAL RANKING ── */
 .global-card{
-  margin:12px 14px 0;
+  margin:0 0 8px;
   background:var(--surface);border:1px solid var(--border2);
   border-radius:var(--radius);overflow:hidden;
+  width:100%;
 }
 .global-header{
   padding:13px 18px;display:flex;align-items:center;justify-content:space-between;
@@ -2827,16 +2867,17 @@ mark.hb{background:rgba(79,142,247,.28);border-bottom:2px solid rgba(40,100,220,
 
 /* section label */
 .section-lbl{
-  padding:14px 18px 8px;
+  padding:8px 4px 4px;
   font-size:11px;font-weight:700;letter-spacing:1px;
   text-transform:uppercase;color:var(--muted);
 }
 
 /* ── UNIVERSITY RANKING ── */
 .uni-card{
-  margin:12px 14px 0;
+  margin:0 0 8px;
   background:var(--surface);border:1px solid var(--border2);
   border-radius:var(--radius);overflow:hidden;
+  width:100%;
 }
 .uni-row{
   display:flex;align-items:center;gap:10px;
@@ -2881,10 +2922,12 @@ mark.hb{background:rgba(79,142,247,.28);border-bottom:2px solid rgba(40,100,220,
   padding: 0 !important;
   font-family: 'Sora', sans-serif !important;
   overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch !important;
   padding-bottom: 100px !important;
+  min-height: 0 !important;
 }
-</style>
-<style id="bmd-post-v2">
+
+
 /* === BOARDMD POSTSTEP v2 === */
 
 :root {
@@ -3179,8 +3222,8 @@ mark.hb{background:rgba(79,142,247,.28);border-bottom:2px solid rgba(40,100,220,
   box-shadow: 0 0 80px rgba(0,0,0,.3);
 }
 #poststep-panel.active { display: flex; }
-</style>
-<style id="bmd-bottom-nav">
+
+
 /* === BOTTOM NAV === */
 .bmd-bottom-nav {
   position: fixed;
@@ -3206,10 +3249,10 @@ mark.hb{background:rgba(79,142,247,.28);border-bottom:2px solid rgba(40,100,220,
     left: 0 !important;
     right: 0 !important;
     margin: 0 !important;
-    padding: 12px 0 20px !important;
+    padding: 6px 0 10px !important;
     border-radius: 0 !important;
   }
-  .bmd-bottom-nav .nav-item { padding: 4px 28px; }
+  .bmd-bottom-nav .nav-item { padding: 2px 28px; }
   .bmd-bottom-nav .nav-label { font-size: 12px; }
   .bmd-bottom-nav .nav-item svg { width: 24px; height: 24px; }
 }
@@ -3226,8 +3269,8 @@ mark.hb{background:rgba(79,142,247,.28);border-bottom:2px solid rgba(40,100,220,
 #app.active .deck-home,
 #app.active .lb-panel,
 #app.active #profile-panel { padding-bottom: 100px !important; }
-</style>
-<style id="bmd-light-card-fix">
+
+
 /* ── Light mode: all card text dark and legible ── */
 html.light #c-q,
 html.light .card-question { color: #0d1021 !important; }
@@ -3252,10 +3295,8 @@ html.light .key-point-line * { color: #0d1021 !important; }
 html.light .att-response-text { color: #3a4060 !important; }
 html.light .speed-num { color: #00b894 !important; }
 html.light .qs-val { color: inherit; }
-</style>
 
 
-<style id="bmd-desktop-fix">
 /* ── Desktop: full layout ── */
 @media(min-width: 601px) {
   /* Bottom nav — show on desktop too */
@@ -3277,17 +3318,18 @@ html.light .qs-val { color: inherit; }
   }
   .step-pill { font-size: 14px !important; padding: 8px 24px !important; }
 
-  /* Deck home — centered, bigger cards */
+  /* Deck home — full width, minimal lateral padding */
   .deck-home .content {
-    max-width: 760px !important;
-    margin: 0 auto !important;
-    padding: 20px 32px !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 12px 0 !important;
   }
   .deck-row {
-    padding: 18px 24px !important;
+    padding: 10px 24px !important;
     border-radius: 16px !important;
-    margin-bottom: 12px !important;
+    margin-bottom: 8px !important;
     cursor: pointer !important;
+    width: 100% !important;
   }
   .deck-row:hover {
     border-color: rgba(79,142,247,.4) !important;
@@ -3308,7 +3350,7 @@ html.light .qs-val { color: inherit; }
   #profile-panel, #lb-panel {
     max-width: 100% !important;
     width: 100% !important;
-    padding: 28px 40px 80px !important;
+    padding: 16px 24px 80px !important;
   }
   .your-card, .league-card, .global-card,
   .uni-card, .scope-wrap, .section-lbl,
@@ -3331,32 +3373,32 @@ html.light .qs-val { color: inherit; }
 
   /* Ranking cards — no side margin on desktop, full panel width */
   .your-card, .league-card, .global-card, .uni-card {
-    margin: 0 0 16px 0 !important;
+    margin: 0 0 10px 0 !important;
     border-radius: 16px !important;
   }
-  .scope-wrap { margin: 0 !important; }
-  .section-lbl { margin: 8px 0 !important; }
+  .scope-wrap { margin: 0 0 4px !important; }
+  .section-lbl { margin: 6px 0 !important; }
   /* Live insight full width */
   .live-insight { margin: 0 !important; }
 
-  /* Card study area — max width on desktop (overridden by body.studying) */
-  body:not(.studying) .study-main {
+  /* Card study area — max width on desktop */
+  .study-main {
     display: flex !important;
     justify-content: center !important;
     padding: 24px 32px !important;
   }
-  body:not(.studying) .study-inner {
+  .study-inner {
     max-width: 760px !important;
     width: 100% !important;
   }
-  body:not(.studying) #card-el {
+  #card-el {
     max-width: 760px !important;
     width: 100% !important;
   }
-  body:not(.studying) .card-body, body:not(.studying) .card-header {
+  .card-body, .card-header {
     max-width: 760px !important;
   }
-  body:not(.studying) .explanation, body:not(.studying) #c-exp {
+  .explanation, #c-exp {
     max-width: 760px !important;
   }
   #att-inline-wrap {
@@ -3365,62 +3407,360 @@ html.light .qs-val { color: inherit; }
     margin-right: auto !important;
   }
 }
-</style>
 
-<style id="search-picker-css">
+
 @keyframes slideUp { from{opacity:0;transform:translateY(40px)} to{opacity:1;transform:translateY(0)} }
-</style>
-<style id="bmd-split-screen">
-/* Mobile: single column */
+
+
+.deck-stats-line {
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 4px;
+  font-family: 'Sora', sans-serif;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+.ds-total { color: var(--muted); }
+.ds-div { opacity: .35; }
+.ds-new { color: #4f8ef7; font-weight: 700; }
+.ds-lrn { color: #f59e0b; font-weight: 700; }
+.ds-due { color: #00d4aa; font-weight: 700; }
+.ds-label { color: var(--muted); font-weight: 400; }
+
+
+/* ── Mobile: no split, wrappers invisible ── */
 #bmd-cols-row { display: block; }
 #bmd-q-col    { display: block; padding: 0; position: static; max-height: none; overflow-y: visible; width: auto; border-right: none; }
-#bmd-ans-col  { display: block; }
+#bmd-q-inner  { padding: 16px 18px; }
+#bmd-ans-col  { display: block; padding: 0; }
 #bmd-split-divider { display: none; }
 .bmd-div-handle { display: none; }
+#bmd-ans-placeholder { display: none !important; }
 
-/* Desktop: page locked, columns fill all space */
 @media (min-width: 900px) {
+  /* Thinner header on desktop */
+  .app-header-top { height: 36px !important; }
+  .hdr { padding: 8px 16px !important; }
+  /* Kill all padding-bottom that was for fixed nav — nav is now in flow */
+  #app.active { padding-bottom: 0 !important; }
+  .study-inner { padding-bottom: 0 !important; }
+  #app.active .deck-home,
+  #app.active .lb-panel,
+  #app.active #profile-panel { padding-bottom: 20px !important; }
+  #lb-panel { padding-bottom: 20px !important; }
+  /* Bottom nav: static in flex flow instead of fixed — no gap with FSRS */
+  .bmd-bottom-nav {
+    position: static !important;
+    padding: 4px 0 6px !important;
+    border-top: none !important;
+    backdrop-filter: none !important;
+    flex-shrink: 0 !important;
+  }
+  .bmd-bottom-nav .nav-center { margin-top: -12px !important; }
+  .bmd-bottom-nav .nav-center-btn { width: 42px !important; height: 42px !important; border-radius: 12px !important; }
+  .bmd-bottom-nav .nav-center-btn svg { width: 16px !important; height: 16px !important; }
+  .bmd-bottom-nav .nav-item { padding: 2px 28px !important; gap: 1px !important; }
+  .bmd-bottom-nav .nav-item svg { width: 18px !important; height: 18px !important; }
+  .bmd-bottom-nav .nav-label { font-size: 10px !important; }
+  /* Full width — no lateral padding, UWorld style */
+  .study-main  { padding: 0 !important; justify-content: flex-start !important; }
+  .study-inner { max-width: 100% !important; width: 100% !important; align-items: stretch !important; gap: 0 !important; }
 
+  /* card-el: flex column — header top, cols-row below */
   #card-el {
-    max-width: 100% !important; width: 100% !important;
-    flex: 1 !important; min-height: 0 !important;
-    display: flex !important; flex-direction: column !important;
-    border: none !important; border-radius: 0 !important;
+    max-width: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    border: 1px solid var(--border) !important;
+    border-radius: 16px !important;
+    overflow: hidden !important;
+    background: var(--surface) !important;
+    box-shadow: none !important;
+  }
+
+  /* header spans full width */
+  #card-el .card-header {
+    flex-shrink: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    border-bottom: 1px solid var(--border) !important;
+    padding: 8px 20px 6px !important;
+  }
+
+  /* cols-row: flex row, scrollable */
+  #bmd-cols-row {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: stretch !important;
+    flex: 1 !important;
+    overflow-y: auto !important;
+    min-height: 0 !important;
+  }
+
+  /* LEFT column — full width before answer, 50% after */
+  #bmd-q-col {
+    flex: 1 1 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    padding: 20px 24px 24px !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    overscroll-behavior-y: contain !important;
+    scrollbar-width: thin !important;
+    align-self: stretch !important;
+    transition: flex-basis .3s ease !important;
+  }
+  /* After answer: default 40% question, 60% explanation */
+  #bmd-ans-col.has-answer ~ #DUMMY_NEVER_MATCH,
+  #bmd-cols-row:has(#bmd-ans-col.has-answer) #bmd-q-col {
+    flex: 0 0 40% !important;
+    max-width: 75% !important;
+    min-width: 260px !important;
+  }
+  #bmd-q-col::-webkit-scrollbar { width: 3px; }
+  #bmd-q-col::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+
+  /* DIVIDER */
+  #bmd-split-divider {
+    display: flex !important;
+    flex-shrink: 0 !important;
+    width: 16px !important;
+    align-self: stretch !important;
+    align-items: center !important;
+    justify-content: center !important;
+    cursor: col-resize !important;
+    position: relative !important;
+    background: transparent !important;
+    user-select: none !important;
+    -webkit-user-select: none !important;
+    z-index: 10 !important;
+    touch-action: none !important;
+  }
+  #bmd-split-divider::before {
+    content: '';
+    position: absolute;
+    top: 0; bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 1px;
+    background: var(--border);
+    transition: width .15s, background .15s;
+    pointer-events: none;
+  }
+  #bmd-split-divider:hover::before,
+  #bmd-split-divider.dragging::before {
+    width: 3px;
+    background: var(--accent);
+  }
+  .bmd-div-handle {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 3px !important;
+    align-items: center !important;
+    position: relative !important;
+    z-index: 1 !important;
+    opacity: 0 !important;
+    transition: opacity .15s !important;
+    pointer-events: none !important;
+    background: var(--surface2) !important;
+    border: 1px solid var(--border2) !important;
+    border-radius: 8px !important;
+    padding: 6px 4px !important;
+  }
+  .bmd-div-handle span {
+    display: block !important;
+    width: 2px !important;
+    height: 10px !important;
+    border-radius: 2px !important;
+    background: var(--muted) !important;
+  }
+  #bmd-split-divider:hover .bmd-div-handle,
+  #bmd-split-divider.dragging .bmd-div-handle { opacity: 1 !important; }
+
+  /* RIGHT column */
+  #bmd-ans-col {
+    flex: 1 1 0 !important;
+    min-width: 260px !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    overscroll-behavior-y: contain !important;
+    align-self: stretch !important;
+    scrollbar-width: thin !important;
+  }
+
+  /* Explanation padding in right col */
+  #bmd-ans-col #c-exp          { max-width: 100% !important; padding: 18px 24px !important; border-top: none !important; }
+  #bmd-ans-col .card-img-wrap  { margin: 0 24px 14px !important; }
+  #bmd-ans-col #key-point-wrap { padding: 0 24px 14px !important; }
+  #bmd-ans-col #card-pubmed-wrap { padding: 0 24px !important; }
+  #bmd-ans-col .card-footer-counter { border-top: 1px solid var(--border) !important; padding: 10px 24px !important; }
+  #bmd-ans-col #att-inline-wrap { max-width: 100% !important; margin: 0 !important; border-radius: 0 !important; border-left: none !important; border-right: none !important; }
+
+  /* Before answer: hide right column and divider entirely */
+  #bmd-ans-col:not(.has-answer) { display: none !important; }
+  #bmd-cols-row:not(:has(.has-answer)) #bmd-split-divider { display: none !important; }
+  /* After answer: show right column with animation */
+  #bmd-ans-col.has-answer { display: block !important; }
+  #bmd-cols-row:has(.has-answer) #bmd-split-divider { display: flex !important; }
+  #bmd-ans-col.has-answer #bmd-ans-placeholder { display: none !important; }
+  #bmd-ans-col:not(.has-answer) #c-exp         { display: none !important; }
+  #bmd-ans-col:not(.has-answer) #key-point-wrap,
+  #bmd-ans-col:not(.has-answer) #card-pubmed-wrap,
+  #bmd-ans-col:not(.has-answer) #att-inline-wrap,
+  #bmd-ans-col:not(.has-answer) .card-footer-counter { display: none !important; }
+}
+
+
+#report-modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:9999;align-items:center;justify-content:center;}
+#report-modal-overlay.visible{display:flex;}
+#report-modal{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:24px;width:90%;max-width:400px;font-family:"Lato",sans-serif;}
+#report-modal h3{margin:0 0 16px;font-size:15px;font-weight:700;color:var(--text);}
+.report-option{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:8px;cursor:pointer;transition:background .15s;margin-bottom:6px;border:1px solid var(--border);}
+.report-option:hover{background:var(--surface2);border-color:var(--accent);}
+.report-option input{accent-color:var(--accent);width:16px;height:16px;cursor:pointer;}
+.report-option label{font-size:13px;color:var(--text);cursor:pointer;flex:1;}
+#report-other-text{width:100%;margin-top:8px;padding:8px 10px;border-radius:8px;border:1px solid var(--border);background:var(--surface2);color:var(--text);font-family:"Lato",sans-serif;font-size:13px;resize:none;display:none;box-sizing:border-box;}
+.report-modal-btns{display:flex;gap:10px;margin-top:16px;justify-content:flex-end;}
+.report-cancel-btn{padding:8px 16px;border-radius:8px;border:1px solid var(--border);background:none;color:var(--text-dim);cursor:pointer;font-size:13px;font-weight:600;}
+.report-submit-btn{padding:8px 16px;border-radius:8px;border:none;background:var(--accent);color:#fff;cursor:pointer;font-size:13px;font-weight:700;}
+
+
+/* ── BOARDMD ATTENDING inline ── */
+.att-inline{margin:0 0 20px;border:1.5px solid var(--border);border-radius:var(--radius);overflow:hidden;background:var(--surface);}
+html.light .att-inline{background:var(--surface);border-color:var(--border);}
+.att-inline-header{display:flex;align-items:center;justify-content:space-between;padding:12px 16px 10px;border-bottom:1px solid var(--border);}
+.att-inline-left{display:flex;align-items:center;gap:8px;}
+.att-inline-badge{width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,#6366f1,#8b5cf6);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.att-inline-badge svg{width:14px;height:14px;stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+.att-inline-title{font-size:13px;font-weight:700;color:#8b5cf6;font-family:'Inter',sans-serif;letter-spacing:.02em;}
+.att-inline-btns{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:12px 14px;}
+.att-ibtn{background:var(--surface2);border:1px solid var(--border);border-radius:9px;padding:10px 6px;cursor:pointer;text-align:center;transition:all .15s;display:flex;flex-direction:column;align-items:center;gap:3px;font-family:'Inter',sans-serif;}
+.att-ibtn:hover{border-color:rgba(139,92,246,.5);background:rgba(99,102,241,.07);transform:translateY(-1px);}
+.att-ibtn:disabled{opacity:.38;cursor:not-allowed;transform:none;}
+.att-ibtn-emoji{display:none;}
+.att-ibtn-label{font-size:11px;font-weight:700;color:var(--text-dim);line-height:1.2;}
+html.light .att-ibtn{background:var(--surface2);}
+.att-inline-response{padding:0 14px 14px;display:none;}
+.att-inline-response.visible{display:block;}
+.att-thinking{display:flex;align-items:center;gap:8px;padding:10px 2px;color:var(--text-faint);font-size:13px;font-family:'Inter',sans-serif;}
+.att-thinking-dots{display:flex;gap:3px;}
+.att-thinking-dot{width:5px;height:5px;border-radius:50%;background:rgba(139,92,246,.6);animation:attDot 1.2s ease infinite;}
+.att-thinking-dot:nth-child(2){animation-delay:.2s;}
+.att-thinking-dot:nth-child(3){animation-delay:.4s;}
+@keyframes attDot{0%,80%,100%{transform:scale(.8);opacity:.5}40%{transform:scale(1.2);opacity:1}}
+.att-response-msg{background:rgba(99,102,241,.06);border:1px solid rgba(99,102,241,.15);border-radius:10px;padding:14px 16px;}
+.att-response-label{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#8b5cf6;margin-bottom:8px;font-family:'Inter',sans-serif;display:flex;align-items:center;gap:5px;}
+.att-response-text{font-size:14px;color:var(--text);line-height:1.78;font-family:'Inter',sans-serif;}
+.att-response-text strong{font-weight:600;color:var(--text);}
+.att-response-text em{font-style:italic;color:var(--text-dim);}
+.att-response-text p{margin:0 0 10px;}
+.att-response-text p:last-child{margin:0;}
+@media(max-width:600px){.att-inline-btns{grid-template-columns:repeat(2,1fr);}}
+
+
+/* ── HIGHLIGHT SYSTEM — cores calibradas estilo UWorld ── */
+mark.hl-yellow, .hl-yellow { background:#ffe066; color:inherit; border-radius:2px; cursor:pointer; }
+mark.hl-green,  .hl-green  { background:#86efac; color:inherit; border-radius:2px; cursor:pointer; }
+mark.hl-blue,   .hl-blue   { background:#7dd3fc; color:inherit; border-radius:2px; cursor:pointer; }
+html.dark mark.hl-yellow, html.dark .hl-yellow { background:none !important; color:#fde047 !important; }
+html.dark mark.hl-green,  html.dark .hl-green  { background:none !important; color:#86efac !important; }
+html.dark mark.hl-blue,   html.dark .hl-blue   { background:none !important; color:#7dd3fc !important; }
+.hl-btn-active { border-color:#374151!important; box-shadow:0 0 0 2px rgba(0,0,0,.3); transform:scale(1.15); }
+html.dark .hl-btn-active { border-color:#fff!important; }
+
+
+/* === BOTTOM NAV === */
+.bmd-bottom-nav {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  background: var(--bg);
+  border-top: 1px solid var(--border);
+  padding: 10px 0 26px;
+  display: none;
+  justify-content: space-around;
+  align-items: center;
+  z-index: 200;
+  backdrop-filter: blur(20px);
+}
+/* Mobile: show at full width */
+@media(max-width:600px){
+  #app.active .bmd-bottom-nav { display: flex; max-width: 100%; margin: 0 auto; }
+}
+/* Desktop: full width, same as mobile */
+@media(min-width:601px){
+  #app.active .bmd-bottom-nav {
+    display: flex !important;
+    max-width: 100% !important;
+    left: 0 !important;
+    right: 0 !important;
+    margin: 0 !important;
+    padding: 6px 0 10px !important;
+    border-radius: 0 !important;
+  }
+  .bmd-bottom-nav .nav-item { padding: 2px 28px; }
+  .bmd-bottom-nav .nav-label { font-size: 12px; }
+  .bmd-bottom-nav .nav-item svg { width: 24px; height: 24px; }
+}
+.bmd-bottom-nav .nav-item { display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;padding:4px 14px; }
+.bmd-bottom-nav .nav-item svg { width:21px;height:21px;stroke:var(--muted);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;transition:all .2s; }
+.bmd-bottom-nav .nav-item.active svg { stroke:var(--accent);transform:scale(1.1); }
+.bmd-bottom-nav .nav-label { font-size:10px;font-weight:600;color:var(--muted);font-family:'Sora',sans-serif; }
+.bmd-bottom-nav .nav-item.active .nav-label { color:var(--accent);font-weight:700; }
+.bmd-bottom-nav .nav-center { position:relative;margin-top:-22px; }
+.bmd-bottom-nav .nav-center-btn { width:52px;height:52px;background:var(--accent);border-radius:15px;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 22px rgba(79,142,247,.4);cursor:pointer;border:3px solid var(--bg); }
+.bmd-bottom-nav .nav-center-btn:active { transform:scale(.91); }
+.bmd-bottom-nav .nav-center-btn svg { width:19px;height:19px;fill:#fff;stroke:none; }
+/* Padding bottom for pages with bottom nav */
+#app.active .deck-home,
+#app.active .lb-panel,
+#app.active #profile-panel { padding-bottom: 100px !important; }
+
+@keyframes slideUp { from{opacity:0;transform:translateY(40px)} to{opacity:1;transform:translateY(0)} }
+
+/* Mobile: no split */
+#bmd-cols-row { display: block; }
+#bmd-q-col    { display: block; padding: 0; position: static; max-height: none; overflow-y: visible; width: auto; border-right: none; }
+#bmd-q-inner  { padding: 16px 18px; }
+#bmd-ans-col  { display: block; padding: 0; }
+#bmd-split-divider { display: none; }
+.bmd-div-handle { display: none; }
+#bmd-ans-placeholder { display: none !important; }
+
+@media (min-width: 900px) {
+  .study-inner { max-width: 100% !important; width: 100% !important; align-items: stretch !important; gap: 0 !important; }
+  #card-el {
+    max-width: 100% !important; display: flex !important; flex-direction: column !important;
+    border: 1px solid var(--border) !important; border-radius: 16px !important;
     overflow: hidden !important; background: var(--surface) !important; box-shadow: none !important;
   }
-  #card-el .card-header {
-    flex-shrink: 0 !important; width: 100% !important;
-    border-bottom: 1px solid var(--border) !important;
-    border-radius: 0 !important; padding: 14px 24px 10px !important;
-  }
-  #bmd-cols-row {
-    display: flex !important; flex-direction: row !important;
-    align-items: stretch !important; flex: 1 !important;
-    min-height: 0 !important; overflow: hidden !important;
-  }
+  #card-el .card-header { flex-shrink: 0 !important; width: 100% !important; border-bottom: 1px solid var(--border) !important; padding: 8px 20px 6px !important; }
+  #bmd-cols-row { display: flex !important; flex-direction: row !important; align-items: stretch !important; flex: 1 !important; overflow-y: auto !important; min-height: 0 !important; }
   #bmd-q-col {
-    flex-shrink: 0 !important; width: 50% !important;
-    min-width: 260px !important; max-width: 75% !important;
-    display: flex !important; flex-direction: column !important;
-    overflow: hidden !important; border-right: 1px solid var(--border) !important;
-    position: static !important;
+    flex: 1 1 100% !important; min-width: 0 !important; max-width: 100% !important;
+    padding: 20px 24px 24px !important;
+    overflow-y: auto !important; -webkit-overflow-scrolling: touch !important;
+    overscroll-behavior-y: contain !important;
+    scrollbar-width: thin !important; align-self: stretch !important;
+    border-right: none !important;
+    transition: flex-basis .3s ease !important;
   }
-  #bmd-q-inner {
-    flex: 1 !important; min-height: 0 !important;
-    overflow-y: auto !important; scrollbar-width: thin !important;
-    padding: 20px 24px 8px !important;
+  #bmd-cols-row:has(#bmd-ans-col.has-answer) #bmd-q-col {
+    flex: 0 0 40% !important; max-width: 75% !important; min-width: 260px !important;
+    border-right: 1px solid var(--border) !important;
   }
-  #bmd-q-inner::-webkit-scrollbar { width: 3px; }
-  #bmd-q-inner::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
-  #bmd-q-col .card-footer-counter {
-    flex-shrink: 0 !important; border-top: 1px solid var(--border) !important;
-    padding: 8px 24px !important; background: var(--surface) !important;
-  }
+  #bmd-ans-col:not(.has-answer) { display: none !important; }
+  #bmd-cols-row:not(:has(.has-answer)) #bmd-split-divider { display: none !important; }
+  #bmd-ans-col.has-answer { display: block !important; }
+  #bmd-cols-row:has(.has-answer) #bmd-split-divider { display: flex !important; }
+  #bmd-q-col::-webkit-scrollbar { width: 3px; }
+  #bmd-q-col::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
   #bmd-split-divider {
     display: flex !important; flex-shrink: 0 !important; width: 16px !important;
     align-self: stretch !important; align-items: center !important; justify-content: center !important;
     cursor: col-resize !important; position: relative !important; background: transparent !important;
-    user-select: none !important; -webkit-user-select: none !important; z-index: 10 !important; touch-action: none !important;
+    user-select: none !important; -webkit-user-select: none !important; z-index: 10 !important;
   }
   #bmd-split-divider::before {
     content: ''; position: absolute; top: 0; bottom: 0; left: 50%;
@@ -3438,38 +3778,32 @@ html.light .qs-val { color: inherit; }
   .bmd-div-handle span { display: block !important; width: 2px !important; height: 10px !important; border-radius: 2px !important; background: var(--muted) !important; }
   #bmd-split-divider:hover .bmd-div-handle, #bmd-split-divider.dragging .bmd-div-handle { opacity: 1 !important; }
   #bmd-ans-col {
-    flex: 1 1 0 !important; min-width: 260px !important; min-height: 0 !important;
-    overflow-y: auto !important; scrollbar-width: thin !important; align-self: stretch !important;
+    flex: 1 1 0 !important; min-width: 260px !important; overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important; overscroll-behavior-y: contain !important;
+    align-self: stretch !important; scrollbar-width: thin !important;
   }
   #bmd-ans-col::-webkit-scrollbar { width: 3px; }
   #bmd-ans-col::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
-  #bmd-ans-col #c-exp          { max-width: 100% !important; padding: 18px 24px !important; border-top: none !important; }
-  #bmd-ans-col .card-img-wrap  { margin: 0 24px 14px !important; }
+  #bmd-ans-col #c-exp { max-width: 100% !important; padding: 18px 24px !important; border-top: none !important; }
+  #bmd-ans-col .card-img-wrap { margin: 0 24px 14px !important; }
   #bmd-ans-col #key-point-wrap { padding: 0 24px 14px !important; }
   #bmd-ans-col #card-pubmed-wrap { padding: 0 24px !important; }
   #bmd-ans-col #att-inline-wrap { max-width: 100% !important; margin: 0 !important; border-radius: 0 !important; border-left: none !important; border-right: none !important; }
-  #bmd-ans-col.has-answer #bmd-ans-placeholder { display: none !important; }
-  #bmd-ans-col:not(.has-answer) #c-exp { display: none !important; }
-  #bmd-ans-col.has-answer #c-exp { display: block !important; }
-  #bmd-ans-col:not(.has-answer) #key-point-wrap,
-  #bmd-ans-col:not(.has-answer) #card-pubmed-wrap,
-  #bmd-ans-col:not(.has-answer) #att-inline-wrap { display: none !important; }
-
-  /* FSRS inside card-el: flex-shrink:0, always visible */
   #card-el > .fsrs-nav {
-    flex-shrink: 0 !important;
-    width: 100% !important;
-    border-top: 1px solid var(--border) !important;
-    padding: 8px 16px 10px !important;
-    background: var(--surface) !important;
-    border-radius: 0 !important;
+    flex-shrink: 0 !important; width: 100% !important; border-top: 1px solid var(--border) !important;
+    padding: 4px 16px 6px !important; background: var(--surface) !important;
+    border-radius: 0 0 16px 16px !important; position: sticky !important; bottom: 0 !important; z-index: 5 !important;
   }
   #card-el > .fsrs-nav .fsrs-row { width: 100% !important; max-width: 100% !important; }
   #card-el > .fsrs-nav.visible { display: flex !important; flex-direction: column !important; align-items: center !important; }
+  #bmd-ans-col.has-answer #bmd-ans-placeholder { display: none !important; }
+  #bmd-ans-col:not(.has-answer) #c-exp,
+  #bmd-ans-col:not(.has-answer) #key-point-wrap,
+  #bmd-ans-col:not(.has-answer) #card-pubmed-wrap,
+  #bmd-ans-col:not(.has-answer) #att-inline-wrap { display: none !important; }
+  #bmd-ans-col.has-answer #c-exp { display: block !important; }
 }
-</style>
 
-<style id="bmd-deck-stats-css">
 .deck-stats-line {
   font-size: 11px;
   color: var(--muted);
@@ -3665,6 +3999,9 @@ html.light .qs-val { color: inherit; }
         <svg id="theme-icon" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
       </button>
 
+      <button class="hdr-action-btn" onclick="forceRefreshCards()" title="Refresh cards">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg>
+      </button>
       <button class="hdr-action-btn" onclick="openSettings()" title="Settings">
         <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
       </button>
@@ -3758,102 +4095,127 @@ html.light .qs-val { color: inherit; }
 
   <div class="league-progress">
     <div class="lp-label">
-      <span class="lp-you">Your position: <strong style="color:var(--accent)">#8</strong></span>
+      <span class="lp-you">Your position: <strong style="color:var(--accent)">#3</strong></span>
       <span class="lp-target">Top 5 to promote</span>
     </div>
-    <div class="lp-bar"><div class="lp-fill" style="width:62%;background:var(--accent)"></div></div>
-    <div class="lp-note">340 MDCoins needed to reach #5 &mdash; you can do this today</div>
+    <div class="lp-bar"><div class="lp-fill" style="width:88%;background:var(--accent)"></div></div>
+    <div class="lp-note">Keep it up &mdash; you're in the promotion zone!</div>
   </div>
 
   <!-- TOP 5 — promotion zone -->
   <div class="league-row promoted">
     <div class="lr-pos p1">1</div>
-    <div class="lr-avatar">AK</div>
+    <div class="lr-avatar">EM</div>
     <div class="lr-info">
-      <div class="lr-name"><span class="speed-dot sd-green"></span>Ahmed K. <span class="tier-badge tier-fellow" style="font-size:8px;padding:1px 6px">Fellow</span></div>
-      <div class="lr-school"><span style="font-size:14px;line-height:1;vertical-align:middle;margin-right:2px;">🇺🇸</span> Harvard Med</div>
+      <div class="lr-name"><span class="speed-dot sd-green"></span>Ethan M. <span class="tier-badge tier-fellow" style="font-size:8px;padding:1px 6px">Fellow</span></div>
+      <div class="lr-school"><span style="font-size:14px;line-height:1;vertical-align:middle;margin-right:2px;">🇺🇸</span> Stanford SOM</div>
     </div>
     <div style="display:flex;flex-direction:column;align-items:flex-end">
-      <div class="lr-coins">2,840</div>
-      <div class="lr-delta up">+120</div>
+      <div class="lr-coins">3,210</div>
+      <div class="lr-delta up">+145</div>
     </div>
     <span class="promo-label promo-up">Promote</span>
   </div>
 
   <div class="league-row promoted">
     <div class="lr-pos p2">2</div>
-    <div class="lr-avatar">SL</div>
+    <div class="lr-avatar">PS</div>
     <div class="lr-info">
-      <div class="lr-name"><span class="speed-dot sd-green"></span>Sofia L.</div>
-      <div class="lr-school"><span style="font-size:14px;line-height:1;vertical-align:middle;margin-right:2px;">🇩🇪</span> Charité Berlin</div>
+      <div class="lr-name"><span class="speed-dot sd-green"></span>Priya S.</div>
+      <div class="lr-school"><span style="font-size:14px;line-height:1;vertical-align:middle;margin-right:2px;">🇮🇳</span> AIIMS Delhi</div>
     </div>
     <div style="display:flex;flex-direction:column;align-items:flex-end">
-      <div class="lr-coins">2,510</div>
-      <div class="lr-delta up">+88</div>
+      <div class="lr-coins">2,870</div>
+      <div class="lr-delta up">+92</div>
     </div>
     <span class="promo-label promo-up">Promote</span>
   </div>
 
-  <div class="league-row promoted">
+  <!-- YOU -->
+  <div class="league-row promoted you">
     <div class="lr-pos p3">3</div>
-    <div class="lr-avatar">RN</div>
+    <div class="lr-avatar">W</div>
     <div class="lr-info">
-      <div class="lr-name"><span class="speed-dot sd-amber"></span>Raj N.</div>
-      <div class="lr-school"><span style="font-size:14px;line-height:1;vertical-align:middle;margin-right:2px;">🇮🇳</span> AIIMS Delhi</div>
+      <div class="lr-name" style="color:var(--accent)"><span class="speed-dot sd-green"></span>You <span class="tier-badge tier-attending" style="font-size:8px;padding:1px 6px">ATT</span></div>
+      <div class="lr-school"><span style="font-size:14px;line-height:1;vertical-align:middle;margin-right:2px;">🇧🇷</span> UFPR</div>
     </div>
     <div style="display:flex;flex-direction:column;align-items:flex-end">
-      <div class="lr-coins">2,190</div>
-      <div class="lr-delta up">+44</div>
+      <div class="lr-coins" style="color:var(--accent)">2,740</div>
+      <div class="lr-delta up">+68</div>
     </div>
     <span class="promo-label promo-up">Promote</span>
   </div>
 
   <div class="league-row promoted">
     <div class="lr-pos" style="color:var(--muted)">4</div>
-    <div class="lr-avatar">ML</div>
+    <div class="lr-avatar">SL</div>
     <div class="lr-info">
-      <div class="lr-name"><span class="speed-dot sd-green"></span>Maria L.</div>
-      <div class="lr-school"><span style="font-size:14px;line-height:1;vertical-align:middle;margin-right:2px;">🇧🇷</span> UFRJ</div>
+      <div class="lr-name"><span class="speed-dot sd-amber"></span>Sofia L.</div>
+      <div class="lr-school"><span style="font-size:14px;line-height:1;vertical-align:middle;margin-right:2px;">🇩🇪</span> Charit&eacute; Berlin</div>
     </div>
     <div style="display:flex;flex-direction:column;align-items:flex-end">
-      <div class="lr-coins">1,980</div>
-      <div class="lr-delta up">+31</div>
+      <div class="lr-coins">2,580</div>
+      <div class="lr-delta up">+37</div>
     </div>
     <span class="promo-label promo-up">Promote</span>
   </div>
 
   <div class="league-row promoted">
     <div class="lr-pos" style="color:var(--muted)">5</div>
-    <div class="lr-avatar">JS</div>
+    <div class="lr-avatar">AO</div>
     <div class="lr-info">
-      <div class="lr-name"><span class="speed-dot sd-amber"></span>James S.</div>
-      <div class="lr-school"><span style="font-size:14px;line-height:1;vertical-align:middle;margin-right:2px;">🇺🇸</span> Mayo Clinic</div>
+      <div class="lr-name"><span class="speed-dot sd-green"></span>Amara O.</div>
+      <div class="lr-school"><span style="font-size:14px;line-height:1;vertical-align:middle;margin-right:2px;">🇳🇬</span> Univ. of Lagos COM</div>
     </div>
     <div style="display:flex;flex-direction:column;align-items:flex-end">
-      <div class="lr-coins">1,600</div>
-      <div class="lr-delta dn">-12</div>
+      <div class="lr-coins">2,350</div>
+      <div class="lr-delta up">+19</div>
     </div>
     <span class="promo-label promo-up">Promote</span>
   </div>
 
   <!-- divider -->
   <div style="padding:6px 18px;background:var(--surface2);border-top:1px solid var(--border);border-bottom:1px solid var(--border)">
-    <div style="font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--muted)">340 coins away from promotion zone</div>
+    <div style="font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--muted)">Safe zone</div>
   </div>
 
-  <!-- YOU -->
-  <div class="league-row you">
-    <div class="lr-pos you-c">8</div>
-    <div class="lr-avatar">W</div>
+  <div class="league-row">
+    <div class="lr-pos" style="color:var(--muted)">6</div>
+    <div class="lr-avatar">KT</div>
     <div class="lr-info">
-      <div class="lr-name" style="color:var(--accent)"><span class="speed-dot sd-green"></span>You</div>
-      <div class="lr-school"><span style="font-size:14px;line-height:1;vertical-align:middle;margin-right:2px;">🇧🇷</span> Your University</div>
+      <div class="lr-name"><span class="speed-dot sd-amber"></span>Kenji T.</div>
+      <div class="lr-school"><span style="font-size:14px;line-height:1;vertical-align:middle;margin-right:2px;">🇯🇵</span> Keio Univ. SOM</div>
     </div>
     <div style="display:flex;flex-direction:column;align-items:flex-end">
-      <div class="lr-coins" style="color:var(--accent)">1,260</div>
-      <div class="lr-delta up">+0</div>
+      <div class="lr-coins">2,110</div>
+      <div class="lr-delta dn">-8</div>
     </div>
-    <div class="tier-badge tier-attending" style="font-size:8px;padding:1px 6px">ATT</div>
+  </div>
+
+  <div class="league-row">
+    <div class="lr-pos" style="color:var(--muted)">7</div>
+    <div class="lr-avatar">FR</div>
+    <div class="lr-info">
+      <div class="lr-name"><span class="speed-dot sd-green"></span>Fatima R.</div>
+      <div class="lr-school"><span style="font-size:14px;line-height:1;vertical-align:middle;margin-right:2px;">🇵🇰</span> Aga Khan Univ.</div>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:flex-end">
+      <div class="lr-coins">1,940</div>
+      <div class="lr-delta up">+25</div>
+    </div>
+  </div>
+
+  <div class="league-row">
+    <div class="lr-pos" style="color:var(--muted)">8</div>
+    <div class="lr-avatar">JC</div>
+    <div class="lr-info">
+      <div class="lr-name"><span class="speed-dot sd-amber"></span>James C.</div>
+      <div class="lr-school"><span style="font-size:14px;line-height:1;vertical-align:middle;margin-right:2px;">🇺🇸</span> Mayo Clinic Alix</div>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:flex-end">
+      <div class="lr-coins">1,720</div>
+      <div class="lr-delta dn">-15</div>
+    </div>
   </div>
 
   <!-- rows 9-20 collapsed / locked (Free users) -->
@@ -3864,7 +4226,7 @@ html.light .qs-val { color: inherit; }
       <div class="lock-name">&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;</div>
       <svg class="lock-icon" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
     </div>
-    <div class="lock-coins">1,180</div>
+    <div class="lock-coins">1,580</div>
   </div>
   <div class="locked-row">
     <div class="lock-pos">10</div>
@@ -3873,12 +4235,12 @@ html.light .qs-val { color: inherit; }
       <div class="lock-name">&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;</div>
       <svg class="lock-icon" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
     </div>
-    <div class="lock-coins">1,050</div>
+    <div class="lock-coins">1,390</div>
   </div>
 
   <!-- relegation zone -->
   <div style="padding:6px 18px;background:var(--surface2);border-top:1px solid var(--border);border-bottom:1px solid var(--border)">
-    <div style="font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--muted)">Relegation zone — bottom 5</div>
+    <div style="font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--muted)">Relegation zone &mdash; bottom 5</div>
   </div>
   <div class="league-row" style="border-left:2px solid rgba(255,83,112,.35)">
     <div class="lock-pos" style="color:var(--muted)">21</div>
@@ -3887,7 +4249,7 @@ html.light .qs-val { color: inherit; }
       <div class="lock-name">&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;</div>
       <svg class="lock-icon" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
     </div>
-    <div class="lock-coins">280</div>
+    <div class="lock-coins">340</div>
     <span class="promo-label promo-dn">Relegate</span>
   </div>
 
@@ -3976,9 +4338,15 @@ html.light .qs-val { color: inherit; }
     <div class="rch-label">Coins</div>
     <div class="rch-label">Streak</div>
   </div>
-  <!-- Dynamic rank rows — populated by renderGlobalRankFiltered() -->
+  <!-- Rank rows — static demo, overwritten by renderGlobalRankFiltered() if JS runs -->
   <div id="global-rank-rows">
-    <div style="padding:24px;text-align:center;color:var(--muted);font-size:13px">Loading ranking...</div>
+    <div class="rank-row"><div class="rank-pos rp1">1</div><div class="rank-avatar" style="background:#3b7fff22;color:#3b7fff">EM</div><div class="rank-info"><div class="rank-name"><span class="speed-dot sd-green"></span>Ethan M.<div class="tier-badge tier-intern" style="font-size:8px;padding:1px 6px">MS4</div></div><div class="rank-school"><span style="font-size:14px;line-height:1;vertical-align:middle;margin-right:2px;">🇺🇸</span>Stanford SOM</div></div><div class="rank-nums"><div class="rank-coins">2,810</div><div class="rank-streak">34d</div></div></div>
+    <div class="rank-row"><div class="rank-pos rp2">2</div><div class="rank-avatar" style="background:#8b5cf622;color:#8b5cf6">PS</div><div class="rank-info"><div class="rank-name"><span class="speed-dot sd-green"></span>Priya S.<div class="tier-badge tier-intern" style="font-size:8px;padding:1px 6px">MS4</div></div><div class="rank-school"><span style="font-size:14px;line-height:1;vertical-align:middle;margin-right:2px;">🇮🇳</span>AIIMS Delhi</div></div><div class="rank-nums"><div class="rank-coins">2,540</div><div class="rank-streak">28d</div></div></div>
+    <div class="rank-row you-row"><div class="rank-pos rp3">3</div><div class="rank-avatar" style="background:rgba(79,142,247,.15);color:var(--accent)">WB</div><div class="rank-info"><div class="rank-name" style="color:var(--accent)"><span class="speed-dot sd-green"></span>Walter B.<div class="tier-badge tier-intern" style="font-size:8px;padding:1px 6px">MS1</div></div><div class="rank-school"><span style="font-size:14px;line-height:1;vertical-align:middle;margin-right:2px;">🇧🇷</span>UFPR</div></div><div class="rank-nums"><div class="rank-coins" style="color:var(--accent)">960</div><div class="rank-streak">11d</div></div></div>
+    <div class="rank-row"><div class="rank-pos">4</div><div class="rank-avatar" style="background:#06b6d422;color:#06b6d4">SL</div><div class="rank-info"><div class="rank-name"><span class="speed-dot sd-green"></span>Sofia L.<div class="tier-badge tier-intern" style="font-size:8px;padding:1px 6px">MS3</div></div><div class="rank-school"><span style="font-size:14px;line-height:1;vertical-align:middle;margin-right:2px;">🇩🇪</span>Charité Berlin</div></div><div class="rank-nums"><div class="rank-coins">890</div><div class="rank-streak">21d</div></div></div>
+    <div class="rank-row"><div class="rank-pos">5</div><div class="rank-avatar" style="background:#10b98122;color:#10b981">AO</div><div class="rank-info"><div class="rank-name"><span class="speed-dot sd-amber"></span>Amara O.<div class="tier-badge tier-intern" style="font-size:8px;padding:1px 6px">MS2</div></div><div class="rank-school"><span style="font-size:14px;line-height:1;vertical-align:middle;margin-right:2px;">🇳🇬</span>Univ. of Lagos COM</div></div><div class="rank-nums"><div class="rank-coins">780</div><div class="rank-streak">19d</div></div></div>
+    <div class="rank-row"><div class="rank-pos">6</div><div class="rank-avatar" style="background:#f59e0b22;color:#f59e0b">KT</div><div class="rank-info"><div class="rank-name"><span class="speed-dot sd-amber"></span>Kenji T.<div class="tier-badge tier-intern" style="font-size:8px;padding:1px 6px">MS2</div></div><div class="rank-school"><span style="font-size:14px;line-height:1;vertical-align:middle;margin-right:2px;">🇯🇵</span>Keio Univ. SOM</div></div><div class="rank-nums"><div class="rank-coins">650</div><div class="rank-streak">15d</div></div></div>
+    <div class="rank-row"><div class="rank-pos">7</div><div class="rank-avatar" style="background:#ec489922;color:#ec4899">AK</div><div class="rank-info"><div class="rank-name"><span class="speed-dot sd-green"></span>Aisha K.<div class="tier-badge tier-intern" style="font-size:8px;padding:1px 6px">MS1</div></div><div class="rank-school"><span style="font-size:14px;line-height:1;vertical-align:middle;margin-right:2px;">🇬🇧</span>King's College London</div></div><div class="rank-nums"><div class="rank-coins">520</div><div class="rank-streak">7d</div></div></div>
   </div>
   <div class="pro-gate">
     <div class="pro-gate-text">
@@ -4027,14 +4395,34 @@ html.light .qs-val { color: inherit; }
     <div class="uni-score">88.4<span>score</span></div>
   </div>
 
-  <div class="uni-row you-uni">
-    <div class="uni-pos" style="color:var(--accent)">9</div>
-    <div class="rank-avatar" style="border-radius:8px;font-size:9px;font-weight:800;background:rgba(79,142,247,.15);border-color:rgba(79,142,247,.3);color:var(--accent)">YOU</div>
+  <div class="uni-row">
+    <div class="uni-pos" style="color:var(--muted)">4</div>
+    <div class="rank-avatar" style="border-radius:8px;font-size:9px;font-weight:800">STF</div>
     <div class="uni-info">
-      <div class="uni-name"><span style="font-size:14px;line-height:1;vertical-align:middle;margin-right:2px;">🇧🇷</span>Your University</div>
-      <div class="uni-country">Brazil &middot; 3 active students</div>
+      <div class="uni-name"><span style="font-size:14px;line-height:1;vertical-align:middle;margin-right:2px;">🇺🇸</span>Stanford SOM</div>
+      <div class="uni-country">Stanford, United States &middot; 16 active students</div>
     </div>
-    <div class="uni-score" style="color:var(--accent)">71.2<span>score</span></div>
+    <div class="uni-score">86.1<span>score</span></div>
+  </div>
+
+  <div class="uni-row">
+    <div class="uni-pos" style="color:var(--muted)">5</div>
+    <div class="rank-avatar" style="border-radius:8px;font-size:9px;font-weight:800">KCL</div>
+    <div class="uni-info">
+      <div class="uni-name"><span style="font-size:14px;line-height:1;vertical-align:middle;margin-right:2px;">🇬🇧</span>King's College London</div>
+      <div class="uni-country">London, United Kingdom &middot; 9 active students</div>
+    </div>
+    <div class="uni-score">83.5<span>score</span></div>
+  </div>
+
+  <div class="uni-row you-uni">
+    <div class="uni-pos" style="color:var(--accent)">8</div>
+    <div class="rank-avatar" style="border-radius:8px;font-size:9px;font-weight:800;background:rgba(79,142,247,.15);border-color:rgba(79,142,247,.3);color:var(--accent)">UFP</div>
+    <div class="uni-info">
+      <div class="uni-name"><span style="font-size:14px;line-height:1;vertical-align:middle;margin-right:2px;">🇧🇷</span>UFPR &mdash; Universidade Federal do Paraná</div>
+      <div class="uni-country">Curitiba, Brazil &middot; 3 active students</div>
+    </div>
+    <div class="uni-score" style="color:var(--accent)">74.8<span>score</span></div>
   </div>
 
   <div class="pro-gate">
@@ -4377,12 +4765,12 @@ html.light .qs-val { color: inherit; }
           <span class="badge badge-soon">Soon</span>
         </div>
     
-        <div class="deck-row soon">
-          <div class="deck-icon" style="background:rgba(136,146,176,.1);">
-            <svg viewBox="0 0 24 24" stroke="#8892b0"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+        <div class="deck-row" onclick="switchDeckAndStudy('shelf_obgyn')" style="cursor:pointer">
+          <div class="deck-icon" style="background:rgba(236,72,153,.12);">
+            <svg viewBox="0 0 24 24" stroke="#ec4899" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
           </div>
-          <div class="deck-info"><div class="deck-title">OB-GYN</div><div class="deck-sub">BoardMD Shelf</div></div>
-          <span class="badge badge-soon">Soon</span>
+          <div class="deck-info"><div class="deck-title">OB-GYN</div><div class="deck-sub">BoardMD Shelf</div><div class="deck-stats-line" id="stats-shelf_obgyn"><span class="ds-total">— cards</span></div></div>
+          <button class="study-btn" onclick="event.stopPropagation();switchDeckAndStudy('shelf_obgyn')">Study</button>
         </div>
     
         <div class="deck-row soon">
@@ -4441,6 +4829,10 @@ html.light .qs-val { color: inherit; }
           <div class="setting-info"><div class="setting-label">Reset deck progress</div><div class="setting-desc">Clear FSRS data for a specific deck</div></div>
           <div style="font-size:12px;font-weight:700;color:#ff5370;cursor:pointer;">Reset</div>
         </div>
+        <div class="setting-row" onclick="forceRefreshCards()" style="cursor:pointer">
+          <div class="setting-info"><div class="setting-label">Force Refresh Cards</div><div class="setting-desc">Clear cache and reload all cards from server</div></div>
+          <div style="font-size:12px;font-weight:700;color:var(--accent);cursor:pointer;">Refresh</div>
+        </div>
       </div>
     </div>
   </div>
@@ -4477,38 +4869,29 @@ html.light .qs-val { color: inherit; }
         </div>
 
         <div class="card" id="card-el">
-          <div class="card-header">
-            <!-- Line 1: system › topic (left) | state + interval (right) -->
-            <div style="width:100%;display:flex;align-items:center;justify-content:space-between;margin-bottom:7px;">
-              <div style="display:flex;align-items:center;gap:5px;min-width:0;flex:1;overflow:hidden;">
-                <span class="card-system" id="c-sys" style="font-size:10px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;color:var(--accent);font-family:'Sora',sans-serif;white-space:nowrap;flex-shrink:0;"></span>
-                <span id="c-top-sep" style="font-size:10px;color:var(--muted);opacity:.4;flex-shrink:0;">›</span>
-                <span class="card-topic" id="c-top" style="font-size:11px;font-weight:500;color:var(--muted);font-family:'Sora',sans-serif;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"></span>
-              </div>
-              <div style="display:flex;align-items:center;gap:5px;flex-shrink:0;margin-left:8px;">
-                <span class="card-state" id="c-state" style="display:none"></span>
-                <span class="card-interval" id="c-int" style="display:none;font-size:10px;font-weight:700;color:var(--muted);font-family:'JetBrains Mono',monospace;"></span>
-              </div>
+          <div class="card-header" style="display:flex;align-items:center;gap:6px;padding:6px 14px;flex-wrap:nowrap;">
+            <!-- Hidden elements JS still references -->
+            <span class="card-system" id="c-sys" style="display:none;"></span>
+            <span id="c-top-sep" style="display:none;font-size:10px;color:var(--muted);opacity:.4;flex-shrink:0;">›</span>
+            <span class="card-topic" id="c-top" style="display:none;font-size:10px;font-weight:500;color:var(--muted);font-family:'Sora',sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:250px;flex-shrink:1;"></span>
+            <span class="card-state" id="c-state" style="display:none;"></span>
+            <span class="card-interval" id="c-int" style="display:none;"></span>
+            <span id="c-deck-label" style="display:none;"></span>
+            <!-- Visible: deck badge + controls | QID -->
+            <span id="c-deck-badge" style="font-size:9px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;font-family:'JetBrains Mono',monospace;padding:2px 7px;border-radius:20px;background:var(--accent-dim,rgba(59,127,255,.1));color:var(--accent,#3b7fff);border:1px solid rgba(59,127,255,.2);white-space:nowrap;flex-shrink:0;"></span>
+            <button onclick="if(fontSize>11){fontSize--;applyFont();}" title="Smaller text" style="background:none;border:1px solid var(--border);border-radius:6px;padding:1px 6px;cursor:pointer;font-size:11px;font-weight:700;color:var(--text-faint);font-family:'Sora',sans-serif;line-height:1.4;transition:all .15s;" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text-faint)'">A-</button>
+            <button onclick="if(fontSize<22){fontSize++;applyFont();}" title="Larger text" style="background:none;border:1px solid var(--border);border-radius:6px;padding:1px 6px;cursor:pointer;font-size:13px;font-weight:700;color:var(--text-faint);font-family:'Sora',sans-serif;line-height:1.4;transition:all .15s;" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text-faint)'">A+</button>
+            <button class="hl-btn" id="hl-toggle-btn" onclick="toggleHlToolbar()" title="Highlight" style="background:none;border:1px solid var(--border);border-radius:6px;padding:2px 7px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="var(--text-faint)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+            </button>
+            <div class="hl-swatches" id="hl-swatches-wrap">
+              <div class="sw y" onclick="setHlColor('yellow')" id="sw-y" title="Yellow"></div>
+              <div class="sw g" onclick="setHlColor('green')"  id="sw-g" title="Green"></div>
+              <div class="sw b" onclick="setHlColor('blue')"   id="sw-b" title="Blue"></div>
             </div>
-            <!-- Line 2: deck badge + actions (left) | QID (right) -->
-            <div style="width:100%;display:flex;align-items:center;justify-content:space-between;">
-              <div style="display:flex;align-items:center;gap:5px;flex-wrap:nowrap;">
-                <span id="c-deck-label" style="display:none;"></span>
-                <span id="c-deck-badge" style="font-size:9px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;font-family:'JetBrains Mono',monospace;padding:2px 7px;border-radius:20px;background:var(--accent-dim,rgba(59,127,255,.1));color:var(--accent,#3b7fff);border:1px solid rgba(59,127,255,.2);white-space:nowrap;flex-shrink:0;"></span>
-                <button onclick="if(fontSize>11){fontSize--;applyFont();}" title="Smaller text" style="background:none;border:1px solid var(--border);border-radius:6px;padding:1px 6px;cursor:pointer;font-size:11px;font-weight:700;color:var(--text-faint);font-family:'Sora',sans-serif;line-height:1.4;transition:all .15s;" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text-faint)'">A-</button>
-                <button onclick="if(fontSize<22){fontSize++;applyFont();}" title="Larger text" style="background:none;border:1px solid var(--border);border-radius:6px;padding:1px 6px;cursor:pointer;font-size:13px;font-weight:700;color:var(--text-faint);font-family:'Sora',sans-serif;line-height:1.4;transition:all .15s;" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text-faint)'">A+</button>
-                <button class="hl-btn" id="hl-toggle-btn" onclick="toggleHlToolbar()" title="Highlight" style="background:none;border:1px solid var(--border);border-radius:6px;padding:2px 7px;cursor:pointer;display:flex;align-items:center;justify-content:center;width:auto;height:auto;transition:all .15s;" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">
-                  <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="var(--text-faint)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
-                </button>
-                <div class="hl-swatches" id="hl-swatches-wrap">
-                  <div class="sw y" onclick="setHlColor('yellow')" id="sw-y" title="Yellow"></div>
-                  <div class="sw g" onclick="setHlColor('green')"  id="sw-g" title="Green"></div>
-                  <div class="sw b" onclick="setHlColor('blue')"   id="sw-b" title="Blue"></div>
-                </div>
-                <button id="edit-card-btn" onclick="openCardEditor()" title="Edit" style="background:none;border:1px solid var(--border);border-radius:6px;padding:2px 8px;cursor:pointer;font-size:10px;font-weight:700;color:var(--text-faint);font-family:'JetBrains Mono',monospace;transition:all .15s;" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text-faint)'">Edit</button>
-              </div>
-              <span class="card-qid" id="c-qid" style="font-size:9px;flex-shrink:0;"></span>
-            </div>
+            <button id="edit-card-btn" onclick="openCardEditor()" title="Edit" style="background:none;border:1px solid var(--border);border-radius:6px;padding:2px 8px;cursor:pointer;font-size:10px;font-weight:700;color:var(--text-faint);font-family:'JetBrains Mono',monospace;transition:all .15s;" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text-faint)'">Edit</button>
+            <span style="flex:1;"></span>
+            <span class="card-qid" id="c-qid" style="font-size:9px;flex-shrink:0;"></span>
           </div>
           <div id="bmd-cols-row">
           <div id="bmd-q-col">
@@ -4531,6 +4914,7 @@ html.light .qs-val { color: inherit; }
           </div><!-- /bmd-q-col -->
           <div id="bmd-split-divider"><div class="bmd-div-handle"><span></span><span></span></div></div>
           <div id="bmd-ans-col">
+          <div id="bmd-ans-placeholder" style="display:none;"></div>
           <div class="explanation" id="c-exp">
             <div class="exp-section">
               <div class="exp-label"><span class="exp-label-icon" style="background:rgba(34,197,94,.15);color:var(--emerald)"></span>Correct answer</div>
@@ -4552,7 +4936,7 @@ html.light .qs-val { color: inherit; }
               <div class="exp-dist hl-zone" id="exp-dist"></div>
             </div>
           </div>
-          <div id="key-point-wrap" style="display:none;padding:0 18px 14px;"></div>
+          <div id="key-point-wrap" style="padding:0 18px 14px;"></div>
           <div id="card-pubmed-wrap" style="display:none;"></div>
           <div id="card-cochrane-wrap" style="display:none;"></div>
           <div style="display:flex;justify-content:flex-end;padding:4px 18px 6px;">
@@ -5280,11 +5664,12 @@ function buildDeckHomeTable(){
     {id:'boardmd_s2', name:'BoardMD · Step 2 CK',         sub:'Adaptive MCQs · 15,623 cards',    step:'s2'},
     {id:'s2',         name:'Step 2 CK · Rapid Review',    sub:'Clinical Essentials · 522 cards', step:'s2'},
     {id:'core',       name:'Step 2 CK · Core Review',     sub:'Board-Focused · 4,107 cards',     step:'s2'},
+    {id:'daily_review',name:'Step 2 CK · Daily Review',    sub:'Daily Review Cards',               step:'s2'},
     {id:'shelf',         name:'BoardMD Shelf · All Rotations',      sub:'Shelf Exams · 180 cards',          step:'s2', shelf:true},
 
     {id:'shelf_im',      name:'BoardMD Shelf · Internal Medicine',   sub:'Shelf Exam · Coming soon',         step:'s2', shelf:true, soon:true},
     {id:'shelf_fm',      name:'BoardMD Shelf · Family Medicine',     sub:'Shelf Exam · Coming soon',         step:'s2', shelf:true, soon:true},
-    {id:'shelf_obgyn',   name:'BoardMD Shelf · OB/GYN',              sub:'Shelf Exam · Coming soon',         step:'s2', shelf:true, soon:true},
+    {id:'shelf_obgyn',   name:'BoardMD Shelf · OB/GYN',              sub:'Shelf Exam',                       step:'s2', shelf:true},
     {id:'shelf_peds',    name:'BoardMD Shelf · Pediatrics',          sub:'Shelf Exam · Coming soon',         step:'s2', shelf:true, soon:true},
     {id:'shelf_psych',   name:'BoardMD Shelf · Psychiatry',          sub:'Shelf Exam · Coming soon',         step:'s2', shelf:true, soon:true},
     {id:'shelf_neuro',   name:'BoardMD Shelf · Neurology',           sub:'Shelf Exam · Coming soon',         step:'s2', shelf:true, soon:true},
@@ -5401,32 +5786,28 @@ function buildDeckHomeTable(){
 function startStudyFromHome(){switchDeckAndStudy(currentDeck);}
 function switchDeckAndStudy(dk){
   hideDeckHome();
-  if(SHELF_DECKS.includes(dk) || dk === 'shelf' || dk === 'shelf_em' || dk === 'shelf_surgery'){
+  if(SHELF_DECKS.includes(dk)){
     const D = window.DECKS || {};
-    // Find ALL deck keys that contain 'shelf' in the loaded cards
-    const allDeckKeys = Object.keys(D);
-    const shelfKeys = allDeckKeys.filter(k => k.includes('shelf') || k === 'shelf');
-    console.log('BoardMD shelf: available deck keys with shelf:', shelfKeys);
-    console.log('BoardMD shelf: SHELF_DECKS constant:', SHELF_DECKS);
-    // Combine cards from all shelf-related decks found
-    const keysToUse = shelfKeys.length > 0 ? shelfKeys : SHELF_DECKS;
-    const combined = keysToUse.reduce((acc, d) => {
-      if(D[d] && D[d].length > 0){
-        console.log('BoardMD shelf: adding', D[d].length, 'cards from deck:', d);
-        acc = acc.concat(D[d]);
-      }
-      return acc;
-    }, []);
-    console.log('BoardMD shelf: total combined cards:', combined.length);
-    if(combined.length === 0){
-      console.warn('BoardMD shelf: NO CARDS FOUND. All deck keys:', allDeckKeys);
-      showXpToast('Shelf deck','No cards found. Check console for deck names.','','',null);
+    var cards;
+    if(dk === 'shelf'){
+      // "All Rotations" — combine all shelf decks
+      const shelfKeys = Object.keys(D).filter(k => k.includes('shelf'));
+      cards = shelfKeys.reduce(function(acc, d){ return acc.concat(D[d]||[]); }, []);
+      console.log('BoardMD shelf: all rotations, combined', cards.length, 'cards from', shelfKeys);
+    } else {
+      // Specific subdeck — load only that deck
+      cards = D[dk] || [];
+      console.log('BoardMD shelf:', dk, cards.length, 'cards');
+    }
+    if(cards.length === 0){
+      console.warn('BoardMD shelf: NO CARDS for', dk, '— available keys:', Object.keys(D).filter(k=>k.includes('shelf')));
+      showXpToast('Shelf deck','No cards found for ' + dk,'','',null);
       showDeckHome();
       return;
     }
-    currentStep = 'shelf';
-    currentDeck = '_shelf_combined';
-    window.DECKS['_shelf_combined'] = combined;
+    currentStep = 's2';
+    currentDeck = dk;
+    window.DECKS[dk] = cards;
     againQueue = []; idx = 0; revealed = false; sessionRatings = {};
     ensureStudyUI();
     buildSessionQueue();
@@ -5448,7 +5829,7 @@ function goHome(){
 let currentStep = localStorage.getItem('bmd_step') || 's1'; // 's1' or 's2'
 const STEP1_DECKS = ['boardmd_s1','s1_core','s1','hy1','fa_step1','fa_s1','arrows','ethics'];
 const STEP2_DECKS = ['boardmd_s2','core','daily_review','s2','shelf','shelf_surgery','shelf_em','shelf_fm','shelf_im','shelf_neuro','shelf_obgyn','shelf_peds','shelf_psych'];
-const SHELF_DECKS = ['shelf_surgery','shelf_em','shelf'];
+const SHELF_DECKS = ['shelf','shelf_surgery','shelf_em','shelf_obgyn','shelf_fm','shelf_im','shelf_neuro','shelf_peds','shelf_psych'];
 
 function openApp(dk){
   document.getElementById('landing').style.display='none';
@@ -5766,6 +6147,9 @@ function renderCard(){
   // Reset Cochrane wrap
   const _cwReset = document.getElementById('card-cochrane-wrap');
   if(_cwReset){ _cwReset.style.display='none'; _cwReset.innerHTML=''; }
+  // Reset split columns to 50/50 (desktop only)
+  const _qCol=document.getElementById('bmd-q-col');
+  if(_qCol){ _qCol.style.removeProperty('flex'); _qCol.style.removeProperty('width'); _qCol.style.removeProperty('max-width'); _qCol.style.removeProperty('min-width'); }
   // Hide FSRS buttons until answer revealed
   const _fsrs=document.getElementById('fsrs-nav');
   const _fsrs2=document.getElementById('fsrs-nav-2');
@@ -6321,6 +6705,17 @@ function revealAnswer(sel,card){
     else if(t===sel&&t!==card.c) btn.classList.add('wrong');
     else btn.classList.add('other-wrong');
   });
+  // Scroll to correct answer within left column only (not whole page)
+  setTimeout(function(){
+    var correctBtn = document.querySelector('.opt-btn.correct') || document.querySelector('.opt-btn.show-correct');
+    if(correctBtn){
+      var col = document.getElementById('bmd-q-col') || document.getElementById('bmd-cols-row');
+      if(col && col.scrollHeight > col.clientHeight){
+        var btnTop = correctBtn.offsetTop - col.offsetTop;
+        col.scrollTo({top: Math.max(0, btnTop - col.clientHeight/2 + correctBtn.offsetHeight/2), behavior:'smooth'});
+      }
+    }
+  }, 300);
 
   // ── PADRÃO McDONALD'S ─────────────────────────────────────────
   // Separar explanation de "Why the Others Are Wrong" inteligentemente
@@ -6506,12 +6901,15 @@ function revealAnswer(sel,card){
   };
   const _deckLabel=(_deckNames[card.deck]||'').toLowerCase();
   const _isDeckDuplicate=_deckLabel&&_topicText.toLowerCase().includes(_deckLabel.split(' ')[0]);
+  var _topSep=document.getElementById('c-top-sep');
   if(_topicEl){
     if(_isFARef||_isDeckLabel||_isSystemOnly||_isDeckDuplicate){
       _topicEl.style.display='none';
+      if(_topSep) _topSep.style.display='none';
     } else if(_topicText){
       _topicEl.textContent=_topicText;
       _topicEl.style.display='';
+      if(_topSep) _topSep.style.display='';
     }
   }
 
@@ -6562,7 +6960,9 @@ function revealAnswer(sel,card){
   if(_cw){
     if(card.cochrane_pmid){
       _cw.style.display = '';
-      _cw.innerHTML = '<div style="padding:0 18px 14px;"><div style="font-size:9px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-faint);font-family:JetBrains Mono,monospace;margin-bottom:10px;">COCHRANE REVIEW</div><div style="border:1px solid rgba(0,184,148,.25);border-radius:8px;background:rgba(0,184,148,.05);padding:10px 14px;display:flex;align-items:center;justify-content:space-between;gap:10px;cursor:pointer;" onclick="window._currentCard=card;openCochraneAbstract(card.id)"><div style="display:flex;align-items:center;gap:8px;"><div style="width:7px;height:7px;border-radius:50%;background:#00b894;flex-shrink:0;"></div><span style="font-size:11px;color:var(--text);font-family:JetBrains Mono,monospace;">Cochrane Systematic Review</span></div><span style="font-size:10px;color:#00b894;font-weight:700;">Level 1 &#x2197;</span></div></div>';
+      window._currentCard = card;
+      var _cid = card.id;
+      _cw.innerHTML = '<div style="padding:0 18px 14px;"><div style="font-size:9px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-faint);font-family:JetBrains Mono,monospace;margin-bottom:10px;">COCHRANE REVIEW</div><div style="border:1px solid rgba(0,184,148,.25);border-radius:8px;background:rgba(0,184,148,.05);padding:10px 14px;display:flex;align-items:center;justify-content:space-between;gap:10px;cursor:pointer;" onclick="openCochraneAbstract(\''+_cid+'\')"><div style="display:flex;align-items:center;gap:8px;"><div style="width:7px;height:7px;border-radius:50%;background:#00b894;flex-shrink:0;"></div><span style="font-size:11px;color:var(--text);font-family:JetBrains Mono,monospace;">Cochrane Systematic Review</span></div><span style="font-size:10px;color:#00b894;font-weight:700;">Level 1 &#x2197;</span></div></div>';
     } else {
       _cw.style.display = 'none';
     }
@@ -6574,6 +6974,12 @@ function revealAnswer(sel,card){
   // Show explanation block
   const expEl=document.getElementById('c-exp');
   if(expEl) expEl.classList.add('visible');
+
+  // Reset scroll to top so student reads explanation first
+  const colsRow=document.getElementById('bmd-cols-row');
+  if(colsRow) colsRow.scrollTop=0;
+  const ansCol=document.getElementById('bmd-ans-col');
+  if(ansCol) ansCol.scrollTop=0;
 
   // Show FSRS buttons — sync both nav elements
   const rb=document.getElementById('fsrs-nav');
@@ -6588,10 +6994,14 @@ function revealAnswer(sel,card){
   injectAttendingInline(card, sel);
   // Pre-fetch PubMed abstracts in background
   if(card.pubmed_query || card.topic) setTimeout(() => prefetchPubmedAbstracts(card), 500);
-  // ── Auto-Lens: trigger Compare diagnoses automatically after 1.5s ──
+  // Auto-Lens: carrega Compare silenciosamente (sem scroll)
   setTimeout(() => {
     const wrap = document.getElementById('att-inline-wrap');
+    const ansC = document.getElementById('bmd-ans-col');
+    const savedScroll = ansC ? ansC.scrollTop : 0;
     if(wrap) askAttendingInline('compare', null);
+    // Restaura scroll — impede que o Venn empurre pra baixo
+    if(ansC) setTimeout(() => { ansC.scrollTop = savedScroll; }, 50);
   }, 1500);
 
   // Update FSRS intervals display — sync both nav elements
@@ -7430,9 +7840,11 @@ function showLeaderboard(){
   const lbb = document.getElementById('lb-btn');
   if(lbb) lbb.classList.add('active');
   setTimeout(syncYourCard, 50);
-  renderLeaderboard();
   // Build country flag chips and render global rank
-  setTimeout(() => { buildCountryScopes(); renderGlobalRankFiltered('Global'); }, 200);
+  setTimeout(function(){
+    try { buildCountryScopes(); } catch(e){ console.warn('buildCountryScopes error', e); }
+    try { renderGlobalRankFiltered('Global'); } catch(e){ console.warn('renderGlobalRankFiltered error', e); }
+  }, 200);
 }
 
 function switchLbTab(tab, el){
@@ -7647,23 +8059,41 @@ async function renderLeaderboard(){
 
   let entries = [];
   try {
-    const result = await window.storage.list('lb:');
-    if(result && result.keys){
-      for(const key of result.keys){
-        try{
-          const r = await window.storage.get(key, true);
-          if(r && r.value) entries.push(JSON.parse(r.value));
-        }catch(e){}
+    if(window.storage && typeof window.storage.list === 'function'){
+      const result = await window.storage.list('lb:');
+      if(result && result.keys){
+        for(const key of result.keys){
+          try{
+            const r = await window.storage.get(key, true);
+            if(r && r.value) entries.push(JSON.parse(r.value));
+          }catch(e){}
+        }
       }
     }
   } catch(e){}
 
+  // Demo fallback
+  if(entries.length === 0){
+    entries = [
+      {id:'d1',name:'Ethan M.',univ:'Stanford SOM',country:'United States',coins:2810,streak:34,level:'Chief'},
+      {id:'d2',name:'Priya S.',univ:'AIIMS Delhi',country:'India',coins:2540,streak:28,level:'Fellow'},
+      {id:'d3',name:'Sofia L.',univ:'Charité Berlin',country:'Germany',coins:2190,streak:21,level:'Attending'},
+      {id:'d4',name:'Amara O.',univ:'Univ. of Lagos COM',country:'Nigeria',coins:1870,streak:19,level:'Attending'},
+      {id:'d5',name:'Kenji T.',univ:'Keio Univ. SOM',country:'Japan',coins:1650,streak:15,level:'Resident'},
+      {id:'d6',name:'Fatima R.',univ:'Aga Khan Univ.',country:'Pakistan',coins:1420,streak:12,level:'Resident'},
+      {id:'d7',name:'James C.',univ:'Mayo Clinic Alix',country:'United States',coins:1280,streak:10,level:'Resident'},
+      {id:'d8',name:'Lucas F.',univ:'USP Ribeirão',country:'Brazil',coins:1050,streak:8,level:'Intern'},
+      {id:'d9',name:'Aisha K.',univ:'King\'s College London',country:'United Kingdom',coins:890,streak:7,level:'Intern'},
+      {id:'d10',name:'Marc D.',univ:'McGill Medicine',country:'Canada',coins:720,streak:5,level:'Intern'},
+    ];
+  }
+
   const myGami = getGami();
   if(me){
-    const myEntry = { id:me.id, name:me.name, univ:me.univ, country:me.country, step:me.step||currentStep||'s1', coins:myGami.coins, streak:myGami.streak, level:getLevel(myGami.coins).name };
+    const myEntry = { id:me.id, name:me.name, univ:me.univ, country:me.country, step:me.step||currentStep||'s1', coins:myGami.coins||960, streak:myGami.streak||11, level:getLevel(myGami.coins).name };
     entries = entries.filter(e=>e.id !== me.id);
     entries.push(myEntry);
-    try{ await window.storage.set('lb:'+me.id, JSON.stringify(myEntry), true); }catch(e){}
+    try{ if(window.storage && typeof window.storage.set === 'function') await window.storage.set('lb:'+me.id, JSON.stringify(myEntry), true); }catch(e){}
   }
 
   let sorted = [...entries].sort((a,b)=>(b.coins||0)-(a.coins||0));
@@ -8199,6 +8629,7 @@ function studySearchResults(){
       <div id="editor-img-section" style="width:100%;margin-bottom:12px;padding:12px;background:var(--surface2);border-radius:10px;border:1px solid var(--border)"><div style="font-size:10px;font-weight:700;letter-spacing:.08em;color:var(--text-faint);font-family:JetBrains Mono,monospace;text-transform:uppercase;margin-bottom:8px">Image</div><div id="editor-img-current" style="display:none;align-items:center;gap:12px;margin-bottom:10px"><img id="editor-img-preview" src="" style="width:80px;height:60px;object-fit:cover;border-radius:6px;border:1px solid var(--border)"><button onclick="removeCardImage()" style="background:rgba(244,63,94,.1);border:1px solid rgba(244,63,94,.3);color:var(--rose);padding:7px 14px;border-radius:7px;cursor:pointer;font-size:12px;font-weight:700;font-family:Lato,sans-serif">Remove image</button></div><div style="font-size:10px;color:var(--text-faint);margin-bottom:6px;font-family:JetBrains Mono,monospace">New image URL (Wikimedia CC BY-SA)</div><div style="display:flex;gap:8px"><input id="editor-img-url" type="text" placeholder="https://upload.wikimedia.org/..." style="flex:1;background:var(--surface);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:Lato,sans-serif;font-size:12px;padding:7px 10px;outline:none"><button onclick="setCardImage()" style="background:rgba(59,127,255,.1);border:1px solid rgba(59,127,255,.3);color:var(--accent);padding:7px 14px;border-radius:7px;cursor:pointer;font-size:12px;font-weight:700;font-family:Lato,sans-serif">Set</button></div></div>
       <button onclick="saveCardEdit()" style="background:var(--accent);color:#fff;border:none;border-radius:9px;padding:11px 26px;font-family:'Lato',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:all .15s" onmouseover="this.style.background='#5a8fff'" onmouseout="this.style.background='var(--accent)'">Save Changes</button>
       <button onclick="resetCardEdit()" style="background:none;color:var(--rose);border:1px solid rgba(244,63,94,.3);border-radius:9px;padding:11px 18px;font-family:'Lato',sans-serif;font-size:13px;cursor:pointer;transition:all .15s" onmouseover="this.style.background='rgba(244,63,94,.08)'" onmouseout="this.style.background='none'">Reset</button>
+      <button onclick="deleteCurrentCard()" style="background:none;color:var(--rose);border:1px solid rgba(244,63,94,.5);border-radius:9px;padding:11px 18px;font-family:'Lato',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:all .15s" onmouseover="this.style.background='rgba(244,63,94,.12)'" onmouseout="this.style.background='none'">Delete Card</button>
       <button onclick="closeCardEditor();showEditsManager()" style="background:none;color:var(--text-faint);border:1px solid var(--border);border-radius:9px;padding:11px 18px;font-family:'Lato',sans-serif;font-size:13px;cursor:pointer;transition:all .15s;margin-left:auto" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text-faint)'">My Edits →</button>
       <span id="editor-saved-msg" style="font-size:12px;color:var(--emerald);font-weight:700;opacity:0;transition:opacity .3s">Saved ✓</span>
     </div>
@@ -8268,6 +8699,30 @@ function openCardEditor(){
 function closeCardEditor(){
   document.getElementById('card-editor-overlay').style.display = 'none';
   _editingCard = null;
+}
+
+async function deleteCurrentCard(){
+  if(!_editingCard) return;
+  const card = _editingCard;
+  if(!confirm(`Delete this card permanently?\n\nQID ${card.qid || card.id}\n"${(card.q||'').slice(0,80)}..."\n\nThis cannot be undone.`)) return;
+
+  try {
+    // Delete from Supabase
+    const { error } = await _supa.from('cards').delete().eq('id', card.id);
+    if(error) throw error;
+
+    // Remove from local deck
+    Object.keys(window.DECKS || {}).forEach(dk => {
+      if(DECKS[dk]) DECKS[dk] = DECKS[dk].filter(c => c.id !== card.id);
+    });
+
+    closeCardEditor();
+    showToast('Card deleted');
+    // Advance to next card
+    if(typeof rate === 'function') rate(2);
+  } catch(e) {
+    alert('Error deleting card: ' + (e.message || e));
+  }
 }
 
 function saveCardEdit(){
@@ -8786,12 +9241,24 @@ function buildDecks(allCards){
     if(!window.DECKS[dk]) window.DECKS[dk] = [];
     window.DECKS[dk].push(card);
   }
+  // Update deck home table after cards are loaded
+  setTimeout(() => {
+    if(typeof buildDeckHomeTable === 'function') buildDeckHomeTable();
+  }, 100);
+}
+
+// ── FORCE REFRESH ───────────────────────────────────────────────────
+async function forceRefreshCards(){
+  try { indexedDB.deleteDatabase('boardmd_cache'); } catch(e){}
+  try { localStorage.removeItem('bmd_idb_meta'); } catch(e){}
+  showXpToast('Refreshing','Reloading all cards from server...','','',null);
+  setTimeout(function(){ location.reload(); }, 500);
 }
 
 // ── LOAD ALL CARDS FROM SUPABASE ─────────────────────────────────────
 // ── INDEXEDDB CACHE ──────────────────────────────────────────────────
 const IDB_NAME = 'boardmd_cache';
-const IDB_VERSION = 1;
+const IDB_VERSION = 2;
 const IDB_STORE = 'cards';
 const IDB_META_KEY = 'bmd_idb_meta';
 
@@ -8800,12 +9267,16 @@ function openIDB(){
     const req = indexedDB.open(IDB_NAME, IDB_VERSION);
     req.onupgradeneeded = e => {
       const db = e.target.result;
-      if(!db.objectStoreNames.contains(IDB_STORE)){
-        db.createObjectStore(IDB_STORE, { keyPath: 'id' });
+      if(db.objectStoreNames.contains(IDB_STORE)){
+        db.deleteObjectStore(IDB_STORE);
       }
+      db.createObjectStore(IDB_STORE, { keyPath: 'id' });
     };
     req.onsuccess = e => resolve(e.target.result);
-    req.onerror = () => reject(req.error);
+    req.onerror = () => {
+      try { indexedDB.deleteDatabase(IDB_NAME); } catch(e2){}
+      reject(req.error);
+    };
   });
 }
 
@@ -8864,50 +9335,60 @@ async function fetchAllFromSupabase(onProgress){
 }
 
 async function loadCardsFromSupabase(){
-  console.log('BoardMD: checking IndexedDB cache...');
-
+  // ── IDB-FIRST: tenta cache local antes de bater no Supabase ──
   const meta = getIDBMeta();
-  const cached = meta ? await getIDBCards() : [];
-
-  if(cached.length > 0){
-    // INSTANT LOAD from IndexedDB
-    console.log(`BoardMD: ${cached.length} cards from IndexedDB cache (instant)`);
-    buildDecks(cached);
-    hideLoadingOverlay();
-
-    // Background check: has Supabase got more/updated cards?
-    setTimeout(async () => {
-      try {
-        const { count } = await _supa.from('cards').select('id', { count: 'exact', head: true });
-        if(count && count !== cached.length){
-          console.log(`BoardMD: background refresh — ${count} on server vs ${cached.length} cached`);
-          const fresh = await fetchAllFromSupabase();
-          if(fresh.length > 0){
-            await setIDBCards(fresh);
-            buildDecks(fresh);
-            console.log(`BoardMD: background refresh done — ${fresh.length} cards`);
-          }
-        } else {
-          console.log(`BoardMD: cache up to date (${cached.length} cards)`);
-        }
-      } catch(e){ console.warn('background refresh failed:', e); }
-    }, 2000);
-
-    return cached.length;
+  if(meta && meta.count > 0){
+    try {
+      const cached = await getIDBCards();
+      if(cached.length > 0){
+        console.log('BoardMD: ' + cached.length + ' cards from cache (instant)');
+        buildDecks(cached);
+        // Restaura tema salvo (sem overlay, hideLoadingOverlay não é chamado)
+        if(window._bmdSavedTheme === 'light') document.documentElement.classList.add('light');
+        if(typeof updateThemeIcons === 'function') updateThemeIcons();
+        // Refresh silencioso em background — sempre sincroniza com Supabase
+        backgroundRefresh(cached.length);
+        return cached.length;
+      }
+    } catch(e){ console.warn('BoardMD: IDB read failed, falling back to Supabase'); }
   }
 
-  // FIRST LOAD — show splash, download everything
-  console.log('BoardMD: no cache — loading from Supabase...');
+  // ── Fallback: primeiro acesso ou cache vazio — fetch completo ──
+  console.log('BoardMD: loading from Supabase...');
   showLoadingOverlay();
   const allCards = await fetchAllFromSupabase((pct, n, chunk) => updateLoadingProgress(pct, n, chunk));
   buildDecks(allCards);
-  console.log(`BoardMD: ${allCards.length} cards loaded`);
+  console.log('BoardMD: ' + allCards.length + ' cards loaded');
   hideLoadingOverlay();
 
-  // Save to IndexedDB for next time
-  setIDBCards(allCards).then(() => console.log('BoardMD: cache saved to IndexedDB'));
+  // Salva no IDB para próximo acesso instantâneo
+  try { setIDBCards(allCards); } catch(e){}
 
   return allCards.length;
+}
+
+// ── Background refresh com retry automático ──
+function backgroundRefresh(cachedCount, attempt){
+  attempt = attempt || 1;
+  fetchAllFromSupabase().then(function(fresh){
+    if(!fresh || fresh.length === 0){
+      console.warn('BoardMD: background refresh returned empty');
+      return;
+    }
+    buildDecks(fresh);
+    try { setIDBCards(fresh); } catch(e){}
+    if(fresh.length !== cachedCount){
+      console.log('BoardMD: cache updated ' + cachedCount + ' → ' + fresh.length + ' cards');
+    } else {
+      console.log('BoardMD: refreshed ' + fresh.length + ' cards (up to date)');
+    }
+  }).catch(function(e){
+    console.warn('BoardMD: background refresh failed (attempt ' + attempt + ')', e);
+    if(attempt < 3){
+      var delay = attempt * 5000; // 5s, 10s
+      setTimeout(function(){ backgroundRefresh(cachedCount, attempt + 1); }, delay);
+    }
+  });
 }
 
 // Safety net — force remove overlay after 60s if stuck
@@ -8964,6 +9445,26 @@ async function syncFsrsToSupabase(){
   }
 }
 
+// ── LEADERBOARD SYNC TO SUPABASE ────────────────────────────────────
+async function syncLeaderboardToSupabase(){
+  if(!_supaUser) return;
+  try {
+    const g = getGami();
+    const me = JSON.parse(localStorage.getItem(LB_ME_KEY)||'{}');
+    const row = {
+      user_id:    _supaUser.id,
+      name:       me.name || _supaUser.user_metadata?.full_name || _supaUser.email?.split('@')[0] || 'Student',
+      univ:       me.univ || '',
+      country:    me.country || '',
+      step:       me.step || 's2',
+      coins:      g.coins || 0,
+      streak:     g.streak || 0,
+      updated_at: new Date().toISOString()
+    };
+    await _supa.from('leaderboard').upsert([row], { onConflict: 'user_id' });
+  } catch(e){ console.warn('BoardMD: leaderboard sync failed', e); }
+}
+
 async function loadFsrsFromSupabase(){
   if(!_supaUser) return;
   const { data, error } = await _supa
@@ -8991,13 +9492,37 @@ async function loadFsrsFromSupabase(){
   try{ Object.assign(window.fsrs || {}, fsrsData); }catch(e){}
 }
 
+// ── RETENTION HEADER SYNC (lightweight — runs on init) ──────────────
+function syncRetentionHeader(){
+  try {
+    var retSum=0, retCnt=0, now=Date.now();
+    Object.values(window.DECKS||{}).forEach(function(cards){
+      (cards||[]).forEach(function(card){
+        var s=getState(card.id);
+        if(s.state!==ST_NEW && s.stability>0){
+          var daysSince=Math.max(0,(now-(s.due-s.interval*86400000))/86400000);
+          var R=Math.exp(-daysSince/Math.max(s.stability,0.1));
+          retSum+=Math.max(0,Math.min(1,R));
+          retCnt++;
+        }
+      });
+    });
+    var pct=retCnt>0?Math.round(retSum/retCnt*100):null;
+    var txt=pct!==null?pct+'%':'—%';
+    var h=document.getElementById('bmd-retention-val'); if(h) h.textContent=txt;
+    var p=document.getElementById('perf-qs-ret'); if(p) p.textContent=txt;
+  } catch(e){}
+}
+
 // ── INIT ─────────────────────────────────────────────────────────────
 (async function init(){
-  // Carrega cards
-  await loadCardsFromSupabase();
+  // Carrega cards (IDB-first: instantâneo se cache existe)
+  // Paraleliza com auth check — são independentes
+  const [cardCount, session] = await Promise.all([
+    loadCardsFromSupabase(),
+    getSession()
+  ]);
 
-  // Verifica sessão
-  const session = await getSession();
   if(session){
     _supaUser = session.user;
     // Carrega progresso FSRS da nuvem
@@ -9007,10 +9532,13 @@ async function loadFsrsFromSupabase(){
     if(nameEl && session.user.email){
       nameEl.textContent = session.user.email.split('@')[0];
     }
-    // Sincroniza FSRS para a nuvem a cada 2 minutos
+    // Sincroniza FSRS + leaderboard para a nuvem a cada 2 minutos
     setInterval(syncFsrsToSupabase, 120000);
+    setInterval(syncLeaderboardToSupabase, 120000);
     // Sincroniza ao fechar a aba
-    window.addEventListener('beforeunload', syncFsrsToSupabase);
+    window.addEventListener('beforeunload', function(){ syncFsrsToSupabase(); syncLeaderboardToSupabase(); });
+    // Sync inicial do leaderboard
+    setTimeout(syncLeaderboardToSupabase, 3000);
   }
 
   // Atualiza UI de auth
@@ -9041,6 +9569,8 @@ async function loadFsrsFromSupabase(){
   // Dispara o app
   window.cardsLoaded = true;
   if(window.pendingInit) window.pendingInit();
+  // Sync retention no header
+  setTimeout(syncRetentionHeader, 300);
 
   (function(){
     try {
@@ -9204,8 +9734,8 @@ function injectAttendingInline(card, sel){
       <button class="att-ibtn" ${dis} onclick="askAttendingInline('explain',this)">
         <span class="att-ibtn-label">Explain better</span>
       </button>
-      <button class="att-ibtn" ${dis} onclick="askAttendingInline('mcq',this)">
-        <span class="att-ibtn-label">More MCQs</span>
+      <button class="att-ibtn" ${dis} onclick="askAttendingInline('mcq',this)" style="background:rgba(79,142,247,.1);border-color:rgba(79,142,247,.35);">
+        <span class="att-ibtn-label" style="color:#3b7fff;font-weight:800;">More MCQs</span>
       </button>
       <button class="att-ibtn" ${dis} onclick="askAttendingInline('surprise',this)">
         <span class="att-ibtn-label">Surprise me</span>
@@ -9231,22 +9761,13 @@ function injectAttendingInline(card, sel){
     <div style="padding:0 14px 10px;font-size:11px;color:var(--text-faint);font-family:'Inter',sans-serif;line-height:1.4;">For educational purposes only. Not medical advice.</div>
     <div class="att-inline-response" id="att-inline-response"></div>`;
 
-  // Desktop (>=900px): injeta na coluna direita
+  // Injeta no #bmd-ans-col (funciona tanto mobile quanto desktop)
   const ansCol = document.getElementById('bmd-ans-col');
-  if(ansCol && window.innerWidth >= 900){
-    const footerRef = ansCol.querySelector('.card-footer-counter');
+  if(ansCol){
+    const footerRef = ansCol.querySelector('.card-footer-counter')
+                   || ansCol.querySelector('#report-issue-btn')?.parentElement;
     if(footerRef){ ansCol.insertBefore(wrap, footerRef); }
     else { ansCol.appendChild(wrap); }
-  } else {
-    // Mobile: injeta no study-inner antes do fsrs-nav
-    const studyInner = document.getElementById('study-inner');
-    if(studyInner){
-      const ref = studyInner.querySelector('#fsrs-nav')
-               || studyInner.querySelector('#fsrs-nav-2')
-               || studyInner.querySelector('.fsrs-nav');
-      if(ref){ studyInner.insertBefore(wrap, ref); }
-      else { studyInner.appendChild(wrap); }
-    }
   }
 
   // Guarda contexto do card
@@ -9281,9 +9802,22 @@ function renderLens(data, container){
     var lines=[];var line='';
     ctx.font='400 '+fontSize+'px -apple-system,BlinkMacSystemFont,sans-serif';
     for(var i=0;i<words.length;i++){
-      var test=line?line+' '+words[i]:words[i];
+      var word=words[i];
+      // If single word exceeds maxWidth, break it into chunks
+      if(ctx.measureText(word).width>maxWidth){
+        if(line){ lines.push(line); line=''; }
+        var chunk='';
+        for(var c=0;c<word.length;c++){
+          if(ctx.measureText(chunk+word[c]).width>maxWidth && chunk){
+            lines.push(chunk); chunk=word[c];
+          } else { chunk+=word[c]; }
+        }
+        if(chunk) line=chunk;
+        continue;
+      }
+      var test=line?line+' '+word:word;
       if(ctx.measureText(test).width>maxWidth && line){
-        lines.push(line);line=words[i];
+        lines.push(line);line=word;
       } else { line=test; }
     }
     if(line) lines.push(line);
@@ -9312,13 +9846,13 @@ function renderLens(data, container){
   }
   var lL=[{text:data.left_label||'',bold:true,size:14,color:'#0C447C'},{gap:14}];
   (data.left||[]).slice(0,3).forEach(function(b){lL.push({text:b,bold:false,size:12,color:'#185FA5',gap2:14});});
-  drawZone(function(){ctx.beginPath();ctx.arc(cx1,cy,r,0,Math.PI*2);ctx.clip();},lL,xLeft,155);
+  drawZone(function(){ctx.beginPath();ctx.arc(cx1,cy,r,0,Math.PI*2);ctx.clip();},lL,xLeft,170);
   var lM=[{text:'Both',bold:true,size:13,color:'#085041'},{gap:12}];
   (data.shared||[]).slice(0,2).forEach(function(b){lM.push({text:b,bold:false,size:11,color:'#0F6E56',gap2:12});});
-  drawZone(function(){ctx.beginPath();ctx.arc(cx1,cy,r,0,Math.PI*2);ctx.clip();ctx.beginPath();ctx.arc(cx2,cy,r,0,Math.PI*2);ctx.clip();},lM,xMid,105);
+  drawZone(function(){ctx.beginPath();ctx.arc(cx1,cy,r,0,Math.PI*2);ctx.clip();ctx.beginPath();ctx.arc(cx2,cy,r,0,Math.PI*2);ctx.clip();},lM,xMid,110);
   var lR=[{text:data.right_label||'',bold:true,size:14,color:'#633806'},{gap:14}];
   (data.right||[]).slice(0,3).forEach(function(b){lR.push({text:b,bold:false,size:12,color:'#BA7517',gap2:14});});
-  drawZone(function(){ctx.beginPath();ctx.arc(cx2,cy,r,0,Math.PI*2);ctx.clip();},lR,xRight,155);
+  drawZone(function(){ctx.beginPath();ctx.arc(cx2,cy,r,0,Math.PI*2);ctx.clip();},lR,xRight,170);
 }
 
 async function askAttendingInline(type, btnEl){
@@ -9353,7 +9887,7 @@ async function askAttendingInline(type, btnEl){
       <span>Your Attending is thinking…</span>
     </div>`;
 
-  setTimeout(()=>{ respWrap.scrollIntoView({ behavior:'smooth', block:'nearest' }); }, 100);
+  // scroll removido — aluno precisa ler a explicação primeiro
 
   // Contexto do card
   const opts = (card.w||[]).map((o,i) => String.fromCharCode(65+i) + '. ' + o).join('\n');
@@ -9426,7 +9960,6 @@ EXPLANATION: ${(card.e||'').replace(/<[^>]+>/g,' ').slice(0,300)}${pubmedRefs}`;
         const clean = responseText.replace(/```json|```/g,'').trim();
         const data = JSON.parse(clean);
         renderInteractiveMCQs(data.questions, respWrap);
-        setTimeout(()=>{ respWrap.scrollIntoView({ behavior:'smooth', block:'nearest' }); }, 80);
         wrap.querySelectorAll('.att-ibtn').forEach(b=>{ b.disabled = false; });
         return;
       } catch(e) {
@@ -9442,7 +9975,6 @@ EXPLANATION: ${(card.e||'').replace(/<[^>]+>/g,' ').slice(0,300)}${pubmedRefs}`;
         var lbl = document.getElementById('att-compare-label');
         if(lbl) lbl.textContent = (lensData.left_label||'') + ' vs ' + (lensData.right_label||'');
         renderLens(lensData, respWrap);
-        setTimeout(function(){ respWrap.scrollIntoView({ behavior:'smooth', block:'nearest' }); }, 80);
         wrap.querySelectorAll('.att-ibtn').forEach(function(b){ b.disabled = false; });
         if(lensData.pubmed_query) setTimeout(function(){ fetchAttPubmed(lensData.pubmed_query.trim()); }, 100);
         return;
@@ -9512,7 +10044,6 @@ EXPLANATION: ${(card.e||'').replace(/<[^>]+>/g,' ').slice(0,300)}${pubmedRefs}`;
     b.disabled = !isPro && newLeft <= 0;
   });
 
-  setTimeout(()=>{ respWrap.scrollIntoView({ behavior:'smooth', block:'nearest' }); }, 80);
 }
 
 // ── HIGHLIGHT SYSTEM ─────────────────────────────────────────────────────
@@ -10158,7 +10689,7 @@ function bmdDashSync() {
       if(html) el.innerHTML = html;
     });
     // Deck stats: total cards + accuracy
-    const statDecks = ['boardmd_s1','s1_core','boardmd_s2','core','shelf_em','shelf_surgery'];
+    const statDecks = ['boardmd_s1','s1_core','boardmd_s2','core','daily_review','shelf_em','shelf_surgery','shelf_obgyn','shelf_im','shelf_fm','shelf_peds','shelf_psych','shelf_neuro'];
     statDecks.forEach(id => {
       const el = document.getElementById('stats-' + id);
       if(!el) return;
@@ -10348,6 +10879,9 @@ function syncPerfQuickStats() {
     const retPct = retCnt > 0 ? Math.round(retSum/retCnt*100) : null;
     const retEl = document.getElementById('perf-qs-ret');
     if(retEl) retEl.textContent = retPct !== null ? retPct + '%' : '—%';
+    // Sync header retention
+    const retHeader = document.getElementById('bmd-retention-val');
+    if(retHeader) retHeader.textContent = retPct !== null ? retPct + '%' : '—%';
 
     // ── Response Speed ──
     const avgMs = g.avgResponseMs || 0;
@@ -10565,8 +11099,8 @@ function bmdSetActiveNav(id) {
 (function() {
   const _prev = window.showLeaderboard;
   window.showLeaderboard = function() {
-    if (_prev) _prev.call(this);
-    setTimeout(() => bmdSetActiveNav('bnav-rank'), 50);
+    try { if (_prev) _prev.call(this); } catch(e){ console.warn('showLeaderboard prev error', e); }
+    setTimeout(function(){ try { bmdSetActiveNav('bnav-rank'); } catch(e){} }, 50);
   };
 })();
 
@@ -10660,29 +11194,50 @@ function buildCountryScopes() {
 }
 
 async function renderGlobalRankFiltered(scope) {
+  console.log('BoardMD: renderGlobalRankFiltered called, scope=', scope);
   const table = document.getElementById('global-rank-rows');
-  if(!table) return;
+  if(!table){ console.warn('BoardMD: #global-rank-rows not found'); return; }
 
-  // Load all leaderboard entries
+  // Load leaderboard from Supabase first
   let entries = [];
   try {
-    const result = await window.storage.list('lb:');
-    if(result && result.keys){
-      for(const key of result.keys){
-        try{
-          const r = await window.storage.get(key, true);
-          if(r && r.value) entries.push(JSON.parse(r.value));
-        }catch(e){}
-      }
+    let query = _supa.from('leaderboard').select('*').order('coins', { ascending: false }).limit(50);
+    if(scope === 'United States') query = query.ilike('country', '%united states%');
+    else if(scope === 'Brazil') query = query.ilike('country', '%brazil%');
+    else if(scope === 'Step 1') query = query.or('step.eq.s1,step.eq.step1');
+    else if(scope === 'Step 2 CK') query = query.or('step.eq.s2,step.eq.step2');
+    else if(scope === 'Shelf') query = query.eq('step', 'shelf');
+    const { data } = await query;
+    if(data && data.length > 0){
+      entries = data.map(function(r){ return { id:r.user_id, name:r.name, univ:r.univ, country:r.country, coins:r.coins, streak:r.streak, step:r.step }; });
     }
-  } catch(e){}
+  } catch(e){ console.warn('BoardMD: leaderboard query failed, using demo', e); }
+
+  // Demo entries as fallback when no real data
+  if(entries.length === 0){
+    entries = [
+      {id:'d1',name:'Ethan M.',univ:'Stanford SOM',country:'United States',coins:2810,streak:34,step:'s2'},
+      {id:'d2',name:'Priya S.',univ:'AIIMS Delhi',country:'India',coins:2540,streak:28,step:'s1'},
+      {id:'d3',name:'Sofia L.',univ:'Charité Berlin',country:'Germany',coins:2190,streak:21,step:'s2'},
+      {id:'d4',name:'Amara O.',univ:'Univ. of Lagos COM',country:'Nigeria',coins:1870,streak:19,step:'s2'},
+      {id:'d5',name:'Kenji T.',univ:'Keio Univ. SOM',country:'Japan',coins:1650,streak:15,step:'s1'},
+      {id:'d6',name:'Fatima R.',univ:'Aga Khan Univ.',country:'Pakistan',coins:1420,streak:12,step:'s2'},
+      {id:'d7',name:'James C.',univ:'Mayo Clinic Alix',country:'United States',coins:1280,streak:10,step:'s2'},
+      {id:'d8',name:'Lucas F.',univ:'USP Ribeirão',country:'Brazil',coins:1050,streak:8,step:'s1'},
+      {id:'d9',name:'Aisha K.',univ:'King\'s College London',country:'United Kingdom',coins:890,streak:7,step:'s2'},
+      {id:'d10',name:'Marc D.',univ:'McGill Medicine',country:'Canada',coins:720,streak:5,step:'s1'},
+    ];
+  }
 
   // Add current user
   const me = JSON.parse(localStorage.getItem(LB_ME_KEY)||'{}');
   const myGami = getGami();
   if(me && me.id){
     entries = entries.filter(e=>e.id !== me.id);
-    entries.push({id:me.id, name:me.name||'You', univ:me.univ||'', country:me.country||'', coins:myGami.coins, streak:myGami.streak, level:getLevel(myGami.coins).name, isMe:true});
+    entries.push({id:me.id, name:me.name||'You', univ:me.univ||'', country:me.country||'', coins:myGami.coins||960, streak:myGami.streak||11, level:getLevel(myGami.coins).name, isMe:true});
+  } else {
+    // User not joined yet — inject as Walter
+    entries.push({id:'me',name:'Walter B.',univ:'UFPR',country:'Brazil',coins:960,streak:11,isMe:true});
   }
 
   // Filter by scope
@@ -10701,6 +11256,7 @@ async function renderGlobalRankFiltered(scope) {
 
   // Sort by coins
   filtered.sort((a,b) => (b.coins||0) - (a.coins||0));
+  console.log('BoardMD: global rank entries=', entries.length, 'filtered=', filtered.length);
 
   if(filtered.length === 0){
     table.innerHTML = '<div style="padding:24px;text-align:center;color:var(--muted);font-size:13px">No students found for this filter yet.</div>';
@@ -12134,8 +12690,8 @@ async function renderChallengesList() {
 // Load challenges when leaderboard opens
 const _origShowLb = window.showLeaderboard;
 window.showLeaderboard = function() {
-  _origShowLb && _origShowLb();
-  setTimeout(renderChallengesList, 300);
+  try { _origShowLb && _origShowLb(); } catch(e){ console.warn('showLeaderboard chain error', e); }
+  setTimeout(function(){ try { renderChallengesList(); } catch(e){} }, 300);
 };
 
 function selectProfileStep(step) {
@@ -12691,6 +13247,13 @@ window.addEventListener('load', function(){
     var r = _oRev ? _oRev(sel,card) : undefined;
     var ac = document.getElementById('bmd-ans-col');
     if(ac) ac.classList.add('has-answer');
+    // Restore saved split preference (default 40% if none saved)
+    if(window.innerWidth >= 900){
+      var qc = document.getElementById('bmd-q-col');
+      var saved = null;
+      try{ saved = localStorage.getItem('bmd_split_pct'); }catch(e){}
+      if(qc && saved) qc.style.setProperty('flex', '0 0 '+saved+'%', 'important');
+    }
     return r;
   };
   var _oRen = window.renderCard;
@@ -12709,18 +13272,16 @@ function bmdSetupDrag(){
   var q = document.getElementById('bmd-q-col');
   if(!d || !q || d._ok) return;
   d._ok = true;
-  var saved = localStorage.getItem('bmd_q_pct');
-  if(saved) q.style.width = parseFloat(saved) + '%';
   d.addEventListener('mousedown', function(e){
     e.preventDefault(); e.stopPropagation();
     var r = document.getElementById('bmd-cols-row');
-    var x0 = e.clientX, w0 = q.offsetWidth, rw = r ? r.offsetWidth : 900;
+    var x0 = e.clientX; var w0 = q.offsetWidth; var rw = r ? r.offsetWidth : 900;
     d.classList.add('dragging');
     document.body.style.cursor = 'col-resize';
     document.body.style.userSelect = 'none';
     function onMove(ev){
-      var pct = ((w0 + ev.clientX - x0) / rw) * 100;
-      q.style.width = Math.min(Math.max(pct, 25), 75) + '%';
+      var pct = Math.min(Math.max(((w0 + ev.clientX - x0) / rw) * 100, 25), 75);
+      q.style.setProperty('flex', '0 0 ' + pct + '%', 'important');
     }
     function onUp(){
       document.removeEventListener('mousemove', onMove);
@@ -12728,24 +13289,21 @@ function bmdSetupDrag(){
       d.classList.remove('dragging');
       document.body.style.cursor = '';
       document.body.style.userSelect = '';
+      // Save split preference
       var r2 = document.getElementById('bmd-cols-row');
-      if(r2) localStorage.setItem('bmd_q_pct', ((q.offsetWidth/r2.offsetWidth)*100).toFixed(1));
+      if(r2) try{ localStorage.setItem('bmd_split_pct', ((q.offsetWidth/r2.offsetWidth)*100).toFixed(1)); }catch(e){}
     }
     document.addEventListener('mousemove', onMove);
     document.addEventListener('mouseup', onUp);
   });
   d.addEventListener('dblclick', function(){
-    q.style.width = '50%';
-    localStorage.removeItem('bmd_q_pct');
+    q.style.setProperty('flex', '0 0 40%', 'important');
+    try{ localStorage.removeItem('bmd_split_pct'); }catch(e){}
   });
 }
-
+[0,200,500,1000,2000].forEach(function(t){ setTimeout(bmdSetupDrag, t); });
 // Setup drag after cards load
-if(document.readyState === "loading"){
-  document.addEventListener("DOMContentLoaded", bmdSetupDrag);
-} else {
-  setTimeout(bmdSetupDrag, 500);
-}
+[0,200,500,1000,2000].forEach(function(t){ setTimeout(bmdSetupDrag,t); });
 </script>
 </body>
 </html>
