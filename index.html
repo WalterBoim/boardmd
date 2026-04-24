@@ -9519,15 +9519,37 @@ async function adminLogout(){
   showToast('Signed out.');
 }
 
-async function checkIsAdmin(){
-  try {
-    const { data: sess } = await _supa.auth.getSession();
-    const uid = sess?.session?.user?.id;
-    if(!uid) return false;
-    const { data, error } = await _supa.from('admins').select('user_id').eq('user_id', uid).maybeSingle();
-    if(error) return false;
-    return !!data;
-  } catch(e){ return false; }
+async function checkIsAdmin(opts){
+  const maxRetries = (opts && opts.retries != null) ? opts.retries : 3;
+  const delayMs = 600;
+  for(let attempt = 0; attempt < maxRetries; attempt++){
+    try {
+      const { data: sess } = await _supa.auth.getSession();
+      const uid = sess?.session?.user?.id;
+      if(!uid){
+        console.log('[checkIsAdmin] attempt', attempt+1, '— no session uid yet');
+        if(attempt < maxRetries-1){ await new Promise(r=>setTimeout(r,delayMs)); continue; }
+        return false;
+      }
+      const { data, error } = await _supa.from('admins').select('user_id').eq('user_id', uid).maybeSingle();
+      if(error){
+        console.warn('[checkIsAdmin] attempt', attempt+1, '— query error:', error);
+        if(attempt < maxRetries-1){ await new Promise(r=>setTimeout(r,delayMs)); continue; }
+        return false;
+      }
+      if(!!data){
+        console.log('[checkIsAdmin] authorized as admin. uid=', uid);
+        return true;
+      }
+      console.log('[checkIsAdmin] uid not in admins table. uid=', uid);
+      return false;
+    } catch(e){
+      console.warn('[checkIsAdmin] attempt', attempt+1, '— exception:', e);
+      if(attempt < maxRetries-1){ await new Promise(r=>setTimeout(r,delayMs)); continue; }
+      return false;
+    }
+  }
+  return false;
 }
 
 async function updateAdminStatus(){
@@ -9590,16 +9612,24 @@ async function updateAdminStatus(){
 
     // React to auth state changes
     _supa.auth.onAuthStateChange(async (event, session) => {
+      console.log('[Auth] event=', event, 'email=', session?.user?.email, 'uid=', session?.user?.id);
       if(event === 'SIGNED_IN' && session){
+        // Wait 1s for session to propagate fully, then check admin status
+        await new Promise(r => setTimeout(r, 1000));
         const isAdmin = await checkIsAdmin();
         if(isAdmin){
           window._isBoardMDAdmin = true;
           showAdminBadge(true);
           showToast('Signed in as admin ✓ — edits save to server');
         } else {
-          // Non-admin user: keep signed in for now so we can show message
           showToast('This Google account is not authorized as admin.');
-          setTimeout(async () => { await _supa.auth.signOut(); }, 2500);
+          // Give user more time to read and avoid race conditions
+          setTimeout(async () => {
+            // Double-check one more time before signing out
+            const finalCheck = await checkIsAdmin({ retries: 2 });
+            if(!finalCheck) await _supa.auth.signOut();
+            else { window._isBoardMDAdmin = true; showAdminBadge(true); showToast('Signed in as admin ✓'); }
+          }, 4000);
         }
       } else if(event === 'SIGNED_OUT'){
         window._isBoardMDAdmin = false;
