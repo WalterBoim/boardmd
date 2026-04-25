@@ -5648,10 +5648,14 @@ function buildSessionQueue(){
   if(!isMidSession){
     idx=0; revealed=false; sessionRatings={};
     // Setor A — reset de telemetria e fila de Learning intra-sessão
+    // SETOR B fix: mirror para window para acesso externo
     lrnSessionQueue=[];
     _sessionStartTime = Date.now();
     _sessionCardCount = 0;
     _sessionTotalMs = 0;
+    window._sessionStartTime = _sessionStartTime;
+    window._sessionCardCount = 0;
+    window._sessionTotalMs = 0;
   }
   // Never reset againQueue here — it's managed by rate()
 
@@ -7332,10 +7336,17 @@ function rate(r){
   }
 
   // SETOR A — telemetria de sessão (item 12: barra de status)
+  // SETOR B fix: tambem escreve em window.* porque 'let' top-level NAO
+  // cria propriedade em window. Sem isso, o wrapper externo de status bar
+  // le window._sessionCardCount como undefined.
   _sessionCardCount++;
+  window._sessionCardCount = _sessionCardCount;
   if(_cardStartTime > 0){
     const dt = Date.now() - _cardStartTime;
-    if(dt > 200 && dt < 600000) _sessionTotalMs += dt; // ignora outliers
+    if(dt > 200 && dt < 600000){
+      _sessionTotalMs += dt; // ignora outliers
+      window._sessionTotalMs = _sessionTotalMs;
+    }
   }
 
   // Track study history for heatmap
