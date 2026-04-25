@@ -13268,6 +13268,126 @@ html.dark .hl-btn-active { border-color:#fff!important; }
 .lb-panel .league-card .league-progress { display: block !important; }
 </style>
 
+<!-- ═══════════════════════════════════════════════════════════════════════
+     DEFENSIVE FIX — bug "alternativas C/D somem após resposta" (Apr 25, 2026)
+     Garante visibilidade absoluta dos 4 botões de alternativa em qualquer
+     estado (pré-resposta, pós-resposta, com classes wrong/correct/other-wrong).
+     Não modifica funcionalidade existente — apenas força invariantes visuais.
+     ═══════════════════════════════════════════════════════════════════════ -->
+<style id="bmd-opt-defensive-fix">
+  /* Container das alternativas: nunca esconde nada */
+  #c-opts {
+    overflow: visible !important;
+    max-height: none !important;
+    height: auto !important;
+    min-height: 0 !important;
+  }
+  /* Botão de alternativa: sempre visível, em qualquer combinação de classes */
+  .opt-btn,
+  .opt-btn.correct,
+  .opt-btn.wrong,
+  .opt-btn.show-correct,
+  .opt-btn.other-wrong,
+  .opt-btn[disabled] {
+    display: flex !important;
+    visibility: visible !important;
+    height: auto !important;
+    min-height: 50px !important;
+    overflow: visible !important;
+    pointer-events: auto !important;
+  }
+  /* Estados pós-resposta: opacity reduzida é ok, mas nunca 0 */
+  .opt-btn.other-wrong { opacity: .45 !important; }
+  .opt-btn.wrong       { opacity: 1 !important; }
+  .opt-btn.correct     { opacity: 1 !important; }
+  .opt-btn.show-correct{ opacity: 1 !important; }
+  /* Texto interno das alternativas: nunca colapsa */
+  .opt-btn .opt-text,
+  .opt-btn .opt-letter {
+    visibility: visible !important;
+  }
+</style>
+
+<script>
+/* ═══════════════════════════════════════════════════════════════════════
+   DEFENSIVE FIX — verificação pós-render das alternativas
+   Após qualquer chamada a revealAnswer() ou renderCard(), confere se os
+   4 botões existem e estão renderizados corretamente. Se algum falhar,
+   força reflow do container para recuperar layout.
+   ═══════════════════════════════════════════════════════════════════════ */
+(function(){
+  'use strict';
+
+  function verifyOptsIntegrity(label){
+    var opts = document.querySelectorAll('.opt-btn');
+    if(opts.length === 0) return; // nada renderizado ainda — ok
+    if(opts.length < 2) return;   // banco com card incompleto — não é nosso problema
+
+    var hidden = 0;
+    var zeroHeight = 0;
+    opts.forEach(function(b){
+      var r = b.getBoundingClientRect();
+      var cs = window.getComputedStyle(b);
+      if(cs.display === 'none' || cs.visibility === 'hidden' || parseFloat(cs.opacity) < 0.05) hidden++;
+      if(r.height < 5) zeroHeight++;
+    });
+
+    if(hidden > 0 || zeroHeight > 0){
+      console.warn('[bmd-defensive] Alternativas com problema visual — forçando reflow. ('+label+') hidden='+hidden+' zeroHeight='+zeroHeight);
+      var container = document.getElementById('c-opts');
+      if(container){
+        // Força reflow: toggle de display dispara recálculo de layout
+        var prev = container.style.display;
+        container.style.display = 'none';
+        void container.offsetHeight; // trigger reflow
+        container.style.display = prev || '';
+        // Garante que cada botão tenha estilos inline-resetados
+        opts.forEach(function(b){
+          b.style.display = '';
+          b.style.visibility = '';
+          b.style.opacity = '';
+          b.style.height = '';
+        });
+      }
+    }
+  }
+
+  function wrap(name){
+    var orig = window[name];
+    if(typeof orig !== 'function') return;
+    if(orig.__bmd_wrapped) return;
+    var wrapped = function(){
+      var r;
+      try { r = orig.apply(this, arguments); }
+      finally {
+        // Verificação assíncrona — não bloqueia o fluxo principal
+        requestAnimationFrame(function(){
+          requestAnimationFrame(function(){ verifyOptsIntegrity(name); });
+        });
+      }
+      return r;
+    };
+    wrapped.__bmd_wrapped = true;
+    window[name] = wrapped;
+  }
+
+  // Aplica em ambos: renderCard (carga inicial) e revealAnswer (pós-resposta)
+  function install(){
+    wrap('renderCard');
+    wrap('revealAnswer');
+  }
+
+  // Tenta instalar imediatamente e em fallbacks (caso funções ainda não existam)
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', install);
+  } else {
+    install();
+  }
+  // Re-instala em momentos seguros caso outras camadas (ex: split layout) tenham reescrito as funções
+  [50, 200, 500, 1000, 2000, 4000].forEach(function(t){ setTimeout(install, t); });
+})();
+</script>
+
 <div id="sys-overlay" class="qid-overlay" style="display:none" onclick="if(event.target===this)closeSysFilter()">
   <div class="qid-modal" style="max-width:580px;">
     <div class="qid-modal-header">
