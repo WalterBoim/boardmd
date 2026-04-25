@@ -4893,6 +4893,16 @@ html.dark .hl-btn-active { border-color:#fff!important; }
             <span style="flex:1;"></span>
             <span class="card-qid" id="c-qid" style="font-size:9px;flex-shrink:0;"></span>
           </div>
+          <!-- SETOR B (item 5): Back / Skip discretos abaixo do header -->
+          <div id="bmd-card-nav" class="bmd-card-nav">
+            <button class="bmd-nav-link" id="bmd-nav-back" onclick="bmdNavBack()" title="Previous card (←)">
+              <span class="bmd-nav-arrow">←</span> Back
+            </button>
+            <span class="bmd-nav-sep">·</span>
+            <button class="bmd-nav-link" id="bmd-nav-skip" onclick="bmdNavSkip()" title="Skip without rating (→)">
+              Skip <span class="bmd-nav-arrow">→</span>
+            </button>
+          </div>
           <div id="bmd-cols-row">
           <div id="bmd-q-col">
           <div id="bmd-q-inner">
@@ -6270,6 +6280,20 @@ function shuffleOpts(card){
 function renderCard(){
   revealed=false;
   _cardStartTime = Date.now(); // track response time
+  // ── SETOR B (item 2): zerar scroll de todas as colunas a cada novo card ──
+  // Garante que ambas as colunas (esquerda/direita) e o container principal
+  // comecem do topo. Aluno rola manualmente se quiser.
+  try {
+    const _q = document.getElementById('bmd-q-col');
+    const _a = document.getElementById('bmd-ans-col');
+    const _row = document.getElementById('bmd-cols-row');
+    const _study = document.getElementById('study-inner');
+    if(_q) _q.scrollTop = 0;
+    if(_a) _a.scrollTop = 0;
+    if(_row) _row.scrollTop = 0;
+    if(_study) _study.scrollTop = 0;
+    if(typeof window !== 'undefined' && window.scrollTo) window.scrollTo(0, 0);
+  } catch(e){}
   // Remove Attending block from previous card
   const oldAtt = document.getElementById('att-inline-wrap');
   if(oldAtt) oldAtt.remove();
@@ -6861,17 +6885,13 @@ function revealAnswer(sel,card){
     else if(t===sel&&t!==card.c) btn.classList.add('wrong');
     else btn.classList.add('other-wrong');
   });
-  // Scroll to correct answer within left column only (not whole page)
-  setTimeout(function(){
-    var correctBtn = document.querySelector('.opt-btn.correct') || document.querySelector('.opt-btn.show-correct');
-    if(correctBtn){
-      var col = document.getElementById('bmd-q-col') || document.getElementById('bmd-cols-row');
-      if(col && col.scrollHeight > col.clientHeight){
-        var btnTop = correctBtn.offsetTop - col.offsetTop;
-        col.scrollTo({top: Math.max(0, btnTop - col.clientHeight/2 + correctBtn.offsetHeight/2), behavior:'smooth'});
-      }
-    }
-  }, 300);
+  // SETOR B (item 2): removido auto-scroll para centralizar a alternativa
+  // correta apos resposta. UWorld nao faz isso — o aluno escolhe se quer
+  // rolar. Codigo original preservado em comentario para referencia:
+  //   setTimeout(function(){
+  //     var correctBtn = document.querySelector('.opt-btn.correct') || ...
+  //     if(correctBtn){ ... col.scrollTo({top: ..., behavior:'smooth'}); }
+  //   }, 300);
 
   // ── PADRÃO McDONALD'S ─────────────────────────────────────────
   // Separar explanation de "Why the Others Are Wrong" inteligentemente
@@ -7132,10 +7152,16 @@ function revealAnswer(sel,card){
   if(expEl) expEl.classList.add('visible');
 
   // Reset scroll to top so student reads explanation first
-  const colsRow=document.getElementById('bmd-cols-row');
-  if(colsRow) colsRow.scrollTop=0;
-  const ansCol=document.getElementById('bmd-ans-col');
-  if(ansCol) ansCol.scrollTop=0;
+  // SETOR B (item 2): removido reset de scrollTop ao revelar resposta.
+  // Fazia colsRow.scrollTop=0 e ansCol.scrollTop=0 — empurrava o aluno
+  // para o topo no momento em que ele respondia, gerando movimento
+  // estranho. O reset agora acontece apenas no carregamento de novo
+  // card (em renderCard), nao ao revelar resposta.
+  // Codigo removido:
+  //   const colsRow=document.getElementById('bmd-cols-row');
+  //   if(colsRow) colsRow.scrollTop=0;
+  //   const ansCol=document.getElementById('bmd-ans-col');
+  //   if(ansCol) ansCol.scrollTop=0;
 
   // Show FSRS buttons — sync both nav elements
   const rb=document.getElementById('fsrs-nav');
@@ -7150,14 +7176,16 @@ function revealAnswer(sel,card){
   injectAttendingInline(card, sel);
   // Pre-fetch PubMed abstracts in background
   if(card.pubmed_query || card.topic) setTimeout(() => prefetchPubmedAbstracts(card), 500);
-  // Auto-Lens: carrega Compare silenciosamente (sem scroll)
+  // Auto-Lens: carrega Compare silenciosamente
+  // SETOR B (item 2): removida a manipulacao de scrollTop que causava o
+  // movimento estranho da coluna direita ao Venn/Compare carregar.
+  // Comportamento original (problematico):
+  //   const savedScroll = ansC ? ansC.scrollTop : 0;
+  //   if(ansC) setTimeout(() => { ansC.scrollTop = savedScroll; }, 50);
+  // Agora o Compare apenas carrega; a coluna nao se move.
   setTimeout(() => {
     const wrap = document.getElementById('att-inline-wrap');
-    const ansC = document.getElementById('bmd-ans-col');
-    const savedScroll = ansC ? ansC.scrollTop : 0;
     if(wrap) askAttendingInline('compare', null);
-    // Restaura scroll — impede que o Venn empurre pra baixo
-    if(ansC) setTimeout(() => { ansC.scrollTop = savedScroll; }, 50);
   }, 1500);
 
   // Update FSRS intervals display — sync both nav elements
@@ -7333,6 +7361,15 @@ function skipFwd(){
 function skipBack(){
   if(idx>0){idx--;revealed=false;renderCard();}
 }
+
+// SETOR B (item 5): skipForward — pula para proximo card sem rating
+// No mesmo escopo do skipBack para acessar 'idx' lexicalmente.
+function skipForward(){
+  const fullLen = deck.length + (againQueue ? againQueue.length : 0);
+  if(idx < fullLen - 1){ idx++; revealed=false; renderCard(); }
+}
+// Expor ambos para acesso externo e wrappers
+try { window.skipBack = skipBack; window.skipForward = skipForward; } catch(e){}
 
 // ── DONE SCREEN ───────────────────────────────────────────────────────
 function showDone(){
@@ -8836,10 +8873,11 @@ window.goToHome = function(){
 
 // rate() — coins are now awarded in revealAnswer(), not here
 // rate() only handles FSRS scheduling
-const _origRate = window.rate;
-window.rate = function(r){
-  _origRate(r);
-};
+// SETOR B fix: removido override inerte de window.rate que estava
+// sobrescrevendo o wrapper da status bar. O override original era:
+//   const _origRate = window.rate;
+//   window.rate = function(r){ _origRate(r); };
+// Era no-op funcional mas quebrava o wrapper. Removido.
 
 // Reset session card count at session start
 const _origSelectSystem = window.selectSystem;
@@ -13730,6 +13768,53 @@ html.dark .hl-btn-active { border-color:#fff!important; }
     margin-left: 6px;
     opacity: .7;
   }
+  /* SETOR B (item 5) — Back / Skip discretos */
+  .bmd-card-nav {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 4px 14px 6px;
+    font-family: 'Lato', sans-serif;
+    user-select: none;
+  }
+  .bmd-nav-link {
+    background: none;
+    border: none;
+    color: var(--text-faint, #94a3b8);
+    font-size: 11px;
+    font-weight: 500;
+    padding: 3px 8px;
+    border-radius: 5px;
+    cursor: pointer;
+    letter-spacing: .2px;
+    opacity: .65;
+    transition: opacity .15s, color .15s, background .15s;
+    font-family: inherit;
+  }
+  .bmd-nav-link:hover {
+    opacity: 1;
+    color: var(--accent, #3b7fff);
+    background: var(--accent-dim, rgba(59,127,255,.08));
+  }
+  .bmd-nav-link:disabled {
+    cursor: not-allowed;
+    opacity: .25;
+  }
+  .bmd-nav-link:disabled:hover {
+    color: var(--text-faint);
+    background: transparent;
+  }
+  .bmd-nav-arrow {
+    font-size: 13px;
+    line-height: 1;
+    vertical-align: middle;
+  }
+  .bmd-nav-sep {
+    color: var(--text-faint);
+    opacity: .35;
+    font-size: 11px;
+  }
 </style>
 
 <script id="bmd-setor-a-script">
@@ -13759,27 +13844,118 @@ html.dark .hl-btn-active { border-color:#fff!important; }
     } catch(e){}
   }
   // Wrap rate() to update bar after each call (mas sem bloquear)
-  function install(){
-    if(typeof window.rate !== 'function') return;
-    if(window.rate.__bmd_status_wrapped) return;
-    const orig = window.rate;
+  // SETOR B — wrapper a prova de re-atribuicao
+  function makeWrapped(orig){
     const wrapped = function(){
-      const r = orig.apply(this, arguments);
-      requestAnimationFrame(updateStatusBar);
+      let r;
+      try { r = orig.apply(this, arguments); }
+      finally { requestAnimationFrame(updateStatusBar); }
       return r;
     };
     wrapped.__bmd_status_wrapped = true;
-    window.rate = wrapped;
+    wrapped.__bmd_orig = orig;
+    return wrapped;
+  }
+  function install(){
+    if(typeof window.rate !== 'function') return;
+    if(window.rate.__bmd_status_wrapped) return;
+    // Se a funcao atual ja foi wrappada antes mas perdeu o flag (override no-op),
+    // ainda assim precisamos re-wrap. Garantimos que nao ha loop infinito porque
+    // checamos __bmd_status_wrapped que é unico.
+    window.rate = makeWrapped(window.rate);
   }
   if(document.readyState === 'loading'){
     document.addEventListener('DOMContentLoaded', install);
   } else { install(); }
-  [50, 200, 500, 1000, 2000].forEach(t => setTimeout(install, t));
+  // Mais retries cobrem casos onde overrides acontecem em pontos tardios do load
+  [50, 200, 500, 1000, 2000, 4000, 8000].forEach(t => setTimeout(install, t));
+
+  // Polling defensivo: se window.rate perder o wrap (alguem reatribuiu),
+  // re-instala. Custo: 1 check a cada 3s. Para apos 60s ou ao detectar wrap estavel.
+  let pollCount = 0;
+  const pollId = setInterval(() => {
+    pollCount++;
+    if(typeof window.rate === 'function' && !window.rate.__bmd_status_wrapped){
+      install();
+    }
+    if(pollCount >= 20) clearInterval(pollId); // 20 * 3s = 60s
+  }, 3000);
 
   // Atualiza tambem na carga inicial
   setTimeout(updateStatusBar, 100);
   // Expor globalmente para debug
   window._bmdUpdateStatusBar = updateStatusBar;
+})();
+
+// ── SETOR B (item 5) — Back / Skip handlers ──────────────────────
+// Back: volta para o card anterior na sessao (apenas visualizacao,
+//   nao reverte rating do card que voltou — ele ja foi para o FSRS)
+// Skip: avanca para o proximo sem dar rating (FSRS nao registra nada)
+window.bmdNavBack = function(){
+  try {
+    if(typeof skipBack === 'function'){
+      skipBack();
+      // Feedback visual quando ja estava no inicio (skipBack vira no-op)
+      // — visual cue handled by bmdUpdateNavButtons disabled state
+    }
+  } catch(e){ console.warn('bmdNavBack error:', e); }
+};
+
+window.bmdNavSkip = function(){
+  try {
+    if(typeof skipForward === 'function'){
+      skipForward();
+    }
+  } catch(e){ console.warn('bmdNavSkip error:', e); }
+};
+
+// Atualiza estado dos botoes (disabled quando no inicio/fim)
+window.bmdUpdateNavButtons = function(){
+  try {
+    const back = document.getElementById('bmd-nav-back');
+    const skip = document.getElementById('bmd-nav-skip');
+    if(!back && !skip) return;
+    // idx/deck/againQueue sao let do escopo do script principal.
+    // Em browser real estao acessiveis via closure. Fallback para window
+    // (ambiente de teste isolado) se variaveis lexicais nao existirem.
+    let _idx, _deck, _aq;
+    try {
+      _idx = (typeof idx !== 'undefined') ? idx : window.idx;
+      _deck = (typeof deck !== 'undefined') ? deck : window.deck;
+      _aq = (typeof againQueue !== 'undefined') ? againQueue : window.againQueue;
+    } catch(e){
+      _idx = window.idx; _deck = window.deck; _aq = window.againQueue;
+    }
+    if(typeof _idx !== 'number' || !Array.isArray(_deck)) return;
+    const fullLen = _deck.length + (Array.isArray(_aq) ? _aq.length : 0);
+    if(back) back.disabled = (_idx <= 0);
+    if(skip) skip.disabled = (_idx >= fullLen - 1);
+  } catch(e){}
+};
+
+// Atualiza botoes a cada novo card (segue padrao do status bar)
+(function(){
+  function tryWrap(){
+    if(typeof window.renderCard !== 'function') return;
+    if(window.renderCard.__bmd_navbtn_wrapped) return;
+    const orig = window.renderCard;
+    const wrapped = function(){
+      let r;
+      try { r = orig.apply(this, arguments); }
+      finally { requestAnimationFrame(window.bmdUpdateNavButtons); }
+      return r;
+    };
+    wrapped.__bmd_navbtn_wrapped = true;
+    // Preserva flags anteriores se houver
+    if(orig.__bmd_wrapped) wrapped.__bmd_wrapped = true;
+    if(orig.__bmd_status_wrapped) wrapped.__bmd_status_wrapped = true;
+    window.renderCard = wrapped;
+  }
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', tryWrap);
+  } else { tryWrap(); }
+  [50, 200, 500, 1000, 2000, 4000].forEach(t => setTimeout(tryWrap, t));
+  setTimeout(window.bmdUpdateNavButtons, 200);
 })();
 </script>
 
