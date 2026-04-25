@@ -4955,6 +4955,15 @@ html.dark .hl-btn-active { border-color:#fff!important; }
             </div>
           </div>
 
+          <!-- SETOR A — Study Status Bar (item 12) -->
+          <div id="bmd-study-status-bar" class="study-status-bar">
+            <span class="ssb-item"><strong id="ssb-cards">0</strong> cards</span>
+            <span class="ssb-sep">·</span>
+            <span class="ssb-item"><strong id="ssb-time">0s</strong></span>
+            <span class="ssb-sep">·</span>
+            <span class="ssb-item"><strong id="ssb-avg">—</strong> /card</span>
+          </div>
+
         </div><!-- /card-el -->
 
         <div style="display:none" id="pre-hint"></div>
@@ -5239,16 +5248,37 @@ const RT_AGAIN=1, RT_HARD=2, RT_GOOD=3, RT_EASY=4;
 
 // ── SETTINGS ────────────────────────────────────────────────────────
 const SETTINGS_KEY='bmd_settings_v3';
+// SETOR A — defaults otimizados para USMLE/MCQ (literatura FSRS + experiencia clinica)
+// Ver AUDITORIA_FSRS_E_PLANO_SETOR_A.md para justificativas detalhadas
 const DEFAULT_SETTINGS={
-  newPerDay:20,
-  learnSteps:[10],      // Single 10-min step — card graduates same session
-  relearnSteps:[10],    // If forgotten, one relearn step
-  graduatingInt:1,      // Graduates to 1 day after Good
-  easyInt:4,            // Easy → 4 days directly
-  maxInterval:36500,
-  requestRetention:0.90,
-  easyBonus:1.3,
-  hardInterval:1.2,
+  // Volume
+  newPerDay:30,            // Era 20. Subido para 30 — sustenta 5-10k cards em 6 meses
+  reviewsPerDay:200,       // NOVO. Cap anti-avalanche FSRS, ~1h30 de estudo
+
+  // Steps
+  learnSteps:[1,10],       // Era [10] (single). Voltou ao default Anki — 2 acertos antes de virar REV
+  relearnSteps:[10],       // Mantido. Anki default
+
+  // Intervalos
+  graduatingInt:1,         // Mantido
+  easyInt:4,               // Mantido
+  maxInterval:365,         // Era 36500 (100 anos). Capado em 1 ano — cada card revisado >=1x/ano
+
+  // FSRS core
+  requestRetention:0.90,   // Mantido. 0.92+ dobra carga diaria
+  easyBonus:1.3,           // Mantido. Anki default
+  hardInterval:1.2,        // Mantido. Anki default
+
+  // SETOR A — Order of display (item 11)
+  newCardOrder:'random',           // Random | added | byTopic
+  newGrouping:'random',            // Random | byDeck
+  newSorting:'random',             // Random | typeOrder
+  newVsReview:'reviewsFirst',      // reviewsFirst | newFirst | mix
+  intradayOrder:'mix',             // mix | learnFirst | reviewFirst
+  reviewSorting:'dueDateThenRandom', // dueDateThenRandom | dueDateThenDeck | random | difficultyAsc | difficultyDesc
+
+  // SETOR A — Behavior (item 11)
+  burySiblings:true,       // ON por padrao — evita cluster de cards do mesmo topico
 };
 let deckSettings={};
 (function(){
@@ -5462,8 +5492,13 @@ function applyFont(){
 // ── SESSION STATE ────────────────────────────────────────────────────
 let currentDeck='s1', currentSystem='all';
 let deck=[], againQueue=[], idx=0, revealed=false, sessionRatings={};
+let lrnSessionQueue=[]; // cards de Learning/Relearning que ficam due durante a sessão (Setor A bug 1)
 let _cardStartTime = 0; // timestamp when card was shown
 let _cardState=0;
+// Setor A — telemetria de sessão (item 12: barra de status)
+let _sessionStartTime = 0;     // ms timestamp do início da sessão atual
+let _sessionCardCount = 0;     // cards respondidos nesta sessão (incrementa em rate())
+let _sessionTotalMs = 0;       // tempo total acumulado de resposta nesta sessão
 
 // ── ANKI-FAITHFUL SESSION QUEUE ──────────────────────────────────────
 // The core of Anki's queue behavior:
@@ -5517,21 +5552,96 @@ function buildSessionQueue(){
   });
 
   // ── Sort & shuffle ────────────────────────────────────────────────────
-  lrnDue.sort((a,b)=>getState(a.id).due-getState(b.id).due);
-  revDue.sort((a,b)=>getState(a.id).due-getState(b.id).due);
-  for(let i=newCards.length-1;i>0;i--){
-    const j=Math.floor(Math.random()*(i+1));
-    [newCards[i],newCards[j]]=[newCards[j],newCards[i]];
+  // SETOR A — review sorting respeita c.reviewSorting
+  const _reviewSort = c.reviewSorting || 'dueDateThenRandom';
+  if(_reviewSort === 'random'){
+    for(let i=revDue.length-1;i>0;i--){
+      const j=Math.floor(Math.random()*(i+1));
+      [revDue[i],revDue[j]]=[revDue[j],revDue[i]];
+    }
+  } else if(_reviewSort === 'dueDateThenDeck'){
+    revDue.sort((a,b)=>{
+      const dA=getState(a.id).due, dB=getState(b.id).due;
+      if(dA!==dB) return dA-dB;
+      return (a.deck||'').localeCompare(b.deck||'');
+    });
+  } else if(_reviewSort === 'difficultyAsc'){
+    revDue.sort((a,b)=>getState(a.id).difficulty - getState(b.id).difficulty);
+  } else if(_reviewSort === 'difficultyDesc'){
+    revDue.sort((a,b)=>getState(b.id).difficulty - getState(a.id).difficulty);
+  } else {
+    // dueDateThenRandom (default)
+    revDue.sort((a,b)=>{
+      const dA=getState(a.id).due, dB=getState(b.id).due;
+      if(dA!==dB) return dA-dB;
+      return Math.random() - 0.5;
+    });
   }
-  const newToday=newCards.slice(0,newAllowed);
+
+  // SETOR A — Reviews per day cap
+  const _reviewLimit = c.reviewsPerDay || 0;
+  const _revToday = (_reviewLimit > 0) ? revDue.slice(0, _reviewLimit) : revDue;
+
+  // Learning cards always sorted by due time
+  lrnDue.sort((a,b)=>getState(a.id).due-getState(b.id).due);
+
+  // SETOR A — newCardOrder respeita c.newCardOrder
+  const _newOrder = c.newCardOrder || 'random';
+  if(_newOrder === 'random'){
+    for(let i=newCards.length-1;i>0;i--){
+      const j=Math.floor(Math.random()*(i+1));
+      [newCards[i],newCards[j]]=[newCards[j],newCards[i]];
+    }
+  } else if(_newOrder === 'byTopic'){
+    newCards.sort((a,b)=>{
+      const tA=(a.topic||a.subject||'')+'::'+(a.qid||'');
+      const tB=(b.topic||b.subject||'')+'::'+(b.qid||'');
+      return tA.localeCompare(tB);
+    });
+  } // 'added' = mantem ordem natural do banco (sem ordenar)
+
+  let newToday=newCards.slice(0,newAllowed);
+
+  // SETOR A — Bury siblings: se ON, agrupa por topic e mantem so 1 por topic
+  if(c.burySiblings){
+    const _seenTopics = new Set();
+    newToday = newToday.filter(card=>{
+      const t = card.topic || card.subject || ('id_'+card.id);
+      if(_seenTopics.has(t)) return false;
+      _seenTopics.add(t);
+      return true;
+    });
+  }
 
   // ── Build deck — ALWAYS reset idx to 0 for fresh session ─────────────
-  deck=[...lrnDue,...newToday,...revDue];
+  // SETOR A — newVsReview controla ordem de Review vs New
+  const _newVsRev = c.newVsReview || 'reviewsFirst';
+  let _orderedQueue;
+  if(_newVsRev === 'newFirst'){
+    _orderedQueue = [...lrnDue, ...newToday, ..._revToday];
+  } else if(_newVsRev === 'mix'){
+    // Intercala new e review aproximadamente
+    _orderedQueue = [...lrnDue];
+    const _maxLen = Math.max(newToday.length, _revToday.length);
+    for(let i=0;i<_maxLen;i++){
+      if(_revToday[i]) _orderedQueue.push(_revToday[i]);
+      if(newToday[i]) _orderedQueue.push(newToday[i]);
+    }
+  } else {
+    // reviewsFirst (default)
+    _orderedQueue = [...lrnDue, ..._revToday, ...newToday];
+  }
+  deck = _orderedQueue;
   // Only reset idx when starting a brand new session (not during rebuild)
   // A rebuild during session is detected by revealed=false AND idx>0
   const isMidSession = (idx > 0 && deck.length > 0);
   if(!isMidSession){
     idx=0; revealed=false; sessionRatings={};
+    // Setor A — reset de telemetria e fila de Learning intra-sessão
+    lrnSessionQueue=[];
+    _sessionStartTime = Date.now();
+    _sessionCardCount = 0;
+    _sessionTotalMs = 0;
   }
   // Never reset againQueue here — it's managed by rate()
 
@@ -5784,6 +5894,28 @@ function buildDeckHomeTable(){
 }
 
 function startStudyFromHome(){switchDeckAndStudy(currentDeck);}
+
+// ── SETOR A — Bug 1: retomar sessao apos espera de Learning ─────────
+function _resumeLrnSession(){
+  if(window._lrnWaitTimer){ clearTimeout(window._lrnWaitTimer); window._lrnWaitTimer = null; }
+  const now = Date.now();
+  // Move cards LRN que ja ficaram due para o deck
+  for(let i = lrnSessionQueue.length - 1; i >= 0; i--){
+    const c = lrnSessionQueue[i];
+    const s = getState(c.id);
+    if(s.due <= now + 5000){
+      deck.push(c);
+      lrnSessionQueue.splice(i, 1);
+    }
+  }
+  // Se nao ha nenhum due ainda, reabre janela de espera (chama showDone que re-decide)
+  // Se ha, renderiza o proximo
+  idx = deck.length - lrnSessionQueue.length; // posiciona no primeiro novo
+  if(idx >= deck.length) idx = deck.length - 1; // safety
+  if(idx < 0) idx = 0;
+  revealed = false;
+  renderCard();
+}
 function switchDeckAndStudy(dk){
   hideDeckHome();
   if(SHELF_DECKS.includes(dk)){
@@ -6155,6 +6287,30 @@ function renderCard(){
   const _fsrs2=document.getElementById('fsrs-nav-2');
   if(_fsrs) _fsrs.classList.remove('visible');
   if(_fsrs2) _fsrs2.classList.remove('visible');
+
+  // ── SETOR A — Bug 1 fix: injetar cards LRN/RLN que ficaram due ─────
+  // Antes de checar se a sessao acabou, verifica se ha cards na lrnSessionQueue
+  // cujo due tempo ja passou (ou esta em <=5s). Se sim, insere no deck atual.
+  // Isso garante que cards de Learning voltam na mesma sessao sem reabrir.
+  if(lrnSessionQueue.length > 0){
+    const _now = Date.now();
+    for(let _i = lrnSessionQueue.length - 1; _i >= 0; _i--){
+      const _c = lrnSessionQueue[_i];
+      const _s = getState(_c.id);
+      if(_s.due <= _now + 5000){
+        // Remove dup do deck/againQueue antes de re-inserir
+        const _dIdx = deck.findIndex(x=>x.id===_c.id);
+        if(_dIdx>=0) deck.splice(_dIdx,1);
+        const _aIdx = againQueue.findIndex(x=>x.id===_c.id);
+        if(_aIdx>=0) againQueue.splice(_aIdx,1);
+        // Insere proximo da posicao atual (idx) — sera mostrado em breve
+        const _insertAt = Math.min(idx + 1, deck.length);
+        deck.splice(_insertAt, 0, _c);
+        lrnSessionQueue.splice(_i, 1);
+      }
+    }
+  }
+
   const full=[...deck,...againQueue];
   if(!full.length||idx>=full.length){showDone();return;}
 
@@ -7134,6 +7290,26 @@ function rate(r){
     againQueue.push(card);
   }
 
+  // ── SETOR A — Bug 1 fix: cards LRN/RLN com due intra-sessão ──────
+  // Quando rating != Again (Hard/Good num card LRN, ou Hard num REV que vira RLN),
+  // o card pode ficar com due em poucos minutos (ex: 1m, 10m do learning step).
+  // Sem isto, o card só voltaria ao reabrir o deck. Aqui enfileiramos para
+  // injecao automatica em renderCard quando ficar due.
+  // Janela de 20min cobre os steps padrao (1m, 10m) com folga.
+  if(r!==0 && (ns.state===ST_LRN || ns.state===ST_RLN) && ns.due <= Date.now() + 20*60*1000){
+    // Remove duplicatas
+    const exLrnIdx = lrnSessionQueue.findIndex(c=>c.id===card.id);
+    if(exLrnIdx>=0) lrnSessionQueue.splice(exLrnIdx,1);
+    lrnSessionQueue.push(card);
+  }
+
+  // SETOR A — telemetria de sessão (item 12: barra de status)
+  _sessionCardCount++;
+  if(_cardStartTime > 0){
+    const dt = Date.now() - _cardStartTime;
+    if(dt > 200 && dt < 600000) _sessionTotalMs += dt; // ignora outliers
+  }
+
   // Track study history for heatmap
   try {
     const histKey = 'bmd_study_history';
@@ -7160,6 +7336,44 @@ function skipBack(){
 
 // ── DONE SCREEN ───────────────────────────────────────────────────────
 function showDone(){
+  // ── SETOR A — Bug 1: nao declarar sessao acabada se ha LRN pendentes ─
+  // Se ainda ha cards no lrnSessionQueue cujo due esta proximo (<=15min),
+  // entra em modo "waiting" e re-tenta inserir periodicamente. Isso evita
+  // a tela "Session complete" enganosa enquanto o FSRS espera os steps.
+  if(lrnSessionQueue.length > 0){
+    const now = Date.now();
+    const nextDue = Math.min(...lrnSessionQueue.map(c => getState(c.id).due));
+    const waitMs = nextDue - now;
+    // Se o proximo card LRN esta em <=15min, mostra tela de espera
+    if(waitMs <= 15 * 60 * 1000 && waitMs > 0){
+      const waitMin = Math.max(1, Math.ceil(waitMs / 60000));
+      const si=document.getElementById('study-inner');
+      if(si){
+        si.innerHTML = `
+          <div class="done-wrap" id="lrn-wait-screen">
+            <h2 style="font-size:22px;margin-bottom:16px">Almost done</h2>
+            <p style="color:var(--text-dim);margin-bottom:8px">
+              <strong style="color:var(--amber)">${lrnSessionQueue.length}</strong>
+              learning card${lrnSessionQueue.length>1?'s':''} pending
+            </p>
+            <p style="color:var(--text-dim);margin-bottom:24px;font-size:13px">
+              Next card available in <strong style="color:var(--accent)">${waitMin} min</strong>
+            </p>
+            <button class="btn-restart" onclick="_resumeLrnSession()">Resume Now</button>
+            <button class="btn-restart" style="background:var(--surface);border:1px solid var(--border);color:var(--text);margin-left:10px" onclick="goToHome()">Save & Exit</button>
+          </div>`;
+        // Auto re-check every 15 seconds
+        if(window._lrnWaitTimer) clearTimeout(window._lrnWaitTimer);
+        window._lrnWaitTimer = setTimeout(()=>{
+          if(document.getElementById('lrn-wait-screen')) _resumeLrnSession();
+        }, 15000);
+      }
+      return;
+    }
+    // Se o proximo esta a mais de 15min, mostra como concluido mas com nota
+    // (cai para o fluxo normal de showDone abaixo, com nota sobre LRN pendentes)
+  }
+
   const total=Object.keys(sessionRatings).length;
   const again=Object.values(sessionRatings).filter(r=>r==='again').length;
   const hard=Object.values(sessionRatings).filter(r=>r==='hard').length;
@@ -7189,7 +7403,33 @@ function showDone(){
 
 // ── UPDATE STATS (header counters) ────────────────────────────────────
 function updateStats(){
-  if(currentDeck==='_search'||!DECKS[currentDeck]){
+  // SETOR A — Bug 2: contadores reais na busca (antes ficava 0/0/0)
+  if(currentDeck==='_search'){
+    const _now = Date.now();
+    let _nw=0,_lrn=0,_du=0;
+    // Itera o conjunto resultante da busca atual (deck + againQueue)
+    const _all = [...deck, ...againQueue];
+    _all.forEach(card=>{
+      const _s = getState(card.id);
+      if(_s.state===ST_NEW) _nw++;
+      else if(_s.state===ST_LRN || _s.state===ST_RLN){
+        if(_s.due <= _now + 1200000) _lrn++;
+      }
+      else if(_s.state===ST_REV){
+        if(_s.due <= _now + 86400000) _du++;
+      }
+    });
+    _lrn = Math.max(_lrn, againQueue.length);
+    const _acN=document.getElementById('ac-new');
+    const _acL=document.getElementById('ac-lrn');
+    const _acD=document.getElementById('ac-due');
+    if(_acN) _acN.textContent=_nw;
+    if(_acL) _acL.textContent=_lrn;
+    if(_acD) _acD.textContent=_du;
+    _syncFC(_nw,_lrn,_du,_cardState);
+    return;
+  }
+  if(!DECKS[currentDeck]){
     _syncFC(0,0,0,_cardState);return;
   }
   const pool=currentSystem==='all'?getCards():getCards().filter(c=>c.system===currentSystem);
@@ -7264,6 +7504,20 @@ function openSettings(){
   document.getElementById('cfg-requestRetention').value=c.requestRetention;
   document.getElementById('cfg-easyBonus').value=c.easyBonus;
   const hi=document.getElementById('cfg-hardInterval');if(hi) hi.value=c.hardInterval||1.2;
+
+  // ═════ SETOR A — populate new fields ═════
+  const _set = (id, val) => { const el=document.getElementById(id); if(el) el.value=val; };
+  _set('cfg-reviewsPerDay', c.reviewsPerDay ?? 200);
+  _set('cfg-newCardOrder',  c.newCardOrder  || 'random');
+  _set('cfg-newGrouping',   c.newGrouping   || 'random');
+  _set('cfg-newSorting',    c.newSorting    || 'random');
+  _set('cfg-newVsReview',   c.newVsReview   || 'reviewsFirst');
+  _set('cfg-intradayOrder', c.intradayOrder || 'mix');
+  _set('cfg-reviewSorting', c.reviewSorting || 'dueDateThenRandom');
+  const _bs = document.getElementById('cfg-burySiblings');
+  if(_bs) _bs.checked = c.burySiblings !== false;
+  // ═════ /SETOR A ═════
+
   // Atualizar contador de edições
   const editsCount = Object.keys(getCardEdits()).length;
   const lbl = document.getElementById('edits-count-label');
@@ -7275,6 +7529,27 @@ function openSettings(){
   document.getElementById('settings-overlay').style.display='flex';
 }
 function closeSettings(){document.getElementById('settings-overlay').style.display='none';}
+
+// ── SETOR A — apply recommended defaults to current deck ────────────
+function applyRecommendedDefaults(){
+  const c = cfg();
+  // Aplica TODOS os defaults atuais (sobrescreve customizacoes do usuario neste deck)
+  Object.keys(DEFAULT_SETTINGS).forEach(k=>{
+    c[k] = (typeof DEFAULT_SETTINGS[k] === 'object')
+      ? JSON.parse(JSON.stringify(DEFAULT_SETTINGS[k]))
+      : DEFAULT_SETTINGS[k];
+  });
+  // Re-popula UI com novos valores
+  openSettings();
+  // Toast simples — feedback visual
+  try {
+    const toast = document.createElement('div');
+    toast.textContent = 'BoardMD recommended defaults applied';
+    toast.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--accent);color:#fff;padding:10px 18px;border-radius:8px;font-family:Lato,sans-serif;font-size:13px;font-weight:600;z-index:99999;box-shadow:0 4px 16px rgba(0,0,0,.3);';
+    document.body.appendChild(toast);
+    setTimeout(()=>toast.remove(), 2000);
+  } catch(e){}
+}
 function parseSteps(str){return str.split(/[\s,]+/).map(Number).filter(n=>n>0&&n<1440)||[10];}
 function saveSettingsModal(){
   // Garante que currentDeck tem settings inicializados
@@ -7295,6 +7570,20 @@ function saveSettingsModal(){
   c.requestRetention=Math.min(0.99,Math.max(0.7,parseFloat(document.getElementById('cfg-requestRetention').value)||0.90));
   c.easyBonus=Math.min(3,Math.max(1,parseFloat(document.getElementById('cfg-easyBonus').value)||1.3));
   const hi=document.getElementById('cfg-hardInterval');if(hi) c.hardInterval=Math.min(2,Math.max(1,parseFloat(hi.value)||1.2));
+
+  // ═════ SETOR A — save new fields ═════
+  const _get = (id) => document.getElementById(id);
+  const _rpd = parseInt(_get('cfg-reviewsPerDay')?.value, 10);
+  c.reviewsPerDay = isNaN(_rpd) ? 200 : Math.max(0, _rpd);
+  c.newCardOrder  = _get('cfg-newCardOrder')?.value  || 'random';
+  c.newGrouping   = _get('cfg-newGrouping')?.value   || 'random';
+  c.newSorting    = _get('cfg-newSorting')?.value    || 'random';
+  c.newVsReview   = _get('cfg-newVsReview')?.value   || 'reviewsFirst';
+  c.intradayOrder = _get('cfg-intradayOrder')?.value || 'mix';
+  c.reviewSorting = _get('cfg-reviewSorting')?.value || 'dueDateThenRandom';
+  c.burySiblings  = !!_get('cfg-burySiblings')?.checked;
+  // ═════ /SETOR A ═════
+
   // Aplica newPerDay em todos os decks do step atual e reseta newSeen
   const today=dayStamp();
   let stepDecksToReset;
@@ -7311,6 +7600,15 @@ function saveSettingsModal(){
     deckSettings[d].easyInt = c.easyInt;
     deckSettings[d].maxInterval = c.maxInterval;
     deckSettings[d].requestRetention = c.requestRetention;
+    // SETOR A — propaga novos campos para todos os decks do step
+    deckSettings[d].reviewsPerDay = c.reviewsPerDay;
+    deckSettings[d].newCardOrder  = c.newCardOrder;
+    deckSettings[d].newGrouping   = c.newGrouping;
+    deckSettings[d].newSorting    = c.newSorting;
+    deckSettings[d].newVsReview   = c.newVsReview;
+    deckSettings[d].intradayOrder = c.intradayOrder;
+    deckSettings[d].reviewSorting = c.reviewSorting;
+    deckSettings[d].burySiblings  = c.burySiblings;
     if(!todayData[d]) todayData[d]={date:today,newSeen:0};
     todayData[d].newSeen=0;
   });
@@ -7572,6 +7870,98 @@ applyFont();
         <div class="settings-row-sub">Multiplier for Hard (Anki default: 1.2)</div></div>
         <input class="settings-input" id="cfg-hardInterval" type="number" step="0.05" min="1" max="2"/>
       </div>
+
+      <!-- ═══════ SETOR A — NEW CONFIG BLOCKS ═══════ -->
+      <div class="settings-group" style="margin-top:18px">
+        <div class="settings-label">Daily Limits</div>
+        <div class="settings-row">
+          <div><div class="settings-row-label">Reviews per day</div>
+               <div class="settings-row-sub">Max reviews shown daily (0 = unlimited)</div></div>
+          <input class="settings-input" type="number" id="cfg-reviewsPerDay" min="0" max="9999">
+        </div>
+      </div>
+
+      <div class="settings-group">
+        <div class="settings-label">Display Order</div>
+        <div class="settings-row">
+          <div><div class="settings-row-label">New card grouping</div>
+               <div class="settings-row-sub">How new cards are batched</div></div>
+          <select class="settings-input" id="cfg-newGrouping">
+            <option value="random">Random cards</option>
+            <option value="byDeck">By deck</option>
+          </select>
+        </div>
+        <div class="settings-row">
+          <div><div class="settings-row-label">New card sorting</div>
+               <div class="settings-row-sub">Order within new card group</div></div>
+          <select class="settings-input" id="cfg-newSorting">
+            <option value="random">Random</option>
+            <option value="typeOrder">By card type</option>
+          </select>
+        </div>
+        <div class="settings-row">
+          <div><div class="settings-row-label">New vs Review order</div>
+               <div class="settings-row-sub">Reviews first prevents lapse spirals</div></div>
+          <select class="settings-input" id="cfg-newVsReview">
+            <option value="reviewsFirst">Show reviews first (recommended)</option>
+            <option value="newFirst">Show new first</option>
+            <option value="mix">Mix with reviews</option>
+          </select>
+        </div>
+        <div class="settings-row">
+          <div><div class="settings-row-label">Learning vs Review (intra-day)</div>
+               <div class="settings-row-sub">Order during the day</div></div>
+          <select class="settings-input" id="cfg-intradayOrder">
+            <option value="mix">Mix</option>
+            <option value="learnFirst">Learning first</option>
+            <option value="reviewFirst">Review first</option>
+          </select>
+        </div>
+        <div class="settings-row">
+          <div><div class="settings-row-label">Review sorting</div>
+               <div class="settings-row-sub">How due reviews are ordered</div></div>
+          <select class="settings-input" id="cfg-reviewSorting">
+            <option value="dueDateThenRandom">Due date, then random</option>
+            <option value="dueDateThenDeck">Due date, then deck</option>
+            <option value="random">Random</option>
+            <option value="difficultyAsc">Difficulty (easy first)</option>
+            <option value="difficultyDesc">Difficulty (hard first)</option>
+          </select>
+        </div>
+        <div class="settings-row">
+          <div><div class="settings-row-label">New card order</div>
+               <div class="settings-row-sub">Pool order for new cards</div></div>
+          <select class="settings-input" id="cfg-newCardOrder">
+            <option value="random">Random</option>
+            <option value="added">Order added</option>
+            <option value="byTopic">By topic</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="settings-group">
+        <div class="settings-label">Behavior</div>
+        <div class="settings-row">
+          <div><div class="settings-row-label">Bury siblings</div>
+               <div class="settings-row-sub">Hide other cards from same topic until next day (recommended for MCQ)</div></div>
+          <label class="bmd-toggle" style="cursor:pointer;display:inline-flex;align-items:center">
+            <input type="checkbox" id="cfg-burySiblings" style="width:18px;height:18px;cursor:pointer">
+          </label>
+        </div>
+      </div>
+
+      <div style="margin:14px 0 6px;padding:12px;background:var(--surface2);border:1px solid var(--border);border-radius:10px">
+        <div style="font-size:11px;color:var(--text-faint);margin-bottom:8px;font-family:'JetBrains Mono',monospace;letter-spacing:.5px">RECOMMENDED PRESET</div>
+        <div style="font-size:12px;color:var(--text-dim);margin-bottom:10px;line-height:1.5">
+          Apply BoardMD-recommended FSRS defaults optimized for USMLE preparation:
+          30 new/day, 200 reviews/day cap, learn steps 1-10min, max interval 1 year, reviews first, bury siblings on.
+        </div>
+        <button onclick="applyRecommendedDefaults()" style="background:var(--accent);border:none;border-radius:8px;padding:8px 16px;font-family:'Lato',sans-serif;font-size:12px;font-weight:700;color:#fff;cursor:pointer">
+          Apply BoardMD recommended
+        </button>
+      </div>
+      <!-- ═══════ /SETOR A ═══════ -->
+
       <div class="settings-footer">
       <button class="btn-settings-cancel" onclick="closeSettings()">Cancel</button>
       <button class="btn-settings-save" onclick="saveSettingsModal()">Save & restart</button>
@@ -13307,6 +13697,91 @@ html.dark .hl-btn-active { border-color:#fff!important; }
     visibility: visible !important;
   }
 </style>
+
+<!-- SETOR A — Study Status Bar (item 12) — estilo discreto Anki-like -->
+<style id="bmd-setor-a-style">
+  .study-status-bar {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0;
+    font-family: 'JetBrains Mono', 'SF Mono', monospace;
+    font-size: 11px;
+    color: var(--text-faint, #94a3b8);
+    padding: 8px 12px 4px;
+    letter-spacing: .25px;
+    user-select: none;
+    opacity: .85;
+  }
+  .study-status-bar .ssb-item { white-space: nowrap; }
+  .study-status-bar strong {
+    color: var(--text-dim, var(--text2, #c8d0ee));
+    font-weight: 600;
+  }
+  .study-status-bar .ssb-sep {
+    margin: 0 10px;
+    opacity: .4;
+  }
+  /* Bury siblings — visual cue when card has buried siblings */
+  .bury-indicator {
+    display: inline-block;
+    font-size: 10px;
+    color: var(--amber, #f59e0b);
+    margin-left: 6px;
+    opacity: .7;
+  }
+</style>
+
+<script id="bmd-setor-a-script">
+/* SETOR A — Study Status Bar updater (item 12)
+   Atualiza a barra "X cards · Y total · Z s/card" ao final de cada rate() */
+(function(){
+  'use strict';
+  function fmtTime(ms){
+    if(!ms || ms < 1000) return '0s';
+    const s = Math.round(ms/1000);
+    if(s < 60) return s+'s';
+    const m = Math.floor(s/60);
+    const r = s % 60;
+    return r === 0 ? (m+'m') : (m+'m'+r+'s');
+  }
+  function updateStatusBar(){
+    try {
+      const cards = window._sessionCardCount || 0;
+      const totalMs = window._sessionTotalMs || 0;
+      const avgMs = cards > 0 ? Math.round(totalMs / cards) : 0;
+      const elC = document.getElementById('ssb-cards');
+      const elT = document.getElementById('ssb-time');
+      const elA = document.getElementById('ssb-avg');
+      if(elC) elC.textContent = cards;
+      if(elT) elT.textContent = fmtTime(totalMs);
+      if(elA) elA.textContent = avgMs > 0 ? fmtTime(avgMs) : '—';
+    } catch(e){}
+  }
+  // Wrap rate() to update bar after each call (mas sem bloquear)
+  function install(){
+    if(typeof window.rate !== 'function') return;
+    if(window.rate.__bmd_status_wrapped) return;
+    const orig = window.rate;
+    const wrapped = function(){
+      const r = orig.apply(this, arguments);
+      requestAnimationFrame(updateStatusBar);
+      return r;
+    };
+    wrapped.__bmd_status_wrapped = true;
+    window.rate = wrapped;
+  }
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', install);
+  } else { install(); }
+  [50, 200, 500, 1000, 2000].forEach(t => setTimeout(install, t));
+
+  // Atualiza tambem na carga inicial
+  setTimeout(updateStatusBar, 100);
+  // Expor globalmente para debug
+  window._bmdUpdateStatusBar = updateStatusBar;
+})();
+</script>
 
 <script>
 /* ═══════════════════════════════════════════════════════════════════════
