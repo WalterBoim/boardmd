@@ -9924,6 +9924,91 @@ async function fetchAllFromSupabase(onProgress){
   return allCards;
 }
 
+// SETOR B v7 — fetch cards de um conjunto especifico de decks (lazy load por step)
+async function fetchStepFromSupabase(deckIds, onProgress){
+  const PAGE = 2000;
+  const allCards = [];
+  let from = 0;
+  let total = null;
+  while(true){
+    const { data, error, count } = await _supa
+      .from('cards')
+      .select('id,deck,system,topic,subject,qid,q,c,w,e,kp,d,img,pubmed_query,cochrane_pmid', { count: total === null ? 'exact' : undefined })
+      .in('deck', deckIds)
+      .order('id')
+      .range(from, from + PAGE - 1);
+    if(error || !data || data.length === 0) break;
+    if(total === null && count !== null) total = count;
+    allCards.push(...data);
+    from += PAGE;
+    if(onProgress) onProgress(total ? Math.round(allCards.length / total * 100) : 0, allCards.length, data);
+    if(data.length < PAGE) break;
+  }
+  return allCards;
+}
+
+// SETOR B v7 — Spinner discreto para background loading
+function showBackgroundSpinner(stepLabel){
+  let el = document.getElementById('bmd-bg-spinner');
+  if(!el){
+    el = document.createElement('div');
+    el.id = 'bmd-bg-spinner';
+    el.style.cssText = `
+      position: fixed;
+      bottom: 70px;
+      left: 14px;
+      background: rgba(20, 28, 46, 0.92);
+      color: #c8d0ee;
+      padding: 8px 14px;
+      border-radius: 20px;
+      font-family: 'Inter', -apple-system, sans-serif;
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: .3px;
+      z-index: 9998;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, .35);
+      border: 1px solid rgba(255, 255, 255, .08);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      opacity: 0;
+      transition: opacity .3s ease;
+      pointer-events: none;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+    `;
+    el.innerHTML = `
+      <span style="display:inline-block;width:10px;height:10px;border:1.5px solid #4f8ef7;border-top-color:transparent;border-radius:50%;animation:bmdSpin 0.8s linear infinite;"></span>
+      <span id="bmd-bg-spinner-label">Loading...</span>
+    `;
+    // Add keyframes once
+    if(!document.getElementById('bmd-spin-style')){
+      const st = document.createElement('style');
+      st.id = 'bmd-spin-style';
+      st.textContent = '@keyframes bmdSpin{to{transform:rotate(360deg)}}';
+      document.head.appendChild(st);
+    }
+    document.body.appendChild(el);
+  }
+  const label = el.querySelector('#bmd-bg-spinner-label');
+  if(label) label.textContent = stepLabel;
+  // Fade in
+  requestAnimationFrame(() => { el.style.opacity = '1'; });
+}
+
+function hideBackgroundSpinner(){
+  const el = document.getElementById('bmd-bg-spinner');
+  if(el){
+    el.style.opacity = '0';
+    setTimeout(() => { try { el.remove(); } catch(e){} }, 400);
+  }
+}
+
+function updateBackgroundSpinner(stepLabel){
+  const lbl = document.getElementById('bmd-bg-spinner-label');
+  if(lbl) lbl.textContent = stepLabel;
+}
+
 async function loadCardsFromSupabase(){
   // ── IDB-FIRST: tenta cache local antes de bater no Supabase ──
   const meta = getIDBMeta();
@@ -9943,27 +10028,74 @@ async function loadCardsFromSupabase(){
     } catch(e){ console.warn('BoardMD: IDB read failed, falling back to Supabase'); }
   }
 
-  // ── Fallback: primeiro acesso ou cache vazio — fetch completo ──
-  console.log('BoardMD: loading from Supabase...');
+  // ── SETOR B v7 — Lazy load: primeiro fetch SO do step ativo ──
+  // Resto carrega em background com spinner discreto.
+  // Target: <3s para UI 100% pronta no step ativo.
+  const activeStep = (typeof currentStep !== 'undefined' && currentStep) || localStorage.getItem('bmd_step') || 's2';
+  let activeDecks, otherDecks, activeLabel, otherLabel;
+  if(activeStep === 's1'){
+    activeDecks = STEP1_DECKS.slice();
+    otherDecks = STEP2_DECKS.concat(SHELF_DECKS).filter((d,i,a)=>a.indexOf(d)===i);
+    activeLabel = 'Step 1';
+    otherLabel = 'Step 2 + Shelf';
+  } else if(activeStep === 'shelf'){
+    activeDecks = SHELF_DECKS.slice();
+    otherDecks = STEP1_DECKS.concat(STEP2_DECKS).filter(d => !SHELF_DECKS.includes(d));
+    activeLabel = 'Shelf';
+    otherLabel = 'Step 1 + Step 2';
+  } else {
+    // s2 default
+    activeDecks = STEP2_DECKS.slice();
+    otherDecks = STEP1_DECKS.concat(SHELF_DECKS).filter(d => !STEP2_DECKS.includes(d));
+    activeLabel = 'Step 2 CK';
+    otherLabel = 'Step 1 + Shelf';
+  }
+
+  console.log('BoardMD: lazy loading — active step ' + activeLabel + ' first');
   showLoadingOverlay();
-  const allCards = await fetchAllFromSupabase((pct, n, chunk) => updateLoadingProgress(pct, n, chunk));
-  buildDecks(allCards);
-  console.log('BoardMD: ' + allCards.length + ' cards loaded');
+  const t0 = Date.now();
+  const activeCards = await fetchStepFromSupabase(activeDecks, (pct, n, chunk) => updateLoadingProgress(pct, n, chunk));
+  console.log('BoardMD: ' + activeCards.length + ' active step cards loaded in ' + (Date.now()-t0) + 'ms');
+  buildDecks(activeCards);
   hideLoadingOverlay();
 
-  // Salva no IDB para próximo acesso instantâneo
-  try { setIDBCards(allCards); } catch(e){}
+  // Background: outros steps com spinner discreto
+  showBackgroundSpinner('Loading ' + otherLabel + '...');
+  fetchStepFromSupabase(otherDecks).then(otherCards => {
+    console.log('BoardMD: ' + otherCards.length + ' other step cards loaded in background');
+    // Merge: combina active + other em uma lista unica
+    const combined = activeCards.concat(otherCards);
+    buildDecks(combined);
+    // Salva no IDB para proximo acesso instantaneo (lista completa)
+    try { setIDBCards(combined); } catch(e){}
+    hideBackgroundSpinner();
+  }).catch(e => {
+    console.warn('BoardMD: background step load failed', e);
+    updateBackgroundSpinner('Background load failed');
+    setTimeout(hideBackgroundSpinner, 3000);
+    // Salva ao menos o que temos
+    try { setIDBCards(activeCards); } catch(e){}
+  });
 
-  return allCards.length;
+  return activeCards.length;
 }
 
 // ── Background refresh com retry automático ──
+// SETOR B v7: agora mostra spinner discreto se cache estava significativamente
+// desatualizado (>5% diff), dando feedback ao aluno que ha sincronizacao.
 function backgroundRefresh(cachedCount, attempt){
   attempt = attempt || 1;
   fetchAllFromSupabase().then(function(fresh){
     if(!fresh || fresh.length === 0){
       console.warn('BoardMD: background refresh returned empty');
       return;
+    }
+    const diff = Math.abs(fresh.length - cachedCount);
+    const pctDiff = cachedCount > 0 ? (diff / cachedCount) * 100 : 100;
+    if(pctDiff > 5){
+      // Cache desatualizado: aluno teve cards faltando — informa
+      showBackgroundSpinner('Syncing cards (' + diff + ' updates)...');
+      setTimeout(hideBackgroundSpinner, 2500);
     }
     buildDecks(fresh);
     try { setIDBCards(fresh); } catch(e){}
