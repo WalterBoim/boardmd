@@ -2,16 +2,14 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>BoardMD — Medical Board Review</title>
 <!-- PWA -->
 <link rel="manifest" href="/manifest.json">
 <meta name="theme-color" content="#080c12">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="BoardMD">
-<meta name="format-detection" content="telephone=no">
 <link rel="apple-touch-icon" href="/icon-192.png">
 <!-- Puter.js for Gemini AI (free tier) -->
 <script src="https://js.puter.com/v2/"></script>
@@ -6287,9 +6285,6 @@ function renderCard(){
   revealed=false;
   _cardStartTime = Date.now(); // track response time
   window._cardStartTime = _cardStartTime; // SETOR B v3: mirror to window for cross-script access
-  // SETOR B v6: reseta acumulador de idle time (visibility pause) a cada novo card
-  window._idleAccumMs = 0;
-  window._hiddenAt = 0;
   // ── SETOR B (item 2): zerar scroll de todas as colunas a cada novo card ──
   // Garante que ambas as colunas (esquerda/direita) e o container principal
   // comecem do topo. Aluno rola manualmente se quiser.
@@ -6862,65 +6857,28 @@ function revealAnswer(sel,card){
   if(revealed) return;
   revealed=true;
 
-  // ── SETOR B v6 — Time-validated scoring (anti-cheat / ranking justo) ──
-  // Classifica o tempo de resposta para ajustar coins, ranking e avgTime.
-  // Escala USMLE-aware com bonus para velocidade (filosofia Duolingo da Medicina):
-  //   <5s         : reflex      (clique acidental ou chute reflexo)        | 0 coins
-  //   5s - 15s    : lightning   (recognition de elite — top USMLE)          | +8 coins
-  //   15s - 45s   : fast        (target USMLE — aluno bem preparado)        | +6 coins
-  //   45s - 2min  : standard    (raciocinio normal)                          | +5 coins
-  //   2min - 5min : slow        (travou ou consultou — descarta avgTime)     | +2 coins
-  //   >5min       : idle/cheat  (provavelmente fez outra coisa)              | 0 coins
-  // Stats (correct/incorrect) SEMPRE contam — voce precisa saber que respondeu.
-  // O que varia eh coins/ranking/avgTime.
-  function classifyResponseTime(ms){
-    // ms negativo = sentinel do visibility pause (aba ficou hidden). Trata como idle.
-    if(ms < 0)             return 'idle';
-    if(!ms || ms < 5000)   return 'reflex';
-    if(ms < 15 * 1000)     return 'lightning';
-    if(ms < 45 * 1000)     return 'fast';
-    if(ms < 2 * 60 * 1000) return 'standard';
-    if(ms < 5 * 60 * 1000) return 'slow';
-    return 'idle';
-  }
-
-  let _responseMs = 0;
-  let _timeCategory = 'reflex';
+  // Track response time
   if(_cardStartTime > 0){
-    _responseMs = Date.now() - _cardStartTime;
-    // SETOR B v6: subtrai tempo que a aba ficou hidden (anti-cheat por troca de aba)
-    if(typeof window._idleAccumMs === 'number' && window._idleAccumMs > 0){
-      _responseMs = Math.max(0, _responseMs - window._idleAccumMs);
-    }
-    _timeCategory = classifyResponseTime(_responseMs);
-
-    // avgResponseMs: SO conta lightning/fast/standard (descarta slow/idle/reflex).
-    // Mantem o tempo medio honesto — sem inflar com cheating ou outliers.
-    if(_timeCategory === 'lightning' || _timeCategory === 'fast' || _timeCategory === 'standard'){
+    const responseMs = Date.now() - _cardStartTime;
+    if(responseMs > 500 && responseMs < 300000){ // 0.5s–5min = valid
       const g0 = getGami();
       const prev = g0.avgResponseMs || 0;
       const cnt  = g0.responseCount || 0;
-      g0.avgResponseMs = Math.round((prev * cnt + _responseMs) / (cnt + 1));
+      // Rolling average
+      g0.avgResponseMs = Math.round((prev * cnt + responseMs) / (cnt + 1));
       g0.responseCount = cnt + 1;
       saveGami(g0);
     }
-
-    // _sessionTotalMs (barra de status): conta lightning/fast/standard/slow.
-    // Descarta idle (>5min) e reflex (<5s) — nao refletem estudo real.
-    if(_timeCategory !== 'idle' && _timeCategory !== 'reflex'){
-      _sessionTotalMs += _responseMs;
+    // SETOR B v3 fix: contabiliza tempo na sessao AQUI (em revealAnswer),
+    // ANTES de zerar _cardStartTime. O codigo anterior tentava ler
+    // _cardStartTime dentro de rate(), mas a essa altura ja era 0.
+    if(responseMs > 200 && responseMs < 600000){
+      _sessionTotalMs += responseMs;
       window._sessionTotalMs = _sessionTotalMs;
     }
-
     _cardStartTime = 0;
     window._cardStartTime = 0;
-    // Reset idle accumulator para o proximo card
-    window._idleAccumMs = 0;
   }
-
-  // Expor a categoria no window para debug e outras camadas
-  window._lastResponseMs = _responseMs;
-  window._lastTimeCategory = _timeCategory;
 
   // Limpa grifos da pergunta ao revelar — mantém só os da explicação
   clearQHighlights();
@@ -6928,20 +6886,14 @@ function revealAnswer(sel,card){
 
   // ── SETOR B+ (filosofia MCQ-first): incrementa contador de sessao
   // AQUI (no clique da alternativa), nao no FSRS rating.
+  // O clique na alternativa eh a "resposta" real (UWorld-style).
   _sessionCardCount++;
   window._sessionCardCount = _sessionCardCount;
 
-  // SETOR B v5: chama o updater da barra de status diretamente
-  try {
-    if(typeof window._bmdUpdateStatusBar === 'function'){
-      requestAnimationFrame(window._bmdUpdateStatusBar);
-    }
-  } catch(e){}
-
   // ── SETOR B+ — registrar correct/incorrect imediatamente no clique
-  // SETOR B v6: stats SEMPRE contam (regardless of timeCategory) — voce
-  // precisa saber que respondeu, mesmo que tenha demorado/cheated.
-  // O que muda eh ranking/coins/avgTime, nao acerto/erro.
+  // (em vez de esperar o FSRS button). totalCorrect/totalIncorrect/deckStats
+  // sao atualizados aqui. O rate() ainda registra ratings de FSRS, mas
+  // estatisticas de performance ja estao salvas neste ponto.
   try {
     const _g = getGami();
     if(answeredCorrectly){
@@ -6963,24 +6915,8 @@ function revealAnswer(sel,card){
     saveGami(_g);
   } catch(e){ console.warn('MCQ-first stats write error:', e); }
 
-  // ── SETOR B v6 — Coins time-gated com bonus para velocidade ───────────
-  // lightning correct (5-15s):  +8 coins (recognition de elite)
-  // fast correct (15-45s):      +6 coins (target USMLE)
-  // standard correct (45s-2m):  +5 coins (raciocinio normal)
-  // slow correct (2-5min):      +2 coins (suspeito mas engajamento)
-  // idle/reflex correct:        0 coins  (estudo nao confiavel)
-  // qualquer errado:            0 coins  (regra MCQ-first)
-  if(typeof awardCoins === 'function' && answeredCorrectly){
-    if(_timeCategory === 'lightning'){
-      awardCoins(8, 'Correct (lightning)');
-    } else if(_timeCategory === 'fast'){
-      awardCoins(6, 'Correct (fast)');
-    } else if(_timeCategory === 'standard'){
-      awardCoins(5, 'Correct');
-    } else if(_timeCategory === 'slow'){
-      awardCoins(2, 'Correct (slow)');
-    }
-    // idle/reflex: zero coins
+  if(typeof awardCoins === 'function'){
+    if(answeredCorrectly) awardCoins(5, 'Correct');
   }
 
   // Highlight options
@@ -9926,91 +9862,6 @@ async function fetchAllFromSupabase(onProgress){
   return allCards;
 }
 
-// SETOR B v7 — fetch cards de um conjunto especifico de decks (lazy load por step)
-async function fetchStepFromSupabase(deckIds, onProgress){
-  const PAGE = 2000;
-  const allCards = [];
-  let from = 0;
-  let total = null;
-  while(true){
-    const { data, error, count } = await _supa
-      .from('cards')
-      .select('id,deck,system,topic,subject,qid,q,c,w,e,kp,d,img,pubmed_query,cochrane_pmid', { count: total === null ? 'exact' : undefined })
-      .in('deck', deckIds)
-      .order('id')
-      .range(from, from + PAGE - 1);
-    if(error || !data || data.length === 0) break;
-    if(total === null && count !== null) total = count;
-    allCards.push(...data);
-    from += PAGE;
-    if(onProgress) onProgress(total ? Math.round(allCards.length / total * 100) : 0, allCards.length, data);
-    if(data.length < PAGE) break;
-  }
-  return allCards;
-}
-
-// SETOR B v7 — Spinner discreto para background loading
-function showBackgroundSpinner(stepLabel){
-  let el = document.getElementById('bmd-bg-spinner');
-  if(!el){
-    el = document.createElement('div');
-    el.id = 'bmd-bg-spinner';
-    el.style.cssText = `
-      position: fixed;
-      bottom: 70px;
-      left: 14px;
-      background: rgba(20, 28, 46, 0.92);
-      color: #c8d0ee;
-      padding: 8px 14px;
-      border-radius: 20px;
-      font-family: 'Inter', -apple-system, sans-serif;
-      font-size: 11px;
-      font-weight: 500;
-      letter-spacing: .3px;
-      z-index: 9998;
-      box-shadow: 0 4px 14px rgba(0, 0, 0, .35);
-      border: 1px solid rgba(255, 255, 255, .08);
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      opacity: 0;
-      transition: opacity .3s ease;
-      pointer-events: none;
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
-    `;
-    el.innerHTML = `
-      <span style="display:inline-block;width:10px;height:10px;border:1.5px solid #4f8ef7;border-top-color:transparent;border-radius:50%;animation:bmdSpin 0.8s linear infinite;"></span>
-      <span id="bmd-bg-spinner-label">Loading...</span>
-    `;
-    // Add keyframes once
-    if(!document.getElementById('bmd-spin-style')){
-      const st = document.createElement('style');
-      st.id = 'bmd-spin-style';
-      st.textContent = '@keyframes bmdSpin{to{transform:rotate(360deg)}}';
-      document.head.appendChild(st);
-    }
-    document.body.appendChild(el);
-  }
-  const label = el.querySelector('#bmd-bg-spinner-label');
-  if(label) label.textContent = stepLabel;
-  // Fade in
-  requestAnimationFrame(() => { el.style.opacity = '1'; });
-}
-
-function hideBackgroundSpinner(){
-  const el = document.getElementById('bmd-bg-spinner');
-  if(el){
-    el.style.opacity = '0';
-    setTimeout(() => { try { el.remove(); } catch(e){} }, 400);
-  }
-}
-
-function updateBackgroundSpinner(stepLabel){
-  const lbl = document.getElementById('bmd-bg-spinner-label');
-  if(lbl) lbl.textContent = stepLabel;
-}
-
 async function loadCardsFromSupabase(){
   // ── IDB-FIRST: tenta cache local antes de bater no Supabase ──
   const meta = getIDBMeta();
@@ -10030,74 +9881,27 @@ async function loadCardsFromSupabase(){
     } catch(e){ console.warn('BoardMD: IDB read failed, falling back to Supabase'); }
   }
 
-  // ── SETOR B v7 — Lazy load: primeiro fetch SO do step ativo ──
-  // Resto carrega em background com spinner discreto.
-  // Target: <3s para UI 100% pronta no step ativo.
-  const activeStep = (typeof currentStep !== 'undefined' && currentStep) || localStorage.getItem('bmd_step') || 's2';
-  let activeDecks, otherDecks, activeLabel, otherLabel;
-  if(activeStep === 's1'){
-    activeDecks = STEP1_DECKS.slice();
-    otherDecks = STEP2_DECKS.concat(SHELF_DECKS).filter((d,i,a)=>a.indexOf(d)===i);
-    activeLabel = 'Step 1';
-    otherLabel = 'Step 2 + Shelf';
-  } else if(activeStep === 'shelf'){
-    activeDecks = SHELF_DECKS.slice();
-    otherDecks = STEP1_DECKS.concat(STEP2_DECKS).filter(d => !SHELF_DECKS.includes(d));
-    activeLabel = 'Shelf';
-    otherLabel = 'Step 1 + Step 2';
-  } else {
-    // s2 default
-    activeDecks = STEP2_DECKS.slice();
-    otherDecks = STEP1_DECKS.concat(SHELF_DECKS).filter(d => !STEP2_DECKS.includes(d));
-    activeLabel = 'Step 2 CK';
-    otherLabel = 'Step 1 + Shelf';
-  }
-
-  console.log('BoardMD: lazy loading — active step ' + activeLabel + ' first');
+  // ── Fallback: primeiro acesso ou cache vazio — fetch completo ──
+  console.log('BoardMD: loading from Supabase...');
   showLoadingOverlay();
-  const t0 = Date.now();
-  const activeCards = await fetchStepFromSupabase(activeDecks, (pct, n, chunk) => updateLoadingProgress(pct, n, chunk));
-  console.log('BoardMD: ' + activeCards.length + ' active step cards loaded in ' + (Date.now()-t0) + 'ms');
-  buildDecks(activeCards);
+  const allCards = await fetchAllFromSupabase((pct, n, chunk) => updateLoadingProgress(pct, n, chunk));
+  buildDecks(allCards);
+  console.log('BoardMD: ' + allCards.length + ' cards loaded');
   hideLoadingOverlay();
 
-  // Background: outros steps com spinner discreto
-  showBackgroundSpinner('Loading ' + otherLabel + '...');
-  fetchStepFromSupabase(otherDecks).then(otherCards => {
-    console.log('BoardMD: ' + otherCards.length + ' other step cards loaded in background');
-    // Merge: combina active + other em uma lista unica
-    const combined = activeCards.concat(otherCards);
-    buildDecks(combined);
-    // Salva no IDB para proximo acesso instantaneo (lista completa)
-    try { setIDBCards(combined); } catch(e){}
-    hideBackgroundSpinner();
-  }).catch(e => {
-    console.warn('BoardMD: background step load failed', e);
-    updateBackgroundSpinner('Background load failed');
-    setTimeout(hideBackgroundSpinner, 3000);
-    // Salva ao menos o que temos
-    try { setIDBCards(activeCards); } catch(e){}
-  });
+  // Salva no IDB para próximo acesso instantâneo
+  try { setIDBCards(allCards); } catch(e){}
 
-  return activeCards.length;
+  return allCards.length;
 }
 
 // ── Background refresh com retry automático ──
-// SETOR B v7: agora mostra spinner discreto se cache estava significativamente
-// desatualizado (>5% diff), dando feedback ao aluno que ha sincronizacao.
 function backgroundRefresh(cachedCount, attempt){
   attempt = attempt || 1;
   fetchAllFromSupabase().then(function(fresh){
     if(!fresh || fresh.length === 0){
       console.warn('BoardMD: background refresh returned empty');
       return;
-    }
-    const diff = Math.abs(fresh.length - cachedCount);
-    const pctDiff = cachedCount > 0 ? (diff / cachedCount) * 100 : 100;
-    if(pctDiff > 5){
-      // Cache desatualizado: aluno teve cards faltando — informa
-      showBackgroundSpinner('Syncing cards (' + diff + ' updates)...');
-      setTimeout(hideBackgroundSpinner, 2500);
     }
     buildDecks(fresh);
     try { setIDBCards(fresh); } catch(e){}
@@ -14057,413 +13861,6 @@ html.dark .hl-btn-active { border-color:#fff!important; }
   }
 </style>
 
-<!-- ═══════════════════════════════════════════════════════════════════════
-     SETOR F — Mobile App Fixed Layout (item 16)
-     Resolve o "scroll do navegador" que move toda a tela. Tela presa estilo
-     app nativo: header e bottom-nav fixos, só conteudo central rola.
-     Inclui safe-area iPhone (notch + home bar) e fix do iOS Safari URL bar.
-     ═══════════════════════════════════════════════════════════════════════ -->
-<style id="bmd-setor-f-mobile">
-  /* Variavel CSS dinamica para altura real do viewport (corrige iOS bug) */
-  :root {
-    --vh: 1vh;
-    --bmd-safe-top: env(safe-area-inset-top, 0px);
-    --bmd-safe-bottom: env(safe-area-inset-bottom, 0px);
-    --bmd-safe-left: env(safe-area-inset-left, 0px);
-    --bmd-safe-right: env(safe-area-inset-right, 0px);
-  }
-
-  /* ── ROOT: trava 100% da viewport, zero scroll do body ─────────────── */
-  html, body {
-    height: 100%;
-    height: 100dvh; /* dynamic viewport height — funciona no iOS moderno */
-    height: calc(var(--vh, 1vh) * 100); /* fallback via JS */
-    overflow: hidden !important;
-    overscroll-behavior: none !important; /* impede bounce que mostra fundo */
-    -webkit-overflow-scrolling: touch;
-    position: fixed; /* trava posicao — nao deixa o body se mover */
-    width: 100%;
-    top: 0; left: 0;
-    /* Anti-tap-highlight no mobile */
-    -webkit-tap-highlight-color: transparent;
-    /* Anti-text-selection acidental */
-    -webkit-touch-callout: none;
-  }
-
-  /* Permite selecao de texto onde faz sentido (perguntas, explicacoes) */
-  .card-q, .card-e, p, h1, h2, h3, .opt-text, input, textarea, [contenteditable] {
-    -webkit-touch-callout: default;
-    -webkit-user-select: text;
-    user-select: text;
-  }
-
-  /* ── APP CONTAINER: ocupa 100% e gerencia scroll interno ────────────── */
-  #app {
-    height: 100%;
-    height: 100dvh;
-    height: calc(var(--vh, 1vh) * 100);
-    width: 100%;
-    overflow: hidden;
-    position: relative;
-    display: flex;
-    flex-direction: column;
-  }
-
-  /* ── HEADER: fixo no topo + safe-area pra notch ──────────────────────── */
-  .app-header {
-    position: sticky !important;
-    top: 0 !important;
-    z-index: 200 !important;
-    flex-shrink: 0 !important;
-    padding-top: var(--bmd-safe-top) !important;
-  }
-
-  /* ── BOTTOM NAV: fixo + safe-area pra home bar iPhone ──────────────── */
-  .bmd-bottom-nav {
-    padding-bottom: calc(26px + var(--bmd-safe-bottom)) !important;
-    padding-left: var(--bmd-safe-left);
-    padding-right: var(--bmd-safe-right);
-  }
-
-  /* ── AREA CENTRAL: scroll proprio, contained, sem afetar tela ─────── */
-  /* Todos os containers de conteudo do app que devem scrollar */
-  #study-inner,
-  .study-inner,
-  .deck-home,
-  .lb-panel,
-  #app > main,
-  #app > section,
-  #bmd-q-col,
-  #bmd-ans-col,
-  #bmd-cols-row {
-    -webkit-overflow-scrolling: touch !important;
-    overscroll-behavior: contain !important; /* scroll para no limite, sem bounce */
-    touch-action: pan-y; /* permite scroll vertical, bloqueia horizontal */
-  }
-
-  /* ── MOBILE SPECIFIC ────────────────────────────────────────────────── */
-  @media (max-width: 600px) {
-    /* Garante que nao tem como arrastar a pagina toda no mobile */
-    body {
-      position: fixed !important;
-      width: 100% !important;
-      height: 100% !important;
-      overflow: hidden !important;
-    }
-
-    /* Espaco extra no fim do conteudo central para nao ficar atras do bottom-nav */
-    #app.active #study-inner,
-    #app.active .study-inner {
-      padding-bottom: calc(80px + var(--bmd-safe-bottom)) !important;
-    }
-
-    /* Touch targets minimum 44px (Apple HIG) */
-    .opt-btn, .fsrs-btn, .deck-row, .nav-item, button:not(.bmd-nav-link) {
-      min-height: 44px !important;
-    }
-
-    /* Bottom nav nao "encolhe" em mobile */
-    #app.active .bmd-bottom-nav {
-      padding-top: 8px !important;
-      padding-bottom: calc(20px + var(--bmd-safe-bottom)) !important;
-    }
-  }
-
-  /* ── PWA INSTALL PROMPT ───────────────────────────────────────────── */
-  #bmd-install-prompt {
-    position: fixed;
-    bottom: calc(80px + var(--bmd-safe-bottom));
-    left: 16px;
-    right: 16px;
-    max-width: 420px;
-    margin: 0 auto;
-    background: linear-gradient(135deg, #1a2334, #14202c);
-    color: #eef1ff;
-    padding: 14px 16px;
-    border-radius: 14px;
-    font-family: 'Inter', -apple-system, sans-serif;
-    font-size: 13px;
-    line-height: 1.45;
-    z-index: 9999;
-    box-shadow: 0 8px 28px rgba(0,0,0,.45), 0 0 0 1px rgba(255,255,255,.06);
-    display: none;
-    animation: bmdInstallSlideUp .35s cubic-bezier(.2,.8,.3,1);
-  }
-  #bmd-install-prompt.show { display: flex; align-items: center; gap: 12px; }
-  #bmd-install-prompt .install-icon {
-    width: 36px; height: 36px; flex-shrink: 0;
-    background: linear-gradient(135deg, #4f8ef7, #3b5fdc);
-    border-radius: 10px;
-    display: flex; align-items: center; justify-content: center;
-    box-shadow: 0 4px 12px rgba(79,142,247,.4);
-  }
-  #bmd-install-prompt .install-icon svg { width: 20px; height: 20px; fill: #fff; }
-  #bmd-install-prompt .install-text { flex: 1; min-width: 0; }
-  #bmd-install-prompt .install-title {
-    font-weight: 700; font-size: 13px; letter-spacing: .2px; margin-bottom: 2px;
-  }
-  #bmd-install-prompt .install-desc {
-    font-size: 11.5px; color: #a8b2c8; line-height: 1.35;
-  }
-  #bmd-install-prompt .install-btn {
-    background: #4f8ef7;
-    color: #fff;
-    border: none;
-    padding: 8px 14px;
-    border-radius: 8px;
-    font-family: inherit;
-    font-size: 12.5px;
-    font-weight: 700;
-    cursor: pointer;
-    flex-shrink: 0;
-    letter-spacing: .2px;
-  }
-  #bmd-install-prompt .install-btn:active { transform: scale(.96); }
-  #bmd-install-prompt .install-close {
-    background: transparent;
-    border: none;
-    color: #6b7891;
-    cursor: pointer;
-    padding: 4px;
-    margin-left: 4px;
-    font-size: 16px;
-    line-height: 1;
-  }
-  @keyframes bmdInstallSlideUp {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-  /* iOS Safari install instructions modal */
-  #bmd-ios-install-modal {
-    position: fixed; inset: 0;
-    background: rgba(0,0,0,.7);
-    backdrop-filter: blur(8px);
-    z-index: 10000;
-    display: none;
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
-  }
-  #bmd-ios-install-modal.show { display: flex; }
-  #bmd-ios-install-modal .ios-card {
-    background: #14202c;
-    color: #eef1ff;
-    padding: 28px 24px;
-    border-radius: 18px;
-    max-width: 360px;
-    text-align: center;
-    font-family: 'Inter', -apple-system, sans-serif;
-  }
-  #bmd-ios-install-modal h3 {
-    font-size: 18px; margin-bottom: 8px; font-weight: 700;
-  }
-  #bmd-ios-install-modal p {
-    font-size: 13.5px; color: #b0bcd2; margin-bottom: 16px; line-height: 1.5;
-  }
-  #bmd-ios-install-modal .ios-step {
-    background: rgba(79,142,247,.1);
-    border: 1px solid rgba(79,142,247,.2);
-    padding: 12px 14px;
-    border-radius: 10px;
-    margin-bottom: 10px;
-    font-size: 13px;
-    text-align: left;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-  #bmd-ios-install-modal .ios-step-num {
-    width: 22px; height: 22px;
-    background: #4f8ef7;
-    border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 11.5px; font-weight: 700;
-    flex-shrink: 0;
-  }
-  #bmd-ios-install-modal .ios-close {
-    margin-top: 10px;
-    background: transparent;
-    border: 1px solid rgba(255,255,255,.15);
-    color: #eef1ff;
-    padding: 10px 22px;
-    border-radius: 10px;
-    font-family: inherit;
-    font-size: 13px;
-    font-weight: 600;
-    cursor: pointer;
-  }
-</style>
-
-<script id="bmd-setor-f-script">
-/* SETOR F — Mobile App Fixed Layout + PWA Install
-   - Calcula --vh dinamicamente (corrige iOS Safari URL bar collapse)
-   - Detecta evento beforeinstallprompt (Android/Chrome)
-   - Mostra prompt customizado de install
-   - Trata iOS Safari (sem beforeinstallprompt — mostra instrucoes manuais)
-*/
-(function(){
-  'use strict';
-
-  // ── 1. Fix iOS Safari URL bar collapse: calcula --vh em real-time ───
-  function setVh(){
-    const vh = window.innerHeight * 0.01;
-    document.documentElement.style.setProperty('--vh', vh + 'px');
-  }
-  setVh();
-  window.addEventListener('resize', setVh);
-  window.addEventListener('orientationchange', () => setTimeout(setVh, 100));
-
-  // ── 2. PWA install detection ─────────────────────────────────────────
-  let _deferredPrompt = null;
-  const INSTALL_KEY = 'bmd_install_dismissed';
-  const INSTALL_INSTALLED = 'bmd_install_done';
-
-  function isStandalone(){
-    return window.matchMedia('(display-mode: standalone)').matches ||
-           window.navigator.standalone === true;
-  }
-
-  function isIOS(){
-    return /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-  }
-
-  function shouldShowPrompt(){
-    if(isStandalone()) return false; // ja instalado
-    if(localStorage.getItem(INSTALL_INSTALLED) === '1') return false;
-    const dismissed = localStorage.getItem(INSTALL_KEY);
-    if(dismissed){
-      // Re-mostra apos 7 dias
-      const age = Date.now() - parseInt(dismissed, 10);
-      if(age < 7 * 24 * 60 * 60 * 1000) return false;
-    }
-    return true;
-  }
-
-  // ── 3. Captura beforeinstallprompt (Chrome/Edge/Android) ─────────────
-  window.addEventListener('beforeinstallprompt', function(e){
-    e.preventDefault();
-    _deferredPrompt = e;
-    if(shouldShowPrompt()){
-      setTimeout(showInstallPrompt, 8000); // espera 8s antes de mostrar
-    }
-  });
-
-  // ── 4. iOS Safari nao tem beforeinstallprompt — detecta manualmente ─
-  function maybeShowIosInstall(){
-    if(!isIOS() || isStandalone()) return;
-    if(!shouldShowPrompt()) return;
-    setTimeout(showInstallPrompt, 12000); // espera 12s no iOS
-  }
-
-  // ── 5. Mostra prompt ─────────────────────────────────────────────────
-  function showInstallPrompt(){
-    if(document.getElementById('bmd-install-prompt')) return; // ja existe
-
-    const prompt = document.createElement('div');
-    prompt.id = 'bmd-install-prompt';
-    prompt.className = 'show';
-    prompt.innerHTML = `
-      <div class="install-icon">
-        <svg viewBox="0 0 24 24"><path d="M12 2L3 7v10l9 5 9-5V7l-9-5zm0 2.18L19 8v8l-7 3.89L5 16V8l7-3.82z"/><path d="M11 10v4H7l5 5 5-5h-4v-4z"/></svg>
-      </div>
-      <div class="install-text">
-        <div class="install-title">Install BoardMD</div>
-        <div class="install-desc">Faster access · works offline · home screen icon</div>
-      </div>
-      <button class="install-btn" id="bmd-install-btn">Install</button>
-      <button class="install-close" id="bmd-install-close" aria-label="Dismiss">×</button>
-    `;
-    document.body.appendChild(prompt);
-
-    document.getElementById('bmd-install-btn').addEventListener('click', triggerInstall);
-    document.getElementById('bmd-install-close').addEventListener('click', dismissPrompt);
-  }
-
-  function dismissPrompt(){
-    const el = document.getElementById('bmd-install-prompt');
-    if(el) el.remove();
-    localStorage.setItem(INSTALL_KEY, Date.now().toString());
-  }
-
-  async function triggerInstall(){
-    if(_deferredPrompt){
-      // Android/Chrome: usa o native prompt
-      _deferredPrompt.prompt();
-      const { outcome } = await _deferredPrompt.userChoice;
-      if(outcome === 'accepted'){
-        localStorage.setItem(INSTALL_INSTALLED, '1');
-      } else {
-        localStorage.setItem(INSTALL_KEY, Date.now().toString());
-      }
-      _deferredPrompt = null;
-      const el = document.getElementById('bmd-install-prompt');
-      if(el) el.remove();
-    } else if(isIOS()){
-      // iOS: mostra instrucoes manuais
-      showIosInstructions();
-    }
-  }
-
-  function showIosInstructions(){
-    let modal = document.getElementById('bmd-ios-install-modal');
-    if(!modal){
-      modal = document.createElement('div');
-      modal.id = 'bmd-ios-install-modal';
-      modal.innerHTML = `
-        <div class="ios-card" onclick="event.stopPropagation()">
-          <h3>Install BoardMD</h3>
-          <p>Get the app icon on your home screen for faster access</p>
-          <div class="ios-step">
-            <div class="ios-step-num">1</div>
-            <div>Tap the Share button <span style="font-size:18px">⬆</span></div>
-          </div>
-          <div class="ios-step">
-            <div class="ios-step-num">2</div>
-            <div>Scroll and tap "Add to Home Screen"</div>
-          </div>
-          <div class="ios-step">
-            <div class="ios-step-num">3</div>
-            <div>Tap "Add" in the top right</div>
-          </div>
-          <button class="ios-close" id="bmd-ios-modal-close">Got it</button>
-        </div>
-      `;
-      modal.addEventListener('click', closeIosInstructions);
-      document.body.appendChild(modal);
-      document.getElementById('bmd-ios-modal-close').addEventListener('click', function(e){
-        e.stopPropagation();
-        closeIosInstructions();
-      });
-    }
-    modal.classList.add('show');
-    // Fecha o prompt menor
-    const small = document.getElementById('bmd-install-prompt');
-    if(small) small.remove();
-  }
-
-  function closeIosInstructions(){
-    const modal = document.getElementById('bmd-ios-install-modal');
-    if(modal) modal.classList.remove('show');
-  }
-
-  // ── 6. Quando o app é instalado, marca no storage ────────────────────
-  window.addEventListener('appinstalled', function(){
-    localStorage.setItem(INSTALL_INSTALLED, '1');
-    const el = document.getElementById('bmd-install-prompt');
-    if(el) el.remove();
-  });
-
-  // ── 7. Inicia detector iOS apos page load ────────────────────────────
-  if(document.readyState === 'complete') maybeShowIosInstall();
-  else window.addEventListener('load', maybeShowIosInstall);
-
-  // ── 8. Expor para debug/manual trigger ───────────────────────────────
-  window.bmdShowInstallPrompt = showInstallPrompt;
-  window.bmdDismissInstall = dismissPrompt;
-})();
-</script>
-
 <script id="bmd-setor-a-script">
 /* SETOR A — Study Status Bar updater (item 12)
    Atualiza a barra "X cards · Y total · Z s/card" ao final de cada rate() */
@@ -14532,33 +13929,6 @@ html.dark .hl-btn-active { border-color:#fff!important; }
   setTimeout(updateStatusBar, 100);
   // Expor globalmente para debug
   window._bmdUpdateStatusBar = updateStatusBar;
-
-  // ── SETOR B v6 — Anti-cheat: pausa timer quando aba perde foco ────
-  // Estrategia "accumulate idle, dont punish":
-  //   - Quando aba fica escondida, marca o timestamp em window._hiddenAt
-  //   - Quando aba volta, calcula quanto tempo ficou hidden e SOMA em
-  //     window._idleAccumMs
-  //   - revealAnswer SUBTRAI window._idleAccumMs do _responseMs antes
-  //     de classificar — entao tempo idle nao infla cheat detection
-  //   - Se ficou hidden por >5min, considera idle/abandono total — o
-  //     responseMs efetivo vai cair em 'idle' naturalmente
-  // Isso protege contra falso positivo (aluno abre WhatsApp 30s e volta).
-  if(!window._idleAccumMs) window._idleAccumMs = 0;
-  document.addEventListener('visibilitychange', function(){
-    try {
-      if(document.hidden){
-        window._hiddenAt = Date.now();
-      } else {
-        const hiddenAt = window._hiddenAt || 0;
-        if(hiddenAt > 0){
-          const hiddenMs = Date.now() - hiddenAt;
-          // Acumula tempo idle (nao penaliza, apenas desconta na hora de classificar)
-          window._idleAccumMs = (window._idleAccumMs || 0) + hiddenMs;
-        }
-        window._hiddenAt = 0;
-      }
-    } catch(e){}
-  });
 })();
 
 // ── SETOR B (item 5) — Back / Skip handlers ──────────────────────
