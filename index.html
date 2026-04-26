@@ -6284,6 +6284,7 @@ function shuffleOpts(card){
 function renderCard(){
   revealed=false;
   _cardStartTime = Date.now(); // track response time
+  window._cardStartTime = _cardStartTime; // SETOR B v3: mirror to window for cross-script access
   // ── SETOR B (item 2): zerar scroll de todas as colunas a cada novo card ──
   // Garante que ambas as colunas (esquerda/direita) e o container principal
   // comecem do topo. Aluno rola manualmente se quiser.
@@ -6868,7 +6869,15 @@ function revealAnswer(sel,card){
       g0.responseCount = cnt + 1;
       saveGami(g0);
     }
+    // SETOR B v3 fix: contabiliza tempo na sessao AQUI (em revealAnswer),
+    // ANTES de zerar _cardStartTime. O codigo anterior tentava ler
+    // _cardStartTime dentro de rate(), mas a essa altura ja era 0.
+    if(responseMs > 200 && responseMs < 600000){
+      _sessionTotalMs += responseMs;
+      window._sessionTotalMs = _sessionTotalMs;
+    }
     _cardStartTime = 0;
+    window._cardStartTime = 0;
   }
 
   // Limpa grifos da pergunta ao revelar — mantém só os da explicação
@@ -7336,18 +7345,12 @@ function rate(r){
   }
 
   // SETOR A — telemetria de sessão (item 12: barra de status)
-  // SETOR B fix: tambem escreve em window.* porque 'let' top-level NAO
-  // cria propriedade em window. Sem isso, o wrapper externo de status bar
-  // le window._sessionCardCount como undefined.
+  // SETOR B v3: o tempo de resposta agora eh contabilizado em revealAnswer
+  // (antes do reset de _cardStartTime), porque rate() executa DEPOIS de
+  // revealAnswer ter zerado _cardStartTime. Aqui apenas incrementamos o
+  // contador de cards respondidos.
   _sessionCardCount++;
   window._sessionCardCount = _sessionCardCount;
-  if(_cardStartTime > 0){
-    const dt = Date.now() - _cardStartTime;
-    if(dt > 200 && dt < 600000){
-      _sessionTotalMs += dt; // ignora outliers
-      window._sessionTotalMs = _sessionTotalMs;
-    }
-  }
 
   // Track study history for heatmap
   try {
