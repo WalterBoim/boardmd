@@ -6285,6 +6285,9 @@ function renderCard(){
   revealed=false;
   _cardStartTime = Date.now(); // track response time
   window._cardStartTime = _cardStartTime; // SETOR B v3: mirror to window for cross-script access
+  // SETOR B v6: reseta acumulador de idle time (visibility pause) a cada novo card
+  window._idleAccumMs = 0;
+  window._hiddenAt = 0;
   // ── SETOR B (item 2): zerar scroll de todas as colunas a cada novo card ──
   // Garante que ambas as colunas (esquerda/direita) e o container principal
   // comecem do topo. Aluno rola manualmente se quiser.
@@ -6857,28 +6860,65 @@ function revealAnswer(sel,card){
   if(revealed) return;
   revealed=true;
 
-  // Track response time
+  // ── SETOR B v6 — Time-validated scoring (anti-cheat / ranking justo) ──
+  // Classifica o tempo de resposta para ajustar coins, ranking e avgTime.
+  // Escala USMLE-aware com bonus para velocidade (filosofia Duolingo da Medicina):
+  //   <5s         : reflex      (clique acidental ou chute reflexo)        | 0 coins
+  //   5s - 15s    : lightning   (recognition de elite — top USMLE)          | +8 coins
+  //   15s - 45s   : fast        (target USMLE — aluno bem preparado)        | +6 coins
+  //   45s - 2min  : standard    (raciocinio normal)                          | +5 coins
+  //   2min - 5min : slow        (travou ou consultou — descarta avgTime)     | +2 coins
+  //   >5min       : idle/cheat  (provavelmente fez outra coisa)              | 0 coins
+  // Stats (correct/incorrect) SEMPRE contam — voce precisa saber que respondeu.
+  // O que varia eh coins/ranking/avgTime.
+  function classifyResponseTime(ms){
+    // ms negativo = sentinel do visibility pause (aba ficou hidden). Trata como idle.
+    if(ms < 0)             return 'idle';
+    if(!ms || ms < 5000)   return 'reflex';
+    if(ms < 15 * 1000)     return 'lightning';
+    if(ms < 45 * 1000)     return 'fast';
+    if(ms < 2 * 60 * 1000) return 'standard';
+    if(ms < 5 * 60 * 1000) return 'slow';
+    return 'idle';
+  }
+
+  let _responseMs = 0;
+  let _timeCategory = 'reflex';
   if(_cardStartTime > 0){
-    const responseMs = Date.now() - _cardStartTime;
-    if(responseMs > 500 && responseMs < 300000){ // 0.5s–5min = valid
+    _responseMs = Date.now() - _cardStartTime;
+    // SETOR B v6: subtrai tempo que a aba ficou hidden (anti-cheat por troca de aba)
+    if(typeof window._idleAccumMs === 'number' && window._idleAccumMs > 0){
+      _responseMs = Math.max(0, _responseMs - window._idleAccumMs);
+    }
+    _timeCategory = classifyResponseTime(_responseMs);
+
+    // avgResponseMs: SO conta lightning/fast/standard (descarta slow/idle/reflex).
+    // Mantem o tempo medio honesto — sem inflar com cheating ou outliers.
+    if(_timeCategory === 'lightning' || _timeCategory === 'fast' || _timeCategory === 'standard'){
       const g0 = getGami();
       const prev = g0.avgResponseMs || 0;
       const cnt  = g0.responseCount || 0;
-      // Rolling average
-      g0.avgResponseMs = Math.round((prev * cnt + responseMs) / (cnt + 1));
+      g0.avgResponseMs = Math.round((prev * cnt + _responseMs) / (cnt + 1));
       g0.responseCount = cnt + 1;
       saveGami(g0);
     }
-    // SETOR B v3 fix: contabiliza tempo na sessao AQUI (em revealAnswer),
-    // ANTES de zerar _cardStartTime. O codigo anterior tentava ler
-    // _cardStartTime dentro de rate(), mas a essa altura ja era 0.
-    if(responseMs > 200 && responseMs < 600000){
-      _sessionTotalMs += responseMs;
+
+    // _sessionTotalMs (barra de status): conta lightning/fast/standard/slow.
+    // Descarta idle (>5min) e reflex (<5s) — nao refletem estudo real.
+    if(_timeCategory !== 'idle' && _timeCategory !== 'reflex'){
+      _sessionTotalMs += _responseMs;
       window._sessionTotalMs = _sessionTotalMs;
     }
+
     _cardStartTime = 0;
     window._cardStartTime = 0;
+    // Reset idle accumulator para o proximo card
+    window._idleAccumMs = 0;
   }
+
+  // Expor a categoria no window para debug e outras camadas
+  window._lastResponseMs = _responseMs;
+  window._lastTimeCategory = _timeCategory;
 
   // Limpa grifos da pergunta ao revelar — mantém só os da explicação
   clearQHighlights();
@@ -6886,12 +6926,10 @@ function revealAnswer(sel,card){
 
   // ── SETOR B+ (filosofia MCQ-first): incrementa contador de sessao
   // AQUI (no clique da alternativa), nao no FSRS rating.
-  // O clique na alternativa eh a "resposta" real (UWorld-style).
   _sessionCardCount++;
   window._sessionCardCount = _sessionCardCount;
 
   // SETOR B v5: chama o updater da barra de status diretamente
-  // (revealAnswer nao eh wrappado pelo updater como rate() eh).
   try {
     if(typeof window._bmdUpdateStatusBar === 'function'){
       requestAnimationFrame(window._bmdUpdateStatusBar);
@@ -6899,9 +6937,9 @@ function revealAnswer(sel,card){
   } catch(e){}
 
   // ── SETOR B+ — registrar correct/incorrect imediatamente no clique
-  // (em vez de esperar o FSRS button). totalCorrect/totalIncorrect/deckStats
-  // sao atualizados aqui. O rate() ainda registra ratings de FSRS, mas
-  // estatisticas de performance ja estao salvas neste ponto.
+  // SETOR B v6: stats SEMPRE contam (regardless of timeCategory) — voce
+  // precisa saber que respondeu, mesmo que tenha demorado/cheated.
+  // O que muda eh ranking/coins/avgTime, nao acerto/erro.
   try {
     const _g = getGami();
     if(answeredCorrectly){
@@ -6923,8 +6961,24 @@ function revealAnswer(sel,card){
     saveGami(_g);
   } catch(e){ console.warn('MCQ-first stats write error:', e); }
 
-  if(typeof awardCoins === 'function'){
-    if(answeredCorrectly) awardCoins(5, 'Correct');
+  // ── SETOR B v6 — Coins time-gated com bonus para velocidade ───────────
+  // lightning correct (5-15s):  +8 coins (recognition de elite)
+  // fast correct (15-45s):      +6 coins (target USMLE)
+  // standard correct (45s-2m):  +5 coins (raciocinio normal)
+  // slow correct (2-5min):      +2 coins (suspeito mas engajamento)
+  // idle/reflex correct:        0 coins  (estudo nao confiavel)
+  // qualquer errado:            0 coins  (regra MCQ-first)
+  if(typeof awardCoins === 'function' && answeredCorrectly){
+    if(_timeCategory === 'lightning'){
+      awardCoins(8, 'Correct (lightning)');
+    } else if(_timeCategory === 'fast'){
+      awardCoins(6, 'Correct (fast)');
+    } else if(_timeCategory === 'standard'){
+      awardCoins(5, 'Correct');
+    } else if(_timeCategory === 'slow'){
+      awardCoins(2, 'Correct (slow)');
+    }
+    // idle/reflex: zero coins
   }
 
   // Highlight options
@@ -13937,6 +13991,33 @@ html.dark .hl-btn-active { border-color:#fff!important; }
   setTimeout(updateStatusBar, 100);
   // Expor globalmente para debug
   window._bmdUpdateStatusBar = updateStatusBar;
+
+  // ── SETOR B v6 — Anti-cheat: pausa timer quando aba perde foco ────
+  // Estrategia "accumulate idle, dont punish":
+  //   - Quando aba fica escondida, marca o timestamp em window._hiddenAt
+  //   - Quando aba volta, calcula quanto tempo ficou hidden e SOMA em
+  //     window._idleAccumMs
+  //   - revealAnswer SUBTRAI window._idleAccumMs do _responseMs antes
+  //     de classificar — entao tempo idle nao infla cheat detection
+  //   - Se ficou hidden por >5min, considera idle/abandono total — o
+  //     responseMs efetivo vai cair em 'idle' naturalmente
+  // Isso protege contra falso positivo (aluno abre WhatsApp 30s e volta).
+  if(!window._idleAccumMs) window._idleAccumMs = 0;
+  document.addEventListener('visibilitychange', function(){
+    try {
+      if(document.hidden){
+        window._hiddenAt = Date.now();
+      } else {
+        const hiddenAt = window._hiddenAt || 0;
+        if(hiddenAt > 0){
+          const hiddenMs = Date.now() - hiddenAt;
+          // Acumula tempo idle (nao penaliza, apenas desconta na hora de classificar)
+          window._idleAccumMs = (window._idleAccumMs || 0) + hiddenMs;
+        }
+        window._hiddenAt = 0;
+      }
+    } catch(e){}
+  });
 })();
 
 // ── SETOR B (item 5) — Back / Skip handlers ──────────────────────
