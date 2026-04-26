@@ -2,14 +2,16 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>BoardMD — Medical Board Review</title>
 <!-- PWA -->
 <link rel="manifest" href="/manifest.json">
 <meta name="theme-color" content="#080c12">
 <meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="BoardMD">
+<meta name="format-detection" content="telephone=no">
 <link rel="apple-touch-icon" href="/icon-192.png">
 <!-- Puter.js for Gemini AI (free tier) -->
 <script src="https://js.puter.com/v2/"></script>
@@ -14054,6 +14056,413 @@ html.dark .hl-btn-active { border-color:#fff!important; }
     font-size: 11px;
   }
 </style>
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     SETOR F — Mobile App Fixed Layout (item 16)
+     Resolve o "scroll do navegador" que move toda a tela. Tela presa estilo
+     app nativo: header e bottom-nav fixos, só conteudo central rola.
+     Inclui safe-area iPhone (notch + home bar) e fix do iOS Safari URL bar.
+     ═══════════════════════════════════════════════════════════════════════ -->
+<style id="bmd-setor-f-mobile">
+  /* Variavel CSS dinamica para altura real do viewport (corrige iOS bug) */
+  :root {
+    --vh: 1vh;
+    --bmd-safe-top: env(safe-area-inset-top, 0px);
+    --bmd-safe-bottom: env(safe-area-inset-bottom, 0px);
+    --bmd-safe-left: env(safe-area-inset-left, 0px);
+    --bmd-safe-right: env(safe-area-inset-right, 0px);
+  }
+
+  /* ── ROOT: trava 100% da viewport, zero scroll do body ─────────────── */
+  html, body {
+    height: 100%;
+    height: 100dvh; /* dynamic viewport height — funciona no iOS moderno */
+    height: calc(var(--vh, 1vh) * 100); /* fallback via JS */
+    overflow: hidden !important;
+    overscroll-behavior: none !important; /* impede bounce que mostra fundo */
+    -webkit-overflow-scrolling: touch;
+    position: fixed; /* trava posicao — nao deixa o body se mover */
+    width: 100%;
+    top: 0; left: 0;
+    /* Anti-tap-highlight no mobile */
+    -webkit-tap-highlight-color: transparent;
+    /* Anti-text-selection acidental */
+    -webkit-touch-callout: none;
+  }
+
+  /* Permite selecao de texto onde faz sentido (perguntas, explicacoes) */
+  .card-q, .card-e, p, h1, h2, h3, .opt-text, input, textarea, [contenteditable] {
+    -webkit-touch-callout: default;
+    -webkit-user-select: text;
+    user-select: text;
+  }
+
+  /* ── APP CONTAINER: ocupa 100% e gerencia scroll interno ────────────── */
+  #app {
+    height: 100%;
+    height: 100dvh;
+    height: calc(var(--vh, 1vh) * 100);
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ── HEADER: fixo no topo + safe-area pra notch ──────────────────────── */
+  .app-header {
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 200 !important;
+    flex-shrink: 0 !important;
+    padding-top: var(--bmd-safe-top) !important;
+  }
+
+  /* ── BOTTOM NAV: fixo + safe-area pra home bar iPhone ──────────────── */
+  .bmd-bottom-nav {
+    padding-bottom: calc(26px + var(--bmd-safe-bottom)) !important;
+    padding-left: var(--bmd-safe-left);
+    padding-right: var(--bmd-safe-right);
+  }
+
+  /* ── AREA CENTRAL: scroll proprio, contained, sem afetar tela ─────── */
+  /* Todos os containers de conteudo do app que devem scrollar */
+  #study-inner,
+  .study-inner,
+  .deck-home,
+  .lb-panel,
+  #app > main,
+  #app > section,
+  #bmd-q-col,
+  #bmd-ans-col,
+  #bmd-cols-row {
+    -webkit-overflow-scrolling: touch !important;
+    overscroll-behavior: contain !important; /* scroll para no limite, sem bounce */
+    touch-action: pan-y; /* permite scroll vertical, bloqueia horizontal */
+  }
+
+  /* ── MOBILE SPECIFIC ────────────────────────────────────────────────── */
+  @media (max-width: 600px) {
+    /* Garante que nao tem como arrastar a pagina toda no mobile */
+    body {
+      position: fixed !important;
+      width: 100% !important;
+      height: 100% !important;
+      overflow: hidden !important;
+    }
+
+    /* Espaco extra no fim do conteudo central para nao ficar atras do bottom-nav */
+    #app.active #study-inner,
+    #app.active .study-inner {
+      padding-bottom: calc(80px + var(--bmd-safe-bottom)) !important;
+    }
+
+    /* Touch targets minimum 44px (Apple HIG) */
+    .opt-btn, .fsrs-btn, .deck-row, .nav-item, button:not(.bmd-nav-link) {
+      min-height: 44px !important;
+    }
+
+    /* Bottom nav nao "encolhe" em mobile */
+    #app.active .bmd-bottom-nav {
+      padding-top: 8px !important;
+      padding-bottom: calc(20px + var(--bmd-safe-bottom)) !important;
+    }
+  }
+
+  /* ── PWA INSTALL PROMPT ───────────────────────────────────────────── */
+  #bmd-install-prompt {
+    position: fixed;
+    bottom: calc(80px + var(--bmd-safe-bottom));
+    left: 16px;
+    right: 16px;
+    max-width: 420px;
+    margin: 0 auto;
+    background: linear-gradient(135deg, #1a2334, #14202c);
+    color: #eef1ff;
+    padding: 14px 16px;
+    border-radius: 14px;
+    font-family: 'Inter', -apple-system, sans-serif;
+    font-size: 13px;
+    line-height: 1.45;
+    z-index: 9999;
+    box-shadow: 0 8px 28px rgba(0,0,0,.45), 0 0 0 1px rgba(255,255,255,.06);
+    display: none;
+    animation: bmdInstallSlideUp .35s cubic-bezier(.2,.8,.3,1);
+  }
+  #bmd-install-prompt.show { display: flex; align-items: center; gap: 12px; }
+  #bmd-install-prompt .install-icon {
+    width: 36px; height: 36px; flex-shrink: 0;
+    background: linear-gradient(135deg, #4f8ef7, #3b5fdc);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 4px 12px rgba(79,142,247,.4);
+  }
+  #bmd-install-prompt .install-icon svg { width: 20px; height: 20px; fill: #fff; }
+  #bmd-install-prompt .install-text { flex: 1; min-width: 0; }
+  #bmd-install-prompt .install-title {
+    font-weight: 700; font-size: 13px; letter-spacing: .2px; margin-bottom: 2px;
+  }
+  #bmd-install-prompt .install-desc {
+    font-size: 11.5px; color: #a8b2c8; line-height: 1.35;
+  }
+  #bmd-install-prompt .install-btn {
+    background: #4f8ef7;
+    color: #fff;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 12.5px;
+    font-weight: 700;
+    cursor: pointer;
+    flex-shrink: 0;
+    letter-spacing: .2px;
+  }
+  #bmd-install-prompt .install-btn:active { transform: scale(.96); }
+  #bmd-install-prompt .install-close {
+    background: transparent;
+    border: none;
+    color: #6b7891;
+    cursor: pointer;
+    padding: 4px;
+    margin-left: 4px;
+    font-size: 16px;
+    line-height: 1;
+  }
+  @keyframes bmdInstallSlideUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* iOS Safari install instructions modal */
+  #bmd-ios-install-modal {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,.7);
+    backdrop-filter: blur(8px);
+    z-index: 10000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  #bmd-ios-install-modal.show { display: flex; }
+  #bmd-ios-install-modal .ios-card {
+    background: #14202c;
+    color: #eef1ff;
+    padding: 28px 24px;
+    border-radius: 18px;
+    max-width: 360px;
+    text-align: center;
+    font-family: 'Inter', -apple-system, sans-serif;
+  }
+  #bmd-ios-install-modal h3 {
+    font-size: 18px; margin-bottom: 8px; font-weight: 700;
+  }
+  #bmd-ios-install-modal p {
+    font-size: 13.5px; color: #b0bcd2; margin-bottom: 16px; line-height: 1.5;
+  }
+  #bmd-ios-install-modal .ios-step {
+    background: rgba(79,142,247,.1);
+    border: 1px solid rgba(79,142,247,.2);
+    padding: 12px 14px;
+    border-radius: 10px;
+    margin-bottom: 10px;
+    font-size: 13px;
+    text-align: left;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  #bmd-ios-install-modal .ios-step-num {
+    width: 22px; height: 22px;
+    background: #4f8ef7;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11.5px; font-weight: 700;
+    flex-shrink: 0;
+  }
+  #bmd-ios-install-modal .ios-close {
+    margin-top: 10px;
+    background: transparent;
+    border: 1px solid rgba(255,255,255,.15);
+    color: #eef1ff;
+    padding: 10px 22px;
+    border-radius: 10px;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+</style>
+
+<script id="bmd-setor-f-script">
+/* SETOR F — Mobile App Fixed Layout + PWA Install
+   - Calcula --vh dinamicamente (corrige iOS Safari URL bar collapse)
+   - Detecta evento beforeinstallprompt (Android/Chrome)
+   - Mostra prompt customizado de install
+   - Trata iOS Safari (sem beforeinstallprompt — mostra instrucoes manuais)
+*/
+(function(){
+  'use strict';
+
+  // ── 1. Fix iOS Safari URL bar collapse: calcula --vh em real-time ───
+  function setVh(){
+    const vh = window.innerHeight * 0.01;
+    document.documentElement.style.setProperty('--vh', vh + 'px');
+  }
+  setVh();
+  window.addEventListener('resize', setVh);
+  window.addEventListener('orientationchange', () => setTimeout(setVh, 100));
+
+  // ── 2. PWA install detection ─────────────────────────────────────────
+  let _deferredPrompt = null;
+  const INSTALL_KEY = 'bmd_install_dismissed';
+  const INSTALL_INSTALLED = 'bmd_install_done';
+
+  function isStandalone(){
+    return window.matchMedia('(display-mode: standalone)').matches ||
+           window.navigator.standalone === true;
+  }
+
+  function isIOS(){
+    return /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+  }
+
+  function shouldShowPrompt(){
+    if(isStandalone()) return false; // ja instalado
+    if(localStorage.getItem(INSTALL_INSTALLED) === '1') return false;
+    const dismissed = localStorage.getItem(INSTALL_KEY);
+    if(dismissed){
+      // Re-mostra apos 7 dias
+      const age = Date.now() - parseInt(dismissed, 10);
+      if(age < 7 * 24 * 60 * 60 * 1000) return false;
+    }
+    return true;
+  }
+
+  // ── 3. Captura beforeinstallprompt (Chrome/Edge/Android) ─────────────
+  window.addEventListener('beforeinstallprompt', function(e){
+    e.preventDefault();
+    _deferredPrompt = e;
+    if(shouldShowPrompt()){
+      setTimeout(showInstallPrompt, 8000); // espera 8s antes de mostrar
+    }
+  });
+
+  // ── 4. iOS Safari nao tem beforeinstallprompt — detecta manualmente ─
+  function maybeShowIosInstall(){
+    if(!isIOS() || isStandalone()) return;
+    if(!shouldShowPrompt()) return;
+    setTimeout(showInstallPrompt, 12000); // espera 12s no iOS
+  }
+
+  // ── 5. Mostra prompt ─────────────────────────────────────────────────
+  function showInstallPrompt(){
+    if(document.getElementById('bmd-install-prompt')) return; // ja existe
+
+    const prompt = document.createElement('div');
+    prompt.id = 'bmd-install-prompt';
+    prompt.className = 'show';
+    prompt.innerHTML = `
+      <div class="install-icon">
+        <svg viewBox="0 0 24 24"><path d="M12 2L3 7v10l9 5 9-5V7l-9-5zm0 2.18L19 8v8l-7 3.89L5 16V8l7-3.82z"/><path d="M11 10v4H7l5 5 5-5h-4v-4z"/></svg>
+      </div>
+      <div class="install-text">
+        <div class="install-title">Install BoardMD</div>
+        <div class="install-desc">Faster access · works offline · home screen icon</div>
+      </div>
+      <button class="install-btn" id="bmd-install-btn">Install</button>
+      <button class="install-close" id="bmd-install-close" aria-label="Dismiss">×</button>
+    `;
+    document.body.appendChild(prompt);
+
+    document.getElementById('bmd-install-btn').addEventListener('click', triggerInstall);
+    document.getElementById('bmd-install-close').addEventListener('click', dismissPrompt);
+  }
+
+  function dismissPrompt(){
+    const el = document.getElementById('bmd-install-prompt');
+    if(el) el.remove();
+    localStorage.setItem(INSTALL_KEY, Date.now().toString());
+  }
+
+  async function triggerInstall(){
+    if(_deferredPrompt){
+      // Android/Chrome: usa o native prompt
+      _deferredPrompt.prompt();
+      const { outcome } = await _deferredPrompt.userChoice;
+      if(outcome === 'accepted'){
+        localStorage.setItem(INSTALL_INSTALLED, '1');
+      } else {
+        localStorage.setItem(INSTALL_KEY, Date.now().toString());
+      }
+      _deferredPrompt = null;
+      const el = document.getElementById('bmd-install-prompt');
+      if(el) el.remove();
+    } else if(isIOS()){
+      // iOS: mostra instrucoes manuais
+      showIosInstructions();
+    }
+  }
+
+  function showIosInstructions(){
+    let modal = document.getElementById('bmd-ios-install-modal');
+    if(!modal){
+      modal = document.createElement('div');
+      modal.id = 'bmd-ios-install-modal';
+      modal.innerHTML = `
+        <div class="ios-card" onclick="event.stopPropagation()">
+          <h3>Install BoardMD</h3>
+          <p>Get the app icon on your home screen for faster access</p>
+          <div class="ios-step">
+            <div class="ios-step-num">1</div>
+            <div>Tap the Share button <span style="font-size:18px">⬆</span></div>
+          </div>
+          <div class="ios-step">
+            <div class="ios-step-num">2</div>
+            <div>Scroll and tap "Add to Home Screen"</div>
+          </div>
+          <div class="ios-step">
+            <div class="ios-step-num">3</div>
+            <div>Tap "Add" in the top right</div>
+          </div>
+          <button class="ios-close" id="bmd-ios-modal-close">Got it</button>
+        </div>
+      `;
+      modal.addEventListener('click', closeIosInstructions);
+      document.body.appendChild(modal);
+      document.getElementById('bmd-ios-modal-close').addEventListener('click', function(e){
+        e.stopPropagation();
+        closeIosInstructions();
+      });
+    }
+    modal.classList.add('show');
+    // Fecha o prompt menor
+    const small = document.getElementById('bmd-install-prompt');
+    if(small) small.remove();
+  }
+
+  function closeIosInstructions(){
+    const modal = document.getElementById('bmd-ios-install-modal');
+    if(modal) modal.classList.remove('show');
+  }
+
+  // ── 6. Quando o app é instalado, marca no storage ────────────────────
+  window.addEventListener('appinstalled', function(){
+    localStorage.setItem(INSTALL_INSTALLED, '1');
+    const el = document.getElementById('bmd-install-prompt');
+    if(el) el.remove();
+  });
+
+  // ── 7. Inicia detector iOS apos page load ────────────────────────────
+  if(document.readyState === 'complete') maybeShowIosInstall();
+  else window.addEventListener('load', maybeShowIosInstall);
+
+  // ── 8. Expor para debug/manual trigger ───────────────────────────────
+  window.bmdShowInstallPrompt = showInstallPrompt;
+  window.bmdDismissInstall = dismissPrompt;
+})();
+</script>
 
 <script id="bmd-setor-a-script">
 /* SETOR A — Study Status Bar updater (item 12)
