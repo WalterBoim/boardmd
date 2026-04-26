@@ -6884,6 +6884,37 @@ function revealAnswer(sel,card){
   clearQHighlights();
   const answeredCorrectly=(sel===card.c);
 
+  // ── SETOR B+ (filosofia MCQ-first): incrementa contador de sessao
+  // AQUI (no clique da alternativa), nao no FSRS rating.
+  // O clique na alternativa eh a "resposta" real (UWorld-style).
+  _sessionCardCount++;
+  window._sessionCardCount = _sessionCardCount;
+
+  // ── SETOR B+ — registrar correct/incorrect imediatamente no clique
+  // (em vez de esperar o FSRS button). totalCorrect/totalIncorrect/deckStats
+  // sao atualizados aqui. O rate() ainda registra ratings de FSRS, mas
+  // estatisticas de performance ja estao salvas neste ponto.
+  try {
+    const _g = getGami();
+    if(answeredCorrectly){
+      _g.totalCorrect = (_g.totalCorrect||0) + 1;
+    } else {
+      _g.totalIncorrect = (_g.totalIncorrect||0) + 1;
+    }
+    if(!_g.deckStats) _g.deckStats = {};
+    if(!_g.deckStats[card.deck]) _g.deckStats[card.deck] = {correct:0, incorrect:0, seen:0};
+    _g.deckStats[card.deck].seen++;
+    if(answeredCorrectly) _g.deckStats[card.deck].correct++;
+    else                  _g.deckStats[card.deck].incorrect++;
+    if(card.system){
+      if(!_g.systemStats) _g.systemStats = {};
+      if(!_g.systemStats[card.system]) _g.systemStats[card.system] = {correct:0, incorrect:0};
+      if(answeredCorrectly) _g.systemStats[card.system].correct++;
+      else                  _g.systemStats[card.system].incorrect++;
+    }
+    saveGami(_g);
+  } catch(e){ console.warn('MCQ-first stats write error:', e); }
+
   if(typeof awardCoins === 'function'){
     if(answeredCorrectly) awardCoins(5, 'Correct');
   }
@@ -7300,25 +7331,24 @@ function rate(r){
   const keys=['again','hard','good','easy'];
   sessionRatings[card.id]=keys[r];
 
-  // Gamification stats (coins awarded in revealAnswer)
-  const g2=getGami();
-  if(r===0){g2.totalIncorrect=(g2.totalIncorrect||0)+1;}
-  else if(r===1){g2.totalHard=(g2.totalHard||0)+1;g2.totalCorrect=(g2.totalCorrect||0)+1;}
-  else{g2.totalCorrect=(g2.totalCorrect||0)+1;}
-  if(!g2.deckStats) g2.deckStats={};
-  if(!g2.deckStats[card.deck]) g2.deckStats[card.deck]={correct:0,incorrect:0,seen:0};
-  g2.deckStats[card.deck].seen++;
-  if(r===0) g2.deckStats[card.deck].incorrect++;
-  else      g2.deckStats[card.deck].correct++;
-  // Track system-level stats
-  if(card.system){
-    if(!g2.systemStats) g2.systemStats={};
-    const sys = card.system;
-    if(!g2.systemStats[sys]) g2.systemStats[sys]={correct:0,incorrect:0};
-    if(r===0) g2.systemStats[sys].incorrect++;
-    else      g2.systemStats[sys].correct++;
+  // SETOR B+ (filosofia MCQ-first): totalCorrect/totalIncorrect/deckStats/
+  // systemStats foram movidos para revealAnswer (clique na alternativa).
+  // Isso eh o momento da "resposta real" do aluno em MCQ.
+  // O FSRS rating eh apenas metacognicao para scheduling, nao a resposta.
+  // Bloco original removido daqui — preservado em comentario para historico:
+  //   const g2=getGami();
+  //   if(r===0){g2.totalIncorrect=(g2.totalIncorrect||0)+1;}
+  //   else if(r===1){g2.totalHard=(g2.totalHard||0)+1;g2.totalCorrect=(g2.totalCorrect||0)+1;}
+  //   else{g2.totalCorrect=(g2.totalCorrect||0)+1;}
+  //   ...deckStats e systemStats...
+  //   saveGami(g2);
+  // Mantemos apenas totalHard (essa metrica eh especifica de FSRS-self-rating
+  // e nao tem equivalente no momento do clique).
+  if(r===1){
+    const _gh = getGami();
+    _gh.totalHard = (_gh.totalHard||0) + 1;
+    saveGami(_gh);
   }
-  saveGami(g2);
 
   // ── Anki-faithful Again re-queue with step timing ─────────────────
   // Card goes to againQueue; it's shown AFTER the main deck is exhausted
@@ -7347,10 +7377,10 @@ function rate(r){
   // SETOR A — telemetria de sessão (item 12: barra de status)
   // SETOR B v3: o tempo de resposta agora eh contabilizado em revealAnswer
   // (antes do reset de _cardStartTime), porque rate() executa DEPOIS de
-  // revealAnswer ter zerado _cardStartTime. Aqui apenas incrementamos o
-  // contador de cards respondidos.
-  _sessionCardCount++;
-  window._sessionCardCount = _sessionCardCount;
+  // revealAnswer ter zerado _cardStartTime.
+  // SETOR B+ (filosofia MCQ-first): _sessionCardCount tambem foi movido
+  // para revealAnswer. O clique na alternativa eh o momento da resposta
+  // real (UWorld-style), nao o clique no FSRS button.
 
   // Track study history for heatmap
   try {
