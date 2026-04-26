@@ -6890,6 +6890,14 @@ function revealAnswer(sel,card){
   _sessionCardCount++;
   window._sessionCardCount = _sessionCardCount;
 
+  // SETOR B v5: chama o updater da barra de status diretamente
+  // (revealAnswer nao eh wrappado pelo updater como rate() eh).
+  try {
+    if(typeof window._bmdUpdateStatusBar === 'function'){
+      requestAnimationFrame(window._bmdUpdateStatusBar);
+    }
+  } catch(e){}
+
   // ── SETOR B+ — registrar correct/incorrect imediatamente no clique
   // (em vez de esperar o FSRS button). totalCorrect/totalIncorrect/deckStats
   // sao atualizados aqui. O rate() ainda registra ratings de FSRS, mas
