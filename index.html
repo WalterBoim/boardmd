@@ -6285,6 +6285,9 @@ function renderCard(){
   revealed=false;
   _cardStartTime = Date.now(); // track response time
   window._cardStartTime = _cardStartTime; // SETOR B v3: mirror to window for cross-script access
+  // SETOR B v6: reseta acumulador de idle time (visibility pause) a cada novo card
+  window._idleAccumMs = 0;
+  window._hiddenAt = 0;
   // ── SETOR B (item 2): zerar scroll de todas as colunas a cada novo card ──
   // Garante que ambas as colunas (esquerda/direita) e o container principal
   // comecem do topo. Aluno rola manualmente se quiser.
@@ -6857,28 +6860,65 @@ function revealAnswer(sel,card){
   if(revealed) return;
   revealed=true;
 
-  // Track response time
+  // ── SETOR B v6 — Time-validated scoring (anti-cheat / ranking justo) ──
+  // Classifica o tempo de resposta para ajustar coins, ranking e avgTime.
+  // Escala USMLE-aware com bonus para velocidade (filosofia Duolingo da Medicina):
+  //   <5s         : reflex      (clique acidental ou chute reflexo)        | 0 coins
+  //   5s - 15s    : lightning   (recognition de elite — top USMLE)          | +8 coins
+  //   15s - 45s   : fast        (target USMLE — aluno bem preparado)        | +6 coins
+  //   45s - 2min  : standard    (raciocinio normal)                          | +5 coins
+  //   2min - 5min : slow        (travou ou consultou — descarta avgTime)     | +2 coins
+  //   >5min       : idle/cheat  (provavelmente fez outra coisa)              | 0 coins
+  // Stats (correct/incorrect) SEMPRE contam — voce precisa saber que respondeu.
+  // O que varia eh coins/ranking/avgTime.
+  function classifyResponseTime(ms){
+    // ms negativo = sentinel do visibility pause (aba ficou hidden). Trata como idle.
+    if(ms < 0)             return 'idle';
+    if(!ms || ms < 5000)   return 'reflex';
+    if(ms < 15 * 1000)     return 'lightning';
+    if(ms < 45 * 1000)     return 'fast';
+    if(ms < 2 * 60 * 1000) return 'standard';
+    if(ms < 5 * 60 * 1000) return 'slow';
+    return 'idle';
+  }
+
+  let _responseMs = 0;
+  let _timeCategory = 'reflex';
   if(_cardStartTime > 0){
-    const responseMs = Date.now() - _cardStartTime;
-    if(responseMs > 500 && responseMs < 300000){ // 0.5s–5min = valid
+    _responseMs = Date.now() - _cardStartTime;
+    // SETOR B v6: subtrai tempo que a aba ficou hidden (anti-cheat por troca de aba)
+    if(typeof window._idleAccumMs === 'number' && window._idleAccumMs > 0){
+      _responseMs = Math.max(0, _responseMs - window._idleAccumMs);
+    }
+    _timeCategory = classifyResponseTime(_responseMs);
+
+    // avgResponseMs: SO conta lightning/fast/standard (descarta slow/idle/reflex).
+    // Mantem o tempo medio honesto — sem inflar com cheating ou outliers.
+    if(_timeCategory === 'lightning' || _timeCategory === 'fast' || _timeCategory === 'standard'){
       const g0 = getGami();
       const prev = g0.avgResponseMs || 0;
       const cnt  = g0.responseCount || 0;
-      // Rolling average
-      g0.avgResponseMs = Math.round((prev * cnt + responseMs) / (cnt + 1));
+      g0.avgResponseMs = Math.round((prev * cnt + _responseMs) / (cnt + 1));
       g0.responseCount = cnt + 1;
       saveGami(g0);
     }
-    // SETOR B v3 fix: contabiliza tempo na sessao AQUI (em revealAnswer),
-    // ANTES de zerar _cardStartTime. O codigo anterior tentava ler
-    // _cardStartTime dentro de rate(), mas a essa altura ja era 0.
-    if(responseMs > 200 && responseMs < 600000){
-      _sessionTotalMs += responseMs;
+
+    // _sessionTotalMs (barra de status): conta lightning/fast/standard/slow.
+    // Descarta idle (>5min) e reflex (<5s) — nao refletem estudo real.
+    if(_timeCategory !== 'idle' && _timeCategory !== 'reflex'){
+      _sessionTotalMs += _responseMs;
       window._sessionTotalMs = _sessionTotalMs;
     }
+
     _cardStartTime = 0;
     window._cardStartTime = 0;
+    // Reset idle accumulator para o proximo card
+    window._idleAccumMs = 0;
   }
+
+  // Expor a categoria no window para debug e outras camadas
+  window._lastResponseMs = _responseMs;
+  window._lastTimeCategory = _timeCategory;
 
   // Limpa grifos da pergunta ao revelar — mantém só os da explicação
   clearQHighlights();
@@ -6886,14 +6926,20 @@ function revealAnswer(sel,card){
 
   // ── SETOR B+ (filosofia MCQ-first): incrementa contador de sessao
   // AQUI (no clique da alternativa), nao no FSRS rating.
-  // O clique na alternativa eh a "resposta" real (UWorld-style).
   _sessionCardCount++;
   window._sessionCardCount = _sessionCardCount;
 
+  // SETOR B v5: chama o updater da barra de status diretamente
+  try {
+    if(typeof window._bmdUpdateStatusBar === 'function'){
+      requestAnimationFrame(window._bmdUpdateStatusBar);
+    }
+  } catch(e){}
+
   // ── SETOR B+ — registrar correct/incorrect imediatamente no clique
-  // (em vez de esperar o FSRS button). totalCorrect/totalIncorrect/deckStats
-  // sao atualizados aqui. O rate() ainda registra ratings de FSRS, mas
-  // estatisticas de performance ja estao salvas neste ponto.
+  // SETOR B v6: stats SEMPRE contam (regardless of timeCategory) — voce
+  // precisa saber que respondeu, mesmo que tenha demorado/cheated.
+  // O que muda eh ranking/coins/avgTime, nao acerto/erro.
   try {
     const _g = getGami();
     if(answeredCorrectly){
@@ -6915,8 +6961,24 @@ function revealAnswer(sel,card){
     saveGami(_g);
   } catch(e){ console.warn('MCQ-first stats write error:', e); }
 
-  if(typeof awardCoins === 'function'){
-    if(answeredCorrectly) awardCoins(5, 'Correct');
+  // ── SETOR B v6 — Coins time-gated com bonus para velocidade ───────────
+  // lightning correct (5-15s):  +8 coins (recognition de elite)
+  // fast correct (15-45s):      +6 coins (target USMLE)
+  // standard correct (45s-2m):  +5 coins (raciocinio normal)
+  // slow correct (2-5min):      +2 coins (suspeito mas engajamento)
+  // idle/reflex correct:        0 coins  (estudo nao confiavel)
+  // qualquer errado:            0 coins  (regra MCQ-first)
+  if(typeof awardCoins === 'function' && answeredCorrectly){
+    if(_timeCategory === 'lightning'){
+      awardCoins(8, 'Correct (lightning)');
+    } else if(_timeCategory === 'fast'){
+      awardCoins(6, 'Correct (fast)');
+    } else if(_timeCategory === 'standard'){
+      awardCoins(5, 'Correct');
+    } else if(_timeCategory === 'slow'){
+      awardCoins(2, 'Correct (slow)');
+    }
+    // idle/reflex: zero coins
   }
 
   // Highlight options
@@ -9862,6 +9924,91 @@ async function fetchAllFromSupabase(onProgress){
   return allCards;
 }
 
+// SETOR B v7 — fetch cards de um conjunto especifico de decks (lazy load por step)
+async function fetchStepFromSupabase(deckIds, onProgress){
+  const PAGE = 2000;
+  const allCards = [];
+  let from = 0;
+  let total = null;
+  while(true){
+    const { data, error, count } = await _supa
+      .from('cards')
+      .select('id,deck,system,topic,subject,qid,q,c,w,e,kp,d,img,pubmed_query,cochrane_pmid', { count: total === null ? 'exact' : undefined })
+      .in('deck', deckIds)
+      .order('id')
+      .range(from, from + PAGE - 1);
+    if(error || !data || data.length === 0) break;
+    if(total === null && count !== null) total = count;
+    allCards.push(...data);
+    from += PAGE;
+    if(onProgress) onProgress(total ? Math.round(allCards.length / total * 100) : 0, allCards.length, data);
+    if(data.length < PAGE) break;
+  }
+  return allCards;
+}
+
+// SETOR B v7 — Spinner discreto para background loading
+function showBackgroundSpinner(stepLabel){
+  let el = document.getElementById('bmd-bg-spinner');
+  if(!el){
+    el = document.createElement('div');
+    el.id = 'bmd-bg-spinner';
+    el.style.cssText = `
+      position: fixed;
+      bottom: 70px;
+      left: 14px;
+      background: rgba(20, 28, 46, 0.92);
+      color: #c8d0ee;
+      padding: 8px 14px;
+      border-radius: 20px;
+      font-family: 'Inter', -apple-system, sans-serif;
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: .3px;
+      z-index: 9998;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, .35);
+      border: 1px solid rgba(255, 255, 255, .08);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      opacity: 0;
+      transition: opacity .3s ease;
+      pointer-events: none;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+    `;
+    el.innerHTML = `
+      <span style="display:inline-block;width:10px;height:10px;border:1.5px solid #4f8ef7;border-top-color:transparent;border-radius:50%;animation:bmdSpin 0.8s linear infinite;"></span>
+      <span id="bmd-bg-spinner-label">Loading...</span>
+    `;
+    // Add keyframes once
+    if(!document.getElementById('bmd-spin-style')){
+      const st = document.createElement('style');
+      st.id = 'bmd-spin-style';
+      st.textContent = '@keyframes bmdSpin{to{transform:rotate(360deg)}}';
+      document.head.appendChild(st);
+    }
+    document.body.appendChild(el);
+  }
+  const label = el.querySelector('#bmd-bg-spinner-label');
+  if(label) label.textContent = stepLabel;
+  // Fade in
+  requestAnimationFrame(() => { el.style.opacity = '1'; });
+}
+
+function hideBackgroundSpinner(){
+  const el = document.getElementById('bmd-bg-spinner');
+  if(el){
+    el.style.opacity = '0';
+    setTimeout(() => { try { el.remove(); } catch(e){} }, 400);
+  }
+}
+
+function updateBackgroundSpinner(stepLabel){
+  const lbl = document.getElementById('bmd-bg-spinner-label');
+  if(lbl) lbl.textContent = stepLabel;
+}
+
 async function loadCardsFromSupabase(){
   // ── IDB-FIRST: tenta cache local antes de bater no Supabase ──
   const meta = getIDBMeta();
@@ -9881,27 +10028,74 @@ async function loadCardsFromSupabase(){
     } catch(e){ console.warn('BoardMD: IDB read failed, falling back to Supabase'); }
   }
 
-  // ── Fallback: primeiro acesso ou cache vazio — fetch completo ──
-  console.log('BoardMD: loading from Supabase...');
+  // ── SETOR B v7 — Lazy load: primeiro fetch SO do step ativo ──
+  // Resto carrega em background com spinner discreto.
+  // Target: <3s para UI 100% pronta no step ativo.
+  const activeStep = (typeof currentStep !== 'undefined' && currentStep) || localStorage.getItem('bmd_step') || 's2';
+  let activeDecks, otherDecks, activeLabel, otherLabel;
+  if(activeStep === 's1'){
+    activeDecks = STEP1_DECKS.slice();
+    otherDecks = STEP2_DECKS.concat(SHELF_DECKS).filter((d,i,a)=>a.indexOf(d)===i);
+    activeLabel = 'Step 1';
+    otherLabel = 'Step 2 + Shelf';
+  } else if(activeStep === 'shelf'){
+    activeDecks = SHELF_DECKS.slice();
+    otherDecks = STEP1_DECKS.concat(STEP2_DECKS).filter(d => !SHELF_DECKS.includes(d));
+    activeLabel = 'Shelf';
+    otherLabel = 'Step 1 + Step 2';
+  } else {
+    // s2 default
+    activeDecks = STEP2_DECKS.slice();
+    otherDecks = STEP1_DECKS.concat(SHELF_DECKS).filter(d => !STEP2_DECKS.includes(d));
+    activeLabel = 'Step 2 CK';
+    otherLabel = 'Step 1 + Shelf';
+  }
+
+  console.log('BoardMD: lazy loading — active step ' + activeLabel + ' first');
   showLoadingOverlay();
-  const allCards = await fetchAllFromSupabase((pct, n, chunk) => updateLoadingProgress(pct, n, chunk));
-  buildDecks(allCards);
-  console.log('BoardMD: ' + allCards.length + ' cards loaded');
+  const t0 = Date.now();
+  const activeCards = await fetchStepFromSupabase(activeDecks, (pct, n, chunk) => updateLoadingProgress(pct, n, chunk));
+  console.log('BoardMD: ' + activeCards.length + ' active step cards loaded in ' + (Date.now()-t0) + 'ms');
+  buildDecks(activeCards);
   hideLoadingOverlay();
 
-  // Salva no IDB para próximo acesso instantâneo
-  try { setIDBCards(allCards); } catch(e){}
+  // Background: outros steps com spinner discreto
+  showBackgroundSpinner('Loading ' + otherLabel + '...');
+  fetchStepFromSupabase(otherDecks).then(otherCards => {
+    console.log('BoardMD: ' + otherCards.length + ' other step cards loaded in background');
+    // Merge: combina active + other em uma lista unica
+    const combined = activeCards.concat(otherCards);
+    buildDecks(combined);
+    // Salva no IDB para proximo acesso instantaneo (lista completa)
+    try { setIDBCards(combined); } catch(e){}
+    hideBackgroundSpinner();
+  }).catch(e => {
+    console.warn('BoardMD: background step load failed', e);
+    updateBackgroundSpinner('Background load failed');
+    setTimeout(hideBackgroundSpinner, 3000);
+    // Salva ao menos o que temos
+    try { setIDBCards(activeCards); } catch(e){}
+  });
 
-  return allCards.length;
+  return activeCards.length;
 }
 
 // ── Background refresh com retry automático ──
+// SETOR B v7: agora mostra spinner discreto se cache estava significativamente
+// desatualizado (>5% diff), dando feedback ao aluno que ha sincronizacao.
 function backgroundRefresh(cachedCount, attempt){
   attempt = attempt || 1;
   fetchAllFromSupabase().then(function(fresh){
     if(!fresh || fresh.length === 0){
       console.warn('BoardMD: background refresh returned empty');
       return;
+    }
+    const diff = Math.abs(fresh.length - cachedCount);
+    const pctDiff = cachedCount > 0 ? (diff / cachedCount) * 100 : 100;
+    if(pctDiff > 5){
+      // Cache desatualizado: aluno teve cards faltando — informa
+      showBackgroundSpinner('Syncing cards (' + diff + ' updates)...');
+      setTimeout(hideBackgroundSpinner, 2500);
     }
     buildDecks(fresh);
     try { setIDBCards(fresh); } catch(e){}
@@ -13929,6 +14123,33 @@ html.dark .hl-btn-active { border-color:#fff!important; }
   setTimeout(updateStatusBar, 100);
   // Expor globalmente para debug
   window._bmdUpdateStatusBar = updateStatusBar;
+
+  // ── SETOR B v6 — Anti-cheat: pausa timer quando aba perde foco ────
+  // Estrategia "accumulate idle, dont punish":
+  //   - Quando aba fica escondida, marca o timestamp em window._hiddenAt
+  //   - Quando aba volta, calcula quanto tempo ficou hidden e SOMA em
+  //     window._idleAccumMs
+  //   - revealAnswer SUBTRAI window._idleAccumMs do _responseMs antes
+  //     de classificar — entao tempo idle nao infla cheat detection
+  //   - Se ficou hidden por >5min, considera idle/abandono total — o
+  //     responseMs efetivo vai cair em 'idle' naturalmente
+  // Isso protege contra falso positivo (aluno abre WhatsApp 30s e volta).
+  if(!window._idleAccumMs) window._idleAccumMs = 0;
+  document.addEventListener('visibilitychange', function(){
+    try {
+      if(document.hidden){
+        window._hiddenAt = Date.now();
+      } else {
+        const hiddenAt = window._hiddenAt || 0;
+        if(hiddenAt > 0){
+          const hiddenMs = Date.now() - hiddenAt;
+          // Acumula tempo idle (nao penaliza, apenas desconta na hora de classificar)
+          window._idleAccumMs = (window._idleAccumMs || 0) + hiddenMs;
+        }
+        window._hiddenAt = 0;
+      }
+    } catch(e){}
+  });
 })();
 
 // ── SETOR B (item 5) — Back / Skip handlers ──────────────────────
