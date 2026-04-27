@@ -9903,103 +9903,188 @@ function getIDBMeta(){
   try { return JSON.parse(localStorage.getItem(IDB_META_KEY) || 'null'); } catch(e){ return null; }
 }
 
+// ── FETCH ADAPTATIVO COM KEYSET PAGINATION ──
+// Em vez de OFFSET (lento, O(N) por pagina), usa WHERE id > last_id (O(1) sempre).
+// Diferenca: pagina 26 com offset = 7000ms; com keyset = <50ms.
+// Mantem count() como ground truth. Tolera ate 10% de paginas falhando.
 async function fetchAllFromSupabase(onProgress){
-  const PAGE = 2000;
+  const PAGE = 1000;
   const SELECT_FIELDS = 'id,deck,system,topic,subject,qid,q,c,w,e,kp,d,img,pubmed_query,cochrane_pmid';
 
-  // Step 1: descobre o total com 1 request rapido (HEAD-like com count exact)
-  const countResp = await _supa
-    .from('cards')
-    .select('id', { count: 'exact', head: true });
-  const total = countResp.count || 0;
-  if(total === 0){
-    console.warn('BoardMD: count returned 0 — fallback para fetch sequencial');
-    return await _fetchSequentialFallback(onProgress);
-  }
-
-  // Step 2: calcula numero de paginas e dispara TODAS em paralelo
-  const numPages = Math.ceil(total / PAGE);
-  console.log(`BoardMD: parallel fetch — ${total} cards in ${numPages} pages of ${PAGE}`);
-
-  let pagesCompleted = 0;
-  const fetchPromises = [];
-  for(let p = 0; p < numPages; p++){
-    const from = p * PAGE;
-    const to = from + PAGE - 1;
-    const promise = _supa
+  // Descobre o total atual no Supabase (ground truth pro caller)
+  let total = 0;
+  try {
+    const countResp = await _supa
       .from('cards')
-      .select(SELECT_FIELDS)
-      .order('id')
-      .range(from, to)
-      .then(({ data, error }) => {
-        if(error || !data) return [];
-        pagesCompleted++;
-        if(onProgress){
-          const pct = Math.round((pagesCompleted / numPages) * 100);
-          // n = quantos cards completos ate agora (estimado)
-          const n = pagesCompleted * PAGE;
-          onProgress(pct, n, data);
-        }
-        return data;
-      })
-      .catch(e => {
-        console.warn(`BoardMD: page ${p} fetch failed`, e);
-        return [];
-      });
-    fetchPromises.push(promise);
+      .select('id', { count: 'exact', head: true });
+    total = countResp.count || 0;
+  } catch(e){
+    console.warn('BoardMD: count() falhou', e);
+  }
+  console.log('BoardMD: total reportado pelo Supabase: ' + total);
+
+  const allCards = [];
+  let lastId = null;
+  let pagesOk = 0;
+  let pagesFail = 0;
+  let consecutiveFails = 0;
+  const MAX_PAGES_SAFETY = 500;
+  let pageIdx = 0;
+
+  while(pageIdx < MAX_PAGES_SAFETY){
+    let data, error;
+    try {
+      // Constroi a query: primeira pagina sem WHERE, demais com gt('id', lastId)
+      let q = _supa.from('cards').select(SELECT_FIELDS).order('id').limit(PAGE);
+      if(lastId !== null) q = q.gt('id', lastId);
+      const resp = await q;
+      data = resp.data; error = resp.error;
+    } catch(e){
+      console.warn('BoardMD: page ' + pageIdx + ' exception', e);
+      pagesFail++;
+      consecutiveFails++;
+      pageIdx++;
+      // 3 falhas seguidas no inicio = problema serio, paramos
+      if(consecutiveFails >= 3) break;
+      continue;
+    }
+
+    if(error){
+      console.warn('BoardMD: page ' + pageIdx + ' error', error);
+      pagesFail++;
+      consecutiveFails++;
+      pageIdx++;
+      if(consecutiveFails >= 3) break;
+      continue;
+    }
+
+    consecutiveFails = 0;
+
+    // data === [] significa que chegamos no fim do dataset (id > ultimo) — fim natural
+    if(!data || data.length === 0) break;
+
+    allCards.push(...data);
+    pagesOk++;
+    pageIdx++;
+
+    // O proximo cursor e o id do ultimo card desta pagina
+    lastId = data[data.length - 1].id;
+
+    if(onProgress){
+      const pct = total ? Math.round(allCards.length / total * 100) : 0;
+      onProgress(pct, allCards.length, data);
+    }
+
+    // Se sabemos o total e ja chegamos, paramos (defesa em profundidade)
+    if(total && allCards.length >= total) break;
+
+    // Se a pagina veio incompleta (< PAGE), e fim natural do dataset
+    if(data.length < PAGE) break;
   }
 
-  // Step 3: aguarda todas as paginas terminarem
-  const pages = await Promise.all(fetchPromises);
-
-  // Step 4: concatena na ordem correta (Promise.all preserva ordem do array)
-  const allCards = [];
-  for(const page of pages) allCards.push(...page);
+  console.log('BoardMD: fetch terminado — ' + allCards.length + '/' + total +
+              ' cards (ok: ' + pagesOk + ', fail: ' + pagesFail + ', keyset)');
+  allCards._supabaseTotal = total;
   return allCards;
 }
 
-// Fallback sequencial — usado se count() falhar por algum motivo
-async function _fetchSequentialFallback(onProgress){
-  const PAGE = 2000;
+// Fallback sequencial — usado se count() falhar OU se parallel fetch vier incompleto
+// CRÍTICO: PAGE=1000 (teto hard do Supabase). Para SÓ quando data.length === 0.
+async function _fetchSequentialFallback(onProgress, knownTotal){
+  const PAGE = 1000;
   const allCards = [];
   let from = 0;
-  let total = null;
-  while(true){
-    const { data, error, count } = await _supa
-      .from('cards')
-      .select('id,deck,system,topic,subject,qid,q,c,w,e,kp,d,img,pubmed_query,cochrane_pmid', { count: total === null ? 'exact' : undefined })
-      .order('id')
-      .range(from, from + PAGE - 1);
-    if(error || !data || data.length === 0) break;
-    if(total === null && count !== null) total = count;
+  let total = knownTotal || null;
+  let consecutiveEmpty = 0;
+  const MAX_PAGES_SAFETY = 200;
+  let pageCount = 0;
+
+  while(pageCount < MAX_PAGES_SAFETY){
+    let data, error, count;
+    try {
+      const resp = await _supa
+        .from('cards')
+        .select('id,deck,system,topic,subject,qid,q,c,w,e,kp,d,img,pubmed_query,cochrane_pmid',
+          { count: total === null ? 'exact' : undefined })
+        .order('id')
+        .range(from, from + PAGE - 1);
+      data = resp.data; error = resp.error; count = resp.count;
+    } catch(e){
+      console.warn('BoardMD: sequential fetch erro de rede page=' + pageCount, e);
+      consecutiveEmpty++;
+      if(consecutiveEmpty >= 3) break;
+      from += PAGE; pageCount++;
+      continue;
+    }
+    if(error){
+      console.warn('BoardMD: sequential page ' + pageCount + ' error', error);
+      consecutiveEmpty++;
+      if(consecutiveEmpty >= 3) break;
+      from += PAGE; pageCount++;
+      continue;
+    }
+    if(!data || data.length === 0) break;
+    if(total === null && count !== null && count !== undefined) total = count;
     allCards.push(...data);
     from += PAGE;
-    if(onProgress) onProgress(total ? Math.round(allCards.length / total * 100) : 0, allCards.length, data);
-    if(data.length < PAGE) break;
+    pageCount++;
+    consecutiveEmpty = 0;
+    if(onProgress) onProgress(
+      total ? Math.round(allCards.length / total * 100) : 0,
+      allCards.length,
+      data
+    );
+    if(total && allCards.length >= total) break;
   }
+  if(pageCount >= MAX_PAGES_SAFETY){
+    console.warn('BoardMD: sequential fetch hit safety limit de ' + MAX_PAGES_SAFETY + ' páginas');
+  }
+  console.log('BoardMD: sequential fetch retornou ' + allCards.length + ' cards' + (total ? ' de ' + total : ''));
   return allCards;
 }
 
 // SETOR B v7 — fetch cards de um conjunto especifico de decks (lazy load por step)
+// CRÍTICO: PAGE=1000 (teto Supabase). Para SÓ quando data.length === 0.
 async function fetchStepFromSupabase(deckIds, onProgress){
-  const PAGE = 2000;
+  const PAGE = 1000;
   const allCards = [];
   let from = 0;
   let total = null;
-  while(true){
-    const { data, error, count } = await _supa
-      .from('cards')
-      .select('id,deck,system,topic,subject,qid,q,c,w,e,kp,d,img,pubmed_query,cochrane_pmid', { count: total === null ? 'exact' : undefined })
-      .in('deck', deckIds)
-      .order('id')
-      .range(from, from + PAGE - 1);
-    if(error || !data || data.length === 0) break;
-    if(total === null && count !== null) total = count;
+  let pageCount = 0;
+  const MAX_PAGES_SAFETY = 200;
+
+  while(pageCount < MAX_PAGES_SAFETY){
+    let data, error, count;
+    try {
+      const resp = await _supa
+        .from('cards')
+        .select('id,deck,system,topic,subject,qid,q,c,w,e,kp,d,img,pubmed_query,cochrane_pmid',
+          { count: total === null ? 'exact' : undefined })
+        .in('deck', deckIds)
+        .order('id')
+        .range(from, from + PAGE - 1);
+      data = resp.data; error = resp.error; count = resp.count;
+    } catch(e){
+      console.warn('BoardMD: fetchStep erro de rede page=' + pageCount, e);
+      break;
+    }
+    if(error){
+      console.warn('BoardMD: fetchStep page ' + pageCount + ' error', error);
+      break;
+    }
+    if(!data || data.length === 0) break;
+    if(total === null && count !== null && count !== undefined) total = count;
     allCards.push(...data);
     from += PAGE;
-    if(onProgress) onProgress(total ? Math.round(allCards.length / total * 100) : 0, allCards.length, data);
-    if(data.length < PAGE) break;
+    pageCount++;
+    if(onProgress) onProgress(
+      total ? Math.round(allCards.length / total * 100) : 0,
+      allCards.length,
+      data
+    );
+    if(total && allCards.length >= total) break;
   }
+  console.log('BoardMD: fetchStep [' + deckIds.join(',') + '] retornou ' + allCards.length + ' cards' + (total ? ' de ' + total : ''));
   return allCards;
 }
 
@@ -10065,45 +10150,74 @@ function updateBackgroundSpinner(stepLabel){
   if(lbl) lbl.textContent = stepLabel;
 }
 
+// ── LOAD ADAPTATIVO: cache valido = >= 90% do count() atual ──
+// Sem constante hardcoded. Funciona com qualquer numero de cards no banco.
 async function loadCardsFromSupabase(){
-  // ── IDB-FIRST: tenta cache local antes de bater no Supabase ──
   const meta = getIDBMeta();
-  if(meta && meta.count > 0){
+
+  // Pega count atual do Supabase para decidir se o cache é válido
+  let currentTotal = 0;
+  try {
+    const r = await _supa.from('cards').select('id', { count: 'exact', head: true });
+    currentTotal = r.count || 0;
+  } catch(e){ console.warn('BoardMD: count check falhou', e); }
+
+  // Cache válido se: existe E cobre >= 90% do total atual do Supabase
+  // Se count falhou (currentTotal=0), aceitamos qualquer cache > 0 (evita ciclo)
+  const cacheCovers = (cnt) => {
+    if(!cnt || cnt <= 0) return false;
+    if(currentTotal <= 0) return cnt > 0; // count falhou, cache > 0 vale
+    return cnt >= currentTotal * 0.9;
+  };
+
+  if(meta && cacheCovers(meta.count)){
     try {
       const cached = await getIDBCards();
-      if(cached.length > 0){
-        console.log('BoardMD: ' + cached.length + ' cards from cache (instant)');
+      if(cacheCovers(cached.length)){
+        console.log('BoardMD: ' + cached.length + ' cards from cache (cobre ' +
+                    (currentTotal ? Math.round(cached.length/currentTotal*100) + '% do banco' : 'banco offline') + ')');
         buildDecks(cached);
         if(window._bmdSavedTheme === 'light') document.documentElement.classList.add('light');
         if(typeof updateThemeIcons === 'function') updateThemeIcons();
-        // Refresh em background SO se cache for antigo (>24h).
-        // Isso evita re-download desnecessario a cada abertura. Para forcar
-        // refresh imediato, use o botao manual de refresh no header.
+
+        // Refresh em background apenas se cache antigo (>24h)
         const cacheAgeMs = Date.now() - (meta.ts || 0);
         const ONE_DAY_MS = 24 * 60 * 60 * 1000;
         if(cacheAgeMs > ONE_DAY_MS){
-          console.log('BoardMD: cache is ' + Math.round(cacheAgeMs/3600000) + 'h old — refreshing in background');
-          // Atrasa 5s para nao competir com renderizacao inicial
+          console.log('BoardMD: cache > 24h, refresh em background em 5s');
           setTimeout(() => backgroundRefresh(cached.length), 5000);
-        } else {
-          console.log('BoardMD: cache fresh (' + Math.round(cacheAgeMs/60000) + 'min old) — skipping refresh');
         }
         return cached.length;
       }
-    } catch(e){ console.warn('BoardMD: IDB read failed, falling back to Supabase'); }
+    } catch(e){ console.warn('BoardMD: IDB read falhou, baixando do Supabase'); }
+  } else if(meta && meta.count > 0){
+    // Cache existe mas é parcial. Avisa e segue para re-download.
+    console.warn('BoardMD: cache parcial (' + meta.count + ' de ' + currentTotal +
+                 ') — sera substituido por fetch completo');
   }
 
-  // ── Fetch completo: baixa TUDO antes de liberar UI ──
-  console.log('BoardMD: loading from Supabase (full)...');
+  // Fetch completo
+  console.log('BoardMD: fetch completo do Supabase...');
   showLoadingOverlay();
   const t0 = Date.now();
   const allCards = await fetchAllFromSupabase((pct, n, chunk) => updateLoadingProgress(pct, n, chunk));
-  console.log('BoardMD: ' + allCards.length + ' cards loaded in ' + (Date.now()-t0) + 'ms');
+  const supaTotal = allCards._supabaseTotal || currentTotal || allCards.length;
+  console.log('BoardMD: ' + allCards.length + ' cards baixados em ' + (Date.now()-t0) + 'ms');
   buildDecks(allCards);
   hideLoadingOverlay();
 
-  // Salva no IDB para proxima abertura ser instantanea
-  try { setIDBCards(allCards); } catch(e){}
+  // Salva cache se baixou >= 90% OU se nao temos count para comparar
+  // Isso evita ciclo de re-download quando o fetch traz parcial mas razoavel.
+  const shouldCache = supaTotal > 0
+    ? allCards.length >= supaTotal * 0.9
+    : allCards.length > 0;
+  if(shouldCache){
+    try { setIDBCards(allCards); } catch(e){}
+    console.log('BoardMD: cache salvo (' + allCards.length + ' cards)');
+  } else {
+    console.warn('BoardMD: fetch trouxe ' + allCards.length + '/' + supaTotal +
+                 ' (<90%) — NAO salvando cache, tenta de novo na proxima abertura');
+  }
 
   return allCards.length;
 }
@@ -10118,24 +10232,36 @@ function backgroundRefresh(cachedCount, attempt){
       console.warn('BoardMD: background refresh returned empty');
       return;
     }
+    // Adaptativo: refresh só sobrescreve cache se for >= 90% do supaTotal
+    // ou se for >= 95% do cache atual (evita downgrades por timeout passageiro).
+    const supaTotal = fresh._supabaseTotal || 0;
+    const meetsTotal = supaTotal > 0 && fresh.length >= supaTotal * 0.9;
+    const meetsCache = fresh.length >= cachedCount * 0.95;
+    if(!meetsTotal && !meetsCache){
+      console.warn('BoardMD: background refresh parcial (' + fresh.length +
+                   ' vs cache ' + cachedCount + ', supa ' + supaTotal + ') — descartando');
+      if(attempt < 3){
+        setTimeout(function(){ backgroundRefresh(cachedCount, attempt + 1); }, attempt * 5000);
+      }
+      return;
+    }
     const diff = Math.abs(fresh.length - cachedCount);
     const pctDiff = cachedCount > 0 ? (diff / cachedCount) * 100 : 100;
     if(pctDiff > 5){
-      // Cache desatualizado: aluno teve cards faltando — informa
       showBackgroundSpinner('Syncing cards (' + diff + ' updates)...');
       setTimeout(hideBackgroundSpinner, 2500);
     }
     buildDecks(fresh);
     try { setIDBCards(fresh); } catch(e){}
     if(fresh.length !== cachedCount){
-      console.log('BoardMD: cache updated ' + cachedCount + ' → ' + fresh.length + ' cards');
+      console.log('BoardMD: cache atualizado ' + cachedCount + ' -> ' + fresh.length + ' cards');
     } else {
-      console.log('BoardMD: refreshed ' + fresh.length + ' cards (up to date)');
+      console.log('BoardMD: refresh ok ' + fresh.length + ' cards (up to date)');
     }
   }).catch(function(e){
     console.warn('BoardMD: background refresh failed (attempt ' + attempt + ')', e);
     if(attempt < 3){
-      var delay = attempt * 5000; // 5s, 10s
+      var delay = attempt * 5000;
       setTimeout(function(){ backgroundRefresh(cachedCount, attempt + 1); }, delay);
     }
   });
@@ -14734,4 +14860,4 @@ function bmdSetupDrag(){
 </script>
 </body>
 </html>
-<!-- v2 -->
+<!-- v2 --><!-- redeploy -->
