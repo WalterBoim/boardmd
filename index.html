@@ -11150,12 +11150,19 @@ async function askAttendingInline(type, btnEl){
   // scroll removido — aluno precisa ler a explicação primeiro
 
   // Contexto do card
-  const opts = (card.w||[]).map((o,i) => String.fromCharCode(65+i) + '. ' + o).join('\n');
+  // CRITICO: usa NOMES das opcoes, nao letras A/B/C/D, porque as opcoes sao
+  // embaralhadas em renderCard(). lastChosenIdx aponta pra ordem embaralhada;
+  // (card.w||[])[lastChosenIdx] referencia o array original (errado).
+  // Solucao: extrair o NOME da opcao que o aluno clicou direto do DOM.
+  const _shownBtns = document.querySelectorAll('.opt-btn');
+  const opts = Array.from(_shownBtns).map(b => '- ' + (b.textContent||'').trim()).join('\n');
   const chosenIdx = window.lastChosenIdx;
-  const userChoice = chosenIdx !== undefined
-    ? String.fromCharCode(65+chosenIdx) + '. ' + (card.w||[])[chosenIdx]
-    : 'Not recorded';
-  const wasCorrect = chosenIdx !== undefined && (card.w||[])[chosenIdx] === card.c;
+  let _userChoiceName = 'Not recorded';
+  if(chosenIdx !== undefined && _shownBtns[chosenIdx]){
+    _userChoiceName = (_shownBtns[chosenIdx].textContent||'').trim();
+  }
+  const userChoice = _userChoiceName;
+  const wasCorrect = userChoice === card.c;
 
   // Build real pubmed references with abstracts from cache
   const _pubCache = window._pubmedCache && window._pubmedCache[card.id];
@@ -15000,4 +15007,4 @@ function bmdSetupDrag(){
 </script>
 </body>
 </html>
-<!-- v2 --><!-- redeploy --><!-- redeploy -->
+<!-- v2 --><!-- redeploy --><!-- redeploy --><!-- redeploy -->
