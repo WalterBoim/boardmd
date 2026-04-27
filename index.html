@@ -10076,8 +10076,18 @@ async function loadCardsFromSupabase(){
         buildDecks(cached);
         if(window._bmdSavedTheme === 'light') document.documentElement.classList.add('light');
         if(typeof updateThemeIcons === 'function') updateThemeIcons();
-        // Refresh silencioso em background — sempre sincroniza com Supabase
-        backgroundRefresh(cached.length);
+        // Refresh em background SO se cache for antigo (>24h).
+        // Isso evita re-download desnecessario a cada abertura. Para forcar
+        // refresh imediato, use o botao manual de refresh no header.
+        const cacheAgeMs = Date.now() - (meta.ts || 0);
+        const ONE_DAY_MS = 24 * 60 * 60 * 1000;
+        if(cacheAgeMs > ONE_DAY_MS){
+          console.log('BoardMD: cache is ' + Math.round(cacheAgeMs/3600000) + 'h old — refreshing in background');
+          // Atrasa 5s para nao competir com renderizacao inicial
+          setTimeout(() => backgroundRefresh(cached.length), 5000);
+        } else {
+          console.log('BoardMD: cache fresh (' + Math.round(cacheAgeMs/60000) + 'min old) — skipping refresh');
+        }
         return cached.length;
       }
     } catch(e){ console.warn('BoardMD: IDB read failed, falling back to Supabase'); }
