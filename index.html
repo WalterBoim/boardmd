@@ -9905,6 +9905,62 @@ function getIDBMeta(){
 
 async function fetchAllFromSupabase(onProgress){
   const PAGE = 2000;
+  const SELECT_FIELDS = 'id,deck,system,topic,subject,qid,q,c,w,e,kp,d,img,pubmed_query,cochrane_pmid';
+
+  // Step 1: descobre o total com 1 request rapido (HEAD-like com count exact)
+  const countResp = await _supa
+    .from('cards')
+    .select('id', { count: 'exact', head: true });
+  const total = countResp.count || 0;
+  if(total === 0){
+    console.warn('BoardMD: count returned 0 — fallback para fetch sequencial');
+    return await _fetchSequentialFallback(onProgress);
+  }
+
+  // Step 2: calcula numero de paginas e dispara TODAS em paralelo
+  const numPages = Math.ceil(total / PAGE);
+  console.log(`BoardMD: parallel fetch — ${total} cards in ${numPages} pages of ${PAGE}`);
+
+  let pagesCompleted = 0;
+  const fetchPromises = [];
+  for(let p = 0; p < numPages; p++){
+    const from = p * PAGE;
+    const to = from + PAGE - 1;
+    const promise = _supa
+      .from('cards')
+      .select(SELECT_FIELDS)
+      .order('id')
+      .range(from, to)
+      .then(({ data, error }) => {
+        if(error || !data) return [];
+        pagesCompleted++;
+        if(onProgress){
+          const pct = Math.round((pagesCompleted / numPages) * 100);
+          // n = quantos cards completos ate agora (estimado)
+          const n = pagesCompleted * PAGE;
+          onProgress(pct, n, data);
+        }
+        return data;
+      })
+      .catch(e => {
+        console.warn(`BoardMD: page ${p} fetch failed`, e);
+        return [];
+      });
+    fetchPromises.push(promise);
+  }
+
+  // Step 3: aguarda todas as paginas terminarem
+  const pages = await Promise.all(fetchPromises);
+
+  // Step 4: concatena na ordem correta (Promise.all preserva ordem do array)
+  const allCards = [];
+  for(const page of pages) allCards.push(...page);
+  return allCards;
+}
+
+// Fallback sequencial — usado se count() falhar por algum motivo
+async function _fetchSequentialFallback(onProgress){
+  const PAGE = 2000;
   const allCards = [];
   let from = 0;
   let total = null;
@@ -10018,7 +10074,6 @@ async function loadCardsFromSupabase(){
       if(cached.length > 0){
         console.log('BoardMD: ' + cached.length + ' cards from cache (instant)');
         buildDecks(cached);
-        // Restaura tema salvo (sem overlay, hideLoadingOverlay não é chamado)
         if(window._bmdSavedTheme === 'light') document.documentElement.classList.add('light');
         if(typeof updateThemeIcons === 'function') updateThemeIcons();
         // Refresh silencioso em background — sempre sincroniza com Supabase
@@ -10028,56 +10083,19 @@ async function loadCardsFromSupabase(){
     } catch(e){ console.warn('BoardMD: IDB read failed, falling back to Supabase'); }
   }
 
-  // ── SETOR B v7 — Lazy load: primeiro fetch SO do step ativo ──
-  // Resto carrega em background com spinner discreto.
-  // Target: <3s para UI 100% pronta no step ativo.
-  const activeStep = (typeof currentStep !== 'undefined' && currentStep) || localStorage.getItem('bmd_step') || 's2';
-  let activeDecks, otherDecks, activeLabel, otherLabel;
-  if(activeStep === 's1'){
-    activeDecks = STEP1_DECKS.slice();
-    otherDecks = STEP2_DECKS.concat(SHELF_DECKS).filter((d,i,a)=>a.indexOf(d)===i);
-    activeLabel = 'Step 1';
-    otherLabel = 'Step 2 + Shelf';
-  } else if(activeStep === 'shelf'){
-    activeDecks = SHELF_DECKS.slice();
-    otherDecks = STEP1_DECKS.concat(STEP2_DECKS).filter(d => !SHELF_DECKS.includes(d));
-    activeLabel = 'Shelf';
-    otherLabel = 'Step 1 + Step 2';
-  } else {
-    // s2 default
-    activeDecks = STEP2_DECKS.slice();
-    otherDecks = STEP1_DECKS.concat(SHELF_DECKS).filter(d => !STEP2_DECKS.includes(d));
-    activeLabel = 'Step 2 CK';
-    otherLabel = 'Step 1 + Shelf';
-  }
-
-  console.log('BoardMD: lazy loading — active step ' + activeLabel + ' first');
+  // ── Fetch completo: baixa TUDO antes de liberar UI ──
+  console.log('BoardMD: loading from Supabase (full)...');
   showLoadingOverlay();
   const t0 = Date.now();
-  const activeCards = await fetchStepFromSupabase(activeDecks, (pct, n, chunk) => updateLoadingProgress(pct, n, chunk));
-  console.log('BoardMD: ' + activeCards.length + ' active step cards loaded in ' + (Date.now()-t0) + 'ms');
-  buildDecks(activeCards);
+  const allCards = await fetchAllFromSupabase((pct, n, chunk) => updateLoadingProgress(pct, n, chunk));
+  console.log('BoardMD: ' + allCards.length + ' cards loaded in ' + (Date.now()-t0) + 'ms');
+  buildDecks(allCards);
   hideLoadingOverlay();
 
-  // Background: outros steps com spinner discreto
-  showBackgroundSpinner('Loading ' + otherLabel + '...');
-  fetchStepFromSupabase(otherDecks).then(otherCards => {
-    console.log('BoardMD: ' + otherCards.length + ' other step cards loaded in background');
-    // Merge: combina active + other em uma lista unica
-    const combined = activeCards.concat(otherCards);
-    buildDecks(combined);
-    // Salva no IDB para proximo acesso instantaneo (lista completa)
-    try { setIDBCards(combined); } catch(e){}
-    hideBackgroundSpinner();
-  }).catch(e => {
-    console.warn('BoardMD: background step load failed', e);
-    updateBackgroundSpinner('Background load failed');
-    setTimeout(hideBackgroundSpinner, 3000);
-    // Salva ao menos o que temos
-    try { setIDBCards(activeCards); } catch(e){}
-  });
+  // Salva no IDB para proxima abertura ser instantanea
+  try { setIDBCards(allCards); } catch(e){}
 
-  return activeCards.length;
+  return allCards.length;
 }
 
 // ── Background refresh com retry automático ──
