@@ -1,0 +1,141 @@
+# ── Sensitive ──────────────────────────────────────────
+SUPABASE_PRIVADO*.md
+*_PRIVADO*
+*.env
+*.env.*
+.env
+secrets/
+*secret*
+*.key
+*.pem
+
+# ── macOS ──────────────────────────────────────────────
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+
+# ── Node ───────────────────────────────────────────────
+node_modules/
+package-lock.json
+npm-debug.log
+yarn-error.log
+
+# ── Python (scripts de geração) ────────────────────────
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+
+# ── BoardMD: arquivos de trabalho que NÃO sobem ────────
+progress_*.json
+batch_*.json
+checkpoint*.json
+*_BACKUP*.html
+*_STABLE*.html
+*_BROKEN*.html
+*_TEST*.html
+*_old*.html
+index_v*.zip
+boardmd_v*.html*
+boardmd_part_*
+part_*
+fix_*.py
+gerar_*.py
+extract_*.py
+inject_*.py
+add_*.py
+apply_*.py
+script*.py
+update_supabase*.py
+
+# ── Dados grandes (xlsx, zim, json grandes) ────────────
+*.xlsx
+*.zim
+*.idx
+*.chk
+anking_*.json
+candidates_*.json
+shelf_*.json
+relatorio_*.json
+relatorio_*.txt
+faltantes*.json
+review_*.json
+
+# ── Logs ───────────────────────────────────────────────
+*.log
+*.gz
+
+# ── Editor ─────────────────────────────────────────────
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# ── Mais regras BoardMD (round 2) ──────────────────────
+# HTMLs auxiliares (previews, reviews, backups que não seguem o padrão acima)
+attending_preview.html
+boardmd_card.html
+boardmd_index_final.html
+boardmd_performance.html
+boardmd_poststep.html
+boardmd_ranking.html
+curator_anking.html
+lens_preview.html
+previa_layout.html
+projecao_fix.html
+review_*.html
+index_*.html
+index*.html
+!index.html
+!vercel_index.html
+*.html.zip
+
+# Schemas e SQL de trabalho
+boardmd_schema.sql/
+fix_*.sql
+
+# JSON de trabalho extras
+cards_for_review.json
+core_cards_extracted.json
+corpus_brasil_boardmd_final.json
+images_*_log.json
+kp_*.json
+kpfix_*.json
+retag_*.json
+revalida_*.json
+revalida_*.md
+tabelas_*.json
+tabelas_*.html
+s2_all_eos.json
+pente_fino_*
+
+# Scripts Python extras
+*.py
+!*.config.py
+
+# Arquivos de texto de trabalho
+*.txt
+!README.txt
+prompt_gerar_*.txt
+anking_*.txt
+*Anking*.txt
+*AnKing*.txt
+
+# Diretórios de batches
+rewrite_*_batches/
+
+# Docs/contexto local
+boardmd_context.md
+*.md
+!README.md
+
+# Outros
+icon-1024-preview.png
+index_b64.txt
+main
+package.json
+
+rewrite_*_progress.json
