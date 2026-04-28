@@ -6348,24 +6348,6 @@ function renderCard(){
 
   // Skip again cards that aren't due yet — show a waiting message instead
   const card=full[idx];
-
-  // ── LAZY HYDRATION ────────────────────────────────────────────────
-  // Se o card nao tem os campos pesados (e, w, etc), busca e re-renderiza.
-  if(card && (card.e === undefined || card.w === undefined)){
-    const _qEl = document.getElementById('c-q');
-    if(_qEl) _qEl.textContent = 'Loading card...';
-    if(typeof hydrateCardIfNeeded === 'function'){
-      hydrateCardIfNeeded(card).then((ok) => {
-        if(ok){
-          renderCard();
-        } else {
-          if(_qEl) _qEl.textContent = 'Erro ao carregar card. Tente proximo.';
-        }
-      });
-      return;
-    }
-  }
-
   const state=getState(card.id);
   const isAgain = againQueue.includes(card);
   if(isAgain && state.due > Date.now()){
@@ -9936,18 +9918,9 @@ function getIDBMeta(){
 // Em vez de OFFSET (lento, O(N) por pagina), usa WHERE id > last_id (O(1) sempre).
 // Diferenca: pagina 26 com offset = 7000ms; com keyset = <50ms.
 // Mantem count() como ground truth. Tolera ate 10% de paginas falhando.
-// Campos LEVES carregados no fetch inicial. ~250B/card.
-// Inclui q, c (pra renderizar a pergunta + opcao certa logo de cara) e d (distratores).
-// Campos pesados (w, e, kp, img, pubmed_query, cochrane_pmid) vem sob demanda em renderCard.
-const BMD_LIGHT_FIELDS = 'id,deck,system,topic,subject,qid,q,c,d';
-const BMD_HEAVY_FIELDS = 'w,e,kp,img,pubmed_query,cochrane_pmid';
-const BMD_ALL_FIELDS = BMD_LIGHT_FIELDS + ',' + BMD_HEAVY_FIELDS;
-
 async function fetchAllFromSupabase(onProgress){
-  // PAGE=1000 e o teto seguro do Supabase (db.max_rows default).
-  // Com payload leve (~250B/card), 1000 cards = ~250KB, vem rapido.
   const PAGE = 1000;
-  const SELECT_FIELDS = BMD_LIGHT_FIELDS;
+  const SELECT_FIELDS = 'id,deck,system,topic,subject,qid,q,c,w,e,kp,d,img,pubmed_query,cochrane_pmid';
 
   // Descobre o total atual no Supabase (ground truth pro caller)
   let total = 0;
@@ -10021,116 +9994,13 @@ async function fetchAllFromSupabase(onProgress){
   }
 
   console.log('BoardMD: fetch terminado — ' + allCards.length + '/' + total +
-              ' cards (ok: ' + pagesOk + ', fail: ' + pagesFail + ', keyset, light)');
+              ' cards (ok: ' + pagesOk + ', fail: ' + pagesFail + ', keyset)');
   allCards._supabaseTotal = total;
   return allCards;
 }
 
-// ── LAZY LOAD: busca campos pesados de UM card ──
-const BMD_FULL_CACHE = new Map();
-async function fetchCardFull(cardId){
-  if(BMD_FULL_CACHE.has(cardId)) return BMD_FULL_CACHE.get(cardId);
-  try {
-    const { data, error } = await _supa
-      .from('cards')
-      .select(BMD_HEAVY_FIELDS)
-      .eq('id', cardId)
-      .maybeSingle();
-    if(error || !data){
-      console.warn('BoardMD: fetchCardFull(' + cardId + ') erro', error);
-      return null;
-    }
-    BMD_FULL_CACHE.set(cardId, data);
-    return data;
-  } catch(e){
-    console.warn('BoardMD: fetchCardFull(' + cardId + ') exception', e);
-    return null;
-  }
-}
-
-async function hydrateCardIfNeeded(card){
-  if(!card) return false;
-  if(card.e !== undefined && card.w !== undefined) return true;
-  const heavy = await fetchCardFull(card.id);
-  if(!heavy) return false;
-  card.w = heavy.w;
-  card.e = heavy.e;
-  card.kp = heavy.kp;
-  card.img = heavy.img;
-  card.pubmed_query = heavy.pubmed_query;
-  card.cochrane_pmid = heavy.cochrane_pmid;
-  return true;
-}
-
-let _bmdBackgroundPrefetchStarted = false;
-async function startBackgroundPrefetch(){
-  if(_bmdBackgroundPrefetchStarted) return;
-  _bmdBackgroundPrefetchStarted = true;
-  console.log('BoardMD: iniciando prefetch dos campos pesados em background');
-  const allCards = [];
-  try {
-    if(window.DECKS){
-      for(const dk in window.DECKS){
-        const arr = window.DECKS[dk];
-        if(Array.isArray(arr)){
-          for(const c of arr){
-            if(c && (c.e === undefined || c.w === undefined)) allCards.push(c);
-          }
-        }
-      }
-    }
-  } catch(e){ return; }
-  if(!allCards.length){
-    console.log('BoardMD: nada pra prefetch (todos os cards ja completos)');
-    return;
-  }
-  console.log('BoardMD: prefetch de ' + allCards.length + ' cards em background');
-  const BATCH = 200;
-  let done = 0;
-  for(let i = 0; i < allCards.length; i += BATCH){
-    const batch = allCards.slice(i, i + BATCH);
-    const ids = batch.map(c => c.id);
-    try {
-      const { data, error } = await _supa
-        .from('cards')
-        .select('id,' + BMD_HEAVY_FIELDS)
-        .in('id', ids);
-      if(error || !data){
-        console.warn('BoardMD: prefetch batch ' + i + ' falhou', error);
-      } else {
-        const heavyMap = new Map(data.map(d => [d.id, d]));
-        for(const c of batch){
-          const h = heavyMap.get(c.id);
-          if(h){
-            c.w = h.w; c.e = h.e; c.kp = h.kp;
-            c.img = h.img;
-            c.pubmed_query = h.pubmed_query;
-            c.cochrane_pmid = h.cochrane_pmid;
-            BMD_FULL_CACHE.set(c.id, h);
-          }
-        }
-        done += data.length;
-      }
-    } catch(e){
-      console.warn('BoardMD: prefetch batch ' + i + ' exception', e);
-    }
-    await new Promise(r => setTimeout(r, 500));
-  }
-  console.log('BoardMD: prefetch terminado, ' + done + ' cards hidratados');
-  try {
-    const flat = [];
-    for(const dk in (window.DECKS || {})){
-      const arr = window.DECKS[dk];
-      if(Array.isArray(arr)) flat.push(...arr);
-    }
-    if(flat.length && typeof setIDBCards === 'function'){
-      await setIDBCards(flat);
-      console.log('BoardMD: cache IDB atualizado com ' + flat.length + ' cards completos');
-    }
-  } catch(e){ console.warn('BoardMD: persist IDB falhou', e); }
-}
-
-// Fallback sequencial — usado se count() falhar OU se parallel fetch vier incompleto
+// ── L
+llback sequencial — usado se count() falhar OU se parallel fetch vier incompleto
 // CRÍTICO: PAGE=1000 (teto hard do Supabase). Para SÓ quando data.length === 0.
 async function _fetchSequentialFallback(onProgress, knownTotal){
   const PAGE = 1000;
@@ -10329,10 +10199,6 @@ async function loadCardsFromSupabase(){
           console.log('BoardMD: cache > 24h, refresh em background em 5s');
           setTimeout(() => backgroundRefresh(cached.length), 5000);
         }
-        // Prefetch de pesados se algum card do cache nao tiver
-        setTimeout(() => {
-          if(typeof startBackgroundPrefetch === 'function') startBackgroundPrefetch();
-        }, 3000);
         return cached.length;
       }
     } catch(e){ console.warn('BoardMD: IDB read falhou, baixando do Supabase'); }
@@ -10364,11 +10230,6 @@ async function loadCardsFromSupabase(){
     console.warn('BoardMD: fetch trouxe ' + allCards.length + '/' + supaTotal +
                  ' (<90%) — NAO salvando cache, tenta de novo na proxima abertura');
   }
-
-  // Prefetch dos campos pesados em background (3s depois)
-  setTimeout(() => {
-    if(typeof startBackgroundPrefetch === 'function') startBackgroundPrefetch();
-  }, 3000);
 
   return allCards.length;
 }
@@ -15030,4 +14891,4 @@ function bmdSetupDrag(){
 </script>
 </body>
 </html>
-<!-- v2 --><!-- redeploy --><!-- redeploy --><!-- redeploy --><!-- redeploy --><!-- redeploy --><!-- redeploy -->
+<!-- v2 --><!-- redeploy --><!-- redeploy --><!-- redeploy --><!-- redeploy --><!-- redeploy --><!-- redeploy --><!-- redeploy -->
