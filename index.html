@@ -424,11 +424,11 @@ html.light .qid-textarea{background:var(--surface2);}
 
 /* ══════════════ GAMIFICATION — PREMIUM REDESIGN ══════════════ */
 /* XP Toast */
-.xp-toast{position:fixed;bottom:90px;left:24px;z-index:9999;pointer-events:none;display:flex;flex-direction:column;gap:6px;}
-.xp-toast-item{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:9px 14px;display:flex;align-items:center;gap:10px;font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;color:var(--text);box-shadow:0 4px 24px rgba(0,0,0,.35);animation:xpIn .25s cubic-bezier(.34,1.56,.64,1) forwards;opacity:0;transform:translateX(-50px);}
+.xp-toast{position:fixed;bottom:90px;right:24px;z-index:9999;pointer-events:none;display:flex;flex-direction:column;gap:6px;}
+.xp-toast-item{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:9px 14px;display:flex;align-items:center;gap:10px;font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;color:var(--text);box-shadow:0 4px 24px rgba(0,0,0,.35);animation:xpIn .25s cubic-bezier(.34,1.56,.64,1) forwards;opacity:0;transform:translateX(50px);}
 .xp-toast-item.fade-out{animation:xpOut .35s ease forwards;}
 @keyframes xpIn{to{opacity:1;transform:translateX(0);}}
-@keyframes xpOut{to{opacity:0;transform:translateX(-50px);}}
+@keyframes xpOut{to{opacity:0;transform:translateX(50px);}}
 .xp-toast-dot{width:7px;height:7px;border-radius:50%;background:var(--gold);flex-shrink:0;}
 .xp-toast-pts{color:var(--gold);}
 
@@ -15030,4 +15030,4 @@ function bmdSetupDrag(){
 </script>
 </body>
 </html>
-<!-- v2 --><!-- redeploy --><!-- redeploy --><!-- redeploy --><!-- redeploy --><!-- redeploy -->
+<!-- v2 --><!-- redeploy --><!-- redeploy --><!-- redeploy --><!-- redeploy --><!-- redeploy --><!-- redeploy -->
