@@ -11132,6 +11132,7 @@ EXPLANATION: ${(card.e||'').replace(/<[^>]+>/g,' ').slice(0,300)}${pubmedRefs}`;
         wrap.querySelectorAll('.att-ibtn').forEach(b=>{ b.disabled = false; });
         return;
       } catch(e) {
+        console.error('[BoardMD MCQ parse fail]', e, '\nRAW RESPONSE:\n', responseText);
         // fallback para texto se JSON falhar
       }
     }
@@ -11147,7 +11148,9 @@ EXPLANATION: ${(card.e||'').replace(/<[^>]+>/g,' ').slice(0,300)}${pubmedRefs}`;
         wrap.querySelectorAll('.att-ibtn').forEach(function(b){ b.disabled = false; });
         if(lensData.pubmed_query) setTimeout(function(){ fetchAttPubmed(lensData.pubmed_query.trim()); }, 100);
         return;
-      } catch(e) {}
+      } catch(e) {
+        console.error('[BoardMD Lens parse fail]', e, '\nRAW RESPONSE:\n', responseText);
+      }
     }
 
     // Extract PUBMED_QUERY if present
