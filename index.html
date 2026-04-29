@@ -11066,6 +11066,32 @@ EXPLANATION: ${(card.e||'').replace(/<[^>]+>/g,' ').slice(0,300)}${pubmedRefs}`;
     }
     const finalPrompt = prompts[type] + ragContext;
 
+    // ── Helper: extract first valid JSON object from messy LLM output ──
+    // Handles: ```json fences, text before/after, trailing PUBMED_QUERY:, etc.
+    const extractJSON = (raw) => {
+      if (!raw || typeof raw !== 'string') return null;
+      let s = raw.replace(/```json|```/g, '').trim();
+      const start = s.indexOf('{');
+      if (start === -1) return null;
+      let depth = 0, inStr = false, esc = false;
+      for (let i = start; i < s.length; i++) {
+        const ch = s[i];
+        if (esc) { esc = false; continue; }
+        if (ch === '\\') { esc = true; continue; }
+        if (ch === '"') { inStr = !inStr; continue; }
+        if (inStr) continue;
+        if (ch === '{') depth++;
+        else if (ch === '}') {
+          depth--;
+          if (depth === 0) {
+            try { return JSON.parse(s.slice(start, i + 1)); }
+            catch (e) { return null; }
+          }
+        }
+      }
+      return null;
+    };
+
     // ── Call Supabase Edge Function `attending-ai` (Gemini 2.5 Flash) ──
     // Retry on 503 (Gemini overload) up to 3 times with exponential backoff
     const callAttending = async (attempt = 0) => {
@@ -11100,8 +11126,8 @@ EXPLANATION: ${(card.e||'').replace(/<[^>]+>/g,' ').slice(0,300)}${pubmedRefs}`;
     // MCQ interativo — parse JSON e renderiza com botões
     if(type === 'mcq'){
       try {
-        const clean = responseText.replace(/```json|```/g,'').trim();
-        const data = JSON.parse(clean);
+        const data = extractJSON(responseText);
+        if (!data || !data.questions) throw new Error('Could not extract MCQ JSON');
         renderInteractiveMCQs(data.questions, respWrap);
         wrap.querySelectorAll('.att-ibtn').forEach(b=>{ b.disabled = false; });
         return;
@@ -11113,8 +11139,8 @@ EXPLANATION: ${(card.e||'').replace(/<[^>]+>/g,' ').slice(0,300)}${pubmedRefs}`;
     // Compare diagnoses — Lens
     if(type === 'compare'){
       try {
-        var clean = responseText.replace(/```json|```/g,'').trim();
-        var lensData = JSON.parse(clean);
+        var lensData = extractJSON(responseText);
+        if (!lensData) throw new Error('Could not extract Lens JSON');
         var lbl = document.getElementById('att-compare-label');
         if(lbl) lbl.textContent = (lensData.left_label||'') + ' vs ' + (lensData.right_label||'');
         renderLens(lensData, respWrap);
