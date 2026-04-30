@@ -15089,6 +15089,84 @@ function bmdSetupDrag(){
 }
 .bs-storm-lbl{font-size:10px;color:var(--gold);font-weight:700;text-align:center;margin-top:5px;letter-spacing:.04em;font-family:'Sora','Lato',sans-serif}
 
+/* Active Recall Mode */
+.bs-ar{padding:22px 28px 18px;display:flex;flex-direction:column;gap:16px;position:relative}
+.bs-ar::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:linear-gradient(180deg,#e8a836,#3b7fff,#22c55e);border-radius:0 2px 2px 0}
+
+/* HY Clue block */
+.bs-ar-hy{opacity:0;transform:translateY(8px);transition:opacity .4s,transform .4s}
+.bs-ar-hy.show{opacity:1;transform:translateY(0)}
+.bs-ar-hy-l{font-size:9.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#e8a836;margin-bottom:6px;display:flex;align-items:center;gap:6px}
+.bs-ar-hy-l::before{content:'';width:6px;height:6px;border-radius:50%;background:#e8a836;display:inline-block}
+.bs-ar-hy-t{padding:13px 18px;border-radius:0 10px 10px 0;background:rgba(232,168,54,.12);border-left:3px solid #e8a836;line-height:1.65;color:var(--text)}
+.fz-md .bs-ar-hy-t{font-size:16px}.fz-lg .bs-ar-hy-t{font-size:19px}.fz-xl .bs-ar-hy-t{font-size:23px}
+
+/* Question block */
+.bs-ar-q{opacity:0;transform:translateY(8px);transition:opacity .4s,transform .4s}
+.bs-ar-q.show{opacity:1;transform:translateY(0)}
+.bs-ar-q-l{font-size:11px;font-weight:700;color:var(--text-dim);margin-bottom:10px;letter-spacing:.02em}
+.bs-ar-opts{display:flex;flex-direction:column;gap:8px}
+.bs-ar-opt{
+  padding:13px 18px;border-radius:10px;
+  border:1.5px solid var(--border);
+  background:var(--surface);
+  cursor:pointer;font-size:15px;font-weight:500;
+  color:var(--text);text-align:left;
+  font-family:inherit;
+  transition:all .15s;
+  display:flex;align-items:center;gap:12px;
+}
+.fz-md .bs-ar-opt{font-size:15px}.fz-lg .bs-ar-opt{font-size:17px}.fz-xl .bs-ar-opt{font-size:20px}
+.bs-ar-opt:hover:not(:disabled){border-color:var(--accent);background:var(--accent-dim)}
+.bs-ar-opt.correct{background:rgba(34,197,94,.12);border-color:#4a9e3a;color:#22c55e;cursor:default}
+.bs-ar-opt.wrong{background:rgba(244,63,94,.08);border-color:rgba(244,63,94,.4);color:#f43f5e;opacity:.7;cursor:default}
+.bs-ar-opt:disabled{cursor:default}
+.bs-ar-opt-letter{
+  width:28px;height:28px;border-radius:50%;
+  background:var(--surface2);
+  display:flex;align-items:center;justify-content:center;
+  font-size:12px;font-weight:700;flex-shrink:0;
+  border:1.5px solid var(--border);
+}
+.bs-ar-opt.correct .bs-ar-opt-letter{background:#22c55e;border-color:#22c55e;color:#fff}
+.bs-ar-opt.wrong .bs-ar-opt-letter{background:#f43f5e;border-color:#f43f5e;color:#fff}
+
+/* Confirmed diagnosis/action block */
+.bs-ar-confirmed{
+  opacity:0;transform:translateY(6px);
+  transition:opacity .35s,transform .35s;
+  padding:13px 18px;border-radius:0 10px 10px 0;
+  line-height:1.65;color:var(--text);font-weight:500;
+}
+.bs-ar-confirmed.show{opacity:1;transform:translateY(0)}
+.bs-ar-confirmed.dx-confirmed{background:rgba(59,127,255,.1);border-left:3px solid #3b7fff}
+.bs-ar-confirmed.action-confirmed{border-left:3px solid currentColor}
+.fz-md .bs-ar-confirmed{font-size:16px}.fz-lg .bs-ar-confirmed{font-size:19px}.fz-xl .bs-ar-confirmed{font-size:23px}
+
+/* FSRS buttons no Active Recall */
+.bs-ar-fsrs{
+  opacity:0;transform:translateY(8px);
+  transition:opacity .4s,transform .4s;
+  display:flex;gap:8px;justify-content:center;
+  padding:4px 0 8px;
+}
+.bs-ar-fsrs.show{opacity:1;transform:translateY(0)}
+.bs-ar-fsrs-btn{
+  flex:1;padding:12px 8px;border-radius:10px;
+  border:1.5px solid var(--border);
+  background:var(--surface);
+  font-size:13px;font-weight:700;
+  cursor:pointer;font-family:inherit;
+  transition:all .15s;
+}
+.bs-ar-fsrs-btn:hover{filter:brightness(1.1)}
+.bs-ar-fsrs-btn.again{background:rgba(244,63,94,.12);border-color:#f43f5e;color:#f43f5e}
+.bs-ar-fsrs-btn.hard{background:rgba(249,115,22,.12);border-color:#f97316;color:#f97316}
+.bs-ar-fsrs-btn.good{background:rgba(34,197,94,.12);border-color:#22c55e;color:#22c55e}
+.bs-ar-fsrs-btn.easy{background:rgba(59,127,255,.12);border-color:#3b7fff;color:#3b7fff}
+.bs-ar-fsrs-label{font-size:9px;color:var(--text-dim);margin-top:3px;display:block}
+
+
 /* Clinical Reasoning chunks */
 .bs-cr{padding:22px 28px 18px;display:flex;flex-direction:column;gap:14px;position:relative}
 .bs-cr::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:linear-gradient(180deg,#e8a836,#3b7fff,#22c55e);border-radius:0 2px 2px 0}
@@ -15146,6 +15224,7 @@ function bmdSetupDrag(){
     <div class="bs-modes">
       
       <div class="bs-mode on" data-mode="phrase"><div class="bs-mode-n">Clinical Reasoning</div><div class="bs-mode-d">HY Clue → Diagnosis → Action</div></div>
+      <div class="bs-mode" data-mode="active"><div class="bs-mode-n">Active Recall</div><div class="bs-mode-d">Choose: HY → Dx → Action</div></div>
       <div class="bs-mode" data-mode="kp"><div class="bs-mode-n">Key Points only</div><div class="bs-mode-d">Ultra-fast pre-exam review</div></div>
       <div class="bs-mode" data-mode="errors"><div class="bs-mode-n">Review errors</div><div class="bs-mode-d">Last 24h "Again" cards</div></div>
     </div>
@@ -15203,7 +15282,7 @@ const BS={mode:'phrase',deck:'all',spd:3000,cards:[],cur:0,ph:0,playing:false,ti
 const SPDS={1:800,2:1500,3:3000,4:5000,5:8000,6:12000,7:20000};
 const SLBL={1:'0.8s',2:'1.5s',3:'3s',4:'5s',5:'8s',6:'12s',7:'20s'};
 const SWPM={1:'≈75/min',2:'≈40/min',3:'≈20/min',4:'≈12/min',5:'≈7/min',6:'≈5/min',7:'≈3/min'};
-const PHS={flash:['vignette','choices','answer','kp'],phrase:['phrase'],kp:['kp'],errors:['vignette','choices','answer','kp']};
+const PHS={flash:['vignette','choices','answer','kp'],phrase:['phrase'],active:['active'],kp:['kp'],errors:['vignette','choices','answer','kp']};
 const FZL=['md','lg','xl'];
 const FZN={md:'Medium',lg:'Large',xl:'X-Large'};
 const DKL={boardmd_s2:'BoardMD S2',core:'Core S2',boardmd_s1:'BoardMD S1',s1_core:'Core S1'};
@@ -15331,6 +15410,17 @@ function render(){
   let h='<div class="bs-ch"><span class="bs-ct">'+topic+'</span><div class="bs-cm"><span class="bs-db">'+dk+'</span><span class="bs-qi">'+qid+'</span></div></div>';
   if(ph==='vignette'){
     h+='<div class="bs-sl">Vignette</div><div class="bs-vg">'+hlVignette(card.q||'',card.phrase||'')+'</div>';
+  }else if(ph==='active'){
+    // Active Recall mode
+    const tempAR = document.createElement('div');
+    renderActiveRecall(card, tempAR);
+    h += '<div class="bs-ch"><span class="bs-ct">'+topic+'</span><div class="bs-cm"><span class="bs-db">'+dk+'</span><span class="bs-qi">'+qid+'</span></div></div>' + tempAR.innerHTML;
+    el.innerHTML = h;
+    const fbAR=document.getElementById('bs-flag-btn');if(fbAR)fbAR.classList.toggle('on',BS.flagged.has(card.id));
+    // Re-attach event listeners (innerHTML resets them)
+    el.querySelectorAll('.bs-ar-opt[onclick]').forEach(function(b){});
+    setTimeout(function(){const hy=document.getElementById('ar-hy');if(hy)hy.classList.add('show');},80);
+    return;
   }else if(ph==='phrase'){
     // Clinical Reasoning mode — usa campo brainstorm (Sonnet) ou fallback para phrase
     el.innerHTML = '';
@@ -15515,6 +15605,253 @@ function hlBold(t) {
   return t ? String(t).replace(/\*\*(.+?)\*\*/g, '<span class="bs-hlb">$1</span>') : '';
 }
 
+
+/* Active Recall State */
+const AR = {
+  dxAnswered: false,
+  actionAnswered: false,
+  dxCorrect: false,
+  actionCorrect: false,
+  cardId: null
+};
+
+function renderActiveRecall(card, el) {
+  const raw = card.brainstorm;
+  if (!raw) {
+    // Fallback para Clinical Reasoning normal
+    renderClinicalReasoning(card, el);
+    return;
+  }
+  let bs;
+  try { bs = typeof raw === 'string' ? JSON.parse(raw) : raw; }
+  catch(e) { renderClinicalReasoning(card, el); return; }
+
+  // Reset AR state
+  AR.dxAnswered = false;
+  AR.actionAnswered = false;
+  AR.dxCorrect = false;
+  AR.actionCorrect = false;
+  AR.cardId = card.id;
+
+  const hy       = bs.hy_clue || '';
+  const dx       = bs.diagnosis || '';
+  const dxDist   = bs.dx_distractor || '';
+  const atype    = (bs.action_type || 'NONE').toUpperCase();
+  const action   = bs.action_content || '';
+  const actDist  = bs.action_distractor || '';
+
+  const ACTION_LABELS = {
+    NEXT_STEP: 'Next Step', BEST_TEST: 'Best Test',
+    TREATMENT: 'Treatment', MECHANISM: 'Mechanism', PROGNOSIS: 'Prognosis'
+  };
+  const ACTION_COLORS = {
+    NEXT_STEP:'#a855f7', BEST_TEST:'#06b6d4',
+    TREATMENT:'#22c55e', MECHANISM:'#f97316', PROGNOSIS:'#ec4899'
+  };
+
+  // Shuffle 2 options
+  function shuffleTwo(correct, wrong) {
+    return Math.random() > 0.5
+      ? [{text: correct, isCorrect: true}, {text: wrong, isCorrect: false}]
+      : [{text: wrong, isCorrect: false}, {text: correct, isCorrect: true}];
+  }
+
+  const dxOpts = dxDist ? shuffleTwo(dx, dxDist) : null;
+  const actOpts = (atype !== 'NONE' && action && actDist) ? shuffleTwo(action, actDist) : null;
+  const hasAction = atype !== 'NONE' && action;
+
+  let html = '<div class="bs-ar" id="bs-ar-wrap">';
+
+  // 1. HY Clue
+  html += `<div class="bs-ar-hy" id="ar-hy">
+    <div class="bs-ar-hy-l">HY Clue</div>
+    <div class="bs-ar-hy-t">${hlBold(hy)}</div>
+  </div>`;
+
+  // 2. Dx Question
+  if (dxOpts) {
+    html += `<div class="bs-ar-q" id="ar-dx-q">
+      <div class="bs-ar-q-l">What is the most likely diagnosis?</div>
+      <div class="bs-ar-opts">`;
+    dxOpts.forEach((opt, i) => {
+      const letter = i === 0 ? 'A' : 'B';
+      html += `<button class="bs-ar-opt" data-correct="${opt.isCorrect}" onclick="arPickDx(this,'${card.id}')" data-full="${encodeURIComponent(dx)}">
+        <span class="bs-ar-opt-letter">${letter}</span>
+        ${hlBold(opt.text)}
+      </button>`;
+    });
+    html += `</div></div>`;
+  } else {
+    // No distractor — show dx directly
+    html += `<div class="bs-ar-confirmed dx-confirmed show" id="ar-dx-confirmed" style="border-left:3px solid #3b7fff">
+      <span style="font-size:9.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#3b7fff;display:block;margin-bottom:5px">Diagnosis</span>
+      ${hlBold(dx)}
+    </div>`;
+    AR.dxAnswered = true;
+    AR.dxCorrect = true;
+  }
+
+  // 3. Dx Confirmed (hidden until answered)
+  if (dxOpts) {
+    html += `<div class="bs-ar-confirmed dx-confirmed" id="ar-dx-confirmed">
+      <span style="font-size:9.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#3b7fff;display:block;margin-bottom:5px">Diagnosis</span>
+      ${hlBold(dx)}
+    </div>`;
+  }
+
+  // 4. Action Question (hidden until dx answered)
+  if (actOpts) {
+    const acolor = ACTION_COLORS[atype] || '#22c55e';
+    const alabel = ACTION_LABELS[atype] || 'Action';
+    html += `<div class="bs-ar-q" id="ar-act-q" style="display:none">
+      <div class="bs-ar-q-l">What is the ${alabel.toLowerCase()}?</div>
+      <div class="bs-ar-opts">`;
+    actOpts.forEach((opt, i) => {
+      const letter = i === 0 ? 'A' : 'B';
+      html += `<button class="bs-ar-opt" data-correct="${opt.isCorrect}" onclick="arPickAction(this,'${card.id}')" data-full="${encodeURIComponent(action)}">
+        <span class="bs-ar-opt-letter">${letter}</span>
+        ${hlBold(opt.text)}
+      </button>`;
+    });
+    html += `</div></div>`;
+    // Action confirmed
+    html += `<div class="bs-ar-confirmed action-confirmed" id="ar-act-confirmed" style="display:none;border-left:3px solid ${acolor};background:${acolor}18">
+      <span style="font-size:9.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:${acolor};display:block;margin-bottom:5px">${alabel}</span>
+      ${hlBold(action)}
+    </div>`;
+  } else if (hasAction) {
+    // Has action but no distractor
+    const acolor = ACTION_COLORS[atype] || '#22c55e';
+    const alabel = ACTION_LABELS[atype] || 'Action';
+    html += `<div class="bs-ar-confirmed action-confirmed" id="ar-act-confirmed" style="border-left:3px solid ${acolor};background:${acolor}18">
+      <span style="font-size:9.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:${acolor};display:block;margin-bottom:5px">${alabel}</span>
+      ${hlBold(action)}
+    </div>`;
+    AR.actionAnswered = true;
+    AR.actionCorrect = true;
+  }
+
+  // 5. FSRS buttons (hidden until all answered)
+  html += `<div class="bs-ar-fsrs" id="ar-fsrs" style="display:none">
+    <button class="bs-ar-fsrs-btn again" onclick="arFsrs('again','${card.id}')">
+      Again<span class="bs-ar-fsrs-label">1m</span>
+    </button>
+    <button class="bs-ar-fsrs-btn hard" onclick="arFsrs('hard','${card.id}')">
+      Hard<span class="bs-ar-fsrs-label">~10m</span>
+    </button>
+    <button class="bs-ar-fsrs-btn good" onclick="arFsrs('good','${card.id}')">
+      Good<span class="bs-ar-fsrs-label">~1d</span>
+    </button>
+    <button class="bs-ar-fsrs-btn easy" onclick="arFsrs('easy','${card.id}')">
+      Easy<span class="bs-ar-fsrs-label">~4d</span>
+    </button>
+  </div>`;
+
+  html += '</div>';
+  el.innerHTML = html;
+
+  // Animate HY Clue in
+  setTimeout(() => {
+    const hy = document.getElementById('ar-hy');
+    if (hy) hy.classList.add('show');
+  }, 80);
+
+  // If no dx question, show action question and check completion
+  if (!dxOpts) {
+    setTimeout(() => arCheckComplete(), 200);
+  }
+}
+
+function arPickDx(btn, cardId) {
+  if (AR.dxAnswered) return;
+  AR.dxAnswered = true;
+  const isCorrect = btn.dataset.correct === 'true';
+  AR.dxCorrect = isCorrect;
+
+  // Disable all buttons and show feedback
+  const opts = btn.closest('.bs-ar-opts').querySelectorAll('.bs-ar-opt');
+  opts.forEach(opt => {
+    opt.disabled = true;
+    if (opt.dataset.correct === 'true') opt.classList.add('correct');
+    else opt.classList.add('wrong');
+  });
+
+  // Show confirmed dx after delay
+  setTimeout(() => {
+    const confirmed = document.getElementById('ar-dx-confirmed');
+    if (confirmed) { confirmed.classList.add('show'); }
+
+    // Show action question
+    setTimeout(() => {
+      const actQ = document.getElementById('ar-act-q');
+      if (actQ) {
+        actQ.style.display = 'block';
+        setTimeout(() => actQ.classList.add('show'), 50);
+      } else {
+        AR.actionAnswered = true;
+        arCheckComplete();
+      }
+    }, 400);
+  }, 600);
+}
+
+function arPickAction(btn, cardId) {
+  if (AR.actionAnswered) return;
+  AR.actionAnswered = true;
+  const isCorrect = btn.dataset.correct === 'true';
+  AR.actionCorrect = isCorrect;
+
+  const opts = btn.closest('.bs-ar-opts').querySelectorAll('.bs-ar-opt');
+  opts.forEach(opt => {
+    opt.disabled = true;
+    if (opt.dataset.correct === 'true') opt.classList.add('correct');
+    else opt.classList.add('wrong');
+  });
+
+  setTimeout(() => {
+    const confirmed = document.getElementById('ar-act-confirmed');
+    if (confirmed) {
+      confirmed.style.display = 'block';
+      setTimeout(() => confirmed.classList.add('show'), 50);
+    }
+    setTimeout(() => arCheckComplete(), 400);
+  }, 600);
+}
+
+function arCheckComplete() {
+  if (!AR.dxAnswered) return;
+  const actQ = document.getElementById('ar-act-q');
+  const hasActionQ = actQ !== null;
+  if (hasActionQ && !AR.actionAnswered) return;
+
+  // Show FSRS
+  setTimeout(() => {
+    const fsrs = document.getElementById('ar-fsrs');
+    if (fsrs) {
+      fsrs.style.display = 'flex';
+      setTimeout(() => fsrs.classList.add('show'), 50);
+
+      // Pre-select based on performance
+      if (!AR.dxCorrect || !AR.actionCorrect) {
+        fsrs.querySelector('.again').style.outline = '2px solid #f43f5e';
+      } else if (AR.dxCorrect && AR.actionCorrect) {
+        fsrs.querySelector('.good').style.outline = '2px solid #22c55e';
+      }
+    }
+  }, 300);
+}
+
+function arFsrs(rating, cardId) {
+  // Chama o FSRS normal do BoardMD se disponível
+  if (typeof bmdRateCard === 'function') {
+    bmdRateCard(rating, cardId);
+  } else if (typeof window.rateCard === 'function') {
+    window.rateCard(rating);
+  }
+  // Avança para o próximo card
+  bsGo(1);
+}
+
 console.log('BoardMD BrainStorm v5 loaded');
 })();
 </script>
@@ -15640,6 +15977,84 @@ console.log('BoardMD BrainStorm v5 loaded');
 }
 .bs-storm-lbl{font-size:10px;color:var(--gold);font-weight:700;text-align:center;margin-top:5px;letter-spacing:.04em;font-family:'Sora','Lato',sans-serif}
 
+/* Active Recall Mode */
+.bs-ar{padding:22px 28px 18px;display:flex;flex-direction:column;gap:16px;position:relative}
+.bs-ar::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:linear-gradient(180deg,#e8a836,#3b7fff,#22c55e);border-radius:0 2px 2px 0}
+
+/* HY Clue block */
+.bs-ar-hy{opacity:0;transform:translateY(8px);transition:opacity .4s,transform .4s}
+.bs-ar-hy.show{opacity:1;transform:translateY(0)}
+.bs-ar-hy-l{font-size:9.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#e8a836;margin-bottom:6px;display:flex;align-items:center;gap:6px}
+.bs-ar-hy-l::before{content:'';width:6px;height:6px;border-radius:50%;background:#e8a836;display:inline-block}
+.bs-ar-hy-t{padding:13px 18px;border-radius:0 10px 10px 0;background:rgba(232,168,54,.12);border-left:3px solid #e8a836;line-height:1.65;color:var(--text)}
+.fz-md .bs-ar-hy-t{font-size:16px}.fz-lg .bs-ar-hy-t{font-size:19px}.fz-xl .bs-ar-hy-t{font-size:23px}
+
+/* Question block */
+.bs-ar-q{opacity:0;transform:translateY(8px);transition:opacity .4s,transform .4s}
+.bs-ar-q.show{opacity:1;transform:translateY(0)}
+.bs-ar-q-l{font-size:11px;font-weight:700;color:var(--text-dim);margin-bottom:10px;letter-spacing:.02em}
+.bs-ar-opts{display:flex;flex-direction:column;gap:8px}
+.bs-ar-opt{
+  padding:13px 18px;border-radius:10px;
+  border:1.5px solid var(--border);
+  background:var(--surface);
+  cursor:pointer;font-size:15px;font-weight:500;
+  color:var(--text);text-align:left;
+  font-family:inherit;
+  transition:all .15s;
+  display:flex;align-items:center;gap:12px;
+}
+.fz-md .bs-ar-opt{font-size:15px}.fz-lg .bs-ar-opt{font-size:17px}.fz-xl .bs-ar-opt{font-size:20px}
+.bs-ar-opt:hover:not(:disabled){border-color:var(--accent);background:var(--accent-dim)}
+.bs-ar-opt.correct{background:rgba(34,197,94,.12);border-color:#4a9e3a;color:#22c55e;cursor:default}
+.bs-ar-opt.wrong{background:rgba(244,63,94,.08);border-color:rgba(244,63,94,.4);color:#f43f5e;opacity:.7;cursor:default}
+.bs-ar-opt:disabled{cursor:default}
+.bs-ar-opt-letter{
+  width:28px;height:28px;border-radius:50%;
+  background:var(--surface2);
+  display:flex;align-items:center;justify-content:center;
+  font-size:12px;font-weight:700;flex-shrink:0;
+  border:1.5px solid var(--border);
+}
+.bs-ar-opt.correct .bs-ar-opt-letter{background:#22c55e;border-color:#22c55e;color:#fff}
+.bs-ar-opt.wrong .bs-ar-opt-letter{background:#f43f5e;border-color:#f43f5e;color:#fff}
+
+/* Confirmed diagnosis/action block */
+.bs-ar-confirmed{
+  opacity:0;transform:translateY(6px);
+  transition:opacity .35s,transform .35s;
+  padding:13px 18px;border-radius:0 10px 10px 0;
+  line-height:1.65;color:var(--text);font-weight:500;
+}
+.bs-ar-confirmed.show{opacity:1;transform:translateY(0)}
+.bs-ar-confirmed.dx-confirmed{background:rgba(59,127,255,.1);border-left:3px solid #3b7fff}
+.bs-ar-confirmed.action-confirmed{border-left:3px solid currentColor}
+.fz-md .bs-ar-confirmed{font-size:16px}.fz-lg .bs-ar-confirmed{font-size:19px}.fz-xl .bs-ar-confirmed{font-size:23px}
+
+/* FSRS buttons no Active Recall */
+.bs-ar-fsrs{
+  opacity:0;transform:translateY(8px);
+  transition:opacity .4s,transform .4s;
+  display:flex;gap:8px;justify-content:center;
+  padding:4px 0 8px;
+}
+.bs-ar-fsrs.show{opacity:1;transform:translateY(0)}
+.bs-ar-fsrs-btn{
+  flex:1;padding:12px 8px;border-radius:10px;
+  border:1.5px solid var(--border);
+  background:var(--surface);
+  font-size:13px;font-weight:700;
+  cursor:pointer;font-family:inherit;
+  transition:all .15s;
+}
+.bs-ar-fsrs-btn:hover{filter:brightness(1.1)}
+.bs-ar-fsrs-btn.again{background:rgba(244,63,94,.12);border-color:#f43f5e;color:#f43f5e}
+.bs-ar-fsrs-btn.hard{background:rgba(249,115,22,.12);border-color:#f97316;color:#f97316}
+.bs-ar-fsrs-btn.good{background:rgba(34,197,94,.12);border-color:#22c55e;color:#22c55e}
+.bs-ar-fsrs-btn.easy{background:rgba(59,127,255,.12);border-color:#3b7fff;color:#3b7fff}
+.bs-ar-fsrs-label{font-size:9px;color:var(--text-dim);margin-top:3px;display:block}
+
+
 /* Clinical Reasoning chunks */
 .bs-cr{padding:22px 28px 18px;display:flex;flex-direction:column;gap:14px;position:relative}
 .bs-cr::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:linear-gradient(180deg,#e8a836,#3b7fff,#22c55e);border-radius:0 2px 2px 0}
@@ -15697,6 +16112,7 @@ console.log('BoardMD BrainStorm v5 loaded');
     <div class="bs-modes">
       
       <div class="bs-mode on" data-mode="phrase"><div class="bs-mode-n">Clinical Reasoning</div><div class="bs-mode-d">HY Clue → Diagnosis → Action</div></div>
+      <div class="bs-mode" data-mode="active"><div class="bs-mode-n">Active Recall</div><div class="bs-mode-d">Choose: HY → Dx → Action</div></div>
       <div class="bs-mode" data-mode="kp"><div class="bs-mode-n">Key Points only</div><div class="bs-mode-d">Ultra-fast pre-exam review</div></div>
       <div class="bs-mode" data-mode="errors"><div class="bs-mode-n">Review errors</div><div class="bs-mode-d">Last 24h "Again" cards</div></div>
     </div>
@@ -15754,7 +16170,7 @@ const BS={mode:'phrase',deck:'all',spd:3000,cards:[],cur:0,ph:0,playing:false,ti
 const SPDS={1:800,2:1500,3:3000,4:5000,5:8000,6:12000,7:20000};
 const SLBL={1:'0.8s',2:'1.5s',3:'3s',4:'5s',5:'8s',6:'12s',7:'20s'};
 const SWPM={1:'≈75/min',2:'≈40/min',3:'≈20/min',4:'≈12/min',5:'≈7/min',6:'≈5/min',7:'≈3/min'};
-const PHS={flash:['vignette','choices','answer','kp'],phrase:['phrase'],kp:['kp'],errors:['vignette','choices','answer','kp']};
+const PHS={flash:['vignette','choices','answer','kp'],phrase:['phrase'],active:['active'],kp:['kp'],errors:['vignette','choices','answer','kp']};
 const FZL=['md','lg','xl'];
 const FZN={md:'Medium',lg:'Large',xl:'X-Large'};
 const DKL={boardmd_s2:'BoardMD S2',core:'Core S2',boardmd_s1:'BoardMD S1',s1_core:'Core S1'};
@@ -15882,6 +16298,17 @@ function render(){
   let h='<div class="bs-ch"><span class="bs-ct">'+topic+'</span><div class="bs-cm"><span class="bs-db">'+dk+'</span><span class="bs-qi">'+qid+'</span></div></div>';
   if(ph==='vignette'){
     h+='<div class="bs-sl">Vignette</div><div class="bs-vg">'+hlVignette(card.q||'',card.phrase||'')+'</div>';
+  }else if(ph==='active'){
+    // Active Recall mode
+    const tempAR = document.createElement('div');
+    renderActiveRecall(card, tempAR);
+    h += '<div class="bs-ch"><span class="bs-ct">'+topic+'</span><div class="bs-cm"><span class="bs-db">'+dk+'</span><span class="bs-qi">'+qid+'</span></div></div>' + tempAR.innerHTML;
+    el.innerHTML = h;
+    const fbAR=document.getElementById('bs-flag-btn');if(fbAR)fbAR.classList.toggle('on',BS.flagged.has(card.id));
+    // Re-attach event listeners (innerHTML resets them)
+    el.querySelectorAll('.bs-ar-opt[onclick]').forEach(function(b){});
+    setTimeout(function(){const hy=document.getElementById('ar-hy');if(hy)hy.classList.add('show');},80);
+    return;
   }else if(ph==='phrase'){
     // Clinical Reasoning mode — usa campo brainstorm (Sonnet) ou fallback para phrase
     el.innerHTML = '';
@@ -16065,6 +16492,253 @@ function renderClinicalReasoning(card, el) {
 
 function hlBold(t) {
   return t ? String(t).replace(/\*\*(.+?)\*\*/g, '<span class="bs-hlb">$1</span>') : '';
+}
+
+
+/* Active Recall State */
+const AR = {
+  dxAnswered: false,
+  actionAnswered: false,
+  dxCorrect: false,
+  actionCorrect: false,
+  cardId: null
+};
+
+function renderActiveRecall(card, el) {
+  const raw = card.brainstorm;
+  if (!raw) {
+    // Fallback para Clinical Reasoning normal
+    renderClinicalReasoning(card, el);
+    return;
+  }
+  let bs;
+  try { bs = typeof raw === 'string' ? JSON.parse(raw) : raw; }
+  catch(e) { renderClinicalReasoning(card, el); return; }
+
+  // Reset AR state
+  AR.dxAnswered = false;
+  AR.actionAnswered = false;
+  AR.dxCorrect = false;
+  AR.actionCorrect = false;
+  AR.cardId = card.id;
+
+  const hy       = bs.hy_clue || '';
+  const dx       = bs.diagnosis || '';
+  const dxDist   = bs.dx_distractor || '';
+  const atype    = (bs.action_type || 'NONE').toUpperCase();
+  const action   = bs.action_content || '';
+  const actDist  = bs.action_distractor || '';
+
+  const ACTION_LABELS = {
+    NEXT_STEP: 'Next Step', BEST_TEST: 'Best Test',
+    TREATMENT: 'Treatment', MECHANISM: 'Mechanism', PROGNOSIS: 'Prognosis'
+  };
+  const ACTION_COLORS = {
+    NEXT_STEP:'#a855f7', BEST_TEST:'#06b6d4',
+    TREATMENT:'#22c55e', MECHANISM:'#f97316', PROGNOSIS:'#ec4899'
+  };
+
+  // Shuffle 2 options
+  function shuffleTwo(correct, wrong) {
+    return Math.random() > 0.5
+      ? [{text: correct, isCorrect: true}, {text: wrong, isCorrect: false}]
+      : [{text: wrong, isCorrect: false}, {text: correct, isCorrect: true}];
+  }
+
+  const dxOpts = dxDist ? shuffleTwo(dx, dxDist) : null;
+  const actOpts = (atype !== 'NONE' && action && actDist) ? shuffleTwo(action, actDist) : null;
+  const hasAction = atype !== 'NONE' && action;
+
+  let html = '<div class="bs-ar" id="bs-ar-wrap">';
+
+  // 1. HY Clue
+  html += `<div class="bs-ar-hy" id="ar-hy">
+    <div class="bs-ar-hy-l">HY Clue</div>
+    <div class="bs-ar-hy-t">${hlBold(hy)}</div>
+  </div>`;
+
+  // 2. Dx Question
+  if (dxOpts) {
+    html += `<div class="bs-ar-q" id="ar-dx-q">
+      <div class="bs-ar-q-l">What is the most likely diagnosis?</div>
+      <div class="bs-ar-opts">`;
+    dxOpts.forEach((opt, i) => {
+      const letter = i === 0 ? 'A' : 'B';
+      html += `<button class="bs-ar-opt" data-correct="${opt.isCorrect}" onclick="arPickDx(this,'${card.id}')" data-full="${encodeURIComponent(dx)}">
+        <span class="bs-ar-opt-letter">${letter}</span>
+        ${hlBold(opt.text)}
+      </button>`;
+    });
+    html += `</div></div>`;
+  } else {
+    // No distractor — show dx directly
+    html += `<div class="bs-ar-confirmed dx-confirmed show" id="ar-dx-confirmed" style="border-left:3px solid #3b7fff">
+      <span style="font-size:9.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#3b7fff;display:block;margin-bottom:5px">Diagnosis</span>
+      ${hlBold(dx)}
+    </div>`;
+    AR.dxAnswered = true;
+    AR.dxCorrect = true;
+  }
+
+  // 3. Dx Confirmed (hidden until answered)
+  if (dxOpts) {
+    html += `<div class="bs-ar-confirmed dx-confirmed" id="ar-dx-confirmed">
+      <span style="font-size:9.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#3b7fff;display:block;margin-bottom:5px">Diagnosis</span>
+      ${hlBold(dx)}
+    </div>`;
+  }
+
+  // 4. Action Question (hidden until dx answered)
+  if (actOpts) {
+    const acolor = ACTION_COLORS[atype] || '#22c55e';
+    const alabel = ACTION_LABELS[atype] || 'Action';
+    html += `<div class="bs-ar-q" id="ar-act-q" style="display:none">
+      <div class="bs-ar-q-l">What is the ${alabel.toLowerCase()}?</div>
+      <div class="bs-ar-opts">`;
+    actOpts.forEach((opt, i) => {
+      const letter = i === 0 ? 'A' : 'B';
+      html += `<button class="bs-ar-opt" data-correct="${opt.isCorrect}" onclick="arPickAction(this,'${card.id}')" data-full="${encodeURIComponent(action)}">
+        <span class="bs-ar-opt-letter">${letter}</span>
+        ${hlBold(opt.text)}
+      </button>`;
+    });
+    html += `</div></div>`;
+    // Action confirmed
+    html += `<div class="bs-ar-confirmed action-confirmed" id="ar-act-confirmed" style="display:none;border-left:3px solid ${acolor};background:${acolor}18">
+      <span style="font-size:9.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:${acolor};display:block;margin-bottom:5px">${alabel}</span>
+      ${hlBold(action)}
+    </div>`;
+  } else if (hasAction) {
+    // Has action but no distractor
+    const acolor = ACTION_COLORS[atype] || '#22c55e';
+    const alabel = ACTION_LABELS[atype] || 'Action';
+    html += `<div class="bs-ar-confirmed action-confirmed" id="ar-act-confirmed" style="border-left:3px solid ${acolor};background:${acolor}18">
+      <span style="font-size:9.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:${acolor};display:block;margin-bottom:5px">${alabel}</span>
+      ${hlBold(action)}
+    </div>`;
+    AR.actionAnswered = true;
+    AR.actionCorrect = true;
+  }
+
+  // 5. FSRS buttons (hidden until all answered)
+  html += `<div class="bs-ar-fsrs" id="ar-fsrs" style="display:none">
+    <button class="bs-ar-fsrs-btn again" onclick="arFsrs('again','${card.id}')">
+      Again<span class="bs-ar-fsrs-label">1m</span>
+    </button>
+    <button class="bs-ar-fsrs-btn hard" onclick="arFsrs('hard','${card.id}')">
+      Hard<span class="bs-ar-fsrs-label">~10m</span>
+    </button>
+    <button class="bs-ar-fsrs-btn good" onclick="arFsrs('good','${card.id}')">
+      Good<span class="bs-ar-fsrs-label">~1d</span>
+    </button>
+    <button class="bs-ar-fsrs-btn easy" onclick="arFsrs('easy','${card.id}')">
+      Easy<span class="bs-ar-fsrs-label">~4d</span>
+    </button>
+  </div>`;
+
+  html += '</div>';
+  el.innerHTML = html;
+
+  // Animate HY Clue in
+  setTimeout(() => {
+    const hy = document.getElementById('ar-hy');
+    if (hy) hy.classList.add('show');
+  }, 80);
+
+  // If no dx question, show action question and check completion
+  if (!dxOpts) {
+    setTimeout(() => arCheckComplete(), 200);
+  }
+}
+
+function arPickDx(btn, cardId) {
+  if (AR.dxAnswered) return;
+  AR.dxAnswered = true;
+  const isCorrect = btn.dataset.correct === 'true';
+  AR.dxCorrect = isCorrect;
+
+  // Disable all buttons and show feedback
+  const opts = btn.closest('.bs-ar-opts').querySelectorAll('.bs-ar-opt');
+  opts.forEach(opt => {
+    opt.disabled = true;
+    if (opt.dataset.correct === 'true') opt.classList.add('correct');
+    else opt.classList.add('wrong');
+  });
+
+  // Show confirmed dx after delay
+  setTimeout(() => {
+    const confirmed = document.getElementById('ar-dx-confirmed');
+    if (confirmed) { confirmed.classList.add('show'); }
+
+    // Show action question
+    setTimeout(() => {
+      const actQ = document.getElementById('ar-act-q');
+      if (actQ) {
+        actQ.style.display = 'block';
+        setTimeout(() => actQ.classList.add('show'), 50);
+      } else {
+        AR.actionAnswered = true;
+        arCheckComplete();
+      }
+    }, 400);
+  }, 600);
+}
+
+function arPickAction(btn, cardId) {
+  if (AR.actionAnswered) return;
+  AR.actionAnswered = true;
+  const isCorrect = btn.dataset.correct === 'true';
+  AR.actionCorrect = isCorrect;
+
+  const opts = btn.closest('.bs-ar-opts').querySelectorAll('.bs-ar-opt');
+  opts.forEach(opt => {
+    opt.disabled = true;
+    if (opt.dataset.correct === 'true') opt.classList.add('correct');
+    else opt.classList.add('wrong');
+  });
+
+  setTimeout(() => {
+    const confirmed = document.getElementById('ar-act-confirmed');
+    if (confirmed) {
+      confirmed.style.display = 'block';
+      setTimeout(() => confirmed.classList.add('show'), 50);
+    }
+    setTimeout(() => arCheckComplete(), 400);
+  }, 600);
+}
+
+function arCheckComplete() {
+  if (!AR.dxAnswered) return;
+  const actQ = document.getElementById('ar-act-q');
+  const hasActionQ = actQ !== null;
+  if (hasActionQ && !AR.actionAnswered) return;
+
+  // Show FSRS
+  setTimeout(() => {
+    const fsrs = document.getElementById('ar-fsrs');
+    if (fsrs) {
+      fsrs.style.display = 'flex';
+      setTimeout(() => fsrs.classList.add('show'), 50);
+
+      // Pre-select based on performance
+      if (!AR.dxCorrect || !AR.actionCorrect) {
+        fsrs.querySelector('.again').style.outline = '2px solid #f43f5e';
+      } else if (AR.dxCorrect && AR.actionCorrect) {
+        fsrs.querySelector('.good').style.outline = '2px solid #22c55e';
+      }
+    }
+  }, 300);
+}
+
+function arFsrs(rating, cardId) {
+  // Chama o FSRS normal do BoardMD se disponível
+  if (typeof bmdRateCard === 'function') {
+    bmdRateCard(rating, cardId);
+  } else if (typeof window.rateCard === 'function') {
+    window.rateCard(rating);
+  }
+  // Avança para o próximo card
+  bsGo(1);
 }
 
 console.log('BoardMD BrainStorm v5 loaded');
