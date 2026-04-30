@@ -15088,6 +15088,37 @@ function bmdSetupDrag(){
   .bmd-bottom-nav .nav-center-btn.bs-storm-btn svg{width:32px!important;height:32px!important}
 }
 .bs-storm-lbl{font-size:10px;color:var(--gold);font-weight:700;text-align:center;margin-top:5px;letter-spacing:.04em;font-family:'Sora','Lato',sans-serif}
+
+/* Clinical Reasoning chunks */
+.bs-cr{padding:22px 28px 18px;display:flex;flex-direction:column;gap:14px;position:relative}
+.bs-cr::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:linear-gradient(180deg,#e8a836,#3b7fff,#22c55e);border-radius:0 2px 2px 0}
+.bs-crk{opacity:0;transform:translateY(10px);transition:opacity .45s ease,transform .45s ease}
+.bs-crk.show{opacity:1;transform:translateY(0)}
+.bs-crk-l{font-size:9.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;margin-bottom:6px;display:flex;align-items:center;gap:6px}
+.bs-crk-l::before{content:'';width:6px;height:6px;border-radius:50%;display:inline-block;background:currentColor}
+.bs-crk-t{padding:13px 18px;border-radius:0 10px 10px 0;line-height:1.65;color:var(--text)}
+.fz-md .bs-crk-t{font-size:16px}
+.fz-lg .bs-crk-t{font-size:19px}
+.fz-xl .bs-crk-t{font-size:23px}
+.bs-crk-hy   .bs-crk-l{color:#e8a836}
+.bs-crk-hy   .bs-crk-t{background:rgba(232,168,54,.12);border-left:3px solid #e8a836}
+.bs-crk-dx   .bs-crk-l{color:#3b7fff}
+.bs-crk-dx   .bs-crk-t{background:rgba(59,127,255,.1);border-left:3px solid #3b7fff;font-weight:600}
+.bs-crk-ns   .bs-crk-l{color:#a855f7}
+.bs-crk-ns   .bs-crk-t{background:rgba(168,85,247,.1);border-left:3px solid #a855f7}
+.bs-crk-bt   .bs-crk-l{color:#06b6d4}
+.bs-crk-bt   .bs-crk-t{background:rgba(6,182,212,.1);border-left:3px solid #06b6d4}
+.bs-crk-tx   .bs-crk-l{color:#22c55e}
+.bs-crk-tx   .bs-crk-t{background:rgba(34,197,94,.09);border-left:3px solid #22c55e}
+.bs-crk-mx   .bs-crk-l{color:#f97316}
+.bs-crk-mx   .bs-crk-t{background:rgba(249,115,22,.1);border-left:3px solid #f97316}
+.bs-crk-px   .bs-crk-l{color:#ec4899}
+.bs-crk-px   .bs-crk-t{background:rgba(236,72,153,.1);border-left:3px solid #ec4899}
+.bs-cr-fallback{padding:32px 28px;line-height:1.7;color:var(--text);display:flex;align-items:center;min-height:160px}
+.fz-md .bs-cr-fallback{font-size:16px}
+.fz-lg .bs-cr-fallback{font-size:19px}
+.fz-xl .bs-cr-fallback{font-size:23px}
+
 </style>
 
 <div class="bs-overlay" id="bs-overlay">
@@ -15114,7 +15145,7 @@ function bmdSetupDrag(){
     <div class="bs-sh">Review Mode</div>
     <div class="bs-modes">
       <div class="bs-mode on" data-mode="flash"><div class="bs-mode-n">Flash mode</div><div class="bs-mode-d">Vignette → answer → Key Point</div></div>
-      <div class="bs-mode" data-mode="phrase"><div class="bs-mode-n">Key Phrase</div><div class="bs-mode-d">Cognitive chunking in 3 steps</div></div>
+      <div class="bs-mode" data-mode="phrase"><div class="bs-mode-n">Clinical Reasoning</div><div class="bs-mode-d">HY Clue → Diagnosis → Action</div></div>
       <div class="bs-mode" data-mode="kp"><div class="bs-mode-n">Key Points only</div><div class="bs-mode-d">Ultra-fast pre-exam review</div></div>
       <div class="bs-mode" data-mode="errors"><div class="bs-mode-n">Review errors</div><div class="bs-mode-d">Last 24h "Again" cards</div></div>
     </div>
@@ -15301,8 +15332,16 @@ function render(){
   if(ph==='vignette'){
     h+='<div class="bs-sl">Vignette</div><div class="bs-vg">'+hlVignette(card.q||'',card.phrase||'')+'</div>';
   }else if(ph==='phrase'){
-    const raw=card.phrase||card.kp||'';
-    const parts=raw.split(/\s*\u2192\s*/).filter(p=>p.trim().length>0);
+    // Clinical Reasoning mode — usa campo brainstorm (Sonnet) ou fallback para phrase
+    el.innerHTML = '';
+    const tempDiv = document.createElement('div');
+    renderClinicalReasoning(card, tempDiv);
+    el.innerHTML = '<div class="bs-ch"><span class="bs-ct">' + topic + '</span><div class="bs-cm"><span class="bs-db">' + dk + '</span><span class="bs-qi">' + qid + '</span></div></div>' + tempDiv.innerHTML;
+    const fb2=document.getElementById('bs-flag-btn');if(fb2)fb2.classList.toggle('on',BS.flagged.has(card.id));
+    el.querySelectorAll('.bs-crk').forEach(function(c,i){setTimeout(function(){c.classList.add('show');},i*600+80);});
+    return; // Skip o innerHTML=h no final
+    const _unused=card.phrase||card.kp||'';
+    const parts=_unused.split(/\s*\u2192\s*/).filter(p=>p.trim().length>0);
     const lbls=['Trigger','Diagnosis','Key action'];
 
     if(parts.length>=2){
@@ -15414,6 +15453,68 @@ document.addEventListener('keydown',function(e){
   if(e.key===' '){e.preventDefault();bsTogglePlay();}
   if(e.key==='f'||e.key==='F')bsDoFlag();
 });
+
+function renderClinicalReasoning(card, el) {
+  const raw = card.brainstorm;
+  if (!raw) {
+    // Fallback para phrase antiga
+    const phrase = card.phrase || card.kp || '';
+    el.innerHTML = '<div class="bs-cr-fallback">' + hlBold(phrase) + '</div>';
+    return;
+  }
+  let bs;
+  try { bs = typeof raw === 'string' ? JSON.parse(raw) : raw; }
+  catch(e) {
+    el.innerHTML = '<div class="bs-cr-fallback">' + hlBold(card.kp||'') + '</div>';
+    return;
+  }
+
+  const ACTION_MAP = {
+    NEXT_STEP: {cls:'ns', lbl:'Next Step'},
+    BEST_TEST: {cls:'bt', lbl:'Best Test'},
+    TREATMENT: {cls:'tx', lbl:'Treatment'},
+    MECHANISM: {cls:'mx', lbl:'Mechanism'},
+    PROGNOSIS: {cls:'px', lbl:'Prognosis'},
+  };
+
+  let html = '<div class="bs-cr">';
+
+  // Chunk 1: HY Clue
+  html += '<div class="bs-crk bs-crk-hy" data-i="0">' +
+    '<div class="bs-crk-l">HY Clue</div>' +
+    '<div class="bs-crk-t">' + hlBold(bs.hy_clue||'') + '</div>' +
+  '</div>';
+
+  // Chunk 2: Diagnosis
+  html += '<div class="bs-crk bs-crk-dx" data-i="1">' +
+    '<div class="bs-crk-l">Diagnosis</div>' +
+    '<div class="bs-crk-t">' + hlBold(bs.diagnosis||'') + '</div>' +
+  '</div>';
+
+  // Chunk 3: Dynamic Action
+  const atype = (bs.action_type||'').toUpperCase();
+  const acontent = bs.action_content || '';
+  if (atype && atype !== 'NONE' && acontent && ACTION_MAP[atype]) {
+    const {cls, lbl} = ACTION_MAP[atype];
+    html += '<div class="bs-crk bs-crk-' + cls + '" data-i="2">' +
+      '<div class="bs-crk-l">' + lbl + '</div>' +
+      '<div class="bs-crk-t">' + hlBold(acontent) + '</div>' +
+    '</div>';
+  }
+
+  html += '</div>';
+  el.innerHTML = html;
+
+  // Reveal animation: 600ms entre chunks
+  el.querySelectorAll('.bs-crk').forEach(function(c,i){
+    setTimeout(function(){ c.classList.add('show'); }, i * 600 + 80);
+  });
+}
+
+function hlBold(t) {
+  return t ? String(t).replace(/\*\*(.+?)\*\*/g, '<span class="bs-hlb">$1</span>') : '';
+}
+
 console.log('BoardMD BrainStorm v5 loaded');
 })();
 </script>
@@ -15538,6 +15639,37 @@ console.log('BoardMD BrainStorm v5 loaded');
   .bmd-bottom-nav .nav-center-btn.bs-storm-btn svg{width:32px!important;height:32px!important}
 }
 .bs-storm-lbl{font-size:10px;color:var(--gold);font-weight:700;text-align:center;margin-top:5px;letter-spacing:.04em;font-family:'Sora','Lato',sans-serif}
+
+/* Clinical Reasoning chunks */
+.bs-cr{padding:22px 28px 18px;display:flex;flex-direction:column;gap:14px;position:relative}
+.bs-cr::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:linear-gradient(180deg,#e8a836,#3b7fff,#22c55e);border-radius:0 2px 2px 0}
+.bs-crk{opacity:0;transform:translateY(10px);transition:opacity .45s ease,transform .45s ease}
+.bs-crk.show{opacity:1;transform:translateY(0)}
+.bs-crk-l{font-size:9.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;margin-bottom:6px;display:flex;align-items:center;gap:6px}
+.bs-crk-l::before{content:'';width:6px;height:6px;border-radius:50%;display:inline-block;background:currentColor}
+.bs-crk-t{padding:13px 18px;border-radius:0 10px 10px 0;line-height:1.65;color:var(--text)}
+.fz-md .bs-crk-t{font-size:16px}
+.fz-lg .bs-crk-t{font-size:19px}
+.fz-xl .bs-crk-t{font-size:23px}
+.bs-crk-hy   .bs-crk-l{color:#e8a836}
+.bs-crk-hy   .bs-crk-t{background:rgba(232,168,54,.12);border-left:3px solid #e8a836}
+.bs-crk-dx   .bs-crk-l{color:#3b7fff}
+.bs-crk-dx   .bs-crk-t{background:rgba(59,127,255,.1);border-left:3px solid #3b7fff;font-weight:600}
+.bs-crk-ns   .bs-crk-l{color:#a855f7}
+.bs-crk-ns   .bs-crk-t{background:rgba(168,85,247,.1);border-left:3px solid #a855f7}
+.bs-crk-bt   .bs-crk-l{color:#06b6d4}
+.bs-crk-bt   .bs-crk-t{background:rgba(6,182,212,.1);border-left:3px solid #06b6d4}
+.bs-crk-tx   .bs-crk-l{color:#22c55e}
+.bs-crk-tx   .bs-crk-t{background:rgba(34,197,94,.09);border-left:3px solid #22c55e}
+.bs-crk-mx   .bs-crk-l{color:#f97316}
+.bs-crk-mx   .bs-crk-t{background:rgba(249,115,22,.1);border-left:3px solid #f97316}
+.bs-crk-px   .bs-crk-l{color:#ec4899}
+.bs-crk-px   .bs-crk-t{background:rgba(236,72,153,.1);border-left:3px solid #ec4899}
+.bs-cr-fallback{padding:32px 28px;line-height:1.7;color:var(--text);display:flex;align-items:center;min-height:160px}
+.fz-md .bs-cr-fallback{font-size:16px}
+.fz-lg .bs-cr-fallback{font-size:19px}
+.fz-xl .bs-cr-fallback{font-size:23px}
+
 </style>
 
 <div class="bs-overlay" id="bs-overlay">
@@ -15564,7 +15696,7 @@ console.log('BoardMD BrainStorm v5 loaded');
     <div class="bs-sh">Review Mode</div>
     <div class="bs-modes">
       <div class="bs-mode on" data-mode="flash"><div class="bs-mode-n">Flash mode</div><div class="bs-mode-d">Vignette → answer → Key Point</div></div>
-      <div class="bs-mode" data-mode="phrase"><div class="bs-mode-n">Key Phrase</div><div class="bs-mode-d">Cognitive chunking in 3 steps</div></div>
+      <div class="bs-mode" data-mode="phrase"><div class="bs-mode-n">Clinical Reasoning</div><div class="bs-mode-d">HY Clue → Diagnosis → Action</div></div>
       <div class="bs-mode" data-mode="kp"><div class="bs-mode-n">Key Points only</div><div class="bs-mode-d">Ultra-fast pre-exam review</div></div>
       <div class="bs-mode" data-mode="errors"><div class="bs-mode-n">Review errors</div><div class="bs-mode-d">Last 24h "Again" cards</div></div>
     </div>
@@ -15751,8 +15883,16 @@ function render(){
   if(ph==='vignette'){
     h+='<div class="bs-sl">Vignette</div><div class="bs-vg">'+hlVignette(card.q||'',card.phrase||'')+'</div>';
   }else if(ph==='phrase'){
-    const raw=card.phrase||card.kp||'';
-    const parts=raw.split(/\s*\u2192\s*/).filter(p=>p.trim().length>0);
+    // Clinical Reasoning mode — usa campo brainstorm (Sonnet) ou fallback para phrase
+    el.innerHTML = '';
+    const tempDiv = document.createElement('div');
+    renderClinicalReasoning(card, tempDiv);
+    el.innerHTML = '<div class="bs-ch"><span class="bs-ct">' + topic + '</span><div class="bs-cm"><span class="bs-db">' + dk + '</span><span class="bs-qi">' + qid + '</span></div></div>' + tempDiv.innerHTML;
+    const fb2=document.getElementById('bs-flag-btn');if(fb2)fb2.classList.toggle('on',BS.flagged.has(card.id));
+    el.querySelectorAll('.bs-crk').forEach(function(c,i){setTimeout(function(){c.classList.add('show');},i*600+80);});
+    return; // Skip o innerHTML=h no final
+    const _unused=card.phrase||card.kp||'';
+    const parts=_unused.split(/\s*\u2192\s*/).filter(p=>p.trim().length>0);
     const lbls=['Trigger','Diagnosis','Key action'];
     const clrs=['#e8a836','#3b7fff','#22c55e'];
     const bgs=['rgba(232,168,54,.13)','rgba(59,127,255,.1)','rgba(34,197,94,.09)'];
@@ -15865,6 +16005,68 @@ document.addEventListener('keydown',function(e){
   if(e.key===' '){e.preventDefault();bsTogglePlay();}
   if(e.key==='f'||e.key==='F')bsDoFlag();
 });
+
+function renderClinicalReasoning(card, el) {
+  const raw = card.brainstorm;
+  if (!raw) {
+    // Fallback para phrase antiga
+    const phrase = card.phrase || card.kp || '';
+    el.innerHTML = '<div class="bs-cr-fallback">' + hlBold(phrase) + '</div>';
+    return;
+  }
+  let bs;
+  try { bs = typeof raw === 'string' ? JSON.parse(raw) : raw; }
+  catch(e) {
+    el.innerHTML = '<div class="bs-cr-fallback">' + hlBold(card.kp||'') + '</div>';
+    return;
+  }
+
+  const ACTION_MAP = {
+    NEXT_STEP: {cls:'ns', lbl:'Next Step'},
+    BEST_TEST: {cls:'bt', lbl:'Best Test'},
+    TREATMENT: {cls:'tx', lbl:'Treatment'},
+    MECHANISM: {cls:'mx', lbl:'Mechanism'},
+    PROGNOSIS: {cls:'px', lbl:'Prognosis'},
+  };
+
+  let html = '<div class="bs-cr">';
+
+  // Chunk 1: HY Clue
+  html += '<div class="bs-crk bs-crk-hy" data-i="0">' +
+    '<div class="bs-crk-l">HY Clue</div>' +
+    '<div class="bs-crk-t">' + hlBold(bs.hy_clue||'') + '</div>' +
+  '</div>';
+
+  // Chunk 2: Diagnosis
+  html += '<div class="bs-crk bs-crk-dx" data-i="1">' +
+    '<div class="bs-crk-l">Diagnosis</div>' +
+    '<div class="bs-crk-t">' + hlBold(bs.diagnosis||'') + '</div>' +
+  '</div>';
+
+  // Chunk 3: Dynamic Action
+  const atype = (bs.action_type||'').toUpperCase();
+  const acontent = bs.action_content || '';
+  if (atype && atype !== 'NONE' && acontent && ACTION_MAP[atype]) {
+    const {cls, lbl} = ACTION_MAP[atype];
+    html += '<div class="bs-crk bs-crk-' + cls + '" data-i="2">' +
+      '<div class="bs-crk-l">' + lbl + '</div>' +
+      '<div class="bs-crk-t">' + hlBold(acontent) + '</div>' +
+    '</div>';
+  }
+
+  html += '</div>';
+  el.innerHTML = html;
+
+  // Reveal animation: 600ms entre chunks
+  el.querySelectorAll('.bs-crk').forEach(function(c,i){
+    setTimeout(function(){ c.classList.add('show'); }, i * 600 + 80);
+  });
+}
+
+function hlBold(t) {
+  return t ? String(t).replace(/\*\*(.+?)\*\*/g, '<span class="bs-hlb">$1</span>') : '';
+}
+
 console.log('BoardMD BrainStorm v5 loaded');
 })();
 </script>
