@@ -15841,13 +15841,11 @@ function arCheckComplete() {
 }
 
 function arFsrs(rating, cardId) {
-  // Chama o FSRS normal do BoardMD se disponível
-  if (typeof bmdRateCard === 'function') {
-    bmdRateCard(rating, cardId);
-  } else if (typeof window.rateCard === 'function') {
-    window.rateCard(rating);
+  const ratingMap = {'again':1,'hard':2,'good':3,'easy':4};
+  const r = typeof rating === 'string' ? ratingMap[rating] : rating;
+  if (typeof window.rate === 'function') {
+    window.rate(r);
   }
-  // Avança para o próximo card
   bsGo(1);
 }
 
@@ -16729,13 +16727,11 @@ function arCheckComplete() {
 }
 
 function arFsrs(rating, cardId) {
-  // Chama o FSRS normal do BoardMD se disponível
-  if (typeof bmdRateCard === 'function') {
-    bmdRateCard(rating, cardId);
-  } else if (typeof window.rateCard === 'function') {
-    window.rateCard(rating);
+  const ratingMap = {'again':1,'hard':2,'good':3,'easy':4};
+  const r = typeof rating === 'string' ? ratingMap[rating] : rating;
+  if (typeof window.rate === 'function') {
+    window.rate(r);
   }
-  // Avança para o próximo card
   bsGo(1);
 }
 
