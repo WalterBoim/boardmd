@@ -15089,6 +15089,46 @@ function bmdSetupDrag(){
 }
 .bs-storm-lbl{font-size:10px;color:var(--gold);font-weight:700;text-align:center;margin-top:5px;letter-spacing:.04em;font-family:'Sora','Lato',sans-serif}
 
+.bs-cr-occlude{
+  position:relative;cursor:pointer;
+  border-radius:0 10px 10px 0;
+  overflow:hidden;
+  transition:all .2s;
+}
+.bs-cr-occlude::after{
+  content:'Tap to reveal';
+  position:absolute;inset:0;
+  display:flex;align-items:center;justify-content:center;
+  font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+  color:rgba(255,255,255,.7);
+  backdrop-filter:blur(6px);
+  -webkit-backdrop-filter:blur(6px);
+  transition:all .2s;
+}
+.bs-cr-occlude.revealed::after{display:none;}
+.bs-cr-occlude:hover::after{color:#fff;}
+.bs-cr-fsrs{
+  opacity:0;transform:translateY(8px);
+  transition:opacity .4s,transform .4s;
+  display:flex;gap:8px;margin-top:4px;
+}
+.bs-cr-fsrs.show{opacity:1;transform:translateY(0);}
+.bs-cr-fsrs-btn{
+  flex:1;padding:11px 8px;border-radius:10px;
+  border:0.5px solid var(--border);
+  background:var(--surface);
+  font-size:13px;font-weight:700;
+  cursor:pointer;font-family:inherit;
+  transition:all .15s;text-align:center;
+}
+.bs-cr-fsrs-btn:hover{filter:brightness(1.1);}
+.bs-cr-fsrs-btn.again{background:rgba(244,63,94,.1);border-color:rgba(244,63,94,.5);color:#f43f5e;}
+.bs-cr-fsrs-btn.hard{background:rgba(249,115,22,.1);border-color:rgba(249,115,22,.5);color:#f97316;}
+.bs-cr-fsrs-btn.good{background:rgba(34,197,94,.12);border-color:#4a9e3a;color:#22c55e;}
+.bs-cr-fsrs-btn.easy{background:var(--accent-dim);border-color:var(--accent);color:var(--accent);}
+.bs-cr-fsrs-sub{font-size:10px;color:var(--text-dim);margin-top:2px;display:block;}
+
+
 /* Active Recall Mode */
 .bs-ar{padding:22px 28px 18px;display:flex;flex-direction:column;gap:16px;position:relative}
 .bs-ar::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:linear-gradient(180deg,#e8a836,#3b7fff,#22c55e);border-radius:0 2px 2px 0}
@@ -15321,6 +15361,46 @@ function bmdSetupDrag(){
   .bmd-bottom-nav .nav-center-btn.bs-storm-btn svg{width:32px!important;height:32px!important}
 }
 .bs-storm-lbl{font-size:10px;color:var(--gold);font-weight:700;text-align:center;margin-top:5px;letter-spacing:.04em;font-family:'Sora','Lato',sans-serif}
+
+.bs-cr-occlude{
+  position:relative;cursor:pointer;
+  border-radius:0 10px 10px 0;
+  overflow:hidden;
+  transition:all .2s;
+}
+.bs-cr-occlude::after{
+  content:'Tap to reveal';
+  position:absolute;inset:0;
+  display:flex;align-items:center;justify-content:center;
+  font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+  color:rgba(255,255,255,.7);
+  backdrop-filter:blur(6px);
+  -webkit-backdrop-filter:blur(6px);
+  transition:all .2s;
+}
+.bs-cr-occlude.revealed::after{display:none;}
+.bs-cr-occlude:hover::after{color:#fff;}
+.bs-cr-fsrs{
+  opacity:0;transform:translateY(8px);
+  transition:opacity .4s,transform .4s;
+  display:flex;gap:8px;margin-top:4px;
+}
+.bs-cr-fsrs.show{opacity:1;transform:translateY(0);}
+.bs-cr-fsrs-btn{
+  flex:1;padding:11px 8px;border-radius:10px;
+  border:0.5px solid var(--border);
+  background:var(--surface);
+  font-size:13px;font-weight:700;
+  cursor:pointer;font-family:inherit;
+  transition:all .15s;text-align:center;
+}
+.bs-cr-fsrs-btn:hover{filter:brightness(1.1);}
+.bs-cr-fsrs-btn.again{background:rgba(244,63,94,.1);border-color:rgba(244,63,94,.5);color:#f43f5e;}
+.bs-cr-fsrs-btn.hard{background:rgba(249,115,22,.1);border-color:rgba(249,115,22,.5);color:#f97316;}
+.bs-cr-fsrs-btn.good{background:rgba(34,197,94,.12);border-color:#4a9e3a;color:#22c55e;}
+.bs-cr-fsrs-btn.easy{background:var(--accent-dim);border-color:var(--accent);color:var(--accent);}
+.bs-cr-fsrs-sub{font-size:10px;color:var(--text-dim);margin-top:2px;display:block;}
+
 
 /* Active Recall Mode */
 .bs-ar{padding:22px 28px 18px;display:flex;flex-direction:column;gap:16px;position:relative}
@@ -15657,7 +15737,7 @@ function render(){
     // Clinical Reasoning mode — usa campo brainstorm (Sonnet) ou fallback para phrase
     el.innerHTML = '';
     const tempDiv = document.createElement('div');
-    renderClinicalReasoning(card, tempDiv);
+    renderClinicalReasoningReveal(card, tempDiv);
     el.innerHTML = '<div class="bs-ch"><span class="bs-ct">' + topic + '</span><div class="bs-cm"><span class="bs-db">' + dk + '</span><span class="bs-qi">' + qid + '</span></div></div>' + tempDiv.innerHTML;
     const fb2=document.getElementById('bs-flag-btn');if(fb2)fb2.classList.toggle('on',BS.flagged.has(card.id));
     el.querySelectorAll('.bs-crk').forEach(function(c,i){setTimeout(function(){c.classList.add('show');},i*600+80);});
@@ -16090,6 +16170,113 @@ function arFsrs(rating, cardId) {
   }
   bsGo(1);
 }
+
+
+function renderClinicalReasoningReveal(card, el) {
+  const raw = card.brainstorm;
+  if (!raw) {
+    renderClinicalReasoning(card, el);
+    return;
+  }
+  let bs;
+  try {
+    bs = typeof raw === 'string' ? JSON.parse(raw) : raw;
+    if (typeof bs === 'string') bs = JSON.parse(bs);
+  } catch(e) { renderClinicalReasoning(card, el); return; }
+  if (!bs || !bs.hy_clue) { renderClinicalReasoning(card, el); return; }
+
+  const ACTION_MAP = {
+    NEXT_STEP: {cls:'ns', lbl:'Next Step', color:'#a855f7'},
+    BEST_TEST: {cls:'bt', lbl:'Best Test', color:'#06b6d4'},
+    TREATMENT: {cls:'tx', lbl:'Treatment', color:'#22c55e'},
+    MECHANISM: {cls:'mx', lbl:'Mechanism', color:'#f97316'},
+    PROGNOSIS: {cls:'px', lbl:'Prognosis', color:'#ec4899'},
+  };
+
+  const atype = (bs.action_type||'NONE').toUpperCase();
+  const action = bs.action_content || '';
+  const hasAction = atype !== 'NONE' && action;
+  const amap = ACTION_MAP[atype] || null;
+
+  let revealed = 0;
+  const total = hasAction ? 2 : 1;
+
+  function checkFsrs() {
+    if (revealed >= total) {
+      const fsrsEl = el.querySelector('.bs-cr-fsrs');
+      if (fsrsEl) {
+        setTimeout(() => fsrsEl.classList.add('show'), 200);
+      }
+    }
+  }
+
+  let html = '<div class="bs-cr" id="bs-cr-wrap">';
+
+  // HY Clue — normal
+  html += '<div class="bs-crk bs-crk-hy show">' +
+    '<div class="bs-crk-l">HY Clue</div>' +
+    '<div class="bs-crk-t">' + hlBold(bs.hy_clue||'') + '</div>' +
+  '</div>';
+
+  // Diagnosis — ocluido
+  html += '<div class="bs-crk bs-crk-dx show">' +
+    '<div class="bs-crk-l">Diagnosis</div>' +
+    '<div class="bs-crk-t bs-cr-occlude" onclick="crReveal(this,' + (hasAction?'false':'true') + ',\'dx\')">' +
+    hlBold(bs.diagnosis||'') +
+    '</div></div>';
+
+  // Action — ocluido
+  if (hasAction && amap) {
+    html += '<div class="bs-crk bs-crk-' + amap.cls + ' show">' +
+      '<div class="bs-crk-l">' + amap.lbl + '</div>' +
+      '<div class="bs-crk-t bs-cr-occlude" style="border-left:3px solid ' + amap.color + ';background:' + amap.color + '18" onclick="crReveal(this,true,\'act\')">' +
+      hlBold(action) +
+      '</div></div>';
+  }
+
+  // FSRS
+  html += '<div class="bs-cr-fsrs">' +
+    '<button class="bs-cr-fsrs-btn again" onclick="crFsrs(\'again\','' + card.id + '\')">Again<span class="bs-cr-fsrs-sub">1m</span></button>' +
+    '<button class="bs-cr-fsrs-btn hard" onclick="crFsrs(\'hard\','' + card.id + '\')">Hard<span class="bs-cr-fsrs-sub">~10m</span></button>' +
+    '<button class="bs-cr-fsrs-btn good" onclick="crFsrs(\'good\','' + card.id + '\')">Good<span class="bs-cr-fsrs-sub">~1d</span></button>' +
+    '<button class="bs-cr-fsrs-btn easy" onclick="crFsrs(\'easy\','' + card.id + '\')">Easy<span class="bs-cr-fsrs-sub">~4d</span></button>' +
+  '</div>';
+
+  html += '</div>';
+  el.innerHTML = html;
+
+  // Attach reveal state
+  el._crRevealed = 0;
+  el._crTotal = total;
+}
+
+window.crReveal = function(el, isLast, type) {
+  if (el.classList.contains('revealed')) return;
+  el.classList.add('revealed');
+  
+  const wrap = el.closest('#bs-cr-wrap') || el.closest('.bs-cr');
+  if (!wrap) return;
+  
+  const fsrsEl = wrap.querySelector('.bs-cr-fsrs');
+  if (!fsrsEl) return;
+  
+  // Count revealed
+  const allOcclude = wrap.querySelectorAll('.bs-cr-occlude');
+  const revealedCount = wrap.querySelectorAll('.bs-cr-occlude.revealed').length;
+  
+  if (revealedCount >= allOcclude.length) {
+    setTimeout(() => fsrsEl.classList.add('show'), 200);
+  }
+};
+
+window.crFsrs = function(rating, cardId) {
+  const ratingMap = {'again':1,'hard':2,'good':3,'easy':4};
+  const r = ratingMap[rating] || 3;
+  if (typeof window.rate === 'function') {
+    window.rate(r);
+  }
+  bsGo(1);
+};
 
 console.log('BoardMD BrainStorm v5 loaded');
 })();
