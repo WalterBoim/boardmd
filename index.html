@@ -15414,11 +15414,10 @@ function render(){
     // Active Recall mode
     const tempAR = document.createElement('div');
     renderActiveRecall(card, tempAR);
-    h += '<div class="bs-ch"><span class="bs-ct">'+topic+'</span><div class="bs-cm"><span class="bs-db">'+dk+'</span><span class="bs-qi">'+qid+'</span></div></div>' + tempAR.innerHTML;
+    h += tempAR.innerHTML;
+    // Header ja esta em h, nao duplicar
     el.innerHTML = h;
     const fbAR=document.getElementById('bs-flag-btn');if(fbAR)fbAR.classList.toggle('on',BS.flagged.has(card.id));
-    // Re-attach event listeners (innerHTML resets them)
-    el.querySelectorAll('.bs-ar-opt[onclick]').forEach(function(b){});
     setTimeout(function(){const hy=document.getElementById('ar-hy');if(hy)hy.classList.add('show');},80);
     return;
   }else if(ph==='phrase'){
@@ -16302,11 +16301,10 @@ function render(){
     // Active Recall mode
     const tempAR = document.createElement('div');
     renderActiveRecall(card, tempAR);
-    h += '<div class="bs-ch"><span class="bs-ct">'+topic+'</span><div class="bs-cm"><span class="bs-db">'+dk+'</span><span class="bs-qi">'+qid+'</span></div></div>' + tempAR.innerHTML;
+    h += tempAR.innerHTML;
+    // Header ja esta em h, nao duplicar
     el.innerHTML = h;
     const fbAR=document.getElementById('bs-flag-btn');if(fbAR)fbAR.classList.toggle('on',BS.flagged.has(card.id));
-    // Re-attach event listeners (innerHTML resets them)
-    el.querySelectorAll('.bs-ar-opt[onclick]').forEach(function(b){});
     setTimeout(function(){const hy=document.getElementById('ar-hy');if(hy)hy.classList.add('show');},80);
     return;
   }else if(ph==='phrase'){
