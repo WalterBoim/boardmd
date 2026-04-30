@@ -15856,8 +15856,16 @@ function renderActiveRecall(card, el) {
     return;
   }
   let bs;
-  try { bs = typeof raw === 'string' ? JSON.parse(raw) : raw; }
-  catch(e) { renderClinicalReasoning(card, el); return; }
+  try {
+    bs = typeof raw === 'string' ? JSON.parse(raw) : raw;
+    if (typeof bs === 'string') bs = JSON.parse(bs);
+  } catch(e) { renderClinicalReasoning(card, el); return; }
+
+  // Se nao tem distractor, usa Clinical Reasoning
+  if (!bs || !bs.dx_distractor) {
+    renderClinicalReasoning(card, el);
+    return;
+  }
 
   // Reset AR state
   AR.dxAnswered = false;
