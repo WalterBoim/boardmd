@@ -15304,8 +15304,7 @@ function render(){
     const raw=card.phrase||card.kp||'';
     const parts=raw.split(/\s*\u2192\s*/).filter(p=>p.trim().length>0);
     const lbls=['Trigger','Diagnosis','Key action'];
-    const clrs=['#e8a836','#3b7fff','#22c55e'];
-    const bgs=['rgba(232,168,54,.13)','rgba(59,127,255,.1)','rgba(34,197,94,.09)'];
+
     if(parts.length>=2){
       let ch='';
       parts.slice(0,3).forEach((p,i)=>{
