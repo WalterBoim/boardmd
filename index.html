@@ -9974,7 +9974,7 @@ function getIDBMeta(){
 // Mantem count() como ground truth. Tolera ate 10% de paginas falhando.
 async function fetchAllFromSupabase(onProgress){
   const PAGE = 1000;
-  const SELECT_FIELDS = 'id,deck,system,topic,subject,qid,q,c,w,e,kp,phrase,d,img,pubmed_query,cochrane_pmid';
+  const SELECT_FIELDS = 'id,deck,system,topic,subject,qid,q,c,w,e,kp,phrase,brainstorm,d,img,pubmed_query,cochrane_pmid';
 
   // Descobre o total atual no Supabase (ground truth pro caller)
   let total = 0;
@@ -10069,7 +10069,7 @@ async function _fetchSequentialFallback(onProgress, knownTotal){
     try {
       const resp = await _supa
         .from('cards')
-        .select('id,deck,system,topic,subject,qid,q,c,w,e,kp,phrase,d,img,pubmed_query,cochrane_pmid',
+        .select('id,deck,system,topic,subject,qid,q,c,w,e,kp,phrase,brainstorm,d,img,pubmed_query,cochrane_pmid',
           { count: total === null ? 'exact' : undefined })
         .order('id')
         .range(from, from + PAGE - 1);
@@ -10123,7 +10123,7 @@ async function fetchStepFromSupabase(deckIds, onProgress){
     try {
       const resp = await _supa
         .from('cards')
-        .select('id,deck,system,topic,subject,qid,q,c,w,e,kp,phrase,d,img,pubmed_query,cochrane_pmid',
+        .select('id,deck,system,topic,subject,qid,q,c,w,e,kp,phrase,brainstorm,d,img,pubmed_query,cochrane_pmid',
           { count: total === null ? 'exact' : undefined })
         .in('deck', deckIds)
         .order('id')
