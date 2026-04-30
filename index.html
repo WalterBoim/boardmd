@@ -6196,10 +6196,36 @@ function selectSystem(sys){
 }
 
 // ── ENSURE STUDY UI EXISTS ────────────────────────────────────────────
+// FIX (bug split-layout): snapshot do study-inner ORIGINAL feito o quanto antes,
+// para que possamos restaurar a estrutura completa (com #bmd-cols-row, #bmd-q-col,
+// #bmd-ans-col, #bmd-split-divider) caso ela tenha sido destruida por uma versao
+// antiga de showDone(). Esse snapshot eh idempotente e nao depende de DOMContentLoaded
+// (o script roda inline no body, entao o study-inner ja existe).
+(function _bmdSnapshotStudyInner(){
+  try{
+    if(window._bmdStudyInnerHTML) return; // ja salvo
+    const si = document.getElementById('study-inner');
+    if(si && si.querySelector('#bmd-cols-row')){
+      window._bmdStudyInnerHTML = si.innerHTML;
+    }
+  }catch(e){}
+})();
+
 function ensureStudyUI(){
   const si=document.getElementById('study-inner');
-  if(si&&si.querySelector('#card-el')) return; // already built
   if(!si) return;
+  // FIX: alem de checar #card-el, exigir tambem a estrutura split. Se um deles
+  // sumiu (cenario do bug antigo), restaurar do snapshot original.
+  const hasCardEl = !!si.querySelector('#card-el');
+  const hasSplit  = !!si.querySelector('#bmd-cols-row') && !!si.querySelector('#bmd-ans-col');
+  if(hasCardEl && hasSplit) return; // tudo ok
+  // Tentar restaurar do snapshot salvo
+  if(window._bmdStudyInnerHTML){
+    si.innerHTML = window._bmdStudyInnerHTML;
+    return;
+  }
+  // Fallback ultimo recurso: layout single-column (como era antes do fix).
+  // Esse caminho so eh atingido se o snapshot nao foi feito (improvavel).
   si.innerHTML=`
     <div class="progress-wrap">
       <div class="progress-info"><span id="prog-label">—</span><span id="prog-frac">—</span></div>
@@ -6287,6 +6313,10 @@ function renderCard(){
   // SETOR B v6: reseta acumulador de idle time (visibility pause) a cada novo card
   window._idleAccumMs = 0;
   window._hiddenAt = 0;
+  // FIX (bug split-layout): se houver overlay de "Session complete" residual, fecha
+  // para reexibir #card-el e a estrutura split. Isso eh defensive — o overlay deveria
+  // ja ter sido fechado por _bmdRestartSession/_bmdBackToDecks, mas garante consistencia.
+  try { if(typeof _bmdCloseSessionOverlay === 'function') _bmdCloseSessionOverlay(); } catch(e){}
   // ── SETOR B (item 2): zerar scroll de todas as colunas a cada novo card ──
   // Garante que ambas as colunas (esquerda/direita) e o container principal
   // comecem do topo. Aluno rola manualmente se quiser.
@@ -7477,6 +7507,69 @@ function skipForward(){
 try { window.skipBack = skipBack; window.skipForward = skipForward; } catch(e){}
 
 // ── DONE SCREEN ───────────────────────────────────────────────────────
+// FIX (bug split-layout): showDone() NAO destroi mais innerHTML do study-inner.
+// Antes, `si.innerHTML = '...'` apagava a estrutura split (#bmd-cols-row,
+// #bmd-q-col, #bmd-ans-col, #bmd-split-divider) que existe APENAS no HTML
+// estatico. Quando o usuario voltava ao deck normal, ensureStudyUI() reconstruia
+// uma versao single-column (sem coluna direita), causando: "nao aparece a coluna
+// da resposta da direita". Solucao: overlay nao-destrutivo.
+function _bmdShowSessionOverlay(html){
+  const si = document.getElementById('study-inner');
+  if(!si) return;
+  // Esconde tudo dentro do study-inner (sem destruir)
+  Array.from(si.children).forEach(ch => {
+    if(ch.id !== 'bmd-session-overlay'){
+      // Salva display original se ainda nao salvou
+      if(!ch.dataset._bmdSavedDisplay){
+        ch.dataset._bmdSavedDisplay = ch.style.display || '';
+      }
+      ch.style.display = 'none';
+    }
+  });
+  // Cria/reusa o overlay
+  let ov = document.getElementById('bmd-session-overlay');
+  if(!ov){
+    ov = document.createElement('div');
+    ov.id = 'bmd-session-overlay';
+    ov.style.cssText = 'width:100%;display:flex;align-items:center;justify-content:center;padding:40px 20px;';
+    si.appendChild(ov);
+  }
+  ov.style.display = '';
+  ov.innerHTML = html;
+}
+function _bmdCloseSessionOverlay(){
+  const si = document.getElementById('study-inner');
+  if(!si) return;
+  const ov = document.getElementById('bmd-session-overlay');
+  if(ov) ov.remove();
+  // Restaura display dos filhos
+  Array.from(si.children).forEach(ch => {
+    if(ch.dataset && ch.dataset._bmdSavedDisplay !== undefined){
+      ch.style.display = ch.dataset._bmdSavedDisplay;
+      delete ch.dataset._bmdSavedDisplay;
+    }
+  });
+}
+// Expose globally for inline onclick handlers
+try { window._bmdShowSessionOverlay = _bmdShowSessionOverlay; window._bmdCloseSessionOverlay = _bmdCloseSessionOverlay; } catch(e){}
+
+// Helper: "Study Again" do overlay — fecha overlay e reinicia sessao
+function _bmdRestartSession(){
+  _bmdCloseSessionOverlay();
+  // Se for sessao de busca (_search), nao tenta selectSystem (quebraria). Volta para home.
+  if(currentDeck === '_search'){
+    if(typeof goToHome === 'function') goToHome();
+    return;
+  }
+  if(typeof selectSystem === 'function') selectSystem(currentSystem);
+}
+// "Back to Decks" — fecha overlay E vai pro home
+function _bmdBackToDecks(){
+  _bmdCloseSessionOverlay();
+  if(typeof goToHome === 'function') goToHome();
+}
+try { window._bmdRestartSession = _bmdRestartSession; window._bmdBackToDecks = _bmdBackToDecks; } catch(e){}
+
 function showDone(){
   // ── SETOR A — Bug 1: nao declarar sessao acabada se ha LRN pendentes ─
   // Se ainda ha cards no lrnSessionQueue cujo due esta proximo (<=15min),
@@ -7489,27 +7582,27 @@ function showDone(){
     // Se o proximo card LRN esta em <=15min, mostra tela de espera
     if(waitMs <= 15 * 60 * 1000 && waitMs > 0){
       const waitMin = Math.max(1, Math.ceil(waitMs / 60000));
-      const si=document.getElementById('study-inner');
-      if(si){
-        si.innerHTML = `
-          <div class="done-wrap" id="lrn-wait-screen">
-            <h2 style="font-size:22px;margin-bottom:16px">Almost done</h2>
-            <p style="color:var(--text-dim);margin-bottom:8px">
-              <strong style="color:var(--amber)">${lrnSessionQueue.length}</strong>
-              learning card${lrnSessionQueue.length>1?'s':''} pending
-            </p>
-            <p style="color:var(--text-dim);margin-bottom:24px;font-size:13px">
-              Next card available in <strong style="color:var(--accent)">${waitMin} min</strong>
-            </p>
-            <button class="btn-restart" onclick="_resumeLrnSession()">Resume Now</button>
-            <button class="btn-restart" style="background:var(--surface);border:1px solid var(--border);color:var(--text);margin-left:10px" onclick="goToHome()">Save & Exit</button>
-          </div>`;
-        // Auto re-check every 15 seconds
-        if(window._lrnWaitTimer) clearTimeout(window._lrnWaitTimer);
-        window._lrnWaitTimer = setTimeout(()=>{
-          if(document.getElementById('lrn-wait-screen')) _resumeLrnSession();
-        }, 15000);
-      }
+      _bmdShowSessionOverlay(`
+        <div class="done-wrap" id="lrn-wait-screen">
+          <h2 style="font-size:22px;margin-bottom:16px">Almost done</h2>
+          <p style="color:var(--text-dim);margin-bottom:8px">
+            <strong style="color:var(--amber)">${lrnSessionQueue.length}</strong>
+            learning card${lrnSessionQueue.length>1?'s':''} pending
+          </p>
+          <p style="color:var(--text-dim);margin-bottom:24px;font-size:13px">
+            Next card available in <strong style="color:var(--accent)">${waitMin} min</strong>
+          </p>
+          <button class="btn-restart" onclick="_bmdCloseSessionOverlay(); _resumeLrnSession()">Resume Now</button>
+          <button class="btn-restart" style="background:var(--surface);border:1px solid var(--border);color:var(--text);margin-left:10px" onclick="_bmdBackToDecks()">Save & Exit</button>
+        </div>`);
+      // Auto re-check every 15 seconds
+      if(window._lrnWaitTimer) clearTimeout(window._lrnWaitTimer);
+      window._lrnWaitTimer = setTimeout(()=>{
+        if(document.getElementById('lrn-wait-screen')){
+          _bmdCloseSessionOverlay();
+          _resumeLrnSession();
+        }
+      }, 15000);
       return;
     }
     // Se o proximo esta a mais de 15min, mostra como concluido mas com nota
@@ -7526,9 +7619,7 @@ function showDone(){
 
   // Coins already awarded per card in revealAnswer — no double-count here
 
-  const si=document.getElementById('study-inner');
-  if(!si) return;
-  si.innerHTML=`
+  _bmdShowSessionOverlay(`
     <div class="done-wrap">
       <h2>Session complete ✓</h2>
       <p style="margin-bottom:16px">${total} cards · ${pct}% correct</p>
@@ -7538,9 +7629,9 @@ function showDone(){
         <span style="color:var(--emerald)">Good: ${good}</span>
         <span style="color:var(--accent)">Easy: ${easy}</span>
       </div>
-      <button class="btn-restart" onclick="selectSystem(currentSystem)">Study Again</button>
-      <button class="btn-restart" style="background:var(--surface);border:1px solid var(--border);color:var(--text);margin-left:10px;" onclick="goToHome()">Back to Decks</button>
-    </div>`;
+      <button class="btn-restart" onclick="_bmdRestartSession()">Study Again</button>
+      <button class="btn-restart" style="background:var(--surface);border:1px solid var(--border);color:var(--text);margin-left:10px;" onclick="_bmdBackToDecks()">Back to Decks</button>
+    </div>`);
 }
 
 // ── UPDATE STATS (header counters) ────────────────────────────────────
