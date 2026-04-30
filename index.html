@@ -5208,9 +5208,12 @@ html.dark .hl-btn-active { border-color:#fff!important; }
       <div class="nav-label">Search</div>
     </div>
     <div class="nav-center">
-      <div class="nav-center-btn" onclick="bmdNavGo('study',this)">
-        <svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-      </div>
+      <div class="nav-center-btn" onclick="openBrainStorm()" style="width:56px;height:56px;border-radius:18px;display:flex;align-items:center;justify-content:center;">
+      <svg viewBox="0 0 28 28" width="32" height="32" fill="none">
+        <path d="M10 4C7.5 4 6 5.5 6 7.5c0 .8.3 1.5.8 2-.5.5-.8 1.2-.8 2 0 1.5 1 2.5 2.5 2.5-.3.5-.5 1.1-.5 1.7 0 1.7 1.3 3 3 3h0V4zM18 4c2.5 0 4 1.5 4 3.5 0 .8-.3 1.5-.8 2 .5.5.8 1.2.8 2 0 1.5-1 2.5-2.5 2.5.3.5.5 1.1.5 1.7 0 1.7-1.3 3-3 3h0V4z" stroke="#fff" stroke-width="1.8" stroke-linejoin="round"/>
+        <path d="M16 6 L11 14 L14 14 L11 22 L19 12 L16 12 Z" fill="#FFD93D" stroke="#0a0e15" stroke-width="1" stroke-linejoin="round"/>
+      </svg>
+    </div>
     </div>
     <div class="nav-item" id="bnav-rank" onclick="bmdNavGo('rank',this)">
       <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
@@ -10010,7 +10013,7 @@ function getIDBMeta(){
 // Mantem count() como ground truth. Tolera ate 10% de paginas falhando.
 async function fetchAllFromSupabase(onProgress){
   const PAGE = 1000;
-  const SELECT_FIELDS = 'id,deck,system,topic,subject,qid,q,c,w,e,kp,d,img,pubmed_query,cochrane_pmid';
+  const SELECT_FIELDS = 'id,deck,system,topic,subject,qid,q,c,w,e,kp,phrase,d,img,pubmed_query,cochrane_pmid';
 
   // Descobre o total atual no Supabase (ground truth pro caller)
   let total = 0;
@@ -10105,7 +10108,7 @@ async function _fetchSequentialFallback(onProgress, knownTotal){
     try {
       const resp = await _supa
         .from('cards')
-        .select('id,deck,system,topic,subject,qid,q,c,w,e,kp,d,img,pubmed_query,cochrane_pmid',
+        .select('id,deck,system,topic,subject,qid,q,c,w,e,kp,phrase,d,img,pubmed_query,cochrane_pmid',
           { count: total === null ? 'exact' : undefined })
         .order('id')
         .range(from, from + PAGE - 1);
@@ -10159,7 +10162,7 @@ async function fetchStepFromSupabase(deckIds, onProgress){
     try {
       const resp = await _supa
         .from('cards')
-        .select('id,deck,system,topic,subject,qid,q,c,w,e,kp,d,img,pubmed_query,cochrane_pmid',
+        .select('id,deck,system,topic,subject,qid,q,c,w,e,kp,phrase,d,img,pubmed_query,cochrane_pmid',
           { count: total === null ? 'exact' : undefined })
         .in('deck', deckIds)
         .order('id')
@@ -15012,6 +15015,590 @@ function bmdSetupDrag(){
 // Setup drag after cards load
 [0,200,500,1000,2000].forEach(function(t){ setTimeout(bmdSetupDrag,t); });
 </script>
+<!--
+═══════════════════════════════════════════════════════════════════════
+  BoardMD — BrainStorm Mode (v2)
+  Substitui o botão Play central pelo BrainStorm (cérebro + raio amarelo)
+  Cole este bloco no index.html ANTES do </body>
+═══════════════════════════════════════════════════════════════════════
+-->
+
+<style>
+#brainstorm-overlay {
+  display:none; position:fixed; inset:0; z-index:1500;
+  background:var(--bg); overflow-y:auto;
+  flex-direction:column; font-family:'Lato',sans-serif;
+}
+#brainstorm-overlay.active { display:flex; }
+
+.bs-header {
+  position:sticky; top:0; z-index:10;
+  background:rgba(8,12,18,.92); backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--border);
+  padding:14px 20px;
+  display:flex; align-items:center; justify-content:space-between;
+}
+html.light .bs-header { background:rgba(245,247,250,.94); }
+.bs-title { font-family:'Instrument Serif',serif; font-size:22px; letter-spacing:-.3px; display:flex; align-items:center; gap:10px; }
+.bs-title-icon { width:24px; height:24px; }
+.bs-close { background:none; border:1px solid var(--border); color:var(--text-dim); width:36px; height:36px; border-radius:8px; cursor:pointer; font-size:18px; display:flex; align-items:center; justify-content:center; }
+.bs-close:hover { color:var(--accent); border-color:var(--accent); }
+
+.bs-body { flex:1; padding:24px 20px; max-width:760px; margin:0 auto; width:100%; }
+
+.bs-section-label {
+  font-size:11px; font-weight:700; letter-spacing:.1em;
+  text-transform:uppercase; color:var(--text-dim); margin-bottom:12px;
+}
+
+.bs-mode-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:10px; margin-bottom:24px; }
+.bs-mode-card { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:14px 16px; cursor:pointer; transition:all .15s; }
+.bs-mode-card:hover { border-color:var(--accent-glow); }
+.bs-mode-card.on { border-color:var(--accent); background:var(--accent-dim); }
+.bs-mode-name { font-weight:700; font-size:14px; margin-bottom:4px; }
+.bs-mode-desc { font-size:12px; color:var(--text-dim); line-height:1.4; }
+
+.bs-deck-row { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:24px; }
+.bs-chip { padding:6px 14px; border-radius:20px; background:var(--surface); border:1px solid var(--border); font-size:12px; font-weight:600; cursor:pointer; color:var(--text-dim); transition:all .15s; }
+.bs-chip.on { background:var(--accent); border-color:var(--accent); color:#fff; }
+
+.bs-speed-row { display:flex; align-items:center; gap:14px; background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:14px 18px; margin-bottom:24px; }
+.bs-speed-label { font-size:12px; color:var(--text-dim); white-space:nowrap; }
+.bs-speed-val { font-size:14px; font-weight:700; min-width:38px; }
+.bs-speed-wpm { font-size:11px; color:var(--text-faint); }
+#bs-speed-slider { flex:1; max-width:240px; }
+
+.bs-stats { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-bottom:20px; }
+.bs-stat { background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:12px; text-align:center; }
+.bs-stat-n { font-size:20px; font-weight:700; color:var(--text); }
+.bs-stat-l { font-size:10px; color:var(--text-dim); text-transform:uppercase; letter-spacing:.05em; }
+
+.bs-progress { height:4px; background:var(--surface2); border-radius:2px; margin-bottom:14px; overflow:hidden; }
+.bs-progress-fill { height:100%; background:var(--accent); transition:width .15s linear; width:0%; }
+
+.bs-stage { display:flex; gap:5px; margin-bottom:12px; }
+.bs-stage-dot { width:7px; height:7px; border-radius:50%; background:var(--surface2); transition:all .2s; }
+.bs-stage-dot.done { background:var(--accent); opacity:.6; }
+.bs-stage-dot.active { background:var(--accent); transform:scale(1.4); }
+
+.bs-card-wrap { background:var(--surface); border:1px solid var(--border); border-radius:14px; min-height:320px; overflow:hidden; }
+
+.bs-card-head { padding:12px 18px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px; }
+.bs-card-topic { font-size:11px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--text-dim); }
+.bs-card-meta { display:flex; gap:8px; align-items:center; }
+.bs-deck-badge { padding:3px 10px; border-radius:20px; font-size:10px; font-weight:700; background:var(--accent-dim); color:var(--accent); }
+.bs-qid { font-size:11px; color:var(--text-faint); font-family:'JetBrains Mono',monospace; }
+
+.bs-stage-label { font-size:10px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--text-faint); padding:14px 20px 0; }
+
+.bs-vignette { padding:14px 20px; font-size:15px; line-height:1.8; color:var(--text); }
+.bs-vignette.compact { font-size:13px; padding-bottom:6px; }
+
+.bs-phrase { padding:32px 24px; font-size:18px; line-height:1.7; color:var(--text); display:flex; align-items:center; min-height:140px; }
+
+.bs-divider { height:1px; background:var(--border); }
+
+.bs-choices { padding:10px 18px; display:flex; flex-direction:column; gap:7px; }
+.bs-choice { display:flex; gap:10px; padding:8px 12px; border-radius:8px; border:1px solid var(--border); font-size:13px; color:var(--text-dim); }
+.bs-choice.correct { background:rgba(34,197,94,.1); border-color:var(--good); color:var(--good); font-weight:600; }
+.bs-choice.wrong { background:rgba(244,63,94,.06); border-color:rgba(244,63,94,.3); color:var(--text-faint); opacity:.55; }
+.bs-choice-letter { font-weight:700; min-width:14px; }
+
+.bs-explanation { padding:12px 20px; background:var(--surface2); border-top:1px solid var(--border); font-size:13px; line-height:1.7; color:var(--text-dim); }
+
+.bs-kp { margin:12px 20px; padding:12px 16px; background:var(--accent-dim); border-left:3px solid var(--accent); border-radius:0 8px 8px 0; }
+.bs-kp-label { font-size:10px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--accent); margin-bottom:4px; }
+.bs-kp-text { font-size:13px; font-weight:600; line-height:1.6; color:var(--text); }
+
+.bs-hl   { background:rgba(232,168,54,.18); color:var(--gold); border-radius:3px; padding:1px 4px; font-weight:600; }
+.bs-hl-r { background:rgba(244,63,94,.12); color:var(--rose); border-radius:3px; padding:1px 4px; font-weight:600; }
+.bs-hl-g { background:rgba(34,197,94,.12); color:var(--good); border-radius:3px; padding:1px 4px; font-weight:600; }
+.bs-hl-b { background:var(--accent-dim); color:var(--accent); border-radius:3px; padding:1px 4px; font-weight:600; }
+
+.bs-controls {
+  position:sticky; bottom:0; background:rgba(8,12,18,.94);
+  backdrop-filter:blur(12px); border-top:1px solid var(--border);
+  padding:12px 20px; display:flex; gap:8px; justify-content:center;
+  align-items:center; flex-wrap:wrap;
+}
+html.light .bs-controls { background:rgba(245,247,250,.96); }
+.bs-btn { padding:9px 18px; border-radius:9px; border:1px solid var(--border); background:var(--surface); font-size:13px; font-weight:700; cursor:pointer; color:var(--text); font-family:'Lato',sans-serif; transition:all .15s; }
+.bs-btn:hover { border-color:var(--accent); }
+.bs-btn.primary { background:var(--accent); border-color:var(--accent); color:#fff; }
+.bs-btn.primary:hover { background:#5a8fff; }
+.bs-btn.flag.on { background:var(--gold); border-color:var(--gold); color:#fff; }
+
+.bs-empty { text-align:center; padding:60px 20px; color:var(--text-dim); }
+.bs-empty-title { font-size:18px; margin-bottom:8px; color:var(--text); }
+.bs-empty-sub { font-size:13px; }
+
+.bs-complete { display:flex; flex-direction:column; align-items:center; padding:50px 20px; gap:14px; }
+.bs-complete-title { font-family:'Instrument Serif',serif; font-size:32px; color:var(--text); }
+.bs-complete-stats { display:flex; gap:32px; margin:14px 0; }
+.bs-complete-stat { text-align:center; }
+.bs-complete-stat .n { font-size:26px; font-weight:700; color:var(--accent); }
+.bs-complete-stat .l { font-size:11px; color:var(--text-dim); text-transform:uppercase; }
+
+@media (max-width:600px) {
+  .bs-mode-grid { grid-template-columns:1fr 1fr; }
+  .bs-vignette { font-size:14px; padding:12px 16px; }
+  .bs-phrase { font-size:16px; padding:24px 18px; }
+}
+
+.bs-storm-icon { width:24px; height:24px; }
+.nav-center-btn .bs-storm-icon { width:28px; height:28px; }
+</style>
+
+
+<div id="brainstorm-overlay">
+  <div class="bs-header">
+    <div class="bs-title">
+      <svg class="bs-title-icon" viewBox="0 0 28 28" fill="none">
+        <path d="M10 4C7.5 4 6 5.5 6 7.5c0 .8.3 1.5.8 2-.5.5-.8 1.2-.8 2 0 1.5 1 2.5 2.5 2.5-.3.5-.5 1.1-.5 1.7 0 1.7 1.3 3 3 3h0V4zM18 4c2.5 0 4 1.5 4 3.5 0 .8-.3 1.5-.8 2 .5.5.8 1.2.8 2 0 1.5-1 2.5-2.5 2.5.3.5.5 1.1.5 1.7 0 1.7-1.3 3-3 3h0V4z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+        <path d="M16 6 L11 14 L14 14 L11 22 L19 12 L16 12 Z" fill="#FFD93D" stroke="currentColor" stroke-width=".6" stroke-linejoin="round"/>
+      </svg>
+      BrainStorm Mode
+    </div>
+    <button class="bs-close" onclick="closeBrainStorm()">✕</button>
+  </div>
+
+  <div class="bs-body" id="bs-config-screen">
+    <div class="bs-section-label">Modo de revisão</div>
+    <div class="bs-mode-grid" id="bs-mode-grid">
+      <div class="bs-mode-card on" data-mode="flash" onclick="bsSetMode(this)">
+        <div class="bs-mode-name">Flash completo</div>
+        <div class="bs-mode-desc">Vignette → resposta → Key Point</div>
+      </div>
+      <div class="bs-mode-card" data-mode="phrase" onclick="bsSetMode(this)">
+        <div class="bs-mode-name">Frase-chave</div>
+        <div class="bs-mode-desc">Uma frase clínica por card</div>
+      </div>
+      <div class="bs-mode-card" data-mode="kp" onclick="bsSetMode(this)">
+        <div class="bs-mode-name">Só Key Points</div>
+        <div class="bs-mode-desc">Pré-prova ultrarrápido</div>
+      </div>
+      <div class="bs-mode-card" data-mode="errors" onclick="bsSetMode(this)">
+        <div class="bs-mode-name">Revisar erros</div>
+        <div class="bs-mode-desc">Cards "Again" das últimas 24h</div>
+      </div>
+    </div>
+
+    <div class="bs-section-label">Deck</div>
+    <div class="bs-deck-row" id="bs-deck-row">
+      <div class="bs-chip on" data-deck="all" onclick="bsSetDeck(this)">Step 2 Complete</div>
+      <div class="bs-chip" data-deck="boardmd_s2" onclick="bsSetDeck(this)">BoardMD S2</div>
+      <div class="bs-chip" data-deck="core" onclick="bsSetDeck(this)">Core S2</div>
+      <div class="bs-chip" data-deck="boardmd_s1" onclick="bsSetDeck(this)">BoardMD S1</div>
+      <div class="bs-chip" data-deck="s1_core" onclick="bsSetDeck(this)">Core S1</div>
+    </div>
+
+    <div class="bs-section-label">Velocidade</div>
+    <div class="bs-speed-row">
+      <span class="bs-speed-label">tempo/card</span>
+      <input type="range" min="1" max="7" value="3" step="1" id="bs-speed-slider" oninput="bsSetSpeed(this.value)">
+      <span class="bs-speed-val" id="bs-speed-val">3s</span>
+      <span class="bs-speed-wpm" id="bs-speed-wpm">≈ 20/min</span>
+    </div>
+
+    <button class="bs-btn primary" style="width:100%; padding:14px; font-size:15px;" onclick="bsStart()">▶  Iniciar BrainStorm</button>
+  </div>
+
+  <div class="bs-body" id="bs-session-screen" style="display:none;">
+    <div class="bs-stats">
+      <div class="bs-stat"><div class="bs-stat-n" id="bs-st-seen">0</div><div class="bs-stat-l">vistos</div></div>
+      <div class="bs-stat"><div class="bs-stat-n" id="bs-st-flag">0</div><div class="bs-stat-l">marcados</div></div>
+      <div class="bs-stat"><div class="bs-stat-n" id="bs-st-time">0:00</div><div class="bs-stat-l">tempo</div></div>
+    </div>
+
+    <div class="bs-progress"><div class="bs-progress-fill" id="bs-prog"></div></div>
+    <div class="bs-stage" id="bs-stage-dots"></div>
+
+    <div class="bs-card-wrap" id="bs-card-wrap">
+      <div id="bs-card-body"></div>
+    </div>
+  </div>
+
+  <div class="bs-controls" id="bs-controls" style="display:none;">
+    <button class="bs-btn" onclick="bsGo(-1)">←</button>
+    <button class="bs-btn" id="bs-play-btn" onclick="bsTogglePlay()">▶ Play</button>
+    <button class="bs-btn flag" id="bs-flag-btn" onclick="bsFlag()">⚑</button>
+    <button class="bs-btn" onclick="bsBackToConfig()">⚙</button>
+    <button class="bs-btn primary" onclick="bsGo(1)">→</button>
+  </div>
+</div>
+
+
+<script>
+(function() {
+  'use strict';
+
+  /* SVG do cérebro com raio amarelo (Opção 2) */
+  const STORM_ICON_SVG = `
+    <svg class="bs-storm-icon" viewBox="0 0 28 28" fill="none">
+      <path d="M10 4C7.5 4 6 5.5 6 7.5c0 .8.3 1.5.8 2-.5.5-.8 1.2-.8 2 0 1.5 1 2.5 2.5 2.5-.3.5-.5 1.1-.5 1.7 0 1.7 1.3 3 3 3h0V4zM18 4c2.5 0 4 1.5 4 3.5 0 .8-.3 1.5-.8 2 .5.5.8 1.2.8 2 0 1.5-1 2.5-2.5 2.5.3.5.5 1.1.5 1.7 0 1.7-1.3 3-3 3h0V4z" stroke="#fff" stroke-width="1.6" stroke-linejoin="round"/>
+      <path d="M16 6 L11 14 L14 14 L11 22 L19 12 L16 12 Z" fill="#FFD93D" stroke="#080c12" stroke-width=".8" stroke-linejoin="round"/>
+    </svg>
+  `;
+
+  /* Substitui o botão Play central pelo BrainStorm */
+  function setupBrainStormButton() {
+    const navCenter = document.querySelector('.bmd-bottom-nav .nav-center');
+    if (!navCenter) {
+      console.warn('BrainStorm: .nav-center não encontrado');
+      return;
+    }
+
+    const centerBtn = navCenter.querySelector('.nav-center-btn');
+    if (!centerBtn) return;
+
+    /* Substituir o ícone Play pelo cérebro com raio */
+    centerBtn.innerHTML = STORM_ICON_SVG;
+
+    /* Substituir o onclick — agora abre o BrainStorm */
+    centerBtn.onclick = function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      openBrainStorm();
+    };
+
+    /* Adicionar label "Storm" embaixo */
+    if (!navCenter.querySelector('.nav-storm-label')) {
+      const lbl = document.createElement('div');
+      lbl.className = 'nav-storm-label';
+      lbl.textContent = 'Storm';
+      lbl.style.cssText = 'font-size:9px;color:#FFD93D;font-weight:700;text-align:center;margin-top:4px;font-family:Sora,sans-serif;letter-spacing:.02em;';
+      navCenter.appendChild(lbl);
+    }
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', setupBrainStormButton);
+  } else {
+    setupBrainStormButton();
+  }
+  /* Re-aplica caso a navbar seja regenerada */
+  setTimeout(setupBrainStormButton, 1000);
+  setTimeout(setupBrainStormButton, 3000);
+
+  const BS = {
+    mode:'flash', deck:'all', speed:3000,
+    cards:[], cur:0, phase:0,
+    playing:false, timer:null, clockT:null, elapsed:0,
+    flagged:new Set(), seen:new Set()
+  };
+
+  const SPEEDS={1:800,2:1500,3:3000,4:5000,5:8000,6:12000,7:20000};
+  const SPEED_LABELS={1:'0.8s',2:'1.5s',3:'3s',4:'5s',5:'8s',6:'12s',7:'20s'};
+  const SPEED_WPM={1:'≈ 75/min',2:'≈ 40/min',3:'≈ 20/min',4:'≈ 12/min',5:'≈ 7/min',6:'≈ 5/min',7:'≈ 3/min'};
+  const PHASES={
+    flash:['vignette','choices','answer','kp'],
+    phrase:['phrase'],
+    kp:['kp'],
+    errors:['vignette','choices','answer','kp']
+  };
+
+  function loadCards() {
+    const D = window.DECKS || {};
+    let cards = [];
+    if (BS.deck === 'all') {
+      cards = [...(D.boardmd_s2||[]), ...(D.core||[])];
+    } else {
+      cards = D[BS.deck] || [];
+    }
+    if (BS.mode === 'errors') {
+      const dayAgo = Date.now() - 24*60*60*1000;
+      const fsrs = window.fsrsState || {};
+      cards = cards.filter(c => {
+        const s = fsrs[c.id];
+        return s && s.lastRating === 'again' && s.lastReview > dayAgo;
+      });
+    }
+    cards = cards.slice().sort(() => Math.random() - 0.5);
+    BS.cards = cards;
+    return cards;
+  }
+
+  function getDeckLabel(deckId) {
+    const labels = {
+      'boardmd_s2':'BoardMD S2','core':'Core S2',
+      'boardmd_s1':'BoardMD S1','s1_core':'Core S1',
+      'hy':'HY S2','hy1':'HY S1','ethics':'Ethics'
+    };
+    return labels[deckId] || (deckId||'').toUpperCase();
+  }
+
+  function highlightTerms(text) {
+    if (!text) return '';
+    return String(text).replace(/\*\*(.+?)\*\*/g, '<span class="bs-hl-b">$1</span>');
+  }
+
+  function getCorrectChoice(card) {
+    try {
+      const raw = card.c;
+      const choices = typeof raw === 'string' ? JSON.parse(raw) : (raw||[]);
+      if (!Array.isArray(choices)) return null;
+      return choices.find(ch => ch.correct) || choices[0];
+    } catch(e) { return null; }
+  }
+
+  function getChoices(card) {
+    try {
+      const raw = card.c;
+      const choices = typeof raw === 'string' ? JSON.parse(raw) : (raw||[]);
+      return Array.isArray(choices) ? choices : [];
+    } catch(e) { return []; }
+  }
+
+  function renderStageDots() {
+    const phases = PHASES[BS.mode] || PHASES.flash;
+    const el = document.getElementById('bs-stage-dots');
+    if (!el) return;
+    el.innerHTML = phases.map((p, i) => {
+      const cls = i < BS.phase ? 'done' : i === BS.phase ? 'active' : '';
+      return `<div class="bs-stage-dot ${cls}"></div>`;
+    }).join('');
+  }
+
+  function render() {
+    if (!BS.cards.length) {
+      document.getElementById('bs-card-body').innerHTML = `
+        <div class="bs-empty">
+          <div class="bs-empty-title">Nenhum card disponível</div>
+          <div class="bs-empty-sub">Tente outro modo ou deck</div>
+        </div>`;
+      return;
+    }
+    if (BS.cur >= BS.cards.length) { showComplete(); return; }
+
+    const card = BS.cards[BS.cur];
+    const phases = PHASES[BS.mode] || PHASES.flash;
+    const phase = phases[BS.phase] || phases[0];
+
+    BS.seen.add(card.id);
+    document.getElementById('bs-st-seen').textContent = BS.seen.size;
+    document.getElementById('bs-st-flag').textContent = BS.flagged.size;
+
+    const pct = Math.round((BS.cur / BS.cards.length) * 100);
+    document.getElementById('bs-prog').style.width = pct + '%';
+    renderStageDots();
+
+    const topic = (card.topic || card.subject || 'CARD').toUpperCase();
+    const deck = getDeckLabel(card.deck);
+    const qid = card.qid ? `QID ${card.qid}` : `#${(card.id||'').toString().slice(-6)}`;
+
+    let body = `
+      <div class="bs-card-head">
+        <span class="bs-card-topic">${topic}</span>
+        <div class="bs-card-meta">
+          <span class="bs-deck-badge">${deck}</span>
+          <span class="bs-qid">${qid}</span>
+        </div>
+      </div>`;
+
+    if (phase === 'vignette') {
+      body += `<div class="bs-stage-label">Vignette</div>
+               <div class="bs-vignette">${card.q || ''}</div>`;
+    }
+    else if (phase === 'phrase') {
+      const txt = card.phrase || card.kp || '<em style="color:var(--text-faint)">phrase ainda não gerada</em>';
+      body += `<div class="bs-phrase">${highlightTerms(txt)}</div>`;
+    }
+    else if (phase === 'choices') {
+      body += `<div class="bs-stage-label">Vignette</div>
+               <div class="bs-vignette compact">${card.q || ''}</div>
+               <div class="bs-divider"></div>
+               <div class="bs-choices">`;
+      getChoices(card).forEach((ch, i) => {
+        const letter = String.fromCharCode(65 + i);
+        const text = ch.text || ch.t || ch;
+        body += `<div class="bs-choice"><span class="bs-choice-letter">${letter}.</span>${text}</div>`;
+      });
+      body += `</div>`;
+    }
+    else if (phase === 'answer') {
+      body += `<div class="bs-stage-label">Resposta</div>
+               <div class="bs-vignette compact">${card.q || ''}</div>
+               <div class="bs-divider"></div>
+               <div class="bs-choices">`;
+      getChoices(card).forEach((ch, i) => {
+        const letter = String.fromCharCode(65 + i);
+        const text = ch.text || ch.t || ch;
+        const cls = ch.correct ? 'correct' : 'wrong';
+        body += `<div class="bs-choice ${cls}"><span class="bs-choice-letter">${letter}.</span>${text}</div>`;
+      });
+      body += `</div>`;
+      if (card.e) body += `<div class="bs-explanation">${card.e}</div>`;
+    }
+    else if (phase === 'kp') {
+      body += `<div class="bs-stage-label">Key Point</div>`;
+      if (card.kp) {
+        body += `<div class="bs-kp">
+                   <div class="bs-kp-label">Key Point</div>
+                   <div class="bs-kp-text">${card.kp}</div>
+                 </div>`;
+      }
+      if (card.phrase && BS.mode !== 'kp') {
+        body += `<div class="bs-explanation"><strong>Frase:</strong> ${highlightTerms(card.phrase)}</div>`;
+      }
+    }
+
+    document.getElementById('bs-card-body').innerHTML = body;
+    const flagBtn = document.getElementById('bs-flag-btn');
+    if (flagBtn) flagBtn.classList.toggle('on', BS.flagged.has(card.id));
+  }
+
+  function advance() {
+    const phases = PHASES[BS.mode] || PHASES.flash;
+    if (BS.phase < phases.length - 1) { BS.phase++; render(); }
+    else if (BS.cur < BS.cards.length - 1) { BS.cur++; BS.phase = 0; render(); }
+    else { stopPlay(); showComplete(); }
+  }
+
+  function showComplete() {
+    document.getElementById('bs-prog').style.width = '100%';
+    document.getElementById('bs-card-body').innerHTML = `
+      <div class="bs-complete">
+        <div class="bs-complete-title">Sessão completa</div>
+        <div class="bs-complete-stats">
+          <div class="bs-complete-stat"><div class="n">${BS.seen.size}</div><div class="l">cards</div></div>
+          <div class="bs-complete-stat"><div class="n">${BS.flagged.size}</div><div class="l">marcados</div></div>
+          <div class="bs-complete-stat"><div class="n">${document.getElementById('bs-st-time').textContent}</div><div class="l">tempo</div></div>
+        </div>
+        <button class="bs-btn primary" onclick="bsBackToConfig()">Nova sessão</button>
+      </div>`;
+  }
+
+  window.bsSetMode = function(el) {
+    document.querySelectorAll('.bs-mode-card').forEach(c => c.classList.remove('on'));
+    el.classList.add('on');
+    BS.mode = el.dataset.mode;
+  };
+
+  window.bsSetDeck = function(el) {
+    document.querySelectorAll('.bs-chip').forEach(c => c.classList.remove('on'));
+    el.classList.add('on');
+    BS.deck = el.dataset.deck;
+  };
+
+  window.bsSetSpeed = function(v) {
+    BS.speed = SPEEDS[v] || 3000;
+    document.getElementById('bs-speed-val').textContent = SPEED_LABELS[v];
+    document.getElementById('bs-speed-wpm').textContent = SPEED_WPM[v];
+    localStorage.setItem('bs-speed', v);
+    if (BS.playing) {
+      clearInterval(BS.timer);
+      BS.timer = setInterval(advance, BS.speed);
+    }
+  };
+
+  window.bsStart = function() {
+    loadCards();
+    BS.cur = 0; BS.phase = 0;
+    BS.seen.clear(); BS.flagged.clear();
+    BS.elapsed = 0;
+    document.getElementById('bs-st-time').textContent = '0:00';
+    if (!BS.cards.length) { alert('Nenhum card disponível para esse modo/deck.'); return; }
+    document.getElementById('bs-config-screen').style.display = 'none';
+    document.getElementById('bs-session-screen').style.display = 'block';
+    document.getElementById('bs-controls').style.display = 'flex';
+    render();
+  };
+
+  window.bsBackToConfig = function() {
+    stopPlay();
+    document.getElementById('bs-config-screen').style.display = 'block';
+    document.getElementById('bs-session-screen').style.display = 'none';
+    document.getElementById('bs-controls').style.display = 'none';
+  };
+
+  window.bsGo = function(dir) {
+    const phases = PHASES[BS.mode] || PHASES.flash;
+    if (dir > 0) advance();
+    else {
+      if (BS.phase > 0) { BS.phase--; render(); }
+      else if (BS.cur > 0) { BS.cur--; BS.phase = phases.length - 1; render(); }
+    }
+  };
+
+  window.bsTogglePlay = function() { BS.playing ? stopPlay() : startPlay(); };
+
+  function startPlay() {
+    BS.playing = true;
+    document.getElementById('bs-play-btn').textContent = '⏸ Pause';
+    BS.timer = setInterval(advance, BS.speed);
+    if (!BS.clockT) {
+      BS.clockT = setInterval(() => {
+        BS.elapsed++;
+        const m = Math.floor(BS.elapsed / 60);
+        const s = BS.elapsed % 60;
+        document.getElementById('bs-st-time').textContent = m + ':' + (s < 10 ? '0' : '') + s;
+      }, 1000);
+    }
+  }
+
+  function stopPlay() {
+    BS.playing = false;
+    const btn = document.getElementById('bs-play-btn');
+    if (btn) btn.textContent = '▶ Play';
+    clearInterval(BS.timer);
+  }
+
+  window.bsFlag = function() {
+    const card = BS.cards[BS.cur];
+    if (!card) return;
+    if (BS.flagged.has(card.id)) BS.flagged.delete(card.id);
+    else BS.flagged.add(card.id);
+    document.getElementById('bs-st-flag').textContent = BS.flagged.size;
+    document.getElementById('bs-flag-btn').classList.toggle('on', BS.flagged.has(card.id));
+    if (window._supa && BS.flagged.has(card.id)) {
+      try {
+        window._supa.from('card_errors').insert({
+          card_id:card.id, deck:card.deck, qid:card.qid,
+          topic:card.topic||card.subject, field:'brainstorm_flag',
+          note:'flagged in BrainStorm Mode'
+        }).then(()=>{}).catch(()=>{});
+      } catch(e) {}
+    }
+  };
+
+  window.openBrainStorm = function() {
+    document.getElementById('brainstorm-overlay').classList.add('active');
+    document.body.style.overflow = 'hidden';
+    const saved = localStorage.getItem('bs-speed');
+    if (saved) {
+      document.getElementById('bs-speed-slider').value = saved;
+      bsSetSpeed(saved);
+    }
+    document.getElementById('bs-config-screen').style.display = 'block';
+    document.getElementById('bs-session-screen').style.display = 'none';
+    document.getElementById('bs-controls').style.display = 'none';
+  };
+
+  window.closeBrainStorm = function() {
+    stopPlay();
+    clearInterval(BS.clockT); BS.clockT = null;
+    document.getElementById('brainstorm-overlay').classList.remove('active');
+    document.body.style.overflow = '';
+  };
+
+  document.addEventListener('keydown', e => {
+    const overlay = document.getElementById('brainstorm-overlay');
+    if (!overlay) return;
+    if (e.key === 'Escape' && overlay.classList.contains('active')) {
+      closeBrainStorm();
+    }
+    if (overlay.classList.contains('active') && document.getElementById('bs-session-screen').style.display !== 'none') {
+      if (e.key === 'ArrowRight') bsGo(1);
+      if (e.key === 'ArrowLeft') bsGo(-1);
+      if (e.key === ' ') { e.preventDefault(); bsTogglePlay(); }
+      if (e.key === 'f' || e.key === 'F') bsFlag();
+    }
+  });
+
+  console.log('BoardMD BrainStorm Mode v2 carregado');
+})();
+</script>
+
 </body>
 </html>
 <!-- v2 --><!-- redeploy --><!-- redeploy -->
