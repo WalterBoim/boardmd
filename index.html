@@ -14984,7 +14984,7 @@ function bmdSetupDrag(){
 
 
 <style>
-.bs-overlay{display:none;position:fixed;left:0;right:0;top:0;bottom:78px;z-index:9000;background:var(--bg);flex-direction:column;font-family:'Lato',sans-serif;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.bs-overlay{display:none;position:fixed;left:0;right:0;top:0;bottom:88px;z-index:9000;background:var(--bg);flex-direction:column;font-family:'Lato',sans-serif;overflow-y:auto;-webkit-overflow-scrolling:touch}
 .bs-overlay.on{display:flex}
 .bs-h{display:flex;align-items:center;justify-content:space-between;padding:18px 28px;border-bottom:1px solid var(--border);background:var(--bg);position:sticky;top:0;z-index:10;flex-wrap:wrap;gap:10px}
 .bs-t{display:flex;align-items:center;gap:14px;font-family:'Instrument Serif',serif;font-size:26px;color:var(--text)}
@@ -15144,8 +15144,8 @@ function bmdSetupDrag(){
   <div class="bs-body" id="bs-cfg">
     <div class="bs-sh">Review Mode</div>
     <div class="bs-modes">
-      <div class="bs-mode on" data-mode="flash"><div class="bs-mode-n">Flash mode</div><div class="bs-mode-d">Vignette → answer → Key Point</div></div>
-      <div class="bs-mode" data-mode="phrase"><div class="bs-mode-n">Clinical Reasoning</div><div class="bs-mode-d">HY Clue → Diagnosis → Action</div></div>
+      
+      <div class="bs-mode on" data-mode="phrase"><div class="bs-mode-n">Clinical Reasoning</div><div class="bs-mode-d">HY Clue → Diagnosis → Action</div></div>
       <div class="bs-mode" data-mode="kp"><div class="bs-mode-n">Key Points only</div><div class="bs-mode-d">Ultra-fast pre-exam review</div></div>
       <div class="bs-mode" data-mode="errors"><div class="bs-mode-n">Review errors</div><div class="bs-mode-d">Last 24h "Again" cards</div></div>
     </div>
@@ -15199,7 +15199,7 @@ function bmdSetupDrag(){
 <script>
 (function(){
 'use strict';
-const BS={mode:'flash',deck:'all',spd:3000,cards:[],cur:0,ph:0,playing:false,timer:null,clock:null,elapsed:0,flagged:new Set(),seen:new Set(),fz:'lg'};
+const BS={mode:'phrase',deck:'all',spd:3000,cards:[],cur:0,ph:0,playing:false,timer:null,clock:null,elapsed:0,flagged:new Set(),seen:new Set(),fz:'lg'};
 const SPDS={1:800,2:1500,3:3000,4:5000,5:8000,6:12000,7:20000};
 const SLBL={1:'0.8s',2:'1.5s',3:'3s',4:'5s',5:'8s',6:'12s',7:'20s'};
 const SWPM={1:'≈75/min',2:'≈40/min',3:'≈20/min',4:'≈12/min',5:'≈7/min',6:'≈5/min',7:'≈3/min'};
@@ -15535,7 +15535,7 @@ console.log('BoardMD BrainStorm v5 loaded');
 
 
 <style>
-.bs-overlay{display:none;position:fixed;left:0;right:0;top:0;bottom:78px;z-index:9000;background:var(--bg);flex-direction:column;font-family:'Lato',sans-serif;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.bs-overlay{display:none;position:fixed;left:0;right:0;top:0;bottom:88px;z-index:9000;background:var(--bg);flex-direction:column;font-family:'Lato',sans-serif;overflow-y:auto;-webkit-overflow-scrolling:touch}
 .bs-overlay.on{display:flex}
 .bs-h{display:flex;align-items:center;justify-content:space-between;padding:18px 28px;border-bottom:1px solid var(--border);background:var(--bg);position:sticky;top:0;z-index:10;flex-wrap:wrap;gap:10px}
 .bs-t{display:flex;align-items:center;gap:14px;font-family:'Instrument Serif',serif;font-size:26px;color:var(--text)}
@@ -15695,8 +15695,8 @@ console.log('BoardMD BrainStorm v5 loaded');
   <div class="bs-body" id="bs-cfg">
     <div class="bs-sh">Review Mode</div>
     <div class="bs-modes">
-      <div class="bs-mode on" data-mode="flash"><div class="bs-mode-n">Flash mode</div><div class="bs-mode-d">Vignette → answer → Key Point</div></div>
-      <div class="bs-mode" data-mode="phrase"><div class="bs-mode-n">Clinical Reasoning</div><div class="bs-mode-d">HY Clue → Diagnosis → Action</div></div>
+      
+      <div class="bs-mode on" data-mode="phrase"><div class="bs-mode-n">Clinical Reasoning</div><div class="bs-mode-d">HY Clue → Diagnosis → Action</div></div>
       <div class="bs-mode" data-mode="kp"><div class="bs-mode-n">Key Points only</div><div class="bs-mode-d">Ultra-fast pre-exam review</div></div>
       <div class="bs-mode" data-mode="errors"><div class="bs-mode-n">Review errors</div><div class="bs-mode-d">Last 24h "Again" cards</div></div>
     </div>
@@ -15750,7 +15750,7 @@ console.log('BoardMD BrainStorm v5 loaded');
 <script>
 (function(){
 'use strict';
-const BS={mode:'flash',deck:'all',spd:3000,cards:[],cur:0,ph:0,playing:false,timer:null,clock:null,elapsed:0,flagged:new Set(),seen:new Set(),fz:'lg'};
+const BS={mode:'phrase',deck:'all',spd:3000,cards:[],cur:0,ph:0,playing:false,timer:null,clock:null,elapsed:0,flagged:new Set(),seen:new Set(),fz:'lg'};
 const SPDS={1:800,2:1500,3:3000,4:5000,5:8000,6:12000,7:20000};
 const SLBL={1:'0.8s',2:'1.5s',3:'3s',4:'5s',5:'8s',6:'12s',7:'20s'};
 const SWPM={1:'≈75/min',2:'≈40/min',3:'≈20/min',4:'≈12/min',5:'≈7/min',6:'≈5/min',7:'≈3/min'};
