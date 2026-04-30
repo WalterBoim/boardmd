@@ -15019,172 +15019,215 @@ function bmdSetupDrag(){
 ═══════════════════════════════════════════════════════════════════════
   BoardMD — BrainStorm Mode (v2)
   Substitui o botão Play central pelo BrainStorm (cérebro + raio amarelo)
-  Cole este bloco no index.html ANTES do </body>
-═══════════════════════════════════════════════════════════════════════
--->
+  Cole este bloco no index.html ANTES do <style>
+#bs-overlay{display:none;position:fixed;inset:0;z-index:9999;background:#0a0e15;flex-direction:column;font-family:'Lato','Inter',sans-serif;color:#dde3ee;overflow-y:auto}
+#bs-overlay.on{display:flex}
+html.light #bs-overlay{background:#f5f7fa;color:#1a1f2e}
 
-<style>
-#brainstorm-overlay {
-  display:none; position:fixed; inset:0; z-index:1500;
-  background:var(--bg); overflow-y:auto;
-  flex-direction:column; font-family:'Lato',sans-serif;
+.bs-head{display:flex;align-items:center;justify-content:space-between;padding:22px 32px;border-bottom:.5px solid #1c2435;background:#0a0e15;position:sticky;top:0;z-index:10}
+html.light .bs-head{background:#f5f7fa;border-bottom-color:#dce1ea}
+.bs-title{display:flex;align-items:center;gap:16px;font-family:'Instrument Serif',Georgia,serif;font-size:30px;color:#f0f2f5;letter-spacing:-.4px}
+html.light .bs-title{color:#1a1f2e}
+.bs-title-icon{width:46px;height:46px;flex-shrink:0}
+.bs-head-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.bs-fz{display:flex;align-items:center;gap:6px;background:#141b2a;border:.5px solid #2a3450;border-radius:10px;padding:4px}
+html.light .bs-fz{background:#fff;border-color:#dce1ea}
+.bs-fz-btn{width:34px;height:34px;border-radius:7px;border:none;background:transparent;color:#cfd6e4;cursor:pointer;font-size:14px;font-weight:700;font-family:inherit}
+html.light .bs-fz-btn{color:#1a1f2e}
+.bs-fz-btn:hover{background:rgba(59,127,255,.1)}
+.bs-fz-btn.on{background:#3b7fff;color:#fff}
+.bs-fz-cur{font-size:12px;color:#8a96b0;padding:0 8px;min-width:54px;text-align:center;font-weight:600}
+.bs-icon-btn{width:42px;height:42px;border-radius:10px;border:.5px solid #2a3450;background:transparent;color:#8a96b0;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:18px;font-family:inherit}
+html.light .bs-icon-btn{border-color:#dce1ea;color:#5a6478}
+.bs-icon-btn:hover{border-color:#3b7fff;color:#3b7fff}
+
+.bs-body{padding:24px 32px;max-width:1100px;margin:0 auto;width:100%;flex:1}
+
+.bs-section-h{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#8a96b0;margin-bottom:12px}
+.bs-mode-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:24px}
+.bs-mode{background:#141b2a;border:.5px solid #1c2435;border-radius:12px;padding:16px 18px;cursor:pointer;transition:all .15s}
+html.light .bs-mode{background:#fff;border-color:#dce1ea}
+.bs-mode:hover{border-color:#3b7fff}
+.bs-mode.on{border-color:#3b7fff;background:rgba(59,127,255,.08)}
+.bs-mode-name{font-weight:700;font-size:15px;margin-bottom:4px;color:#f0f2f5}
+html.light .bs-mode-name{color:#1a1f2e}
+.bs-mode-desc{font-size:13px;color:#8a96b0;line-height:1.5}
+
+.bs-deck-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:24px}
+.bs-chip{padding:8px 16px;border-radius:22px;background:#141b2a;border:.5px solid #2a3450;font-size:13px;font-weight:600;cursor:pointer;color:#a8b2c4;font-family:inherit}
+html.light .bs-chip{background:#fff;border-color:#dce1ea;color:#5a6478}
+.bs-chip.on{background:#3b7fff;border-color:#3b7fff;color:#fff}
+
+.bs-speed-row{display:flex;align-items:center;gap:14px;background:#141b2a;border:.5px solid #1c2435;border-radius:12px;padding:14px 18px;margin-bottom:24px}
+html.light .bs-speed-row{background:#fff;border-color:#dce1ea}
+.bs-speed-lab{font-size:13px;color:#8a96b0;white-space:nowrap}
+.bs-speed-val{font-size:15px;font-weight:700;min-width:42px;color:#f0f2f5}
+html.light .bs-speed-val{color:#1a1f2e}
+.bs-speed-wpm{font-size:12px;color:#5a6478}
+#bs-spd{flex:1;max-width:280px}
+
+.bs-cta{width:100%;padding:16px;border:none;border-radius:12px;background:#3b7fff;color:#fff;font-size:16px;font-weight:700;cursor:pointer;font-family:inherit;letter-spacing:.02em}
+.bs-cta:hover{background:#5a8fff}
+
+.bs-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:22px}
+.bs-stat{background:#141b2a;border:.5px solid #1c2435;border-radius:12px;padding:18px;text-align:center}
+html.light .bs-stat{background:#fff;border-color:#dce1ea}
+.bs-stat-n{font-size:28px;font-weight:700;color:#f0f2f5}
+html.light .bs-stat-n{color:#1a1f2e}
+.bs-stat-l{font-size:11px;color:#8a96b0;text-transform:uppercase;letter-spacing:.06em;margin-top:4px;font-weight:600}
+
+.bs-prog{height:4px;background:#1c2435;border-radius:2px;margin-bottom:12px;overflow:hidden}
+html.light .bs-prog{background:#dce1ea}
+.bs-prog-fill{height:100%;background:#3b7fff;width:0%;transition:width .15s linear}
+
+.bs-stage-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}
+.bs-stage-dots{display:flex;gap:6px}
+.bs-stage-dot{width:9px;height:9px;border-radius:50%;background:#2a3450}
+html.light .bs-stage-dot{background:#dce1ea}
+.bs-stage-dot.done{background:#3b7fff;opacity:.5}
+.bs-stage-dot.act{background:#3b7fff;transform:scale(1.4)}
+.bs-stage-text{font-size:12px;color:#8a96b0;letter-spacing:.04em;font-weight:500}
+
+.bs-card{background:#141b2a;border:.5px solid #1c2435;border-radius:16px;overflow:hidden;min-height:480px}
+html.light .bs-card{background:#fff;border-color:#dce1ea}
+.bs-card-head{padding:18px 26px;border-bottom:.5px solid #1c2435;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+html.light .bs-card-head{border-bottom-color:#dce1ea}
+.bs-card-topic{font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#a8b2c4}
+html.light .bs-card-topic{color:#5a6478}
+.bs-card-meta{display:flex;gap:10px;align-items:center}
+.bs-deck-badge{padding:5px 13px;border-radius:20px;font-size:11px;font-weight:700;background:rgba(59,127,255,.15);color:#85b7eb}
+html.light .bs-deck-badge{color:#185fa5}
+.bs-qid{font-size:12px;color:#5a6478;font-family:'JetBrains Mono',Menlo,monospace}
+
+.bs-stage-label{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#8a96b0;padding:20px 28px 0}
+.bs-vignette{padding:14px 28px 22px;line-height:1.85;color:#dde3ee}
+html.light .bs-vignette{color:#1a1f2e}
+.bs-vignette.compact{padding-bottom:8px}
+.bs-divider{height:.5px;background:#1c2435}
+html.light .bs-divider{background:#dce1ea}
+
+.fz-md .bs-vignette{font-size:16px}
+.fz-lg .bs-vignette{font-size:18px}
+.fz-xl .bs-vignette{font-size:21px;line-height:1.9}
+
+.bs-hl{background:rgba(255,217,61,.22);color:#ffd93d;border-radius:4px;padding:1px 6px;font-weight:600}
+html.light .bs-hl{background:rgba(186,117,23,.15);color:#854f0b}
+.bs-hl-b{background:rgba(59,127,255,.2);color:#85b7eb;border-radius:4px;padding:1px 6px;font-weight:600}
+html.light .bs-hl-b{color:#185fa5;background:rgba(59,127,255,.1)}
+
+.bs-phrase{padding:36px 32px;line-height:1.7;color:#f0f2f5;display:flex;align-items:center;min-height:200px;font-weight:500}
+html.light .bs-phrase{color:#1a1f2e}
+.fz-md .bs-phrase{font-size:18px}
+.fz-lg .bs-phrase{font-size:22px}
+.fz-xl .bs-phrase{font-size:26px;line-height:1.8}
+
+.bs-choices{padding:14px 28px;display:flex;flex-direction:column;gap:9px}
+.bs-choice{display:flex;gap:14px;padding:14px 18px;border-radius:10px;border:.5px solid #1c2435;color:#a8b2c4;background:#0f1623;line-height:1.5}
+html.light .bs-choice{background:#f9fafc;border-color:#dce1ea;color:#5a6478}
+.fz-md .bs-choice{font-size:15px}
+.fz-lg .bs-choice{font-size:17px}
+.fz-xl .bs-choice{font-size:19px}
+.bs-choice.correct{background:rgba(99,153,34,.13);border-color:#639922;color:#c0dd97;font-weight:600}
+html.light .bs-choice.correct{color:#27500a}
+.bs-choice.wrong{opacity:.5}
+.bs-choice-letter{font-weight:700;min-width:18px}
+
+.bs-explanation{padding:18px 28px;background:#0f1623;border-top:.5px solid #1c2435;line-height:1.8;color:#b8c2d4}
+html.light .bs-explanation{background:#f9fafc;color:#5a6478;border-top-color:#dce1ea}
+.fz-md .bs-explanation{font-size:14.5px}
+.fz-lg .bs-explanation{font-size:16.5px}
+.fz-xl .bs-explanation{font-size:19px}
+
+.bs-kp{margin:18px 28px;padding:18px 22px;background:rgba(59,127,255,.09);border-left:4px solid #3b7fff;border-radius:0 10px 10px 0}
+.bs-kp-label{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#85b7eb;margin-bottom:8px}
+html.light .bs-kp-label{color:#185fa5}
+.bs-kp-text{font-weight:500;line-height:1.7;color:#eef2f8}
+html.light .bs-kp-text{color:#1a1f2e}
+.fz-md .bs-kp-text{font-size:15px}
+.fz-lg .bs-kp-text{font-size:17px}
+.fz-xl .bs-kp-text{font-size:20px}
+
+.bs-controls{padding:18px 32px;border-top:.5px solid #1c2435;display:flex;justify-content:center;gap:10px;align-items:center;flex-wrap:wrap;background:#0a0e15;position:sticky;bottom:0}
+html.light .bs-controls{background:#f5f7fa;border-top-color:#dce1ea}
+.bs-btn{padding:11px 22px;border-radius:10px;border:.5px solid #2a3450;background:transparent;font-size:14px;font-weight:700;color:#cfd6e4;cursor:pointer;display:inline-flex;align-items:center;gap:7px;font-family:inherit}
+html.light .bs-btn{color:#1a1f2e;border-color:#dce1ea}
+.bs-btn:hover{border-color:#3b7fff}
+.bs-btn.primary{background:#3b7fff;border-color:#3b7fff;color:#fff}
+.bs-btn.primary:hover{background:#5a8fff}
+.bs-btn.flag{color:#ffd93d}
+.bs-btn.flag.on{background:rgba(255,217,61,.15)}
+.bs-spd-mini{padding:9px 14px;border-radius:9px;background:#141b2a;border:.5px solid #2a3450;font-size:12px;color:#a8b2c4;display:flex;align-items:center;gap:8px}
+html.light .bs-spd-mini{background:#fff;border-color:#dce1ea;color:#5a6478}
+.bs-spd-mini input[type="range"]{width:100px}
+
+.bs-empty{text-align:center;padding:80px 20px;color:#8a96b0}
+.bs-empty-h{font-size:22px;margin-bottom:10px;color:#f0f2f5;font-family:'Instrument Serif',serif}
+html.light .bs-empty-h{color:#1a1f2e}
+
+.bs-complete{display:flex;flex-direction:column;align-items:center;padding:60px 20px;gap:18px}
+.bs-complete-h{font-family:'Instrument Serif',Georgia,serif;font-size:42px;color:#f0f2f5}
+html.light .bs-complete-h{color:#1a1f2e}
+.bs-complete-stats{display:flex;gap:40px;margin:18px 0}
+.bs-complete-stat{text-align:center}
+.bs-complete-stat .n{font-size:32px;font-weight:700;color:#3b7fff}
+.bs-complete-stat .l{font-size:12px;color:#8a96b0;text-transform:uppercase;letter-spacing:.05em;font-weight:600}
+
+@media (max-width:700px){
+  .bs-head{padding:16px 18px}
+  .bs-title{font-size:22px}
+  .bs-title-icon{width:36px;height:36px}
+  .bs-body{padding:18px}
+  .bs-stats{grid-template-columns:repeat(2,1fr)}
+  .bs-controls{padding:14px 16px;gap:6px}
+  .bs-btn{padding:9px 14px;font-size:13px}
 }
-#brainstorm-overlay.active { display:flex; }
-
-.bs-header {
-  position:sticky; top:0; z-index:10;
-  background:rgba(8,12,18,.92); backdrop-filter:blur(14px);
-  border-bottom:1px solid var(--border);
-  padding:14px 20px;
-  display:flex; align-items:center; justify-content:space-between;
-}
-html.light .bs-header { background:rgba(245,247,250,.94); }
-.bs-title { font-family:'Instrument Serif',serif; font-size:22px; letter-spacing:-.3px; display:flex; align-items:center; gap:10px; }
-.bs-title-icon { width:24px; height:24px; }
-.bs-close { background:none; border:1px solid var(--border); color:var(--text-dim); width:36px; height:36px; border-radius:8px; cursor:pointer; font-size:18px; display:flex; align-items:center; justify-content:center; }
-.bs-close:hover { color:var(--accent); border-color:var(--accent); }
-
-.bs-body { flex:1; padding:24px 20px; max-width:760px; margin:0 auto; width:100%; }
-
-.bs-section-label {
-  font-size:11px; font-weight:700; letter-spacing:.1em;
-  text-transform:uppercase; color:var(--text-dim); margin-bottom:12px;
-}
-
-.bs-mode-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:10px; margin-bottom:24px; }
-.bs-mode-card { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:14px 16px; cursor:pointer; transition:all .15s; }
-.bs-mode-card:hover { border-color:var(--accent-glow); }
-.bs-mode-card.on { border-color:var(--accent); background:var(--accent-dim); }
-.bs-mode-name { font-weight:700; font-size:14px; margin-bottom:4px; }
-.bs-mode-desc { font-size:12px; color:var(--text-dim); line-height:1.4; }
-
-.bs-deck-row { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:24px; }
-.bs-chip { padding:6px 14px; border-radius:20px; background:var(--surface); border:1px solid var(--border); font-size:12px; font-weight:600; cursor:pointer; color:var(--text-dim); transition:all .15s; }
-.bs-chip.on { background:var(--accent); border-color:var(--accent); color:#fff; }
-
-.bs-speed-row { display:flex; align-items:center; gap:14px; background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:14px 18px; margin-bottom:24px; }
-.bs-speed-label { font-size:12px; color:var(--text-dim); white-space:nowrap; }
-.bs-speed-val { font-size:14px; font-weight:700; min-width:38px; }
-.bs-speed-wpm { font-size:11px; color:var(--text-faint); }
-#bs-speed-slider { flex:1; max-width:240px; }
-
-.bs-stats { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-bottom:20px; }
-.bs-stat { background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:12px; text-align:center; }
-.bs-stat-n { font-size:20px; font-weight:700; color:var(--text); }
-.bs-stat-l { font-size:10px; color:var(--text-dim); text-transform:uppercase; letter-spacing:.05em; }
-
-.bs-progress { height:4px; background:var(--surface2); border-radius:2px; margin-bottom:14px; overflow:hidden; }
-.bs-progress-fill { height:100%; background:var(--accent); transition:width .15s linear; width:0%; }
-
-.bs-stage { display:flex; gap:5px; margin-bottom:12px; }
-.bs-stage-dot { width:7px; height:7px; border-radius:50%; background:var(--surface2); transition:all .2s; }
-.bs-stage-dot.done { background:var(--accent); opacity:.6; }
-.bs-stage-dot.active { background:var(--accent); transform:scale(1.4); }
-
-.bs-card-wrap { background:var(--surface); border:1px solid var(--border); border-radius:14px; min-height:320px; overflow:hidden; }
-
-.bs-card-head { padding:12px 18px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px; }
-.bs-card-topic { font-size:11px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--text-dim); }
-.bs-card-meta { display:flex; gap:8px; align-items:center; }
-.bs-deck-badge { padding:3px 10px; border-radius:20px; font-size:10px; font-weight:700; background:var(--accent-dim); color:var(--accent); }
-.bs-qid { font-size:11px; color:var(--text-faint); font-family:'JetBrains Mono',monospace; }
-
-.bs-stage-label { font-size:10px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--text-faint); padding:14px 20px 0; }
-
-.bs-vignette { padding:14px 20px; font-size:15px; line-height:1.8; color:var(--text); }
-.bs-vignette.compact { font-size:13px; padding-bottom:6px; }
-
-.bs-phrase { padding:32px 24px; font-size:18px; line-height:1.7; color:var(--text); display:flex; align-items:center; min-height:140px; }
-
-.bs-divider { height:1px; background:var(--border); }
-
-.bs-choices { padding:10px 18px; display:flex; flex-direction:column; gap:7px; }
-.bs-choice { display:flex; gap:10px; padding:8px 12px; border-radius:8px; border:1px solid var(--border); font-size:13px; color:var(--text-dim); }
-.bs-choice.correct { background:rgba(34,197,94,.1); border-color:var(--good); color:var(--good); font-weight:600; }
-.bs-choice.wrong { background:rgba(244,63,94,.06); border-color:rgba(244,63,94,.3); color:var(--text-faint); opacity:.55; }
-.bs-choice-letter { font-weight:700; min-width:14px; }
-
-.bs-explanation { padding:12px 20px; background:var(--surface2); border-top:1px solid var(--border); font-size:13px; line-height:1.7; color:var(--text-dim); }
-
-.bs-kp { margin:12px 20px; padding:12px 16px; background:var(--accent-dim); border-left:3px solid var(--accent); border-radius:0 8px 8px 0; }
-.bs-kp-label { font-size:10px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--accent); margin-bottom:4px; }
-.bs-kp-text { font-size:13px; font-weight:600; line-height:1.6; color:var(--text); }
-
-.bs-hl   { background:rgba(232,168,54,.18); color:var(--gold); border-radius:3px; padding:1px 4px; font-weight:600; }
-.bs-hl-r { background:rgba(244,63,94,.12); color:var(--rose); border-radius:3px; padding:1px 4px; font-weight:600; }
-.bs-hl-g { background:rgba(34,197,94,.12); color:var(--good); border-radius:3px; padding:1px 4px; font-weight:600; }
-.bs-hl-b { background:var(--accent-dim); color:var(--accent); border-radius:3px; padding:1px 4px; font-weight:600; }
-
-.bs-controls {
-  position:sticky; bottom:0; background:rgba(8,12,18,.94);
-  backdrop-filter:blur(12px); border-top:1px solid var(--border);
-  padding:12px 20px; display:flex; gap:8px; justify-content:center;
-  align-items:center; flex-wrap:wrap;
-}
-html.light .bs-controls { background:rgba(245,247,250,.96); }
-.bs-btn { padding:9px 18px; border-radius:9px; border:1px solid var(--border); background:var(--surface); font-size:13px; font-weight:700; cursor:pointer; color:var(--text); font-family:'Lato',sans-serif; transition:all .15s; }
-.bs-btn:hover { border-color:var(--accent); }
-.bs-btn.primary { background:var(--accent); border-color:var(--accent); color:#fff; }
-.bs-btn.primary:hover { background:#5a8fff; }
-.bs-btn.flag.on { background:var(--gold); border-color:var(--gold); color:#fff; }
-
-.bs-empty { text-align:center; padding:60px 20px; color:var(--text-dim); }
-.bs-empty-title { font-size:18px; margin-bottom:8px; color:var(--text); }
-.bs-empty-sub { font-size:13px; }
-
-.bs-complete { display:flex; flex-direction:column; align-items:center; padding:50px 20px; gap:14px; }
-.bs-complete-title { font-family:'Instrument Serif',serif; font-size:32px; color:var(--text); }
-.bs-complete-stats { display:flex; gap:32px; margin:14px 0; }
-.bs-complete-stat { text-align:center; }
-.bs-complete-stat .n { font-size:26px; font-weight:700; color:var(--accent); }
-.bs-complete-stat .l { font-size:11px; color:var(--text-dim); text-transform:uppercase; }
-
-@media (max-width:600px) {
-  .bs-mode-grid { grid-template-columns:1fr 1fr; }
-  .bs-vignette { font-size:14px; padding:12px 16px; }
-  .bs-phrase { font-size:16px; padding:24px 18px; }
-}
-
-.bs-storm-icon { width:24px; height:24px; }
-.nav-center-btn .bs-storm-icon { width:28px; height:28px; }
 </style>
 
 
-<div id="brainstorm-overlay">
-  <div class="bs-header">
+<div id="bs-overlay">
+
+  <div class="bs-head">
     <div class="bs-title">
       <svg class="bs-title-icon" viewBox="0 0 28 28" fill="none">
-        <path d="M10 4C7.5 4 6 5.5 6 7.5c0 .8.3 1.5.8 2-.5.5-.8 1.2-.8 2 0 1.5 1 2.5 2.5 2.5-.3.5-.5 1.1-.5 1.7 0 1.7 1.3 3 3 3h0V4zM18 4c2.5 0 4 1.5 4 3.5 0 .8-.3 1.5-.8 2 .5.5.8 1.2.8 2 0 1.5-1 2.5-2.5 2.5.3.5.5 1.1.5 1.7 0 1.7-1.3 3-3 3h0V4z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
-        <path d="M16 6 L11 14 L14 14 L11 22 L19 12 L16 12 Z" fill="#FFD93D" stroke="currentColor" stroke-width=".6" stroke-linejoin="round"/>
+        <path d="M10 4C7.5 4 6 5.5 6 7.5c0 .8.3 1.5.8 2-.5.5-.8 1.2-.8 2 0 1.5 1 2.5 2.5 2.5-.3.5-.5 1.1-.5 1.7 0 1.7 1.3 3 3 3h0V4zM18 4c2.5 0 4 1.5 4 3.5 0 .8-.3 1.5-.8 2 .5.5.8 1.2.8 2 0 1.5-1 2.5-2.5 2.5.3.5.5 1.1.5 1.7 0 1.7-1.3 3-3 3h0V4z" stroke="#fff" stroke-width="1.8" stroke-linejoin="round"/>
+        <path d="M16 6 L11 14 L14 14 L11 22 L19 12 L16 12 Z" fill="#FFD93D" stroke="#0a0e15" stroke-width="1" stroke-linejoin="round"/>
       </svg>
       BrainStorm Mode
     </div>
-    <button class="bs-close" onclick="closeBrainStorm()">✕</button>
+    <div class="bs-head-actions">
+      <div class="bs-fz">
+        <button class="bs-fz-btn" onclick="bsFz(-1)">A−</button>
+        <span class="bs-fz-cur" id="bs-fz-cur">Large</span>
+        <button class="bs-fz-btn" onclick="bsFz(1)">A+</button>
+      </div>
+      <button class="bs-icon-btn" onclick="bsBackToConfig()" title="Settings">⚙</button>
+      <button class="bs-icon-btn" onclick="closeBrainStorm()" title="Close">✕</button>
+    </div>
   </div>
 
-  <div class="bs-body" id="bs-config-screen">
-    <div class="bs-section-label">Modo de revisão</div>
-    <div class="bs-mode-grid" id="bs-mode-grid">
-      <div class="bs-mode-card on" data-mode="flash" onclick="bsSetMode(this)">
-        <div class="bs-mode-name">Flash completo</div>
-        <div class="bs-mode-desc">Vignette → resposta → Key Point</div>
+  <div class="bs-body" id="bs-config">
+    <div class="bs-section-h">Review mode</div>
+    <div class="bs-mode-grid">
+      <div class="bs-mode on" data-mode="flash" onclick="bsSetMode(this)">
+        <div class="bs-mode-name">Flash mode</div>
+        <div class="bs-mode-desc">Vignette → answer → Key Point</div>
       </div>
-      <div class="bs-mode-card" data-mode="phrase" onclick="bsSetMode(this)">
-        <div class="bs-mode-name">Frase-chave</div>
-        <div class="bs-mode-desc">Uma frase clínica por card</div>
+      <div class="bs-mode" data-mode="phrase" onclick="bsSetMode(this)">
+        <div class="bs-mode-name">Key Phrase</div>
+        <div class="bs-mode-desc">One clinical pearl per card</div>
       </div>
-      <div class="bs-mode-card" data-mode="kp" onclick="bsSetMode(this)">
-        <div class="bs-mode-name">Só Key Points</div>
-        <div class="bs-mode-desc">Pré-prova ultrarrápido</div>
+      <div class="bs-mode" data-mode="kp" onclick="bsSetMode(this)">
+        <div class="bs-mode-name">Key Points only</div>
+        <div class="bs-mode-desc">Ultra-fast pre-exam review</div>
       </div>
-      <div class="bs-mode-card" data-mode="errors" onclick="bsSetMode(this)">
-        <div class="bs-mode-name">Revisar erros</div>
-        <div class="bs-mode-desc">Cards "Again" das últimas 24h</div>
+      <div class="bs-mode" data-mode="errors" onclick="bsSetMode(this)">
+        <div class="bs-mode-name">Review errors</div>
+        <div class="bs-mode-desc">Last 24h "Again" cards</div>
       </div>
     </div>
 
-    <div class="bs-section-label">Deck</div>
-    <div class="bs-deck-row" id="bs-deck-row">
+    <div class="bs-section-h">Deck</div>
+    <div class="bs-deck-row">
       <div class="bs-chip on" data-deck="all" onclick="bsSetDeck(this)">Step 2 Complete</div>
       <div class="bs-chip" data-deck="boardmd_s2" onclick="bsSetDeck(this)">BoardMD S2</div>
       <div class="bs-chip" data-deck="core" onclick="bsSetDeck(this)">Core S2</div>
@@ -15192,410 +15235,833 @@ html.light .bs-controls { background:rgba(245,247,250,.96); }
       <div class="bs-chip" data-deck="s1_core" onclick="bsSetDeck(this)">Core S1</div>
     </div>
 
-    <div class="bs-section-label">Velocidade</div>
+    <div class="bs-section-h">Speed</div>
     <div class="bs-speed-row">
-      <span class="bs-speed-label">tempo/card</span>
-      <input type="range" min="1" max="7" value="3" step="1" id="bs-speed-slider" oninput="bsSetSpeed(this.value)">
-      <span class="bs-speed-val" id="bs-speed-val">3s</span>
-      <span class="bs-speed-wpm" id="bs-speed-wpm">≈ 20/min</span>
+      <span class="bs-speed-lab">per card</span>
+      <input type="range" min="1" max="7" value="3" step="1" id="bs-spd" oninput="bsSetSpeed(this.value)">
+      <span class="bs-speed-val" id="bs-spd-val">3s</span>
+      <span class="bs-speed-wpm" id="bs-spd-wpm">≈ 20/min</span>
     </div>
 
-    <button class="bs-btn primary" style="width:100%; padding:14px; font-size:15px;" onclick="bsStart()">▶  Iniciar BrainStorm</button>
+    <button class="bs-cta" onclick="bsStart()">▶  Start BrainStorm</button>
   </div>
 
-  <div class="bs-body" id="bs-session-screen" style="display:none;">
+  <div class="bs-body" id="bs-session" style="display:none">
     <div class="bs-stats">
-      <div class="bs-stat"><div class="bs-stat-n" id="bs-st-seen">0</div><div class="bs-stat-l">vistos</div></div>
-      <div class="bs-stat"><div class="bs-stat-n" id="bs-st-flag">0</div><div class="bs-stat-l">marcados</div></div>
-      <div class="bs-stat"><div class="bs-stat-n" id="bs-st-time">0:00</div><div class="bs-stat-l">tempo</div></div>
+      <div class="bs-stat"><div class="bs-stat-n" id="bs-st-seen">0</div><div class="bs-stat-l">seen</div></div>
+      <div class="bs-stat"><div class="bs-stat-n" id="bs-st-flag">0</div><div class="bs-stat-l">flagged</div></div>
+      <div class="bs-stat"><div class="bs-stat-n" id="bs-st-time">0:00</div><div class="bs-stat-l">time</div></div>
+      <div class="bs-stat"><div class="bs-stat-n" id="bs-st-total">0</div><div class="bs-stat-l">total</div></div>
     </div>
 
-    <div class="bs-progress"><div class="bs-progress-fill" id="bs-prog"></div></div>
-    <div class="bs-stage" id="bs-stage-dots"></div>
+    <div class="bs-prog"><div class="bs-prog-fill" id="bs-prog-fill"></div></div>
+    <div class="bs-stage-row">
+      <div class="bs-stage-dots" id="bs-stage-dots"></div>
+      <div class="bs-stage-text" id="bs-stage-text"></div>
+    </div>
 
-    <div class="bs-card-wrap" id="bs-card-wrap">
-      <div id="bs-card-body"></div>
+    <div class="bs-card" id="bs-card"></div>
+  </div>
+
+  <div class="bs-controls" id="bs-controls" style="display:none">
+    <button class="bs-btn" onclick="bsGo(-1)">←  Back</button>
+    <button class="bs-btn primary" id="bs-play" onclick="bsPlay()">▶  Play</button>
+    <button class="bs-btn flag" id="bs-flag" onclick="bsFlag()">⚑  Flag</button>
+    <button class="bs-btn" onclick="bsGo(1)">Next  →</button>
+    <div class="bs-spd-mini">
+      <span>speed</span>
+      <input type="range" min="1" max="7" value="3" step="1" oninput="bsSetSpeed(this.value)">
+      <span style="color:#f0f2f5;font-weight:700" id="bs-spd-mini-val">3s</span>
     </div>
   </div>
 
-  <div class="bs-controls" id="bs-controls" style="display:none;">
-    <button class="bs-btn" onclick="bsGo(-1)">←</button>
-    <button class="bs-btn" id="bs-play-btn" onclick="bsTogglePlay()">▶ Play</button>
-    <button class="bs-btn flag" id="bs-flag-btn" onclick="bsFlag()">⚑</button>
-    <button class="bs-btn" onclick="bsBackToConfig()">⚙</button>
-    <button class="bs-btn primary" onclick="bsGo(1)">→</button>
-  </div>
 </div>
 
 
 <script>
-(function() {
-  'use strict';
+(function(){
+'use strict';
 
-  /* SVG do cérebro com raio amarelo (Opção 2) */
-  const STORM_ICON_SVG = `
-    <svg class="bs-storm-icon" viewBox="0 0 28 28" fill="none">
-      <path d="M10 4C7.5 4 6 5.5 6 7.5c0 .8.3 1.5.8 2-.5.5-.8 1.2-.8 2 0 1.5 1 2.5 2.5 2.5-.3.5-.5 1.1-.5 1.7 0 1.7 1.3 3 3 3h0V4zM18 4c2.5 0 4 1.5 4 3.5 0 .8-.3 1.5-.8 2 .5.5.8 1.2.8 2 0 1.5-1 2.5-2.5 2.5.3.5.5 1.1.5 1.7 0 1.7-1.3 3-3 3h0V4z" stroke="#fff" stroke-width="1.6" stroke-linejoin="round"/>
-      <path d="M16 6 L11 14 L14 14 L11 22 L19 12 L16 12 Z" fill="#FFD93D" stroke="#080c12" stroke-width=".8" stroke-linejoin="round"/>
-    </svg>
-  `;
+const BS={mode:'flash',deck:'all',speed:3000,cards:[],cur:0,phase:0,playing:false,timer:null,clockT:null,elapsed:0,flagged:new Set(),seen:new Set(),fz:'lg'};
+const SPEEDS={1:800,2:1500,3:3000,4:5000,5:8000,6:12000,7:20000};
+const SPEED_LABELS={1:'0.8s',2:'1.5s',3:'3s',4:'5s',5:'8s',6:'12s',7:'20s'};
+const SPEED_WPM={1:'≈ 75/min',2:'≈ 40/min',3:'≈ 20/min',4:'≈ 12/min',5:'≈ 7/min',6:'≈ 5/min',7:'≈ 3/min'};
+const PHASES={flash:['vignette','choices','answer','kp'],phrase:['phrase'],kp:['kp'],errors:['vignette','choices','answer','kp']};
+const FZ_LEVELS=['md','lg','xl'];
+const FZ_NAMES={md:'Medium',lg:'Large',xl:'Extra Large'};
 
-  /* Substitui o botão Play central pelo BrainStorm */
-  function setupBrainStormButton() {
-    const navCenter = document.querySelector('.bmd-bottom-nav .nav-center');
-    if (!navCenter) {
-      console.warn('BrainStorm: .nav-center não encontrado');
-      return;
-    }
+const DECK_LABELS={'boardmd_s2':'BoardMD S2','core':'Core S2','boardmd_s1':'BoardMD S1','s1_core':'Core S1','hy':'HY S2','hy1':'HY S1','ethics':'Ethics'};
 
-    const centerBtn = navCenter.querySelector('.nav-center-btn');
-    if (!centerBtn) return;
+function setupBtn(){
+  const navCenter=document.querySelector('.bmd-bottom-nav .nav-center');
+  const btn=document.querySelector('.bmd-bottom-nav .nav-center-btn');
+  if(!btn)return;
+  btn.innerHTML=`<svg viewBox="0 0 28 28" width="40" height="40" fill="none"><path d="M10 4C7.5 4 6 5.5 6 7.5c0 .8.3 1.5.8 2-.5.5-.8 1.2-.8 2 0 1.5 1 2.5 2.5 2.5-.3.5-.5 1.1-.5 1.7 0 1.7 1.3 3 3 3h0V4zM18 4c2.5 0 4 1.5 4 3.5 0 .8-.3 1.5-.8 2 .5.5.8 1.2.8 2 0 1.5-1 2.5-2.5 2.5.3.5.5 1.1.5 1.7 0 1.7-1.3 3-3 3h0V4z" stroke="#fff" stroke-width="1.8" stroke-linejoin="round"/><path d="M16 6 L11 14 L14 14 L11 22 L19 12 L16 12 Z" fill="#FFD93D" stroke="#0a0e15" stroke-width="1" stroke-linejoin="round"/></svg>`;
+  btn.removeAttribute('onclick');
+  btn.onclick=function(e){e.preventDefault();e.stopPropagation();openBrainStorm();};
+  btn.style.width='60px';btn.style.height='60px';btn.style.borderRadius='18px';
+  let lbl=navCenter.querySelector('.nav-storm-lbl');
+  if(!lbl){lbl=document.createElement('div');lbl.className='nav-storm-lbl';navCenter.appendChild(lbl);}
+  lbl.textContent='Storm';lbl.style.cssText='font-size:11px;color:#FFD93D;font-weight:700;text-align:center;margin-top:6px;letter-spacing:.04em;font-family:Sora,sans-serif';
+}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',setupBtn);
+else setupBtn();
+setTimeout(setupBtn,500);setTimeout(setupBtn,2000);
 
-    /* Substituir o ícone Play pelo cérebro com raio */
-    centerBtn.innerHTML = STORM_ICON_SVG;
+function loadCards(){
+  const D=window.DECKS||{};
+  let cards=[];
+  if(BS.deck==='all')cards=[...(D.boardmd_s2||[]),...(D.core||[])];
+  else cards=D[BS.deck]||[];
+  if(BS.mode==='errors'){
+    const dayAgo=Date.now()-24*60*60*1000;
+    const fsrs=window.fsrsState||{};
+    cards=cards.filter(c=>{const s=fsrs[c.id];return s&&s.lastRating==='again'&&s.lastReview>dayAgo;});
+  }
+  cards=cards.slice().sort(()=>Math.random()-0.5);
+  BS.cards=cards;
+  return cards;
+}
 
-    /* Substituir o onclick — agora abre o BrainStorm */
-    centerBtn.onclick = function(e) {
-      e.preventDefault();
-      e.stopPropagation();
-      openBrainStorm();
-    };
+function highlightTerms(text){
+  if(!text)return'';
+  return String(text).replace(/\*\*(.+?)\*\*/g,'<span class="bs-hl-b">$1</span>');
+}
 
-    /* Adicionar label "Storm" embaixo */
-    if (!navCenter.querySelector('.nav-storm-label')) {
-      const lbl = document.createElement('div');
-      lbl.className = 'nav-storm-label';
-      lbl.textContent = 'Storm';
-      lbl.style.cssText = 'font-size:9px;color:#FFD93D;font-weight:700;text-align:center;margin-top:4px;font-family:Sora,sans-serif;letter-spacing:.02em;';
-      navCenter.appendChild(lbl);
-    }
+function getChoices(card){
+  try{
+    const raw=card.c;
+    const choices=typeof raw==='string'?JSON.parse(raw):(raw||[]);
+    return Array.isArray(choices)?choices:[];
+  }catch(e){return[];}
+}
+
+function applyFz(){
+  const ov=document.getElementById('bs-overlay');
+  ov.classList.remove('fz-md','fz-lg','fz-xl');
+  ov.classList.add('fz-'+BS.fz);
+  document.getElementById('bs-fz-cur').textContent=FZ_NAMES[BS.fz];
+  localStorage.setItem('bs-fz',BS.fz);
+}
+
+window.bsFz=function(dir){
+  const i=FZ_LEVELS.indexOf(BS.fz);
+  const ni=Math.max(0,Math.min(FZ_LEVELS.length-1,i+dir));
+  BS.fz=FZ_LEVELS[ni];
+  applyFz();
+};
+
+function renderStageDots(){
+  const phases=PHASES[BS.mode]||PHASES.flash;
+  const el=document.getElementById('bs-stage-dots');
+  if(!el)return;
+  el.innerHTML=phases.map((p,i)=>{
+    const cls=i<BS.phase?'done':i===BS.phase?'act':'';
+    return`<div class="bs-stage-dot ${cls}"></div>`;
+  }).join('');
+}
+
+function render(){
+  const stEl=document.getElementById('bs-card');
+  if(!stEl)return;
+  if(!BS.cards.length){
+    stEl.innerHTML=`<div class="bs-empty"><div class="bs-empty-h">No cards available</div><div>Try another mode or deck</div></div>`;
+    return;
+  }
+  if(BS.cur>=BS.cards.length){showComplete();return;}
+  const card=BS.cards[BS.cur];
+  const phases=PHASES[BS.mode]||PHASES.flash;
+  const phase=phases[BS.phase]||phases[0];
+  BS.seen.add(card.id);
+  document.getElementById('bs-st-seen').textContent=BS.seen.size;
+  document.getElementById('bs-st-flag').textContent=BS.flagged.size;
+  document.getElementById('bs-st-total').textContent=BS.cards.length;
+  const pct=Math.round((BS.cur/BS.cards.length)*100);
+  document.getElementById('bs-prog-fill').style.width=pct+'%';
+  const stageNames={vignette:'Vignette',choices:'Choices',answer:'Answer',kp:'Key Point',phrase:'Phrase'};
+  document.getElementById('bs-stage-text').textContent=`Card ${BS.cur+1} of ${BS.cards.length} · ${stageNames[phase]||''} stage`;
+  renderStageDots();
+
+  const topic=card.topic||card.subject||'Card';
+  const deck=DECK_LABELS[card.deck]||(card.deck||'').toUpperCase();
+  const qid=card.qid?`QID ${card.qid}`:`#${(card.id||'').toString().slice(-6)}`;
+
+  let body=`<div class="bs-card-head"><span class="bs-card-topic">${topic}</span><div class="bs-card-meta"><span class="bs-deck-badge">${deck}</span><span class="bs-qid">${qid}</span></div></div>`;
+
+  if(phase==='vignette'){
+    body+=`<div class="bs-stage-label">Vignette</div><div class="bs-vignette">${card.q||''}</div>`;
+  }else if(phase==='phrase'){
+    const txt=card.phrase||card.kp||'<em style="color:#5a6478">phrase not generated yet</em>';
+    body+=`<div class="bs-phrase">${highlightTerms(txt)}</div>`;
+  }else if(phase==='choices'){
+    body+=`<div class="bs-stage-label">Choices</div><div class="bs-vignette compact">${card.q||''}</div><div class="bs-divider"></div><div class="bs-choices">`;
+    getChoices(card).forEach((ch,i)=>{
+      const letter=String.fromCharCode(65+i);
+      const text=ch.text||ch.t||ch;
+      body+=`<div class="bs-choice"><span class="bs-choice-letter">${letter}.</span>${text}</div>`;
+    });
+    body+=`</div>`;
+  }else if(phase==='answer'){
+    body+=`<div class="bs-stage-label">Answer</div><div class="bs-vignette compact">${card.q||''}</div><div class="bs-divider"></div><div class="bs-choices">`;
+    getChoices(card).forEach((ch,i)=>{
+      const letter=String.fromCharCode(65+i);
+      const text=ch.text||ch.t||ch;
+      const cls=ch.correct?'correct':'wrong';
+      body+=`<div class="bs-choice ${cls}"><span class="bs-choice-letter">${letter}.</span>${text}</div>`;
+    });
+    body+=`</div>`;
+    if(card.e)body+=`<div class="bs-explanation">${card.e}</div>`;
+  }else if(phase==='kp'){
+    body+=`<div class="bs-stage-label">Key Point</div>`;
+    if(card.kp)body+=`<div class="bs-kp"><div class="bs-kp-label">Key Point</div><div class="bs-kp-text">${card.kp}</div></div>`;
+    if(card.phrase&&BS.mode!=='kp')body+=`<div class="bs-explanation"><strong>Phrase:</strong> ${highlightTerms(card.phrase)}</div>`;
   }
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', setupBrainStormButton);
-  } else {
-    setupBrainStormButton();
-  }
-  /* Re-aplica caso a navbar seja regenerada */
-  setTimeout(setupBrainStormButton, 1000);
-  setTimeout(setupBrainStormButton, 3000);
+  stEl.innerHTML=body;
+  const flagBtn=document.getElementById('bs-flag');
+  if(flagBtn)flagBtn.classList.toggle('on',BS.flagged.has(card.id));
+}
 
-  const BS = {
-    mode:'flash', deck:'all', speed:3000,
-    cards:[], cur:0, phase:0,
-    playing:false, timer:null, clockT:null, elapsed:0,
-    flagged:new Set(), seen:new Set()
-  };
+function advance(){
+  const phases=PHASES[BS.mode]||PHASES.flash;
+  if(BS.phase<phases.length-1){BS.phase++;render();}
+  else if(BS.cur<BS.cards.length-1){BS.cur++;BS.phase=0;render();}
+  else{stopPlay();showComplete();}
+}
 
-  const SPEEDS={1:800,2:1500,3:3000,4:5000,5:8000,6:12000,7:20000};
-  const SPEED_LABELS={1:'0.8s',2:'1.5s',3:'3s',4:'5s',5:'8s',6:'12s',7:'20s'};
-  const SPEED_WPM={1:'≈ 75/min',2:'≈ 40/min',3:'≈ 20/min',4:'≈ 12/min',5:'≈ 7/min',6:'≈ 5/min',7:'≈ 3/min'};
-  const PHASES={
-    flash:['vignette','choices','answer','kp'],
-    phrase:['phrase'],
-    kp:['kp'],
-    errors:['vignette','choices','answer','kp']
-  };
+function showComplete(){
+  document.getElementById('bs-prog-fill').style.width='100%';
+  document.getElementById('bs-card').innerHTML=`<div class="bs-complete"><div class="bs-complete-h">Session complete</div><div class="bs-complete-stats"><div class="bs-complete-stat"><div class="n">${BS.seen.size}</div><div class="l">cards</div></div><div class="bs-complete-stat"><div class="n">${BS.flagged.size}</div><div class="l">flagged</div></div><div class="bs-complete-stat"><div class="n">${document.getElementById('bs-st-time').textContent}</div><div class="l">time</div></div></div><button class="bs-btn primary" onclick="bsBackToConfig()">New session</button></div>`;
+}
 
-  function loadCards() {
-    const D = window.DECKS || {};
-    let cards = [];
-    if (BS.deck === 'all') {
-      cards = [...(D.boardmd_s2||[]), ...(D.core||[])];
-    } else {
-      cards = D[BS.deck] || [];
-    }
-    if (BS.mode === 'errors') {
-      const dayAgo = Date.now() - 24*60*60*1000;
-      const fsrs = window.fsrsState || {};
-      cards = cards.filter(c => {
-        const s = fsrs[c.id];
-        return s && s.lastRating === 'again' && s.lastReview > dayAgo;
-      });
-    }
-    cards = cards.slice().sort(() => Math.random() - 0.5);
-    BS.cards = cards;
-    return cards;
-  }
-
-  function getDeckLabel(deckId) {
-    const labels = {
-      'boardmd_s2':'BoardMD S2','core':'Core S2',
-      'boardmd_s1':'BoardMD S1','s1_core':'Core S1',
-      'hy':'HY S2','hy1':'HY S1','ethics':'Ethics'
-    };
-    return labels[deckId] || (deckId||'').toUpperCase();
-  }
-
-  function highlightTerms(text) {
-    if (!text) return '';
-    return String(text).replace(/\*\*(.+?)\*\*/g, '<span class="bs-hl-b">$1</span>');
-  }
-
-  function getCorrectChoice(card) {
-    try {
-      const raw = card.c;
-      const choices = typeof raw === 'string' ? JSON.parse(raw) : (raw||[]);
-      if (!Array.isArray(choices)) return null;
-      return choices.find(ch => ch.correct) || choices[0];
-    } catch(e) { return null; }
-  }
-
-  function getChoices(card) {
-    try {
-      const raw = card.c;
-      const choices = typeof raw === 'string' ? JSON.parse(raw) : (raw||[]);
-      return Array.isArray(choices) ? choices : [];
-    } catch(e) { return []; }
-  }
-
-  function renderStageDots() {
-    const phases = PHASES[BS.mode] || PHASES.flash;
-    const el = document.getElementById('bs-stage-dots');
-    if (!el) return;
-    el.innerHTML = phases.map((p, i) => {
-      const cls = i < BS.phase ? 'done' : i === BS.phase ? 'active' : '';
-      return `<div class="bs-stage-dot ${cls}"></div>`;
-    }).join('');
-  }
-
-  function render() {
-    if (!BS.cards.length) {
-      document.getElementById('bs-card-body').innerHTML = `
-        <div class="bs-empty">
-          <div class="bs-empty-title">Nenhum card disponível</div>
-          <div class="bs-empty-sub">Tente outro modo ou deck</div>
-        </div>`;
-      return;
-    }
-    if (BS.cur >= BS.cards.length) { showComplete(); return; }
-
-    const card = BS.cards[BS.cur];
-    const phases = PHASES[BS.mode] || PHASES.flash;
-    const phase = phases[BS.phase] || phases[0];
-
-    BS.seen.add(card.id);
-    document.getElementById('bs-st-seen').textContent = BS.seen.size;
-    document.getElementById('bs-st-flag').textContent = BS.flagged.size;
-
-    const pct = Math.round((BS.cur / BS.cards.length) * 100);
-    document.getElementById('bs-prog').style.width = pct + '%';
-    renderStageDots();
-
-    const topic = (card.topic || card.subject || 'CARD').toUpperCase();
-    const deck = getDeckLabel(card.deck);
-    const qid = card.qid ? `QID ${card.qid}` : `#${(card.id||'').toString().slice(-6)}`;
-
-    let body = `
-      <div class="bs-card-head">
-        <span class="bs-card-topic">${topic}</span>
-        <div class="bs-card-meta">
-          <span class="bs-deck-badge">${deck}</span>
-          <span class="bs-qid">${qid}</span>
-        </div>
-      </div>`;
-
-    if (phase === 'vignette') {
-      body += `<div class="bs-stage-label">Vignette</div>
-               <div class="bs-vignette">${card.q || ''}</div>`;
-    }
-    else if (phase === 'phrase') {
-      const txt = card.phrase || card.kp || '<em style="color:var(--text-faint)">phrase ainda não gerada</em>';
-      body += `<div class="bs-phrase">${highlightTerms(txt)}</div>`;
-    }
-    else if (phase === 'choices') {
-      body += `<div class="bs-stage-label">Vignette</div>
-               <div class="bs-vignette compact">${card.q || ''}</div>
-               <div class="bs-divider"></div>
-               <div class="bs-choices">`;
-      getChoices(card).forEach((ch, i) => {
-        const letter = String.fromCharCode(65 + i);
-        const text = ch.text || ch.t || ch;
-        body += `<div class="bs-choice"><span class="bs-choice-letter">${letter}.</span>${text}</div>`;
-      });
-      body += `</div>`;
-    }
-    else if (phase === 'answer') {
-      body += `<div class="bs-stage-label">Resposta</div>
-               <div class="bs-vignette compact">${card.q || ''}</div>
-               <div class="bs-divider"></div>
-               <div class="bs-choices">`;
-      getChoices(card).forEach((ch, i) => {
-        const letter = String.fromCharCode(65 + i);
-        const text = ch.text || ch.t || ch;
-        const cls = ch.correct ? 'correct' : 'wrong';
-        body += `<div class="bs-choice ${cls}"><span class="bs-choice-letter">${letter}.</span>${text}</div>`;
-      });
-      body += `</div>`;
-      if (card.e) body += `<div class="bs-explanation">${card.e}</div>`;
-    }
-    else if (phase === 'kp') {
-      body += `<div class="bs-stage-label">Key Point</div>`;
-      if (card.kp) {
-        body += `<div class="bs-kp">
-                   <div class="bs-kp-label">Key Point</div>
-                   <div class="bs-kp-text">${card.kp}</div>
-                 </div>`;
-      }
-      if (card.phrase && BS.mode !== 'kp') {
-        body += `<div class="bs-explanation"><strong>Frase:</strong> ${highlightTerms(card.phrase)}</div>`;
-      }
-    }
-
-    document.getElementById('bs-card-body').innerHTML = body;
-    const flagBtn = document.getElementById('bs-flag-btn');
-    if (flagBtn) flagBtn.classList.toggle('on', BS.flagged.has(card.id));
-  }
-
-  function advance() {
-    const phases = PHASES[BS.mode] || PHASES.flash;
-    if (BS.phase < phases.length - 1) { BS.phase++; render(); }
-    else if (BS.cur < BS.cards.length - 1) { BS.cur++; BS.phase = 0; render(); }
-    else { stopPlay(); showComplete(); }
-  }
-
-  function showComplete() {
-    document.getElementById('bs-prog').style.width = '100%';
-    document.getElementById('bs-card-body').innerHTML = `
-      <div class="bs-complete">
-        <div class="bs-complete-title">Sessão completa</div>
-        <div class="bs-complete-stats">
-          <div class="bs-complete-stat"><div class="n">${BS.seen.size}</div><div class="l">cards</div></div>
-          <div class="bs-complete-stat"><div class="n">${BS.flagged.size}</div><div class="l">marcados</div></div>
-          <div class="bs-complete-stat"><div class="n">${document.getElementById('bs-st-time').textContent}</div><div class="l">tempo</div></div>
-        </div>
-        <button class="bs-btn primary" onclick="bsBackToConfig()">Nova sessão</button>
-      </div>`;
-  }
-
-  window.bsSetMode = function(el) {
-    document.querySelectorAll('.bs-mode-card').forEach(c => c.classList.remove('on'));
-    el.classList.add('on');
-    BS.mode = el.dataset.mode;
-  };
-
-  window.bsSetDeck = function(el) {
-    document.querySelectorAll('.bs-chip').forEach(c => c.classList.remove('on'));
-    el.classList.add('on');
-    BS.deck = el.dataset.deck;
-  };
-
-  window.bsSetSpeed = function(v) {
-    BS.speed = SPEEDS[v] || 3000;
-    document.getElementById('bs-speed-val').textContent = SPEED_LABELS[v];
-    document.getElementById('bs-speed-wpm').textContent = SPEED_WPM[v];
-    localStorage.setItem('bs-speed', v);
-    if (BS.playing) {
-      clearInterval(BS.timer);
-      BS.timer = setInterval(advance, BS.speed);
-    }
-  };
-
-  window.bsStart = function() {
-    loadCards();
-    BS.cur = 0; BS.phase = 0;
-    BS.seen.clear(); BS.flagged.clear();
-    BS.elapsed = 0;
-    document.getElementById('bs-st-time').textContent = '0:00';
-    if (!BS.cards.length) { alert('Nenhum card disponível para esse modo/deck.'); return; }
-    document.getElementById('bs-config-screen').style.display = 'none';
-    document.getElementById('bs-session-screen').style.display = 'block';
-    document.getElementById('bs-controls').style.display = 'flex';
-    render();
-  };
-
-  window.bsBackToConfig = function() {
-    stopPlay();
-    document.getElementById('bs-config-screen').style.display = 'block';
-    document.getElementById('bs-session-screen').style.display = 'none';
-    document.getElementById('bs-controls').style.display = 'none';
-  };
-
-  window.bsGo = function(dir) {
-    const phases = PHASES[BS.mode] || PHASES.flash;
-    if (dir > 0) advance();
-    else {
-      if (BS.phase > 0) { BS.phase--; render(); }
-      else if (BS.cur > 0) { BS.cur--; BS.phase = phases.length - 1; render(); }
-    }
-  };
-
-  window.bsTogglePlay = function() { BS.playing ? stopPlay() : startPlay(); };
-
-  function startPlay() {
-    BS.playing = true;
-    document.getElementById('bs-play-btn').textContent = '⏸ Pause';
-    BS.timer = setInterval(advance, BS.speed);
-    if (!BS.clockT) {
-      BS.clockT = setInterval(() => {
-        BS.elapsed++;
-        const m = Math.floor(BS.elapsed / 60);
-        const s = BS.elapsed % 60;
-        document.getElementById('bs-st-time').textContent = m + ':' + (s < 10 ? '0' : '') + s;
-      }, 1000);
-    }
-  }
-
-  function stopPlay() {
-    BS.playing = false;
-    const btn = document.getElementById('bs-play-btn');
-    if (btn) btn.textContent = '▶ Play';
-    clearInterval(BS.timer);
-  }
-
-  window.bsFlag = function() {
-    const card = BS.cards[BS.cur];
-    if (!card) return;
-    if (BS.flagged.has(card.id)) BS.flagged.delete(card.id);
-    else BS.flagged.add(card.id);
-    document.getElementById('bs-st-flag').textContent = BS.flagged.size;
-    document.getElementById('bs-flag-btn').classList.toggle('on', BS.flagged.has(card.id));
-    if (window._supa && BS.flagged.has(card.id)) {
-      try {
-        window._supa.from('card_errors').insert({
-          card_id:card.id, deck:card.deck, qid:card.qid,
-          topic:card.topic||card.subject, field:'brainstorm_flag',
-          note:'flagged in BrainStorm Mode'
-        }).then(()=>{}).catch(()=>{});
-      } catch(e) {}
-    }
-  };
-
-  window.openBrainStorm = function() {
-    document.getElementById('brainstorm-overlay').classList.add('active');
-    document.body.style.overflow = 'hidden';
-    const saved = localStorage.getItem('bs-speed');
-    if (saved) {
-      document.getElementById('bs-speed-slider').value = saved;
-      bsSetSpeed(saved);
-    }
-    document.getElementById('bs-config-screen').style.display = 'block';
-    document.getElementById('bs-session-screen').style.display = 'none';
-    document.getElementById('bs-controls').style.display = 'none';
-  };
-
-  window.closeBrainStorm = function() {
-    stopPlay();
-    clearInterval(BS.clockT); BS.clockT = null;
-    document.getElementById('brainstorm-overlay').classList.remove('active');
-    document.body.style.overflow = '';
-  };
-
-  document.addEventListener('keydown', e => {
-    const overlay = document.getElementById('brainstorm-overlay');
-    if (!overlay) return;
-    if (e.key === 'Escape' && overlay.classList.contains('active')) {
-      closeBrainStorm();
-    }
-    if (overlay.classList.contains('active') && document.getElementById('bs-session-screen').style.display !== 'none') {
-      if (e.key === 'ArrowRight') bsGo(1);
-      if (e.key === 'ArrowLeft') bsGo(-1);
-      if (e.key === ' ') { e.preventDefault(); bsTogglePlay(); }
-      if (e.key === 'f' || e.key === 'F') bsFlag();
-    }
+window.bsSetMode=function(el){
+  document.querySelectorAll('.bs-mode').forEach(c=>c.classList.remove('on'));
+  el.classList.add('on');
+  BS.mode=el.dataset.mode;
+};
+window.bsSetDeck=function(el){
+  document.querySelectorAll('.bs-chip').forEach(c=>c.classList.remove('on'));
+  el.classList.add('on');
+  BS.deck=el.dataset.deck;
+};
+window.bsSetSpeed=function(v){
+  BS.speed=SPEEDS[v]||3000;
+  const lab=SPEED_LABELS[v];
+  const wpm=SPEED_WPM[v];
+  ['bs-spd','bs-spd-mini-val','bs-spd-val'].forEach(id=>{
+    const el=document.getElementById(id);if(!el)return;
+    if(el.tagName==='INPUT')el.value=v;
+    else el.textContent=lab;
   });
+  const wpmEl=document.getElementById('bs-spd-wpm');if(wpmEl)wpmEl.textContent=wpm;
+  localStorage.setItem('bs-speed',v);
+  if(BS.playing){clearInterval(BS.timer);BS.timer=setInterval(advance,BS.speed);}
+};
+window.bsStart=function(){
+  loadCards();
+  BS.cur=0;BS.phase=0;BS.seen.clear();BS.flagged.clear();BS.elapsed=0;
+  document.getElementById('bs-st-time').textContent='0:00';
+  if(!BS.cards.length){alert('No cards available for this mode/deck.');return;}
+  document.getElementById('bs-config').style.display='none';
+  document.getElementById('bs-session').style.display='block';
+  document.getElementById('bs-controls').style.display='flex';
+  render();
+};
+window.bsBackToConfig=function(){
+  stopPlay();
+  document.getElementById('bs-config').style.display='block';
+  document.getElementById('bs-session').style.display='none';
+  document.getElementById('bs-controls').style.display='none';
+};
+window.bsGo=function(dir){
+  const phases=PHASES[BS.mode]||PHASES.flash;
+  if(dir>0)advance();
+  else{if(BS.phase>0){BS.phase--;render();}else if(BS.cur>0){BS.cur--;BS.phase=phases.length-1;render();}}
+};
+window.bsPlay=function(){BS.playing?stopPlay():startPlay();};
+function startPlay(){
+  BS.playing=true;
+  const b=document.getElementById('bs-play');
+  if(b)b.innerHTML='⏸  Pause';
+  BS.timer=setInterval(advance,BS.speed);
+  if(!BS.clockT){
+    BS.clockT=setInterval(()=>{
+      BS.elapsed++;
+      const m=Math.floor(BS.elapsed/60),s=BS.elapsed%60;
+      document.getElementById('bs-st-time').textContent=m+':'+(s<10?'0':'')+s;
+    },1000);
+  }
+}
+function stopPlay(){
+  BS.playing=false;
+  const b=document.getElementById('bs-play');
+  if(b)b.innerHTML='▶  Play';
+  clearInterval(BS.timer);
+}
+window.bsFlag=function(){
+  const card=BS.cards[BS.cur];if(!card)return;
+  if(BS.flagged.has(card.id))BS.flagged.delete(card.id);else BS.flagged.add(card.id);
+  document.getElementById('bs-st-flag').textContent=BS.flagged.size;
+  document.getElementById('bs-flag').classList.toggle('on',BS.flagged.has(card.id));
+  if(window._supa&&BS.flagged.has(card.id)){
+    try{window._supa.from('card_errors').insert({card_id:card.id,deck:card.deck,qid:card.qid,topic:card.topic||card.subject,field:'brainstorm_flag',note:'flagged in BrainStorm Mode'}).then(()=>{}).catch(()=>{});}catch(e){}
+  }
+};
+window.openBrainStorm=function(){
+  const ov=document.getElementById('bs-overlay');
+  ov.classList.add('on');
+  document.body.style.overflow='hidden';
+  const sv=localStorage.getItem('bs-speed');if(sv)bsSetSpeed(sv);
+  const fz=localStorage.getItem('bs-fz');if(fz&&FZ_LEVELS.indexOf(fz)>=0)BS.fz=fz;
+  applyFz();
+  document.getElementById('bs-config').style.display='block';
+  document.getElementById('bs-session').style.display='none';
+  document.getElementById('bs-controls').style.display='none';
+};
+window.closeBrainStorm=function(){
+  stopPlay();
+  clearInterval(BS.clockT);BS.clockT=null;
+  document.getElementById('bs-overlay').classList.remove('on');
+  document.body.style.overflow='';
+};
 
-  console.log('BoardMD BrainStorm Mode v2 carregado');
+document.addEventListener('keydown',e=>{
+  const ov=document.getElementById('bs-overlay');if(!ov||!ov.classList.contains('on'))return;
+  if(e.key==='Escape'){closeBrainStorm();return;}
+  if(document.getElementById('bs-session').style.display==='none')return;
+  if(e.key==='ArrowRight')bsGo(1);
+  if(e.key==='ArrowLeft')bsGo(-1);
+  if(e.key===' '){e.preventDefault();bsPlay();}
+  if(e.key==='f'||e.key==='F')bsFlag();
+});
+
+console.log('BoardMD BrainStorm Mode v3 loaded');
+})();
+</script>
+
+</body>
+═══════════════════════════════════════════════════════════════════════
+-->
+
+
+
+<style>
+#bs-overlay{display:none;position:fixed;inset:0;z-index:9999;background:#0a0e15;flex-direction:column;font-family:'Lato','Inter',sans-serif;color:#dde3ee;overflow-y:auto}
+#bs-overlay.on{display:flex}
+html.light #bs-overlay{background:#f5f7fa;color:#1a1f2e}
+
+.bs-head{display:flex;align-items:center;justify-content:space-between;padding:22px 32px;border-bottom:.5px solid #1c2435;background:#0a0e15;position:sticky;top:0;z-index:10}
+html.light .bs-head{background:#f5f7fa;border-bottom-color:#dce1ea}
+.bs-title{display:flex;align-items:center;gap:16px;font-family:'Instrument Serif',Georgia,serif;font-size:30px;color:#f0f2f5;letter-spacing:-.4px}
+html.light .bs-title{color:#1a1f2e}
+.bs-title-icon{width:46px;height:46px;flex-shrink:0}
+.bs-head-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.bs-fz{display:flex;align-items:center;gap:6px;background:#141b2a;border:.5px solid #2a3450;border-radius:10px;padding:4px}
+html.light .bs-fz{background:#fff;border-color:#dce1ea}
+.bs-fz-btn{width:34px;height:34px;border-radius:7px;border:none;background:transparent;color:#cfd6e4;cursor:pointer;font-size:14px;font-weight:700;font-family:inherit}
+html.light .bs-fz-btn{color:#1a1f2e}
+.bs-fz-btn:hover{background:rgba(59,127,255,.1)}
+.bs-fz-btn.on{background:#3b7fff;color:#fff}
+.bs-fz-cur{font-size:12px;color:#8a96b0;padding:0 8px;min-width:54px;text-align:center;font-weight:600}
+.bs-icon-btn{width:42px;height:42px;border-radius:10px;border:.5px solid #2a3450;background:transparent;color:#8a96b0;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:18px;font-family:inherit}
+html.light .bs-icon-btn{border-color:#dce1ea;color:#5a6478}
+.bs-icon-btn:hover{border-color:#3b7fff;color:#3b7fff}
+
+.bs-body{padding:24px 32px;max-width:1100px;margin:0 auto;width:100%;flex:1}
+
+.bs-section-h{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#8a96b0;margin-bottom:12px}
+.bs-mode-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:24px}
+.bs-mode{background:#141b2a;border:.5px solid #1c2435;border-radius:12px;padding:16px 18px;cursor:pointer;transition:all .15s}
+html.light .bs-mode{background:#fff;border-color:#dce1ea}
+.bs-mode:hover{border-color:#3b7fff}
+.bs-mode.on{border-color:#3b7fff;background:rgba(59,127,255,.08)}
+.bs-mode-name{font-weight:700;font-size:15px;margin-bottom:4px;color:#f0f2f5}
+html.light .bs-mode-name{color:#1a1f2e}
+.bs-mode-desc{font-size:13px;color:#8a96b0;line-height:1.5}
+
+.bs-deck-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:24px}
+.bs-chip{padding:8px 16px;border-radius:22px;background:#141b2a;border:.5px solid #2a3450;font-size:13px;font-weight:600;cursor:pointer;color:#a8b2c4;font-family:inherit}
+html.light .bs-chip{background:#fff;border-color:#dce1ea;color:#5a6478}
+.bs-chip.on{background:#3b7fff;border-color:#3b7fff;color:#fff}
+
+.bs-speed-row{display:flex;align-items:center;gap:14px;background:#141b2a;border:.5px solid #1c2435;border-radius:12px;padding:14px 18px;margin-bottom:24px}
+html.light .bs-speed-row{background:#fff;border-color:#dce1ea}
+.bs-speed-lab{font-size:13px;color:#8a96b0;white-space:nowrap}
+.bs-speed-val{font-size:15px;font-weight:700;min-width:42px;color:#f0f2f5}
+html.light .bs-speed-val{color:#1a1f2e}
+.bs-speed-wpm{font-size:12px;color:#5a6478}
+#bs-spd{flex:1;max-width:280px}
+
+.bs-cta{width:100%;padding:16px;border:none;border-radius:12px;background:#3b7fff;color:#fff;font-size:16px;font-weight:700;cursor:pointer;font-family:inherit;letter-spacing:.02em}
+.bs-cta:hover{background:#5a8fff}
+
+.bs-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:22px}
+.bs-stat{background:#141b2a;border:.5px solid #1c2435;border-radius:12px;padding:18px;text-align:center}
+html.light .bs-stat{background:#fff;border-color:#dce1ea}
+.bs-stat-n{font-size:28px;font-weight:700;color:#f0f2f5}
+html.light .bs-stat-n{color:#1a1f2e}
+.bs-stat-l{font-size:11px;color:#8a96b0;text-transform:uppercase;letter-spacing:.06em;margin-top:4px;font-weight:600}
+
+.bs-prog{height:4px;background:#1c2435;border-radius:2px;margin-bottom:12px;overflow:hidden}
+html.light .bs-prog{background:#dce1ea}
+.bs-prog-fill{height:100%;background:#3b7fff;width:0%;transition:width .15s linear}
+
+.bs-stage-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}
+.bs-stage-dots{display:flex;gap:6px}
+.bs-stage-dot{width:9px;height:9px;border-radius:50%;background:#2a3450}
+html.light .bs-stage-dot{background:#dce1ea}
+.bs-stage-dot.done{background:#3b7fff;opacity:.5}
+.bs-stage-dot.act{background:#3b7fff;transform:scale(1.4)}
+.bs-stage-text{font-size:12px;color:#8a96b0;letter-spacing:.04em;font-weight:500}
+
+.bs-card{background:#141b2a;border:.5px solid #1c2435;border-radius:16px;overflow:hidden;min-height:480px}
+html.light .bs-card{background:#fff;border-color:#dce1ea}
+.bs-card-head{padding:18px 26px;border-bottom:.5px solid #1c2435;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+html.light .bs-card-head{border-bottom-color:#dce1ea}
+.bs-card-topic{font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#a8b2c4}
+html.light .bs-card-topic{color:#5a6478}
+.bs-card-meta{display:flex;gap:10px;align-items:center}
+.bs-deck-badge{padding:5px 13px;border-radius:20px;font-size:11px;font-weight:700;background:rgba(59,127,255,.15);color:#85b7eb}
+html.light .bs-deck-badge{color:#185fa5}
+.bs-qid{font-size:12px;color:#5a6478;font-family:'JetBrains Mono',Menlo,monospace}
+
+.bs-stage-label{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#8a96b0;padding:20px 28px 0}
+.bs-vignette{padding:14px 28px 22px;line-height:1.85;color:#dde3ee}
+html.light .bs-vignette{color:#1a1f2e}
+.bs-vignette.compact{padding-bottom:8px}
+.bs-divider{height:.5px;background:#1c2435}
+html.light .bs-divider{background:#dce1ea}
+
+.fz-md .bs-vignette{font-size:16px}
+.fz-lg .bs-vignette{font-size:18px}
+.fz-xl .bs-vignette{font-size:21px;line-height:1.9}
+
+.bs-hl{background:rgba(255,217,61,.22);color:#ffd93d;border-radius:4px;padding:1px 6px;font-weight:600}
+html.light .bs-hl{background:rgba(186,117,23,.15);color:#854f0b}
+.bs-hl-b{background:rgba(59,127,255,.2);color:#85b7eb;border-radius:4px;padding:1px 6px;font-weight:600}
+html.light .bs-hl-b{color:#185fa5;background:rgba(59,127,255,.1)}
+
+.bs-phrase{padding:36px 32px;line-height:1.7;color:#f0f2f5;display:flex;align-items:center;min-height:200px;font-weight:500}
+html.light .bs-phrase{color:#1a1f2e}
+.fz-md .bs-phrase{font-size:18px}
+.fz-lg .bs-phrase{font-size:22px}
+.fz-xl .bs-phrase{font-size:26px;line-height:1.8}
+
+.bs-choices{padding:14px 28px;display:flex;flex-direction:column;gap:9px}
+.bs-choice{display:flex;gap:14px;padding:14px 18px;border-radius:10px;border:.5px solid #1c2435;color:#a8b2c4;background:#0f1623;line-height:1.5}
+html.light .bs-choice{background:#f9fafc;border-color:#dce1ea;color:#5a6478}
+.fz-md .bs-choice{font-size:15px}
+.fz-lg .bs-choice{font-size:17px}
+.fz-xl .bs-choice{font-size:19px}
+.bs-choice.correct{background:rgba(99,153,34,.13);border-color:#639922;color:#c0dd97;font-weight:600}
+html.light .bs-choice.correct{color:#27500a}
+.bs-choice.wrong{opacity:.5}
+.bs-choice-letter{font-weight:700;min-width:18px}
+
+.bs-explanation{padding:18px 28px;background:#0f1623;border-top:.5px solid #1c2435;line-height:1.8;color:#b8c2d4}
+html.light .bs-explanation{background:#f9fafc;color:#5a6478;border-top-color:#dce1ea}
+.fz-md .bs-explanation{font-size:14.5px}
+.fz-lg .bs-explanation{font-size:16.5px}
+.fz-xl .bs-explanation{font-size:19px}
+
+.bs-kp{margin:18px 28px;padding:18px 22px;background:rgba(59,127,255,.09);border-left:4px solid #3b7fff;border-radius:0 10px 10px 0}
+.bs-kp-label{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#85b7eb;margin-bottom:8px}
+html.light .bs-kp-label{color:#185fa5}
+.bs-kp-text{font-weight:500;line-height:1.7;color:#eef2f8}
+html.light .bs-kp-text{color:#1a1f2e}
+.fz-md .bs-kp-text{font-size:15px}
+.fz-lg .bs-kp-text{font-size:17px}
+.fz-xl .bs-kp-text{font-size:20px}
+
+.bs-controls{padding:18px 32px;border-top:.5px solid #1c2435;display:flex;justify-content:center;gap:10px;align-items:center;flex-wrap:wrap;background:#0a0e15;position:sticky;bottom:0}
+html.light .bs-controls{background:#f5f7fa;border-top-color:#dce1ea}
+.bs-btn{padding:11px 22px;border-radius:10px;border:.5px solid #2a3450;background:transparent;font-size:14px;font-weight:700;color:#cfd6e4;cursor:pointer;display:inline-flex;align-items:center;gap:7px;font-family:inherit}
+html.light .bs-btn{color:#1a1f2e;border-color:#dce1ea}
+.bs-btn:hover{border-color:#3b7fff}
+.bs-btn.primary{background:#3b7fff;border-color:#3b7fff;color:#fff}
+.bs-btn.primary:hover{background:#5a8fff}
+.bs-btn.flag{color:#ffd93d}
+.bs-btn.flag.on{background:rgba(255,217,61,.15)}
+.bs-spd-mini{padding:9px 14px;border-radius:9px;background:#141b2a;border:.5px solid #2a3450;font-size:12px;color:#a8b2c4;display:flex;align-items:center;gap:8px}
+html.light .bs-spd-mini{background:#fff;border-color:#dce1ea;color:#5a6478}
+.bs-spd-mini input[type="range"]{width:100px}
+
+.bs-empty{text-align:center;padding:80px 20px;color:#8a96b0}
+.bs-empty-h{font-size:22px;margin-bottom:10px;color:#f0f2f5;font-family:'Instrument Serif',serif}
+html.light .bs-empty-h{color:#1a1f2e}
+
+.bs-complete{display:flex;flex-direction:column;align-items:center;padding:60px 20px;gap:18px}
+.bs-complete-h{font-family:'Instrument Serif',Georgia,serif;font-size:42px;color:#f0f2f5}
+html.light .bs-complete-h{color:#1a1f2e}
+.bs-complete-stats{display:flex;gap:40px;margin:18px 0}
+.bs-complete-stat{text-align:center}
+.bs-complete-stat .n{font-size:32px;font-weight:700;color:#3b7fff}
+.bs-complete-stat .l{font-size:12px;color:#8a96b0;text-transform:uppercase;letter-spacing:.05em;font-weight:600}
+
+@media (max-width:700px){
+  .bs-head{padding:16px 18px}
+  .bs-title{font-size:22px}
+  .bs-title-icon{width:36px;height:36px}
+  .bs-body{padding:18px}
+  .bs-stats{grid-template-columns:repeat(2,1fr)}
+  .bs-controls{padding:14px 16px;gap:6px}
+  .bs-btn{padding:9px 14px;font-size:13px}
+}
+</style>
+
+
+<div id="bs-overlay">
+
+  <div class="bs-head">
+    <div class="bs-title">
+      <svg class="bs-title-icon" viewBox="0 0 28 28" fill="none">
+        <path d="M10 4C7.5 4 6 5.5 6 7.5c0 .8.3 1.5.8 2-.5.5-.8 1.2-.8 2 0 1.5 1 2.5 2.5 2.5-.3.5-.5 1.1-.5 1.7 0 1.7 1.3 3 3 3h0V4zM18 4c2.5 0 4 1.5 4 3.5 0 .8-.3 1.5-.8 2 .5.5.8 1.2.8 2 0 1.5-1 2.5-2.5 2.5.3.5.5 1.1.5 1.7 0 1.7-1.3 3-3 3h0V4z" stroke="#fff" stroke-width="1.8" stroke-linejoin="round"/>
+        <path d="M16 6 L11 14 L14 14 L11 22 L19 12 L16 12 Z" fill="#FFD93D" stroke="#0a0e15" stroke-width="1" stroke-linejoin="round"/>
+      </svg>
+      BrainStorm Mode
+    </div>
+    <div class="bs-head-actions">
+      <div class="bs-fz">
+        <button class="bs-fz-btn" onclick="bsFz(-1)">A−</button>
+        <span class="bs-fz-cur" id="bs-fz-cur">Large</span>
+        <button class="bs-fz-btn" onclick="bsFz(1)">A+</button>
+      </div>
+      <button class="bs-icon-btn" onclick="bsBackToConfig()" title="Settings">⚙</button>
+      <button class="bs-icon-btn" onclick="closeBrainStorm()" title="Close">✕</button>
+    </div>
+  </div>
+
+  <div class="bs-body" id="bs-config">
+    <div class="bs-section-h">Review mode</div>
+    <div class="bs-mode-grid">
+      <div class="bs-mode on" data-mode="flash" onclick="bsSetMode(this)">
+        <div class="bs-mode-name">Flash mode</div>
+        <div class="bs-mode-desc">Vignette → answer → Key Point</div>
+      </div>
+      <div class="bs-mode" data-mode="phrase" onclick="bsSetMode(this)">
+        <div class="bs-mode-name">Key Phrase</div>
+        <div class="bs-mode-desc">One clinical pearl per card</div>
+      </div>
+      <div class="bs-mode" data-mode="kp" onclick="bsSetMode(this)">
+        <div class="bs-mode-name">Key Points only</div>
+        <div class="bs-mode-desc">Ultra-fast pre-exam review</div>
+      </div>
+      <div class="bs-mode" data-mode="errors" onclick="bsSetMode(this)">
+        <div class="bs-mode-name">Review errors</div>
+        <div class="bs-mode-desc">Last 24h "Again" cards</div>
+      </div>
+    </div>
+
+    <div class="bs-section-h">Deck</div>
+    <div class="bs-deck-row">
+      <div class="bs-chip on" data-deck="all" onclick="bsSetDeck(this)">Step 2 Complete</div>
+      <div class="bs-chip" data-deck="boardmd_s2" onclick="bsSetDeck(this)">BoardMD S2</div>
+      <div class="bs-chip" data-deck="core" onclick="bsSetDeck(this)">Core S2</div>
+      <div class="bs-chip" data-deck="boardmd_s1" onclick="bsSetDeck(this)">BoardMD S1</div>
+      <div class="bs-chip" data-deck="s1_core" onclick="bsSetDeck(this)">Core S1</div>
+    </div>
+
+    <div class="bs-section-h">Speed</div>
+    <div class="bs-speed-row">
+      <span class="bs-speed-lab">per card</span>
+      <input type="range" min="1" max="7" value="3" step="1" id="bs-spd" oninput="bsSetSpeed(this.value)">
+      <span class="bs-speed-val" id="bs-spd-val">3s</span>
+      <span class="bs-speed-wpm" id="bs-spd-wpm">≈ 20/min</span>
+    </div>
+
+    <button class="bs-cta" onclick="bsStart()">▶  Start BrainStorm</button>
+  </div>
+
+  <div class="bs-body" id="bs-session" style="display:none">
+    <div class="bs-stats">
+      <div class="bs-stat"><div class="bs-stat-n" id="bs-st-seen">0</div><div class="bs-stat-l">seen</div></div>
+      <div class="bs-stat"><div class="bs-stat-n" id="bs-st-flag">0</div><div class="bs-stat-l">flagged</div></div>
+      <div class="bs-stat"><div class="bs-stat-n" id="bs-st-time">0:00</div><div class="bs-stat-l">time</div></div>
+      <div class="bs-stat"><div class="bs-stat-n" id="bs-st-total">0</div><div class="bs-stat-l">total</div></div>
+    </div>
+
+    <div class="bs-prog"><div class="bs-prog-fill" id="bs-prog-fill"></div></div>
+    <div class="bs-stage-row">
+      <div class="bs-stage-dots" id="bs-stage-dots"></div>
+      <div class="bs-stage-text" id="bs-stage-text"></div>
+    </div>
+
+    <div class="bs-card" id="bs-card"></div>
+  </div>
+
+  <div class="bs-controls" id="bs-controls" style="display:none">
+    <button class="bs-btn" onclick="bsGo(-1)">←  Back</button>
+    <button class="bs-btn primary" id="bs-play" onclick="bsPlay()">▶  Play</button>
+    <button class="bs-btn flag" id="bs-flag" onclick="bsFlag()">⚑  Flag</button>
+    <button class="bs-btn" onclick="bsGo(1)">Next  →</button>
+    <div class="bs-spd-mini">
+      <span>speed</span>
+      <input type="range" min="1" max="7" value="3" step="1" oninput="bsSetSpeed(this.value)">
+      <span style="color:#f0f2f5;font-weight:700" id="bs-spd-mini-val">3s</span>
+    </div>
+  </div>
+
+</div>
+
+
+<script>
+(function(){
+'use strict';
+
+const BS={mode:'flash',deck:'all',speed:3000,cards:[],cur:0,phase:0,playing:false,timer:null,clockT:null,elapsed:0,flagged:new Set(),seen:new Set(),fz:'lg'};
+const SPEEDS={1:800,2:1500,3:3000,4:5000,5:8000,6:12000,7:20000};
+const SPEED_LABELS={1:'0.8s',2:'1.5s',3:'3s',4:'5s',5:'8s',6:'12s',7:'20s'};
+const SPEED_WPM={1:'≈ 75/min',2:'≈ 40/min',3:'≈ 20/min',4:'≈ 12/min',5:'≈ 7/min',6:'≈ 5/min',7:'≈ 3/min'};
+const PHASES={flash:['vignette','choices','answer','kp'],phrase:['phrase'],kp:['kp'],errors:['vignette','choices','answer','kp']};
+const FZ_LEVELS=['md','lg','xl'];
+const FZ_NAMES={md:'Medium',lg:'Large',xl:'Extra Large'};
+
+const DECK_LABELS={'boardmd_s2':'BoardMD S2','core':'Core S2','boardmd_s1':'BoardMD S1','s1_core':'Core S1','hy':'HY S2','hy1':'HY S1','ethics':'Ethics'};
+
+function setupBtn(){
+  const navCenter=document.querySelector('.bmd-bottom-nav .nav-center');
+  const btn=document.querySelector('.bmd-bottom-nav .nav-center-btn');
+  if(!btn)return;
+  btn.innerHTML=`<svg viewBox="0 0 28 28" width="40" height="40" fill="none"><path d="M10 4C7.5 4 6 5.5 6 7.5c0 .8.3 1.5.8 2-.5.5-.8 1.2-.8 2 0 1.5 1 2.5 2.5 2.5-.3.5-.5 1.1-.5 1.7 0 1.7 1.3 3 3 3h0V4zM18 4c2.5 0 4 1.5 4 3.5 0 .8-.3 1.5-.8 2 .5.5.8 1.2.8 2 0 1.5-1 2.5-2.5 2.5.3.5.5 1.1.5 1.7 0 1.7-1.3 3-3 3h0V4z" stroke="#fff" stroke-width="1.8" stroke-linejoin="round"/><path d="M16 6 L11 14 L14 14 L11 22 L19 12 L16 12 Z" fill="#FFD93D" stroke="#0a0e15" stroke-width="1" stroke-linejoin="round"/></svg>`;
+  btn.removeAttribute('onclick');
+  btn.onclick=function(e){e.preventDefault();e.stopPropagation();openBrainStorm();};
+  btn.style.width='60px';btn.style.height='60px';btn.style.borderRadius='18px';
+  let lbl=navCenter.querySelector('.nav-storm-lbl');
+  if(!lbl){lbl=document.createElement('div');lbl.className='nav-storm-lbl';navCenter.appendChild(lbl);}
+  lbl.textContent='Storm';lbl.style.cssText='font-size:11px;color:#FFD93D;font-weight:700;text-align:center;margin-top:6px;letter-spacing:.04em;font-family:Sora,sans-serif';
+}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',setupBtn);
+else setupBtn();
+setTimeout(setupBtn,500);setTimeout(setupBtn,2000);
+
+function loadCards(){
+  const D=window.DECKS||{};
+  let cards=[];
+  if(BS.deck==='all')cards=[...(D.boardmd_s2||[]),...(D.core||[])];
+  else cards=D[BS.deck]||[];
+  if(BS.mode==='errors'){
+    const dayAgo=Date.now()-24*60*60*1000;
+    const fsrs=window.fsrsState||{};
+    cards=cards.filter(c=>{const s=fsrs[c.id];return s&&s.lastRating==='again'&&s.lastReview>dayAgo;});
+  }
+  cards=cards.slice().sort(()=>Math.random()-0.5);
+  BS.cards=cards;
+  return cards;
+}
+
+function highlightTerms(text){
+  if(!text)return'';
+  return String(text).replace(/\*\*(.+?)\*\*/g,'<span class="bs-hl-b">$1</span>');
+}
+
+function getChoices(card){
+  try{
+    const raw=card.c;
+    const choices=typeof raw==='string'?JSON.parse(raw):(raw||[]);
+    return Array.isArray(choices)?choices:[];
+  }catch(e){return[];}
+}
+
+function applyFz(){
+  const ov=document.getElementById('bs-overlay');
+  ov.classList.remove('fz-md','fz-lg','fz-xl');
+  ov.classList.add('fz-'+BS.fz);
+  document.getElementById('bs-fz-cur').textContent=FZ_NAMES[BS.fz];
+  localStorage.setItem('bs-fz',BS.fz);
+}
+
+window.bsFz=function(dir){
+  const i=FZ_LEVELS.indexOf(BS.fz);
+  const ni=Math.max(0,Math.min(FZ_LEVELS.length-1,i+dir));
+  BS.fz=FZ_LEVELS[ni];
+  applyFz();
+};
+
+function renderStageDots(){
+  const phases=PHASES[BS.mode]||PHASES.flash;
+  const el=document.getElementById('bs-stage-dots');
+  if(!el)return;
+  el.innerHTML=phases.map((p,i)=>{
+    const cls=i<BS.phase?'done':i===BS.phase?'act':'';
+    return`<div class="bs-stage-dot ${cls}"></div>`;
+  }).join('');
+}
+
+function render(){
+  const stEl=document.getElementById('bs-card');
+  if(!stEl)return;
+  if(!BS.cards.length){
+    stEl.innerHTML=`<div class="bs-empty"><div class="bs-empty-h">No cards available</div><div>Try another mode or deck</div></div>`;
+    return;
+  }
+  if(BS.cur>=BS.cards.length){showComplete();return;}
+  const card=BS.cards[BS.cur];
+  const phases=PHASES[BS.mode]||PHASES.flash;
+  const phase=phases[BS.phase]||phases[0];
+  BS.seen.add(card.id);
+  document.getElementById('bs-st-seen').textContent=BS.seen.size;
+  document.getElementById('bs-st-flag').textContent=BS.flagged.size;
+  document.getElementById('bs-st-total').textContent=BS.cards.length;
+  const pct=Math.round((BS.cur/BS.cards.length)*100);
+  document.getElementById('bs-prog-fill').style.width=pct+'%';
+  const stageNames={vignette:'Vignette',choices:'Choices',answer:'Answer',kp:'Key Point',phrase:'Phrase'};
+  document.getElementById('bs-stage-text').textContent=`Card ${BS.cur+1} of ${BS.cards.length} · ${stageNames[phase]||''} stage`;
+  renderStageDots();
+
+  const topic=card.topic||card.subject||'Card';
+  const deck=DECK_LABELS[card.deck]||(card.deck||'').toUpperCase();
+  const qid=card.qid?`QID ${card.qid}`:`#${(card.id||'').toString().slice(-6)}`;
+
+  let body=`<div class="bs-card-head"><span class="bs-card-topic">${topic}</span><div class="bs-card-meta"><span class="bs-deck-badge">${deck}</span><span class="bs-qid">${qid}</span></div></div>`;
+
+  if(phase==='vignette'){
+    body+=`<div class="bs-stage-label">Vignette</div><div class="bs-vignette">${card.q||''}</div>`;
+  }else if(phase==='phrase'){
+    const txt=card.phrase||card.kp||'<em style="color:#5a6478">phrase not generated yet</em>';
+    body+=`<div class="bs-phrase">${highlightTerms(txt)}</div>`;
+  }else if(phase==='choices'){
+    body+=`<div class="bs-stage-label">Choices</div><div class="bs-vignette compact">${card.q||''}</div><div class="bs-divider"></div><div class="bs-choices">`;
+    getChoices(card).forEach((ch,i)=>{
+      const letter=String.fromCharCode(65+i);
+      const text=ch.text||ch.t||ch;
+      body+=`<div class="bs-choice"><span class="bs-choice-letter">${letter}.</span>${text}</div>`;
+    });
+    body+=`</div>`;
+  }else if(phase==='answer'){
+    body+=`<div class="bs-stage-label">Answer</div><div class="bs-vignette compact">${card.q||''}</div><div class="bs-divider"></div><div class="bs-choices">`;
+    getChoices(card).forEach((ch,i)=>{
+      const letter=String.fromCharCode(65+i);
+      const text=ch.text||ch.t||ch;
+      const cls=ch.correct?'correct':'wrong';
+      body+=`<div class="bs-choice ${cls}"><span class="bs-choice-letter">${letter}.</span>${text}</div>`;
+    });
+    body+=`</div>`;
+    if(card.e)body+=`<div class="bs-explanation">${card.e}</div>`;
+  }else if(phase==='kp'){
+    body+=`<div class="bs-stage-label">Key Point</div>`;
+    if(card.kp)body+=`<div class="bs-kp"><div class="bs-kp-label">Key Point</div><div class="bs-kp-text">${card.kp}</div></div>`;
+    if(card.phrase&&BS.mode!=='kp')body+=`<div class="bs-explanation"><strong>Phrase:</strong> ${highlightTerms(card.phrase)}</div>`;
+  }
+
+  stEl.innerHTML=body;
+  const flagBtn=document.getElementById('bs-flag');
+  if(flagBtn)flagBtn.classList.toggle('on',BS.flagged.has(card.id));
+}
+
+function advance(){
+  const phases=PHASES[BS.mode]||PHASES.flash;
+  if(BS.phase<phases.length-1){BS.phase++;render();}
+  else if(BS.cur<BS.cards.length-1){BS.cur++;BS.phase=0;render();}
+  else{stopPlay();showComplete();}
+}
+
+function showComplete(){
+  document.getElementById('bs-prog-fill').style.width='100%';
+  document.getElementById('bs-card').innerHTML=`<div class="bs-complete"><div class="bs-complete-h">Session complete</div><div class="bs-complete-stats"><div class="bs-complete-stat"><div class="n">${BS.seen.size}</div><div class="l">cards</div></div><div class="bs-complete-stat"><div class="n">${BS.flagged.size}</div><div class="l">flagged</div></div><div class="bs-complete-stat"><div class="n">${document.getElementById('bs-st-time').textContent}</div><div class="l">time</div></div></div><button class="bs-btn primary" onclick="bsBackToConfig()">New session</button></div>`;
+}
+
+window.bsSetMode=function(el){
+  document.querySelectorAll('.bs-mode').forEach(c=>c.classList.remove('on'));
+  el.classList.add('on');
+  BS.mode=el.dataset.mode;
+};
+window.bsSetDeck=function(el){
+  document.querySelectorAll('.bs-chip').forEach(c=>c.classList.remove('on'));
+  el.classList.add('on');
+  BS.deck=el.dataset.deck;
+};
+window.bsSetSpeed=function(v){
+  BS.speed=SPEEDS[v]||3000;
+  const lab=SPEED_LABELS[v];
+  const wpm=SPEED_WPM[v];
+  ['bs-spd','bs-spd-mini-val','bs-spd-val'].forEach(id=>{
+    const el=document.getElementById(id);if(!el)return;
+    if(el.tagName==='INPUT')el.value=v;
+    else el.textContent=lab;
+  });
+  const wpmEl=document.getElementById('bs-spd-wpm');if(wpmEl)wpmEl.textContent=wpm;
+  localStorage.setItem('bs-speed',v);
+  if(BS.playing){clearInterval(BS.timer);BS.timer=setInterval(advance,BS.speed);}
+};
+window.bsStart=function(){
+  loadCards();
+  BS.cur=0;BS.phase=0;BS.seen.clear();BS.flagged.clear();BS.elapsed=0;
+  document.getElementById('bs-st-time').textContent='0:00';
+  if(!BS.cards.length){alert('No cards available for this mode/deck.');return;}
+  document.getElementById('bs-config').style.display='none';
+  document.getElementById('bs-session').style.display='block';
+  document.getElementById('bs-controls').style.display='flex';
+  render();
+};
+window.bsBackToConfig=function(){
+  stopPlay();
+  document.getElementById('bs-config').style.display='block';
+  document.getElementById('bs-session').style.display='none';
+  document.getElementById('bs-controls').style.display='none';
+};
+window.bsGo=function(dir){
+  const phases=PHASES[BS.mode]||PHASES.flash;
+  if(dir>0)advance();
+  else{if(BS.phase>0){BS.phase--;render();}else if(BS.cur>0){BS.cur--;BS.phase=phases.length-1;render();}}
+};
+window.bsPlay=function(){BS.playing?stopPlay():startPlay();};
+function startPlay(){
+  BS.playing=true;
+  const b=document.getElementById('bs-play');
+  if(b)b.innerHTML='⏸  Pause';
+  BS.timer=setInterval(advance,BS.speed);
+  if(!BS.clockT){
+    BS.clockT=setInterval(()=>{
+      BS.elapsed++;
+      const m=Math.floor(BS.elapsed/60),s=BS.elapsed%60;
+      document.getElementById('bs-st-time').textContent=m+':'+(s<10?'0':'')+s;
+    },1000);
+  }
+}
+function stopPlay(){
+  BS.playing=false;
+  const b=document.getElementById('bs-play');
+  if(b)b.innerHTML='▶  Play';
+  clearInterval(BS.timer);
+}
+window.bsFlag=function(){
+  const card=BS.cards[BS.cur];if(!card)return;
+  if(BS.flagged.has(card.id))BS.flagged.delete(card.id);else BS.flagged.add(card.id);
+  document.getElementById('bs-st-flag').textContent=BS.flagged.size;
+  document.getElementById('bs-flag').classList.toggle('on',BS.flagged.has(card.id));
+  if(window._supa&&BS.flagged.has(card.id)){
+    try{window._supa.from('card_errors').insert({card_id:card.id,deck:card.deck,qid:card.qid,topic:card.topic||card.subject,field:'brainstorm_flag',note:'flagged in BrainStorm Mode'}).then(()=>{}).catch(()=>{});}catch(e){}
+  }
+};
+window.openBrainStorm=function(){
+  const ov=document.getElementById('bs-overlay');
+  ov.classList.add('on');
+  document.body.style.overflow='hidden';
+  const sv=localStorage.getItem('bs-speed');if(sv)bsSetSpeed(sv);
+  const fz=localStorage.getItem('bs-fz');if(fz&&FZ_LEVELS.indexOf(fz)>=0)BS.fz=fz;
+  applyFz();
+  document.getElementById('bs-config').style.display='block';
+  document.getElementById('bs-session').style.display='none';
+  document.getElementById('bs-controls').style.display='none';
+};
+window.closeBrainStorm=function(){
+  stopPlay();
+  clearInterval(BS.clockT);BS.clockT=null;
+  document.getElementById('bs-overlay').classList.remove('on');
+  document.body.style.overflow='';
+};
+
+document.addEventListener('keydown',e=>{
+  const ov=document.getElementById('bs-overlay');if(!ov||!ov.classList.contains('on'))return;
+  if(e.key==='Escape'){closeBrainStorm();return;}
+  if(document.getElementById('bs-session').style.display==='none')return;
+  if(e.key==='ArrowRight')bsGo(1);
+  if(e.key==='ArrowLeft')bsGo(-1);
+  if(e.key===' '){e.preventDefault();bsPlay();}
+  if(e.key==='f'||e.key==='F')bsFlag();
+});
+
+console.log('BoardMD BrainStorm Mode v3 loaded');
 })();
 </script>
 
