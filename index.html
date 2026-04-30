@@ -7516,25 +7516,30 @@ try { window.skipBack = skipBack; window.skipForward = skipForward; } catch(e){}
 function _bmdShowSessionOverlay(html){
   const si = document.getElementById('study-inner');
   if(!si) return;
-  // Esconde tudo dentro do study-inner (sem destruir)
+  // Esconde tudo dentro do study-inner (sem destruir).
+  // IMPORTANTE: usa setProperty(..., 'important') porque o CSS tem regras
+  // com !important para #card-el (linha 3733: display:flex !important) que
+  // sobrescreveriam um style.display='none' simples. Sem isso, o card antigo
+  // continua visivel acima do "Session complete" — bug visto em prod.
   Array.from(si.children).forEach(ch => {
-    if(ch.id !== 'bmd-session-overlay'){
-      // Salva display original se ainda nao salvou
-      if(!ch.dataset._bmdSavedDisplay){
-        ch.dataset._bmdSavedDisplay = ch.style.display || '';
-      }
-      ch.style.display = 'none';
+    if(ch.id === 'bmd-session-overlay') return;
+    // Salva o display inline original (a primeira vez) para poder restaurar
+    if(ch.dataset._bmdSavedDisplay === undefined){
+      ch.dataset._bmdSavedDisplay = ch.style.getPropertyValue('display') || '';
+      ch.dataset._bmdSavedPriority = ch.style.getPropertyPriority('display') || '';
     }
+    // Esconde com !important pra vencer regras CSS com !important
+    ch.style.setProperty('display', 'none', 'important');
   });
   // Cria/reusa o overlay
   let ov = document.getElementById('bmd-session-overlay');
   if(!ov){
     ov = document.createElement('div');
     ov.id = 'bmd-session-overlay';
-    ov.style.cssText = 'width:100%;display:flex;align-items:center;justify-content:center;padding:40px 20px;';
+    ov.style.cssText = 'width:100%;display:flex;align-items:center;justify-content:center;padding:40px 20px;flex:1;';
     si.appendChild(ov);
   }
-  ov.style.display = '';
+  ov.style.setProperty('display', 'flex', 'important');
   ov.innerHTML = html;
 }
 function _bmdCloseSessionOverlay(){
@@ -7542,11 +7547,17 @@ function _bmdCloseSessionOverlay(){
   if(!si) return;
   const ov = document.getElementById('bmd-session-overlay');
   if(ov) ov.remove();
-  // Restaura display dos filhos
+  // Restaura display dos filhos exatamente como estava (valor + prioridade)
   Array.from(si.children).forEach(ch => {
     if(ch.dataset && ch.dataset._bmdSavedDisplay !== undefined){
-      ch.style.display = ch.dataset._bmdSavedDisplay;
+      const val = ch.dataset._bmdSavedDisplay;
+      const pri = ch.dataset._bmdSavedPriority || '';
+      // Remove a marca de "none !important" que setamos
+      ch.style.removeProperty('display');
+      // Se havia display inline original, restaura com a mesma prioridade
+      if(val) ch.style.setProperty('display', val, pri);
       delete ch.dataset._bmdSavedDisplay;
+      delete ch.dataset._bmdSavedPriority;
     }
   });
 }
