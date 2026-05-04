@@ -7253,6 +7253,9 @@ function revealAnswer(sel,card){
     }
   }
 
+  // V2: build visual blocks + KP cloze
+  try { window._v2card = card; v2build(card); v2kp(card); } catch(e) { console.warn('[v2]', e); }
+
   // Reveal topic
   const _topicEl=document.getElementById('c-top');
   const _topicText=(card.topic||'').trim();
@@ -15863,7 +15866,12 @@ function setupNav(){
 }
 function loop(){setupNav();}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',loop);else loop();
-[300,800,1500,3000,6000].forEach(t=>setTimeout(loop,t));
+[300,800,1500,3000,6000,10000].forEach(t=>setTimeout(loop,t));
+// V2: forçar setupNav periodicamente
+setInterval(function(){
+  const btn=document.querySelector('.bmd-bottom-nav .nav-center-btn');
+  if(btn && !btn.classList.contains('bs-storm-btn')) setupNav();
+}, 2000);
 
 function applyFz(){
   const ov=document.getElementById('bs-overlay');
