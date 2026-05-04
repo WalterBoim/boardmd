@@ -4879,12 +4879,9 @@ html.dark .hl-btn-active { border-color:#fff!important; }
               Skip <span class="bmd-nav-arrow">→</span>
             </button>
           </div>
-          <!-- V2: TIMER BAR -->
-          <div id="bmd-timer-wrap"><div id="bmd-timer-bar" style="background:var(--emerald)"></div></div>
-          <div id="bmd-timer-label">
-            <span id="bmd-timer-secs">0:00</span>
-            <span id="bmd-coins-preview" class="tcp-lightning">+8 coins if correct</span>
-          </div>
+          <!-- V2 TIMER -->
+          <div id="bmd-timer-wrap"><div id="bmd-timer-bar" style="background:#22c55e"></div></div>
+          <div id="bmd-timer-label"><span id="bmd-timer-secs">0:00</span><span id="bmd-coins-preview" class="tcp-lightning">+8 coins if correct</span></div>
           <div id="bmd-cols-row">
           <div id="bmd-q-col">
           <div id="bmd-q-inner">
@@ -4908,26 +4905,11 @@ html.dark .hl-btn-active { border-color:#fff!important; }
           <div id="bmd-ans-col">
           <div id="bmd-ans-placeholder" style="display:none;"></div>
           <div class="explanation" id="c-exp">
-            <!-- V2 TABS -->
-            <div class="v2-exp-tabs" id="v2-exp-tabs">
-              <button class="v2-exp-tab active" onclick="v2SwitchExpTab(0,this)" id="v2-tab-0">
-                <svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>Visual
-              </button>
-              <button class="v2-exp-tab" onclick="v2SwitchExpTab(1,this)" id="v2-tab-1">
-                <svg viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/></svg>Full text
-              </button>
-              <button class="v2-exp-tab" onclick="v2SwitchExpTab(2,this)" id="v2-tab-2">
-                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>Why wrong
-              </button>
-            </div>
-
-            <!-- Correct answer (always visible) -->
-            <div class="exp-section" id="v2-exp-correct-section">
+            <!-- Correct answer - sempre visível -->
+            <div class="exp-section">
               <div class="exp-label"><span class="exp-label-icon" style="background:rgba(34,197,94,.15);color:var(--emerald)"></span>Correct answer</div>
               <div class="exp-correct"><div class="exp-correct-inner" id="exp-ans"></div></div>
             </div>
-
-            <!-- Image -->
             <div id="c-img-wrap" style="display:none" class="card-img-wrap">
               <img id="c-img" class="card-img" src="" alt=""/>
               <div class="card-img-credit">
@@ -4935,48 +4917,40 @@ html.dark .hl-btn-active { border-color:#fff!important; }
                 <span id="c-img-license" style="opacity:.7"></span>
               </div>
             </div>
-
+            <!-- V2 TABS -->
+            <div class="v2-exp-tabs">
+              <button class="v2-exp-tab active" onclick="v2Tab(0,this)">&#9654; Visual</button>
+              <button class="v2-exp-tab" onclick="v2Tab(1,this)">Full text</button>
+              <button class="v2-exp-tab" onclick="v2Tab(2,this)">Why wrong</button>
+            </div>
             <!-- TAB 0: VISUAL -->
-            <div class="v2-exp-panel active" id="v2-panel-0">
-              <div style="padding:12px 16px;">
-                <div class="v2-vis-dots" id="v2-vis-dots"></div>
-                <div id="v2-vis-blocks"></div>
-                <button class="v2-vis-next" id="v2-vis-next" onclick="v2NextBlock()">
-                  <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>Next
-                </button>
+            <div class="v2-exp-panel active" id="v2p0">
+              <div style="padding:12px 14px">
+                <div class="v2-vis-dots" id="v2dots"></div>
+                <div id="v2blocks"></div>
+                <button class="v2-vis-next" id="v2next" onclick="v2Next()">Next &#8250;</button>
               </div>
             </div>
-
             <!-- TAB 1: FULL TEXT -->
-            <div class="v2-exp-panel" id="v2-panel-1">
+            <div class="v2-exp-panel" id="v2p1">
               <div class="exp-section">
                 <div class="exp-label"><span class="exp-label-icon" style="background:rgba(59,127,255,.15);color:var(--accent)">&#8801;</span>Explanation</div>
                 <div class="exp-text hl-zone" id="exp-txt"></div>
               </div>
             </div>
-
             <!-- TAB 2: WHY WRONG -->
-            <div class="v2-exp-panel" id="v2-panel-2">
+            <div class="v2-exp-panel" id="v2p2">
               <div class="exp-section" id="exp-dist-wrap">
                 <div class="exp-label"><span class="exp-label-icon" style="background:rgba(244,63,94,.15);color:var(--rose)"></span>Why the others are wrong</div>
                 <div class="exp-dist hl-zone" id="exp-dist"></div>
               </div>
             </div>
           </div>
-          <div id="v2-kp-wrap" class="v2-kp-wrap" style="display:none">
-            <div class="v2-kp-inner">
-              <div class="v2-kp-lbl">
-                <span>
-                  <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:4px"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-                  Key Point
-                </span>
-                <span class="v2-kp-coins-row" id="v2-kp-coins">0 / 0 coins</span>
-              </div>
-              <p class="v2-kp-txt" id="v2-kp-txt"></p>
-              <div class="v2-kp-allrev" id="v2-kp-allrev">
-                <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
-                All revealed &#x2014; <span id="v2-kp-total-coins">0</span> MDCoins earned
-              </div>
+          <div class="v2-kp-outer" id="v2-kp-outer" style="display:none">
+            <div class="v2-kp-box">
+              <div class="v2-kp-hdr"><span>&#9733; Key Point</span><span class="v2-kp-coins-lbl" id="v2kpcoins">0 / 0 coins</span></div>
+              <p class="v2-kp-text" id="v2kptxt"></p>
+              <div class="v2-kp-done" id="v2kpdone">&#10003; All revealed &mdash; <span id="v2kptotal">0</span> MDCoins</div>
             </div>
           </div>
           <div id="key-point-wrap" style="display:none;padding:0 18px 14px;"></div>
@@ -15347,412 +15321,204 @@ function bmdSetupDrag(){
 
 
 <script>
-// ══════════════════════════════════════════
-// BOARDMD V2 — SURGICAL ADDITIONS
-// Timer UI + Exp Tabs + Visual Blocks + KP Cloze
-// ══════════════════════════════════════════
+/* ═══ BOARDMD V2 — SURGICAL JS ═══ */
 
-// ── TIMER UI ──────────────────────────────
-window._bmdTimerInterval = null;
-
-function bmdStartTimerUI(){
-  if(window._bmdTimerInterval) clearInterval(window._bmdTimerInterval);
-  const bar = document.getElementById('bmd-timer-bar');
-  const lbl = document.getElementById('bmd-timer-secs');
-  const preview = document.getElementById('bmd-coins-preview');
-  const start = Date.now();
-  const maxMs = 5 * 60 * 1000;
-
+// TIMER UI
+window._v2TI = null;
+function v2StartTimer(){
+  clearInterval(window._v2TI);
+  const bar=document.getElementById('bmd-timer-bar');
+  const lbl=document.getElementById('bmd-timer-secs');
+  const prev=document.getElementById('bmd-coins-preview');
+  const start=Date.now(); const maxMs=300000;
   function tick(){
-    // Subtract idle time (anti-cheat, same as main logic)
-    const idleMs = typeof window._idleAccumMs === 'number' ? window._idleAccumMs : 0;
-    const ms = Math.max(0, (Date.now() - start) - idleMs);
-    const secs = Math.floor(ms / 1000);
-    const mins = Math.floor(secs / 60);
-    const s = String(secs % 60).padStart(2, '0');
-    if(lbl) lbl.textContent = mins + ':' + s;
-    const pct = Math.max(0, 100 - (ms / maxMs * 100));
+    const idle=typeof window._idleAccumMs==='number'?window._idleAccumMs:0;
+    const ms=Math.max(0,(Date.now()-start)-idle);
+    const s=Math.floor(ms/1000);
+    if(lbl)lbl.textContent=Math.floor(s/60)+':'+(''+(s%60)).padStart(2,'0');
     if(bar){
-      bar.style.width = pct + '%';
-      if(ms < 15000)       bar.style.background = '#22c55e';
-      else if(ms < 45000)  bar.style.background = 'var(--accent)';
-      else if(ms < 120000) bar.style.background = 'var(--gold)';
-      else if(ms < 300000) bar.style.background = '#a855f7';
-      else                 bar.style.background = 'var(--text-faint)';
+      bar.style.width=Math.max(0,100-ms/maxMs*100)+'%';
+      bar.style.background=ms<15000?'#22c55e':ms<45000?'var(--accent)':ms<120000?'var(--gold)':ms<300000?'#a855f7':'var(--text-faint)';
     }
-    if(preview){
-      let txt, cls;
-      if(ms < 15000)       { txt='+8 coins if correct'; cls='tcp-lightning'; }
-      else if(ms < 45000)  { txt='+6 coins if correct'; cls='tcp-fast'; }
-      else if(ms < 120000) { txt='+5 coins if correct'; cls='tcp-standard'; }
-      else if(ms < 300000) { txt='+2 coins if correct'; cls='tcp-slow'; }
-      else                 { txt='0 coins (idle)';       cls='tcp-idle'; }
-      preview.textContent = txt;
-      preview.className = 'v2-coins-preview ' + cls;
+    if(prev){
+      const d=ms<15000?['+8 coins if correct','tcp-lightning']:ms<45000?['+6 coins if correct','tcp-fast']:ms<120000?['+5 coins if correct','tcp-standard']:ms<300000?['+2 coins if correct','tcp-slow']:['0 coins (idle)','tcp-idle'];
+      prev.textContent=d[0]; prev.className=d[1];
     }
   }
-  tick();
-  window._bmdTimerInterval = setInterval(tick, 400);
+  tick(); window._v2TI=setInterval(tick,400);
+}
+function v2StopTimer(){clearInterval(window._v2TI);}
+
+// TABS
+function v2Tab(i,btn){
+  document.querySelectorAll('.v2-exp-tab').forEach((b,j)=>b.classList.toggle('active',j===i));
+  document.querySelectorAll('.v2-exp-panel').forEach((p,j)=>p.classList.toggle('active',j===i));
 }
 
-function bmdStopTimerUI(){
-  if(window._bmdTimerInterval){ clearInterval(window._bmdTimerInterval); window._bmdTimerInterval = null; }
-}
+// VISUAL BLOCKS
+window._v2bi=0; window._v2bl=[];
+const V2T={context:{l:'Clinical Clues',c:'vb-context'},mechanism:{l:'Why it fits',c:'vb-mechanism'},correct:{l:'Why this answer',c:'vb-correct'},trap:{l:'The board trap',c:'vb-trap'},hook:{l:'Memory hook',c:'vb-hook'}};
 
-// Hook into existing card render
-const _origRenderCard = window.renderCard;
-if(typeof _origRenderCard === 'function'){
-  window.renderCard = function(){
-    _origRenderCard.apply(this, arguments);
-    bmdStartTimerUI();
-    v2ResetExp();
-  };
-}
-
-// Hook into answer selection to stop timer and build visual
-const _origHandleAnswer = window.handleAnswer;
-if(typeof _origHandleAnswer === 'function'){
-  window.handleAnswer = function(){
-    bmdStopTimerUI();
-    _origHandleAnswer.apply(this, arguments);
-  };
-}
-
-// Also hook card load event
-document.addEventListener('bmd:cardloaded', function(){
-  bmdStartTimerUI();
-  v2ResetExp();
-});
-
-document.addEventListener('bmd:answered', function(e){
-  bmdStopTimerUI();
-  // Build visual blocks from card data
-  setTimeout(function(){
-    const card = window._currentCard || window.currentCard;
-    if(card) v2BuildExp(card);
-    v2BuildKP(card);
-    // Switch to Visual tab
-    v2SwitchExpTab(0, document.getElementById('v2-tab-0'));
-  }, 200);
-});
-
-// ── EXPLANATION TABS ──────────────────────
-function v2SwitchExpTab(idx, btn){
-  document.querySelectorAll('.v2-exp-tab').forEach((b,i) => b.classList.toggle('active', i === idx));
-  document.querySelectorAll('.v2-exp-panel').forEach((p,i) => p.classList.toggle('active', i === idx));
-}
-
-function v2ResetExp(){
-  // Reset visual state
-  window._v2BlockIdx = 0;
-  window._v2Blocks = [];
-  const container = document.getElementById('v2-vis-blocks');
-  const dots = document.getElementById('v2-vis-dots');
-  const nextBtn = document.getElementById('v2-vis-next');
-  if(container) container.innerHTML = '';
-  if(dots) dots.innerHTML = '';
-  if(nextBtn){ nextBtn.style.display = ''; nextBtn.classList.remove('done'); nextBtn.innerHTML = '<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>Next'; nextBtn.onclick = v2NextBlock; }
-  // Switch to Visual tab
-  v2SwitchExpTab(0, document.getElementById('v2-tab-0'));
-  // Reset KP
-  const kpWrap = document.getElementById('v2-kp-wrap');
-  if(kpWrap) kpWrap.style.display = 'none';
-}
-
-// ── VISUAL BLOCKS ─────────────────────────
-const V2_BLOCK_TYPES = {
-  context:   { label: 'Clinical Clues',    cls: 'vb-context' },
-  mechanism: { label: 'Why it fits',       cls: 'vb-mechanism' },
-  correct:   { label: 'Why this answer',   cls: 'vb-correct' },
-  trap:      { label: 'The board trap',    cls: 'vb-trap' },
-  hook:      { label: 'Memory hook',       cls: 'vb-hook' }
-};
-
-function v2BuildExp(card){
-  // Try to get visual_blocks from card (new field) or build from explanation
-  let blocks = [];
-
-  if(card.visual_blocks){
-    try {
-      blocks = typeof card.visual_blocks === 'string' ? JSON.parse(card.visual_blocks) : card.visual_blocks;
-    } catch(e){}
-  }
-
-  // Fallback: build blocks from exp text if no visual_blocks field
-  if(!blocks || !blocks.length){
-    blocks = v2BuildBlocksFromExp(card);
-  }
-
-  if(!blocks || !blocks.length) return;
-
-  window._v2Blocks = blocks;
-  window._v2BlockIdx = 0;
-
-  const container = document.getElementById('v2-vis-blocks');
-  const dots = document.getElementById('v2-vis-dots');
-  if(!container || !dots) return;
-  container.innerHTML = '';
-  dots.innerHTML = '';
-
-  blocks.forEach((b, i) => {
-    // Dot
-    const dot = document.createElement('div');
-    dot.className = 'v2-vis-dot' + (i === 0 ? ' active' : '');
-    dot.id = 'v2d-' + i;
-    dots.appendChild(dot);
-
-    // Block
-    const div = document.createElement('div');
-    const typeInfo = V2_BLOCK_TYPES[b.type] || V2_BLOCK_TYPES.context;
-    div.className = 'v2-vis-block ' + typeInfo.cls;
-    div.id = 'v2b-' + i;
-    const content = (b.content || '').replace(/<hl>(.*?)<\/hl>/g, '<span class="v2-vis-hl">$1</span>');
-    div.innerHTML = '<div class="v2-vis-lbl">' + typeInfo.label + '</div><div class="v2-vis-txt">' + content + '</div>';
-    container.appendChild(div);
+function v2Build(card){
+  let blocks=[];
+  if(card.visual_blocks){try{blocks=typeof card.visual_blocks==='string'?JSON.parse(card.visual_blocks):card.visual_blocks;}catch(e){}}
+  if(!blocks||!blocks.length) blocks=v2FromExp(card);
+  if(!blocks||!blocks.length) return;
+  window._v2bl=blocks; window._v2bi=0;
+  const cont=document.getElementById('v2blocks');
+  const dots=document.getElementById('v2dots');
+  const nb=document.getElementById('v2next');
+  if(!cont||!dots) return;
+  cont.innerHTML=''; dots.innerHTML='';
+  if(nb){nb.style.display='';nb.className='v2-vis-next';nb.textContent='Next ›';nb.onclick=v2Next;}
+  blocks.forEach((b,i)=>{
+    const dot=document.createElement('div');
+    dot.className='v2-vis-dot'+(i===0?' active':'');dot.id='v2d'+i;dots.appendChild(dot);
+    const div=document.createElement('div');
+    const ti=V2T[b.type]||V2T.context;
+    div.className='v2-vis-block '+ti.c; div.id='v2b'+i;
+    const cnt=(b.content||'').replace(/<hl>(.*?)<\/hl>/g,'<span class="v2-vis-hl">$1</span>');
+    div.innerHTML='<div class="v2-vis-lbl">'+ti.l+'</div><div class="v2-vis-txt">'+cnt+'</div>';
+    cont.appendChild(div);
   });
-
-  v2ShowBlock(0);
+  v2Show(0);
 }
 
-function v2BuildBlocksFromExp(card){
-  // Build 3 simple blocks from existing exp text
-  const blocks = [];
-  const exp = (card.e || card.explanation || '').replace(/<[^>]+>/g,' ').trim();
-  const kp = (card.kp || '').replace(/<[^>]+>/g,' ').trim();
-
+function v2FromExp(card){
+  const blocks=[];
+  const exp=(card.e||'').replace(/<[^>]+>/g,' ').replace(/\s+/g,' ').trim();
+  const kp=(card.kp||'').replace(/<[^>]+>/g,' ').trim();
   if(!exp) return blocks;
-
-  // Split exp into sentences
-  const sentences = exp.split(/(?<=[.!?])\s+/);
-
-  // Block 1: first 2 sentences = context
-  const s1 = sentences.slice(0, Math.min(2, sentences.length)).join(' ');
-  if(s1) blocks.push({ type: 'context', content: s1 });
-
-  // Block 2: middle sentences = mechanism/why correct
-  if(sentences.length > 3){
-    const s2 = sentences.slice(2, Math.min(4, sentences.length)).join(' ');
-    if(s2) blocks.push({ type: 'correct', content: s2 });
-  }
-
-  // Block 3: last part = trap or hook
-  if(sentences.length > 4){
-    const s3 = sentences.slice(4).join(' ');
-    if(s3) blocks.push({ type: 'trap', content: s3 });
-  } else if(kp){
-    blocks.push({ type: 'hook', content: '<hl>' + kp + '</hl>' });
-  }
-
+  const sents=exp.match(/[^.!?]+[.!?]+/g)||[exp];
+  if(sents.length>0) blocks.push({type:'context',content:sents.slice(0,2).join(' ')});
+  if(sents.length>2) blocks.push({type:'correct',content:sents.slice(2,4).join(' ')});
+  if(sents.length>4) blocks.push({type:'trap',content:sents.slice(4).join(' ')});
+  else if(kp) blocks.push({type:'hook',content:kp});
   return blocks;
 }
 
-function v2ShowBlock(idx){
-  const blocks = window._v2Blocks || [];
-  const block = document.getElementById('v2b-' + idx);
-  if(!block) return;
-  block.classList.add('visible');
-  requestAnimationFrame(() => requestAnimationFrame(() => block.classList.add('revealed')));
-
-  // Update dots
-  for(let i = 0; i < blocks.length; i++){
-    const dot = document.getElementById('v2d-' + i);
-    if(!dot) continue;
-    dot.className = 'v2-vis-dot';
-    if(i < idx) dot.classList.add('done');
-    else if(i === idx) dot.classList.add('active');
+function v2Show(i){
+  const blocks=window._v2bl||[];
+  const b=document.getElementById('v2b'+i); if(!b) return;
+  b.classList.add('visible');
+  requestAnimationFrame(()=>requestAnimationFrame(()=>b.classList.add('revealed')));
+  for(let j=0;j<blocks.length;j++){
+    const d=document.getElementById('v2d'+j); if(!d) continue;
+    d.className='v2-vis-dot'+(j<i?' done':j===i?' active':'');
   }
-
-  const nextBtn = document.getElementById('v2-vis-next');
-  if(idx >= blocks.length - 1){
-    if(nextBtn){
-      nextBtn.classList.add('done');
-      nextBtn.innerHTML = '<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Done';
-      nextBtn.onclick = function(){ nextBtn.style.display = 'none'; };
-      setTimeout(() => nextBtn.style.display = 'none', 600);
-    }
+  const nb=document.getElementById('v2next'); if(!nb) return;
+  if(i>=blocks.length-1){
+    nb.className='v2-vis-next done'; nb.textContent='✓ Done';
+    nb.onclick=()=>nb.style.display='none';
+    setTimeout(()=>nb.style.display='none',500);
   } else {
-    if(nextBtn){
-      nextBtn.classList.remove('done');
-      nextBtn.innerHTML = '<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>Next';
-      nextBtn.onclick = v2NextBlock;
-    }
+    nb.className='v2-vis-next'; nb.textContent='Next ›'; nb.onclick=v2Next;
   }
 }
 
-function v2NextBlock(){
-  window._v2BlockIdx = (window._v2BlockIdx || 0) + 1;
-  v2ShowBlock(window._v2BlockIdx);
-}
+function v2Next(){window._v2bi++;v2Show(window._v2bi);}
 
-// ── KP CLOZE ──────────────────────────────
-let _v2KpRevealed = 0;
-let _v2KpTotal = 0;
-let _v2KpCoins = 0;
-
-function v2BuildKP(card){
-  if(!card) return;
-  const raw = (card.kp || '').trim();
-  if(!raw || raw.toLowerCase() === 'null') return;
-
-  const kpWrap = document.getElementById('v2-kp-wrap');
-  const kpTxt = document.getElementById('v2-kp-txt');
-  const kpCoins = document.getElementById('v2-kp-coins');
-  const kpAllRev = document.getElementById('v2-kp-allrev');
-  if(!kpWrap || !kpTxt) return;
-
-  _v2KpRevealed = 0; _v2KpCoins = 0;
-
-  // Parse: words wrapped in **bold** become cloze
-  let html = raw;
-  let count = 0;
-  html = html.replace(/\*\*(.+?)\*\*/g, function(m, word){
-    count++;
-    return '<span class="v2-cloze" onclick="v2RevealCloze(this)" data-word="' + encodeURIComponent(word) + '">'
-      + '<span class="v2-cloze-mask">&#x2015;&#x2015;&#x2015;</span>'
-      + '<span class="v2-cloze-word">' + word + '</span>'
-      + '</span>';
+// KP CLOZE
+window._v2kpr=0; window._v2kpt=0; window._v2kpc=0;
+function v2KP(card){
+  const raw=(card.kp||'').trim();
+  const outer=document.getElementById('v2-kp-outer');
+  const oldkp=document.getElementById('key-point-wrap');
+  if(!raw||raw.toLowerCase()==='null'){if(outer)outer.style.display='none';return;}
+  const el=document.getElementById('v2kptxt');
+  const coinsEl=document.getElementById('v2kpcoins');
+  const doneEl=document.getElementById('v2kpdone');
+  const totalEl=document.getElementById('v2kptotal');
+  if(!el)return;
+  window._v2kpr=0;window._v2kpc=0;
+  let cnt=0;
+  const html=raw.replace(/\*\*(.+?)\*\*/g,function(m,w){
+    cnt++;
+    return '<span class="v2-cloze" onclick="v2Reveal(this)">'
+      +'<span class="v2-cloze-mask">&#x2015;&#x2015;&#x2015;</span>'
+      +'<span class="v2-cloze-word">'+w+'</span></span>';
   });
-
-  _v2KpTotal = count;
-  kpTxt.innerHTML = html;
-  if(kpCoins) kpCoins.textContent = '0 / ' + count + ' coins';
-  if(kpAllRev) kpAllRev.classList.remove('show');
-  kpWrap.style.display = count > 0 ? '' : 'none';
-  // Hide old KP wrap
-  const oldKp = document.getElementById('key-point-wrap');
-  if(oldKp) oldKp.style.display = 'none';
+  window._v2kpt=cnt;
+  el.innerHTML=html;
+  if(coinsEl)coinsEl.textContent='0 / '+cnt+' coins';
+  if(doneEl)doneEl.classList.remove('show');
+  if(outer)outer.style.display=cnt>0?'':'none';
+  if(oldkp)oldkp.style.display='none';
 }
 
-function v2RevealCloze(el){
-  if(el.classList.contains('revealed')) return;
+function v2Reveal(el){
+  if(el.classList.contains('revealed'))return;
   el.classList.add('revealed');
-  _v2KpRevealed++;
-  _v2KpCoins++;
-
-  // Update counter
-  const kpCoins = document.getElementById('v2-kp-coins');
-  if(kpCoins) kpCoins.textContent = _v2KpCoins + ' / ' + _v2KpTotal + ' coins';
-
-  // Coin burst
-  v2CoinBurst(el, '+1');
-
-  // Award coin
-  if(typeof window.awardCoins === 'function') window.awardCoins(1, 'Key Point revealed');
-
-  if(_v2KpRevealed >= _v2KpTotal){
-    const allRev = document.getElementById('v2-kp-allrev');
-    const totalCoinsEl = document.getElementById('v2-kp-total-coins');
-    if(totalCoinsEl) totalCoinsEl.textContent = _v2KpCoins;
-    if(allRev) allRev.classList.add('show');
+  window._v2kpr++;window._v2kpc++;
+  const coinsEl=document.getElementById('v2kpcoins');
+  if(coinsEl)coinsEl.textContent=window._v2kpc+' / '+window._v2kpt+' coins';
+  v2Burst(el,'+1');
+  if(typeof window.awardCoins==='function')window.awardCoins(1,'Key Point');
+  if(window._v2kpr>=window._v2kpt){
+    const d=document.getElementById('v2kpdone');
+    const t=document.getElementById('v2kptotal');
+    if(t)t.textContent=window._v2kpc;
+    if(d)d.classList.add('show');
   }
 }
 
-function v2CoinBurst(el, txt){
-  const rect = el.getBoundingClientRect();
-  const burst = document.createElement('div');
-  burst.className = 'v2-coin-burst';
-  burst.textContent = txt;
-  burst.style.left = (rect.left + rect.width / 2) + 'px';
-  burst.style.top = (rect.top + window.scrollY) + 'px';
-  document.body.appendChild(burst);
-  setTimeout(() => burst.remove(), 900);
+function v2Burst(el,txt){
+  const r=el.getBoundingClientRect();
+  const d=document.createElement('div');
+  d.className='v2-cburst';d.textContent=txt;
+  d.style.left=(r.left+r.width/2)+'px';d.style.top=(r.top+window.scrollY)+'px';
+  document.body.appendChild(d);setTimeout(()=>d.remove(),900);
 }
 
-// ── HOOK PRINCIPAL ────────────────────────
-// Observer para detectar quando a explicação aparece
-const _v2Observer = new MutationObserver(function(mutations){
-  for(const m of mutations){
-    for(const n of m.addedNodes){
-      if(n.nodeType === 1){
-        // Detectar quando c-exp fica visível
-        const exp = document.getElementById('c-exp');
-        if(exp && exp.style.display !== 'none' && exp.innerHTML.length > 100){
-          const card = window._currentCard || window.currentCard || window._lastCard;
-          if(card && !window._v2ExpBuilt){
-            window._v2ExpBuilt = true;
-            v2BuildExp(card);
-            v2BuildKP(card);
-          }
-        }
-      }
-    }
-    // Watch for display changes on bmd-ans-col
-    if(m.type === 'attributes' && m.attributeName === 'class'){
-      if(m.target.id === 'bmd-ans-col' && m.target.classList.contains('has-answer')){
-        const card = window._currentCard || window.currentCard || window._lastCard;
-        if(card){
-          window._v2ExpBuilt = false;
-          setTimeout(() => {
-            window._v2ExpBuilt = true;
-            v2BuildExp(card);
-            v2BuildKP(card);
-          }, 150);
-        }
-      }
-    }
-  }
+// RESET ao carregar novo card
+function v2Reset(){
+  window._v2bi=0;window._v2bl=[];
+  const c=document.getElementById('v2blocks');const dt=document.getElementById('v2dots');const nb=document.getElementById('v2next');
+  if(c)c.innerHTML='';if(dt)dt.innerHTML='';
+  if(nb){nb.style.display='';nb.className='v2-vis-next';nb.textContent='Next ›';nb.onclick=v2Next;}
+  // Reset KP
+  const outer=document.getElementById('v2-kp-outer');if(outer)outer.style.display='none';
+  // Switch para tab Visual
+  document.querySelectorAll('.v2-exp-tab').forEach((b,i)=>b.classList.toggle('active',i===0));
+  document.querySelectorAll('.v2-exp-panel').forEach((p,i)=>p.classList.toggle('active',i===0));
+}
+
+// HOOK: interceptar _cardStartTime (setado pelo app ao carregar card)
+Object.defineProperty(window,'_cardStartTime',{
+  get:()=>window.__v2cst,
+  set(v){window.__v2cst=v;if(v>0){v2StartTimer();v2Reset();}},
+  configurable:true
 });
 
-// Observar mudanças no bmd-ans-col
-document.addEventListener('DOMContentLoaded', function(){
-  const col = document.getElementById('bmd-ans-col');
+// HOOK: detectar quando exp-txt é populado
+document.addEventListener('DOMContentLoaded',function(){
+  const et=document.getElementById('exp-txt');
+  if(!et)return;
+  new MutationObserver(function(){
+    if(et.textContent.trim().length>10){
+      v2StopTimer();
+      const card=window._currentCard||window.currentCard||window._lastCard;
+      if(card&&!window._v2built){window._v2built=true;v2Build(card);v2KP(card);}
+    }
+  }).observe(et,{childList:true,subtree:true,characterData:true});
+
+  // Também observar bmd-ans-col.has-answer
+  const col=document.getElementById('bmd-ans-col');
   if(col){
-    _v2Observer.observe(col, { attributes: true, childList: true, subtree: true });
-  }
-  // Observar exp-txt para saber quando foi populado
-  const expTxt = document.getElementById('exp-txt');
-  if(expTxt){
-    new MutationObserver(function(){
-      if(expTxt.textContent.trim().length > 10){
-        const card = window._currentCard || window.currentCard || window._lastCard;
-        if(card && !window._v2ExpBuilt){
-          window._v2ExpBuilt = true;
-          setTimeout(() => {
-            v2BuildExp(card);
-            v2BuildKP(card);
-          }, 100);
+    new MutationObserver(function(muts){
+      muts.forEach(m=>{
+        if(m.type==='attributes'&&m.attributeName==='class'&&col.classList.contains('has-answer')){
+          v2StopTimer();
+          const card=window._currentCard||window.currentCard||window._lastCard;
+          if(card){window._v2built=false;setTimeout(()=>{window._v2built=true;v2Build(card);v2KP(card);},200);}
         }
-      }
-    }).observe(expTxt, { childList: true, subtree: true, characterData: true });
+      });
+    }).observe(col,{attributes:true});
   }
 });
 
-// Interceptar a função que popula o exp-txt para capturar o card atual
-const _origPopulate = window.populateExplanation || window.showAnswer || window.revealAnswer;
-
-// Monkey-patch: interceptar qualquer função que seta exp-txt
-const _origExpTxtDesc = Object.getOwnPropertyDescriptor(HTMLElement.prototype, 'innerHTML');
-
-// Simpler approach: override o set de exp-txt via proxy
-window._v2CardCache = {};
-document.addEventListener('bmd:card', function(e){
-  if(e.detail && e.detail.card){
-    window._lastCard = e.detail.card;
-    window._v2ExpBuilt = false;
-    bmdStartTimerUI();
-    v2ResetExp();
-  }
-});
-
-// Intercept da função principal de render do card (rate/loadCard)
-// O app usa window._cardStartTime para começar o timer
-// Quando ele é setado, começamos o timer visual também
-Object.defineProperty(window, '_cardStartTime', {
-  get: function(){ return window.__cardStartTime; },
-  set: function(v){
-    window.__cardStartTime = v;
-    if(v > 0){
-      bmdStartTimerUI();
-      window._v2ExpBuilt = false;
-      v2ResetExp();
-    }
-  },
-  configurable: true
-});
-
-console.log('[BoardMD v2] Surgical additions loaded.');
+console.log('[BoardMD v2] OK');
 </script>
-
 </body>
 ═══════════════════════════════════════════════════════════════════════
 -->
@@ -17058,412 +16824,204 @@ console.log('BoardMD BrainStorm v6 loaded — fixes: icon, search, cloze-KP, att
 
 
 <script>
-// ══════════════════════════════════════════
-// BOARDMD V2 — SURGICAL ADDITIONS
-// Timer UI + Exp Tabs + Visual Blocks + KP Cloze
-// ══════════════════════════════════════════
+/* ═══ BOARDMD V2 — SURGICAL JS ═══ */
 
-// ── TIMER UI ──────────────────────────────
-window._bmdTimerInterval = null;
-
-function bmdStartTimerUI(){
-  if(window._bmdTimerInterval) clearInterval(window._bmdTimerInterval);
-  const bar = document.getElementById('bmd-timer-bar');
-  const lbl = document.getElementById('bmd-timer-secs');
-  const preview = document.getElementById('bmd-coins-preview');
-  const start = Date.now();
-  const maxMs = 5 * 60 * 1000;
-
+// TIMER UI
+window._v2TI = null;
+function v2StartTimer(){
+  clearInterval(window._v2TI);
+  const bar=document.getElementById('bmd-timer-bar');
+  const lbl=document.getElementById('bmd-timer-secs');
+  const prev=document.getElementById('bmd-coins-preview');
+  const start=Date.now(); const maxMs=300000;
   function tick(){
-    // Subtract idle time (anti-cheat, same as main logic)
-    const idleMs = typeof window._idleAccumMs === 'number' ? window._idleAccumMs : 0;
-    const ms = Math.max(0, (Date.now() - start) - idleMs);
-    const secs = Math.floor(ms / 1000);
-    const mins = Math.floor(secs / 60);
-    const s = String(secs % 60).padStart(2, '0');
-    if(lbl) lbl.textContent = mins + ':' + s;
-    const pct = Math.max(0, 100 - (ms / maxMs * 100));
+    const idle=typeof window._idleAccumMs==='number'?window._idleAccumMs:0;
+    const ms=Math.max(0,(Date.now()-start)-idle);
+    const s=Math.floor(ms/1000);
+    if(lbl)lbl.textContent=Math.floor(s/60)+':'+(''+(s%60)).padStart(2,'0');
     if(bar){
-      bar.style.width = pct + '%';
-      if(ms < 15000)       bar.style.background = '#22c55e';
-      else if(ms < 45000)  bar.style.background = 'var(--accent)';
-      else if(ms < 120000) bar.style.background = 'var(--gold)';
-      else if(ms < 300000) bar.style.background = '#a855f7';
-      else                 bar.style.background = 'var(--text-faint)';
+      bar.style.width=Math.max(0,100-ms/maxMs*100)+'%';
+      bar.style.background=ms<15000?'#22c55e':ms<45000?'var(--accent)':ms<120000?'var(--gold)':ms<300000?'#a855f7':'var(--text-faint)';
     }
-    if(preview){
-      let txt, cls;
-      if(ms < 15000)       { txt='+8 coins if correct'; cls='tcp-lightning'; }
-      else if(ms < 45000)  { txt='+6 coins if correct'; cls='tcp-fast'; }
-      else if(ms < 120000) { txt='+5 coins if correct'; cls='tcp-standard'; }
-      else if(ms < 300000) { txt='+2 coins if correct'; cls='tcp-slow'; }
-      else                 { txt='0 coins (idle)';       cls='tcp-idle'; }
-      preview.textContent = txt;
-      preview.className = 'v2-coins-preview ' + cls;
+    if(prev){
+      const d=ms<15000?['+8 coins if correct','tcp-lightning']:ms<45000?['+6 coins if correct','tcp-fast']:ms<120000?['+5 coins if correct','tcp-standard']:ms<300000?['+2 coins if correct','tcp-slow']:['0 coins (idle)','tcp-idle'];
+      prev.textContent=d[0]; prev.className=d[1];
     }
   }
-  tick();
-  window._bmdTimerInterval = setInterval(tick, 400);
+  tick(); window._v2TI=setInterval(tick,400);
+}
+function v2StopTimer(){clearInterval(window._v2TI);}
+
+// TABS
+function v2Tab(i,btn){
+  document.querySelectorAll('.v2-exp-tab').forEach((b,j)=>b.classList.toggle('active',j===i));
+  document.querySelectorAll('.v2-exp-panel').forEach((p,j)=>p.classList.toggle('active',j===i));
 }
 
-function bmdStopTimerUI(){
-  if(window._bmdTimerInterval){ clearInterval(window._bmdTimerInterval); window._bmdTimerInterval = null; }
-}
+// VISUAL BLOCKS
+window._v2bi=0; window._v2bl=[];
+const V2T={context:{l:'Clinical Clues',c:'vb-context'},mechanism:{l:'Why it fits',c:'vb-mechanism'},correct:{l:'Why this answer',c:'vb-correct'},trap:{l:'The board trap',c:'vb-trap'},hook:{l:'Memory hook',c:'vb-hook'}};
 
-// Hook into existing card render
-const _origRenderCard = window.renderCard;
-if(typeof _origRenderCard === 'function'){
-  window.renderCard = function(){
-    _origRenderCard.apply(this, arguments);
-    bmdStartTimerUI();
-    v2ResetExp();
-  };
-}
-
-// Hook into answer selection to stop timer and build visual
-const _origHandleAnswer = window.handleAnswer;
-if(typeof _origHandleAnswer === 'function'){
-  window.handleAnswer = function(){
-    bmdStopTimerUI();
-    _origHandleAnswer.apply(this, arguments);
-  };
-}
-
-// Also hook card load event
-document.addEventListener('bmd:cardloaded', function(){
-  bmdStartTimerUI();
-  v2ResetExp();
-});
-
-document.addEventListener('bmd:answered', function(e){
-  bmdStopTimerUI();
-  // Build visual blocks from card data
-  setTimeout(function(){
-    const card = window._currentCard || window.currentCard;
-    if(card) v2BuildExp(card);
-    v2BuildKP(card);
-    // Switch to Visual tab
-    v2SwitchExpTab(0, document.getElementById('v2-tab-0'));
-  }, 200);
-});
-
-// ── EXPLANATION TABS ──────────────────────
-function v2SwitchExpTab(idx, btn){
-  document.querySelectorAll('.v2-exp-tab').forEach((b,i) => b.classList.toggle('active', i === idx));
-  document.querySelectorAll('.v2-exp-panel').forEach((p,i) => p.classList.toggle('active', i === idx));
-}
-
-function v2ResetExp(){
-  // Reset visual state
-  window._v2BlockIdx = 0;
-  window._v2Blocks = [];
-  const container = document.getElementById('v2-vis-blocks');
-  const dots = document.getElementById('v2-vis-dots');
-  const nextBtn = document.getElementById('v2-vis-next');
-  if(container) container.innerHTML = '';
-  if(dots) dots.innerHTML = '';
-  if(nextBtn){ nextBtn.style.display = ''; nextBtn.classList.remove('done'); nextBtn.innerHTML = '<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>Next'; nextBtn.onclick = v2NextBlock; }
-  // Switch to Visual tab
-  v2SwitchExpTab(0, document.getElementById('v2-tab-0'));
-  // Reset KP
-  const kpWrap = document.getElementById('v2-kp-wrap');
-  if(kpWrap) kpWrap.style.display = 'none';
-}
-
-// ── VISUAL BLOCKS ─────────────────────────
-const V2_BLOCK_TYPES = {
-  context:   { label: 'Clinical Clues',    cls: 'vb-context' },
-  mechanism: { label: 'Why it fits',       cls: 'vb-mechanism' },
-  correct:   { label: 'Why this answer',   cls: 'vb-correct' },
-  trap:      { label: 'The board trap',    cls: 'vb-trap' },
-  hook:      { label: 'Memory hook',       cls: 'vb-hook' }
-};
-
-function v2BuildExp(card){
-  // Try to get visual_blocks from card (new field) or build from explanation
-  let blocks = [];
-
-  if(card.visual_blocks){
-    try {
-      blocks = typeof card.visual_blocks === 'string' ? JSON.parse(card.visual_blocks) : card.visual_blocks;
-    } catch(e){}
-  }
-
-  // Fallback: build blocks from exp text if no visual_blocks field
-  if(!blocks || !blocks.length){
-    blocks = v2BuildBlocksFromExp(card);
-  }
-
-  if(!blocks || !blocks.length) return;
-
-  window._v2Blocks = blocks;
-  window._v2BlockIdx = 0;
-
-  const container = document.getElementById('v2-vis-blocks');
-  const dots = document.getElementById('v2-vis-dots');
-  if(!container || !dots) return;
-  container.innerHTML = '';
-  dots.innerHTML = '';
-
-  blocks.forEach((b, i) => {
-    // Dot
-    const dot = document.createElement('div');
-    dot.className = 'v2-vis-dot' + (i === 0 ? ' active' : '');
-    dot.id = 'v2d-' + i;
-    dots.appendChild(dot);
-
-    // Block
-    const div = document.createElement('div');
-    const typeInfo = V2_BLOCK_TYPES[b.type] || V2_BLOCK_TYPES.context;
-    div.className = 'v2-vis-block ' + typeInfo.cls;
-    div.id = 'v2b-' + i;
-    const content = (b.content || '').replace(/<hl>(.*?)<\/hl>/g, '<span class="v2-vis-hl">$1</span>');
-    div.innerHTML = '<div class="v2-vis-lbl">' + typeInfo.label + '</div><div class="v2-vis-txt">' + content + '</div>';
-    container.appendChild(div);
+function v2Build(card){
+  let blocks=[];
+  if(card.visual_blocks){try{blocks=typeof card.visual_blocks==='string'?JSON.parse(card.visual_blocks):card.visual_blocks;}catch(e){}}
+  if(!blocks||!blocks.length) blocks=v2FromExp(card);
+  if(!blocks||!blocks.length) return;
+  window._v2bl=blocks; window._v2bi=0;
+  const cont=document.getElementById('v2blocks');
+  const dots=document.getElementById('v2dots');
+  const nb=document.getElementById('v2next');
+  if(!cont||!dots) return;
+  cont.innerHTML=''; dots.innerHTML='';
+  if(nb){nb.style.display='';nb.className='v2-vis-next';nb.textContent='Next ›';nb.onclick=v2Next;}
+  blocks.forEach((b,i)=>{
+    const dot=document.createElement('div');
+    dot.className='v2-vis-dot'+(i===0?' active':'');dot.id='v2d'+i;dots.appendChild(dot);
+    const div=document.createElement('div');
+    const ti=V2T[b.type]||V2T.context;
+    div.className='v2-vis-block '+ti.c; div.id='v2b'+i;
+    const cnt=(b.content||'').replace(/<hl>(.*?)<\/hl>/g,'<span class="v2-vis-hl">$1</span>');
+    div.innerHTML='<div class="v2-vis-lbl">'+ti.l+'</div><div class="v2-vis-txt">'+cnt+'</div>';
+    cont.appendChild(div);
   });
-
-  v2ShowBlock(0);
+  v2Show(0);
 }
 
-function v2BuildBlocksFromExp(card){
-  // Build 3 simple blocks from existing exp text
-  const blocks = [];
-  const exp = (card.e || card.explanation || '').replace(/<[^>]+>/g,' ').trim();
-  const kp = (card.kp || '').replace(/<[^>]+>/g,' ').trim();
-
+function v2FromExp(card){
+  const blocks=[];
+  const exp=(card.e||'').replace(/<[^>]+>/g,' ').replace(/\s+/g,' ').trim();
+  const kp=(card.kp||'').replace(/<[^>]+>/g,' ').trim();
   if(!exp) return blocks;
-
-  // Split exp into sentences
-  const sentences = exp.split(/(?<=[.!?])\s+/);
-
-  // Block 1: first 2 sentences = context
-  const s1 = sentences.slice(0, Math.min(2, sentences.length)).join(' ');
-  if(s1) blocks.push({ type: 'context', content: s1 });
-
-  // Block 2: middle sentences = mechanism/why correct
-  if(sentences.length > 3){
-    const s2 = sentences.slice(2, Math.min(4, sentences.length)).join(' ');
-    if(s2) blocks.push({ type: 'correct', content: s2 });
-  }
-
-  // Block 3: last part = trap or hook
-  if(sentences.length > 4){
-    const s3 = sentences.slice(4).join(' ');
-    if(s3) blocks.push({ type: 'trap', content: s3 });
-  } else if(kp){
-    blocks.push({ type: 'hook', content: '<hl>' + kp + '</hl>' });
-  }
-
+  const sents=exp.match(/[^.!?]+[.!?]+/g)||[exp];
+  if(sents.length>0) blocks.push({type:'context',content:sents.slice(0,2).join(' ')});
+  if(sents.length>2) blocks.push({type:'correct',content:sents.slice(2,4).join(' ')});
+  if(sents.length>4) blocks.push({type:'trap',content:sents.slice(4).join(' ')});
+  else if(kp) blocks.push({type:'hook',content:kp});
   return blocks;
 }
 
-function v2ShowBlock(idx){
-  const blocks = window._v2Blocks || [];
-  const block = document.getElementById('v2b-' + idx);
-  if(!block) return;
-  block.classList.add('visible');
-  requestAnimationFrame(() => requestAnimationFrame(() => block.classList.add('revealed')));
-
-  // Update dots
-  for(let i = 0; i < blocks.length; i++){
-    const dot = document.getElementById('v2d-' + i);
-    if(!dot) continue;
-    dot.className = 'v2-vis-dot';
-    if(i < idx) dot.classList.add('done');
-    else if(i === idx) dot.classList.add('active');
+function v2Show(i){
+  const blocks=window._v2bl||[];
+  const b=document.getElementById('v2b'+i); if(!b) return;
+  b.classList.add('visible');
+  requestAnimationFrame(()=>requestAnimationFrame(()=>b.classList.add('revealed')));
+  for(let j=0;j<blocks.length;j++){
+    const d=document.getElementById('v2d'+j); if(!d) continue;
+    d.className='v2-vis-dot'+(j<i?' done':j===i?' active':'');
   }
-
-  const nextBtn = document.getElementById('v2-vis-next');
-  if(idx >= blocks.length - 1){
-    if(nextBtn){
-      nextBtn.classList.add('done');
-      nextBtn.innerHTML = '<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Done';
-      nextBtn.onclick = function(){ nextBtn.style.display = 'none'; };
-      setTimeout(() => nextBtn.style.display = 'none', 600);
-    }
+  const nb=document.getElementById('v2next'); if(!nb) return;
+  if(i>=blocks.length-1){
+    nb.className='v2-vis-next done'; nb.textContent='✓ Done';
+    nb.onclick=()=>nb.style.display='none';
+    setTimeout(()=>nb.style.display='none',500);
   } else {
-    if(nextBtn){
-      nextBtn.classList.remove('done');
-      nextBtn.innerHTML = '<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>Next';
-      nextBtn.onclick = v2NextBlock;
-    }
+    nb.className='v2-vis-next'; nb.textContent='Next ›'; nb.onclick=v2Next;
   }
 }
 
-function v2NextBlock(){
-  window._v2BlockIdx = (window._v2BlockIdx || 0) + 1;
-  v2ShowBlock(window._v2BlockIdx);
-}
+function v2Next(){window._v2bi++;v2Show(window._v2bi);}
 
-// ── KP CLOZE ──────────────────────────────
-let _v2KpRevealed = 0;
-let _v2KpTotal = 0;
-let _v2KpCoins = 0;
-
-function v2BuildKP(card){
-  if(!card) return;
-  const raw = (card.kp || '').trim();
-  if(!raw || raw.toLowerCase() === 'null') return;
-
-  const kpWrap = document.getElementById('v2-kp-wrap');
-  const kpTxt = document.getElementById('v2-kp-txt');
-  const kpCoins = document.getElementById('v2-kp-coins');
-  const kpAllRev = document.getElementById('v2-kp-allrev');
-  if(!kpWrap || !kpTxt) return;
-
-  _v2KpRevealed = 0; _v2KpCoins = 0;
-
-  // Parse: words wrapped in **bold** become cloze
-  let html = raw;
-  let count = 0;
-  html = html.replace(/\*\*(.+?)\*\*/g, function(m, word){
-    count++;
-    return '<span class="v2-cloze" onclick="v2RevealCloze(this)" data-word="' + encodeURIComponent(word) + '">'
-      + '<span class="v2-cloze-mask">&#x2015;&#x2015;&#x2015;</span>'
-      + '<span class="v2-cloze-word">' + word + '</span>'
-      + '</span>';
+// KP CLOZE
+window._v2kpr=0; window._v2kpt=0; window._v2kpc=0;
+function v2KP(card){
+  const raw=(card.kp||'').trim();
+  const outer=document.getElementById('v2-kp-outer');
+  const oldkp=document.getElementById('key-point-wrap');
+  if(!raw||raw.toLowerCase()==='null'){if(outer)outer.style.display='none';return;}
+  const el=document.getElementById('v2kptxt');
+  const coinsEl=document.getElementById('v2kpcoins');
+  const doneEl=document.getElementById('v2kpdone');
+  const totalEl=document.getElementById('v2kptotal');
+  if(!el)return;
+  window._v2kpr=0;window._v2kpc=0;
+  let cnt=0;
+  const html=raw.replace(/\*\*(.+?)\*\*/g,function(m,w){
+    cnt++;
+    return '<span class="v2-cloze" onclick="v2Reveal(this)">'
+      +'<span class="v2-cloze-mask">&#x2015;&#x2015;&#x2015;</span>'
+      +'<span class="v2-cloze-word">'+w+'</span></span>';
   });
-
-  _v2KpTotal = count;
-  kpTxt.innerHTML = html;
-  if(kpCoins) kpCoins.textContent = '0 / ' + count + ' coins';
-  if(kpAllRev) kpAllRev.classList.remove('show');
-  kpWrap.style.display = count > 0 ? '' : 'none';
-  // Hide old KP wrap
-  const oldKp = document.getElementById('key-point-wrap');
-  if(oldKp) oldKp.style.display = 'none';
+  window._v2kpt=cnt;
+  el.innerHTML=html;
+  if(coinsEl)coinsEl.textContent='0 / '+cnt+' coins';
+  if(doneEl)doneEl.classList.remove('show');
+  if(outer)outer.style.display=cnt>0?'':'none';
+  if(oldkp)oldkp.style.display='none';
 }
 
-function v2RevealCloze(el){
-  if(el.classList.contains('revealed')) return;
+function v2Reveal(el){
+  if(el.classList.contains('revealed'))return;
   el.classList.add('revealed');
-  _v2KpRevealed++;
-  _v2KpCoins++;
-
-  // Update counter
-  const kpCoins = document.getElementById('v2-kp-coins');
-  if(kpCoins) kpCoins.textContent = _v2KpCoins + ' / ' + _v2KpTotal + ' coins';
-
-  // Coin burst
-  v2CoinBurst(el, '+1');
-
-  // Award coin
-  if(typeof window.awardCoins === 'function') window.awardCoins(1, 'Key Point revealed');
-
-  if(_v2KpRevealed >= _v2KpTotal){
-    const allRev = document.getElementById('v2-kp-allrev');
-    const totalCoinsEl = document.getElementById('v2-kp-total-coins');
-    if(totalCoinsEl) totalCoinsEl.textContent = _v2KpCoins;
-    if(allRev) allRev.classList.add('show');
+  window._v2kpr++;window._v2kpc++;
+  const coinsEl=document.getElementById('v2kpcoins');
+  if(coinsEl)coinsEl.textContent=window._v2kpc+' / '+window._v2kpt+' coins';
+  v2Burst(el,'+1');
+  if(typeof window.awardCoins==='function')window.awardCoins(1,'Key Point');
+  if(window._v2kpr>=window._v2kpt){
+    const d=document.getElementById('v2kpdone');
+    const t=document.getElementById('v2kptotal');
+    if(t)t.textContent=window._v2kpc;
+    if(d)d.classList.add('show');
   }
 }
 
-function v2CoinBurst(el, txt){
-  const rect = el.getBoundingClientRect();
-  const burst = document.createElement('div');
-  burst.className = 'v2-coin-burst';
-  burst.textContent = txt;
-  burst.style.left = (rect.left + rect.width / 2) + 'px';
-  burst.style.top = (rect.top + window.scrollY) + 'px';
-  document.body.appendChild(burst);
-  setTimeout(() => burst.remove(), 900);
+function v2Burst(el,txt){
+  const r=el.getBoundingClientRect();
+  const d=document.createElement('div');
+  d.className='v2-cburst';d.textContent=txt;
+  d.style.left=(r.left+r.width/2)+'px';d.style.top=(r.top+window.scrollY)+'px';
+  document.body.appendChild(d);setTimeout(()=>d.remove(),900);
 }
 
-// ── HOOK PRINCIPAL ────────────────────────
-// Observer para detectar quando a explicação aparece
-const _v2Observer = new MutationObserver(function(mutations){
-  for(const m of mutations){
-    for(const n of m.addedNodes){
-      if(n.nodeType === 1){
-        // Detectar quando c-exp fica visível
-        const exp = document.getElementById('c-exp');
-        if(exp && exp.style.display !== 'none' && exp.innerHTML.length > 100){
-          const card = window._currentCard || window.currentCard || window._lastCard;
-          if(card && !window._v2ExpBuilt){
-            window._v2ExpBuilt = true;
-            v2BuildExp(card);
-            v2BuildKP(card);
-          }
-        }
-      }
-    }
-    // Watch for display changes on bmd-ans-col
-    if(m.type === 'attributes' && m.attributeName === 'class'){
-      if(m.target.id === 'bmd-ans-col' && m.target.classList.contains('has-answer')){
-        const card = window._currentCard || window.currentCard || window._lastCard;
-        if(card){
-          window._v2ExpBuilt = false;
-          setTimeout(() => {
-            window._v2ExpBuilt = true;
-            v2BuildExp(card);
-            v2BuildKP(card);
-          }, 150);
-        }
-      }
-    }
-  }
+// RESET ao carregar novo card
+function v2Reset(){
+  window._v2bi=0;window._v2bl=[];
+  const c=document.getElementById('v2blocks');const dt=document.getElementById('v2dots');const nb=document.getElementById('v2next');
+  if(c)c.innerHTML='';if(dt)dt.innerHTML='';
+  if(nb){nb.style.display='';nb.className='v2-vis-next';nb.textContent='Next ›';nb.onclick=v2Next;}
+  // Reset KP
+  const outer=document.getElementById('v2-kp-outer');if(outer)outer.style.display='none';
+  // Switch para tab Visual
+  document.querySelectorAll('.v2-exp-tab').forEach((b,i)=>b.classList.toggle('active',i===0));
+  document.querySelectorAll('.v2-exp-panel').forEach((p,i)=>p.classList.toggle('active',i===0));
+}
+
+// HOOK: interceptar _cardStartTime (setado pelo app ao carregar card)
+Object.defineProperty(window,'_cardStartTime',{
+  get:()=>window.__v2cst,
+  set(v){window.__v2cst=v;if(v>0){v2StartTimer();v2Reset();}},
+  configurable:true
 });
 
-// Observar mudanças no bmd-ans-col
-document.addEventListener('DOMContentLoaded', function(){
-  const col = document.getElementById('bmd-ans-col');
+// HOOK: detectar quando exp-txt é populado
+document.addEventListener('DOMContentLoaded',function(){
+  const et=document.getElementById('exp-txt');
+  if(!et)return;
+  new MutationObserver(function(){
+    if(et.textContent.trim().length>10){
+      v2StopTimer();
+      const card=window._currentCard||window.currentCard||window._lastCard;
+      if(card&&!window._v2built){window._v2built=true;v2Build(card);v2KP(card);}
+    }
+  }).observe(et,{childList:true,subtree:true,characterData:true});
+
+  // Também observar bmd-ans-col.has-answer
+  const col=document.getElementById('bmd-ans-col');
   if(col){
-    _v2Observer.observe(col, { attributes: true, childList: true, subtree: true });
-  }
-  // Observar exp-txt para saber quando foi populado
-  const expTxt = document.getElementById('exp-txt');
-  if(expTxt){
-    new MutationObserver(function(){
-      if(expTxt.textContent.trim().length > 10){
-        const card = window._currentCard || window.currentCard || window._lastCard;
-        if(card && !window._v2ExpBuilt){
-          window._v2ExpBuilt = true;
-          setTimeout(() => {
-            v2BuildExp(card);
-            v2BuildKP(card);
-          }, 100);
+    new MutationObserver(function(muts){
+      muts.forEach(m=>{
+        if(m.type==='attributes'&&m.attributeName==='class'&&col.classList.contains('has-answer')){
+          v2StopTimer();
+          const card=window._currentCard||window.currentCard||window._lastCard;
+          if(card){window._v2built=false;setTimeout(()=>{window._v2built=true;v2Build(card);v2KP(card);},200);}
         }
-      }
-    }).observe(expTxt, { childList: true, subtree: true, characterData: true });
+      });
+    }).observe(col,{attributes:true});
   }
 });
 
-// Interceptar a função que popula o exp-txt para capturar o card atual
-const _origPopulate = window.populateExplanation || window.showAnswer || window.revealAnswer;
-
-// Monkey-patch: interceptar qualquer função que seta exp-txt
-const _origExpTxtDesc = Object.getOwnPropertyDescriptor(HTMLElement.prototype, 'innerHTML');
-
-// Simpler approach: override o set de exp-txt via proxy
-window._v2CardCache = {};
-document.addEventListener('bmd:card', function(e){
-  if(e.detail && e.detail.card){
-    window._lastCard = e.detail.card;
-    window._v2ExpBuilt = false;
-    bmdStartTimerUI();
-    v2ResetExp();
-  }
-});
-
-// Intercept da função principal de render do card (rate/loadCard)
-// O app usa window._cardStartTime para começar o timer
-// Quando ele é setado, começamos o timer visual também
-Object.defineProperty(window, '_cardStartTime', {
-  get: function(){ return window.__cardStartTime; },
-  set: function(v){
-    window.__cardStartTime = v;
-    if(v > 0){
-      bmdStartTimerUI();
-      window._v2ExpBuilt = false;
-      v2ResetExp();
-    }
-  },
-  configurable: true
-});
-
-console.log('[BoardMD v2] Surgical additions loaded.');
+console.log('[BoardMD v2] OK');
 </script>
-
 </body>
 </html>
 <!-- v6-brainstorm-fixes -->
