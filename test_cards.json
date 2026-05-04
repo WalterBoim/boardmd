@@ -1,0 +1,322 @@
+[
+  {
+    "id": "boardmd_s2_14824",
+    "deck": "boardmd_s2",
+    "topic": "Chronic subdural hematoma",
+    "system": "Nervous System & Special Senses",
+    "q": "A 68-year-old man with atrial fibrillation on warfarin presents with progressive headache, confusion, and right-sided weakness over the past 10 days. His wife mentions he tripped over their dog 2 weeks ago and bumped his head but seemed fine afterward. Vital signs are temperature 37.1°C (98.8°F), blood pressure 148/82 mmHg, pulse 76/min, and respirations 16/min. Neurological examination shows right upper extremity weakness (4/5 strength) and decreased alertness. INR is 2.8 (therapeutic range 2.0-3.0). What is the most likely diagnosis?",
+    "c": "Chronic subdural hematoma",
+    "w": [
+      "Acute epidural hematoma",
+      "Subarachnoid hemorrhage",
+      "Transient ischemic attack"
+    ],
+    "e": "This 68-year-old anticoagulated man presents with insidious neurologic deterioration 2 weeks after minor head trauma, characteristic of chronic subdural hematoma. The mechanism involves rupture of bridging veins between the cortex and dural sinuses, which bleed slowly into the subdural space. Elderly patients have cerebral atrophy creating increased subdural space, and anticoagulation compounds bleeding risk. Unlike acute epidural hematoma (arterial bleeding causing rapid deterioration within hours), chronic subdural develops gradually over days to weeks as the hematoma expands. The fluctuating mental status and focal deficits reflect mass effect with possible midline shift. CT head showing crescent-shaped hypodense or isodense collection would confirm the diagnosis. Treatment involves hematoma evacuation and reversal of anticoagulation.",
+    "kp": "Chronic subdural hematoma presents with insidious neurologic decline 1-2 weeks post-injury in elderly and fall-prone patients.",
+    "d": "Acute epidural hematoma — Acute epidural hematoma would manifest within hours with rapid deterioration and severe headache with lucid interval\nSubarachnoid hemorrhage — Subarachnoid hemorrhage presents acutely with thunderclap headache and meningismus\nTransient ischemic attack — Transient ischemic attack would be transient without persistent deficits and without headache as a prominent feature"
+  },
+  {
+    "id": "boardmd_s2_13775",
+    "deck": "boardmd_s2",
+    "topic": "Cervical trauma intubation",
+    "system": "Nervous System & Special Senses",
+    "q": "A 45-year-old man is brought to the emergency department following a motor vehicle collision. He is alert but has paradoxical breathing and progressive stridor. CT imaging reveals a C5-C6 fracture-dislocation without cord compression. He has no midface or mandibular injuries. Oxygen saturation is 88% on non-rebreather mask. What is the most appropriate next step in management?",
+    "c": "Orotracheal intubation",
+    "w": [
+      "Nasotracheal intubation",
+      "Tracheostomy",
+      "Blind digital intubation"
+    ],
+    "e": "This 45-year-old man with cervical spine fracture and respiratory compromise requires immediate airway management via orotracheal intubation with manual in-line stabilization. The technique involves one provider maintaining neutral cervical alignment while another performs direct laryngoscopy and intubation, preventing extension or flexion that could worsen spinal injury. Nasotracheal intubation risks intracranial passage through an unrecognized basilar skull fracture. Tracheostomy requires surgical time this unstable patient cannot afford. Blind digital intubation eliminates visualization and increases aspiration and esophageal intubation risk. Orotracheal intubation allows direct visualization while cervical precautions minimize movement, making it the standard for trauma airways when facial anatomy permits.",
+    "kp": "Orotracheal intubation with cervical spine precautions is the preferred technique in cervical trauma without facial injury.",
+    "d": "Nasotracheal intubation — Nasotracheal intubation is contraindicated due to increased risk of intracranial placement and basilar skull fracture complications in cervical trauma\nTracheostomy — Tracheostomy is a surgical procedure reserved for cases where endotracheal intubation fails or is prolonged\nBlind digital intubation — Blind digital intubation bypasses visualization and carries unacceptable risk in trauma"
+  },
+  {
+    "id": "boardmd_s2_1344",
+    "deck": "boardmd_s2",
+    "topic": "Brown Pigment Gallstone Imaging",
+    "system": "Gastrointestinal",
+    "q": "A 62-year-old woman with prior biliary sphincterotomy presents with fever to 38.7°C, right upper quadrant pain, and jaundice. She has had three episodes of ascending cholangitis over 18 months. Laboratory studies show total bilirubin 4.2 mg/dL (0.3-1.2), alkaline phosphatase 385 U/L (30-120). ERCP demonstrates multiple filling defects in the common bile duct with several stones extracted. What is the expected appearance of these stones on plain abdominal radiograph?",
+    "c": "Radiolucent",
+    "w": [
+      "Radiopaque",
+      "Laminated appearance",
+      "Hyperechoic with posterior shadowing"
+    ],
+    "e": "This 62-year-old woman with recurrent ascending cholangitis and prior biliary manipulation has brown pigment stones, which form in the presence of bacterial infection in the bile ducts. Bacteria produce beta-glucuronidase, which deconjugates bilirubin diglucuronide into unconjugated bilirubin that precipitates with calcium as calcium bilirubinate. Unlike black pigment stones that contain enough calcium to be radiopaque, brown stones are predominantly composed of calcium bilirubinate, fatty acids, and bacterial debris with insufficient calcium concentration for radiographic visualization. They therefore appear radiolucent on plain films. These stones typically form in the setting of biliary stasis, strictures, or prior instrumentation that allows bacterial colonization.",
+    "kp": "Brown pigment stones form in infected bile ducts and are radiolucent on plain radiographs",
+    "d": "Radiopaque: Black pigment stones containing calcium bilirubinate are radiopaque and form in sterile bile with chronic hemolysis or cirrhosis, not from biliary infection like brown stones.\nLaminated appearance: Mixed cholesterol stones may show lamination on CT but brown pigment stones lack this organized structure and form amorphously in infected bile.\nHyperechoic with posterior shadowing: This describes ultrasound findings, not plain radiograph characteristics, and confuses imaging modalities inappropriately."
+  },
+  {
+    "id": "boardmd_s2_15290",
+    "deck": "boardmd_s2",
+    "topic": "Hypothyroidism presentation",
+    "system": "Endocrine",
+    "q": "A 62-year-old woman with type 2 diabetes presents with 6-month history of fatigue, cold intolerance, and difficulty buttoning shirts. She reports constipation requiring daily laxatives and occasional muscle cramps. Examination shows hoarse voice, bradycardia, and nonpitting edema of lower extremities with cool, doughy skin. Temperature is 36.1°C (97.0°F), heart rate 54/min. TSH 68 mIU/L (0.4-4.0), free T4 0.3 ng/dL (0.8-1.8). What is the most likely diagnosis?",
+    "c": "Myxedema secondary to hypothyroidism",
+    "w": [
+      "Graves disease with thyroid storm",
+      "Primary hyperparathyroidism",
+      "Systemic sclerosis with cardiac involvement"
+    ],
+    "e": "This 62-year-old woman presents with severe hypothyroidism manifesting as myxedema, characterized by profound thyroid hormone deficiency leading to accumulation of glycosaminoglycans in the dermis and subcutaneous tissues. The mechanism involves decreased thyroid hormone production causing reduced metabolic rate and accumulation of mucopolysaccharides in interstitial spaces, producing the characteristic nonpitting edema and doughy skin texture. The markedly elevated TSH confirms primary hypothyroidism. Her constellation of bradycardia, hypothermia, hoarse voice from laryngeal edema, and constipation from decreased gut motility are classic features. The pretibial myxedema results from hyaluronic acid deposition creating indurated plaques. Immediate levothyroxine replacement is required, though cautious dosing is necessary in elderly patients to avoid precipitating cardiac complications.",
+    "kp": "Myxedema represents the severe end of hypothyroidism with characteristic skin changes from mucopolysaccharide deposition.",
+    "d": "Graves disease with thyroid storm — Graves disease presents with hyperthyroid features including tachycardia and heat intolerance, not hypothyroid symptoms\nPrimary hyperparathyroidism — Primary hyperparathyroidism causes hypercalcemia with polyuria and nephrolithiasis\nSystemic sclerosis with cardiac involvement — Systemic sclerosis produces skin fibrosis but lacks the metabolic and endocrine features seen here"
+  },
+  {
+    "id": "boardmd_s2_3304",
+    "deck": "boardmd_s2",
+    "topic": "Graves Ophthalmopathy Treatment",
+    "system": "Endocrine",
+    "q": "A 42-year-old woman with Graves disease presents with worsening bilateral eye protrusion and diplopia over 9 months. She has difficulty closing her eyes at night. She takes methimazole and selenium. Temperature 37.0°C, pulse 78/min, BP 128/82 mmHg. TSH <0.01 mIU/L (0.5-5.0), free T4 1.2 ng/dL (0.8-1.8). Examination shows 6 mm bilateral proptosis, restricted extraocular movements, and corneal epithelial defects with positive fluorescein staining. What is the most appropriate definitive treatment?",
+    "c": "Thyroidectomy",
+    "w": [
+      "Radioactive iodine ablation",
+      "Orbital radiation therapy",
+      "Continue methimazole therapy"
+    ],
+    "e": "This 42-year-old woman with severe active thyroid eye disease demonstrates structural orbital changes (6 mm proptosis, corneal exposure) despite achieving euthyroidism on methimazole. Thyroidectomy is definitive because it removes the thyroid gland, eliminating the source of thyroid antigens that perpetuate the autoimmune orbital inflammation. This prevents ongoing stimulation of orbital fibroblasts and inflammatory cell infiltration. Radioactive iodine is relatively contraindicated here because acute thyroid cell destruction releases a surge of antigens that can acutely worsen orbital inflammation, particularly dangerous with pre-existing severe ophthalmopathy. Orbital radiation treats inflammation but does not address the antigen source. Methimazole maintains euthyroidism but cannot reverse structural changes or eliminate antigen exposure after 6 months of failure. Following thyroidectomy, most patients require glucocorticoids perioperatively and subsequent orbital decompression surgery for residual proptosis.",
+    "kp": "Thyroidectomy preferred over radioiodine for severe Graves ophthalmopathy to minimize antigen-driven orbital worsening",
+    "d": "Radioactive iodine ablation: Relatively contraindicated in severe ophthalmopathy because thyroid cell destruction releases antigens that can worsen orbital inflammation, and post-ablation hypothyroidism destabilizes eye disease until replacement therapy is optimized.\nOrbital radiation therapy: Treats orbital inflammation but does not address the underlying autoimmune thyroid disease driving ongoing antigen stimulation of orbital tissues, making it adjunctive rather than definitive.\nContinue methimazole therapy: Medical management maintains euthyroidism but does not eliminate thyroid antigen source, cannot reverse structural orbital changes, and has already failed after 6 months in this severe case."
+  },
+  {
+    "id": "boardmd_s2_1334",
+    "deck": "boardmd_s2",
+    "topic": "Gallstone Types",
+    "system": "Gastrointestinal",
+    "q": "A 48-year-old woman with BMI 34 kg/m² and type 2 diabetes presents with episodic right upper quadrant pain 30-60 minutes after fatty meals over 3 months. Examination shows mild right upper quadrant tenderness. Total bilirubin 0.9 mg/dL (0.3-1.2), LDL 165 mg/dL (0-100). Ultrasound reveals a 2.5 cm gallbladder stone with posterior acoustic shadowing; abdominal radiograph shows no radiopaque densities. What is the most likely diagnosis?",
+    "c": "Cholesterol stone",
+    "w": [
+      "Black pigment stone",
+      "Brown pigment stone",
+      "Mixed calcium bilirubinate stone"
+    ],
+    "e": "This obese 48-year-old woman with postprandial right upper quadrant pain has a radiolucent gallstone, consistent with a cholesterol stone. Cholesterol stones account for 80% of gallstones in Western populations and form when bile becomes supersaturated with cholesterol, exceeding the solubilizing capacity of bile salts and lecithin. Risk factors include the '4 Fs': female, forty, fat, and fertile. Obesity increases cholesterol secretion into bile, while diabetes and hyperlipidemia further promote stone formation. The radiolucency on X-ray distinguishes cholesterol stones from pigment stones, which contain calcium and appear radiopaque. Her normal bilirubin and alkaline phosphatase indicate uncomplicated cholelithiasis. Definitive management is laparoscopic cholecystectomy for symptomatic disease.",
+    "kp": "Cholesterol gallstones are radiolucent and associated with obesity, female sex, and hyperlipidemia",
+    "d": "Black pigment stone: Composed of polymerized calcium bilirubinate, these stones are radiopaque and associated with chronic hemolysis (sickle cell disease, hereditary spherocytosis) or cirrhosis, not obesity or hypercholesterolemia.\nBrown pigment stone: Result from biliary stasis and bacterial infection causing bile deconjugation, typically form in bile ducts not gallbladder, and are associated with Asian populations and parasitic infections like Clonorchis sinensis.\nMixed calcium bilirubinate stone: Contain both cholesterol and calcium bilirubinate making them radiopaque on X-ray, contradicting the radiolucent finding in this patient."
+  },
+  {
+    "id": "boardmd_s2_3412",
+    "deck": "boardmd_s2",
+    "topic": "Hepatitis B Post-Exposure Prophylaxis",
+    "system": "Gastrointestinal",
+    "q": "A 29-year-old female emergency department nurse sustains a needlestick injury while drawing blood from a patient with known chronic hepatitis B infection. She reports never completing any hepatitis B vaccination series. Serology shows undetectable anti-HBs antibodies. She has a history of seasonal allergies managed with antihistamines. What is the most appropriate next step in management?",
+    "c": "Administer HBIG and initiate hepatitis B vaccine series",
+    "w": [
+      "Administer hepatitis B vaccine series only",
+      "Administer HBIG only",
+      "Initiate tenofovir prophylaxis for 4 weeks"
+    ],
+    "e": "This 29-year-old unvaccinated nurse exposed to HBsAg-positive blood requires dual immunoprophylaxis. HBIG provides immediate passive immunity through preformed antibodies, offering protection during the critical 4-6 week window before vaccine-induced antibodies develop. The hepatitis B vaccine series initiates active immunity, providing durable long-term protection against future exposures. HBIG alone provides only temporary protection lasting 3-6 months without establishing lasting immunity. Vaccine alone leaves a dangerous gap during early incubation when viral replication begins, as protective antibody levels require weeks to develop. Tenofovir is used for HIV post-exposure prophylaxis, not hepatitis B occupational exposure management. Combined HBIG and vaccination addresses both immediate and long-term protection needs, preventing acute infection while establishing permanent immunity.",
+    "kp": "Unvaccinated HBsAg-positive exposure requires both HBIG for immediate passive immunity and vaccine for long-term active protection",
+    "d": "Administer hepatitis B vaccine series only: Vaccine alone takes 4-6 weeks to generate protective antibody levels, leaving the patient vulnerable during the incubation period when viral replication begins. Without immediate passive immunity from HBIG, transmission risk remains unacceptably high despite future vaccine-induced protection.\nAdminister HBIG only: HBIG provides only temporary passive immunity lasting approximately 3-6 months through transferred antibodies. Without initiating the vaccine series, the patient will not develop durable active immunity and remains susceptible to future hepatitis B exposures after HBIG antibodies wane.\nInitiate tenofovir prophylaxis for 4 weeks: Tenofovir is used for HIV post-exposure prophylaxis, not hepatitis B occupational exposure. Antiviral therapy for hepatitis B is reserved for chronic infection treatment, not acute post-exposure prevention where immunoprophylaxis with HBIG and vaccination is standard."
+  },
+  {
+    "id": "boardmd_s2_11716",
+    "deck": "boardmd_s2",
+    "topic": "Pseudodementia definition",
+    "system": "Behavioral Health",
+    "q": "A 62-year-old woman presents with 4 months of forgetfulness and difficulty making decisions. Her daughter reports she stopped attending her book club and rarely leaves home. She has hypertension controlled with lisinopril. Neuropsychological testing reveals impaired attention and processing speed. Brain MRI shows age-appropriate volume loss. CBC, CMP, TSH, and vitamin B12 are all within normal limits. She admits to sleeping 10-12 hours daily and has lost interest in gardening. What is the most likely diagnosis?",
+    "c": "Major depressive disorder",
+    "w": [
+      "Mild cognitive impairment",
+      "Frontotemporal dementia",
+      "Delirium from metabolic causes"
+    ],
+    "e": "This 62-year-old woman with cognitive complaints, apathy, social withdrawal, and hypersomnia has pseudodementia from major depressive disorder. Depression causes reversible cognitive dysfunction through impaired motivation and concentration rather than structural brain pathology. Normal neuroimaging and lab studies exclude neurodegenerative and metabolic causes. The subacute onset, prominent mood symptoms, and preserved consciousness distinguish this from delirium or true dementia. Key features include subjective cognitive complaints exceeding objective deficits, neurovegetative symptoms like hypersomnia, and functional decline driven by apathy. Treatment with antidepressants and psychotherapy typically reverses cognitive dysfunction, confirming the psychiatric etiology. Recognition prevents inappropriate dementia workup and addresses the underlying mood disorder.",
+    "kp": "Pseudodementia represents cognitive dysfunction from depression mimicking dementia with normal imaging and reversible deficits",
+    "d": "Mild cognitive impairment — Mild cognitive impairment represents true cognitive decline beyond normal aging with preserved functional abilities\nFrontotemporal dementia — Frontotemporal dementia would show characteristic neuroimaging changes and behavioral or language abnormalities\nDelirium from metabolic causes — Delirium from metabolic causes would present acutely with fluctuating consciousness and abnormal vital signs or laboratory findings"
+  },
+  {
+    "id": "boardmd_s2_2516",
+    "deck": "boardmd_s2",
+    "topic": "Duchenne Muscular Dystrophy Genetics",
+    "system": "Musculoskeletal/Skin & Subcutaneous Tissue",
+    "q": "A 4-year-old boy has difficulty climbing stairs and frequent falls for 6 months. He uses his hands to push up from sitting. His older sister had similar symptoms that resolved. Examination shows enlarged calves, hip flexor weakness, and reduced reflexes. Creatine kinase is 18,500 U/L (22-198). Genetic testing reveals a frameshift deletion in the dystrophin gene on chromosome Xp21. What is the most likely diagnosis?",
+    "c": "Duchenne muscular dystrophy",
+    "w": [
+      "Becker muscular dystrophy",
+      "Emery-Dreifuss muscular dystrophy",
+      "Limb-girdle muscular dystrophy"
+    ],
+    "e": "This 4-year-old boy with proximal muscle weakness, Gowers sign (using hands to stand), and calf pseudohypertrophy has Duchenne muscular dystrophy. The frameshift deletion in the dystrophin gene disrupts the reading frame, resulting in premature stop codons and complete absence of functional dystrophin protein. Without dystrophin to stabilize the sarcolemma during muscle contraction, myocytes undergo repeated cycles of damage and necrosis, releasing creatine kinase and causing progressive weakness. The dramatically elevated CK reflects ongoing muscle destruction. Boys typically become wheelchair-dependent by age 12 and require multidisciplinary care including corticosteroids to slow progression, cardiac monitoring for cardiomyopathy, and respiratory support. In contrast, in-frame deletions preserve partial dystrophin function, producing the milder Becker phenotype with later onset and prolonged ambulation.",
+    "kp": "Frameshift dystrophin mutations produce absent protein causing severe Duchenne phenotype versus in-frame deletions in Becker",
+    "d": "Becker muscular dystrophy: Results from in-frame dystrophin deletions producing partially functional dystrophin protein, causing milder symptoms with preserved ambulation into adulthood, not compatible with frameshift mutations.\nEmery-Dreifuss muscular dystrophy: Caused by mutations in emerin or lamin A/C genes affecting the nuclear envelope, characterized by early joint contractures, humeral-peroneal weakness, and cardiac conduction defects, not dystrophin frameshift mutations.\nLimb-girdle muscular dystrophy: Results from autosomal recessive or dominant mutations in sarcoglycan, dysferlin, or calpain genes, not X-linked dystrophin mutations, and typically presents later in childhood or adolescence."
+  },
+  {
+    "id": "boardmd_s2_3127",
+    "deck": "boardmd_s2",
+    "topic": "Cardiac Amyloidosis",
+    "system": "Renal/Urinary & Reproductive",
+    "q": "A 64-year-old man with type 2 diabetes presents with 6 months of progressive exertional dyspnea and bilateral leg edema. He denies chest pain. Examination shows jugular venous distension and 2+ pitting edema to the knees. Blood pressure is 118/76 mmHg. Labs reveal creatinine 1.8 mg/dL (0.7-1.3), albumin 2.4 g/dL (3.5-5.5), and 24-hour urine protein 4.8 g. Echocardiogram shows LVEF 38%, concentric left ventricular hypertrophy with normal chamber size, and granular sparkling myocardial appearance. What is the most likely diagnosis?",
+    "c": "Amyloidosis",
+    "w": [
+      "Hypertrophic cardiomyopathy",
+      "Hemochromatosis",
+      "Sarcoidosis"
+    ],
+    "e": "This 64-year-old man with heart failure, nephrotic-range proteinuria, and characteristic echocardiographic findings has cardiac amyloidosis. Amyloid protein deposition in the myocardium creates restrictive physiology with reduced ejection fraction and concentric hypertrophy despite normal chamber dimensions. The pathognomonic granular sparkling appearance on echo reflects the acoustic properties of amyloid deposits. Concurrent nephrotic proteinuria (>3.5 g/day) with low albumin indicates renal involvement from systemic amyloid deposition, typically seen in AL (light chain) amyloidosis. Diagnosis requires tissue confirmation via endomyocardial biopsy or fat pad/rectal biopsy showing Congo red-positive deposits with apple-green birefringence under polarized light. Typing the amyloid (AL vs ATTR) guides treatment: chemotherapy for AL amyloidosis versus tafamidis for ATTR amyloidosis.",
+    "kp": "Cardiac amyloidosis presents with concentric LVH, granular sparkling echo, and nephrotic proteinuria from systemic deposition",
+    "d": "Hypertrophic cardiomyopathy: Presents with asymmetric septal hypertrophy and dynamic LVOT obstruction rather than concentric symmetric thickening, lacks nephrotic proteinuria and granular echo texture\nHemochromatosis: Iron deposition causes dilated cardiomyopathy with enlarged ventricles and reduced EF, not concentric hypertrophy with normal chamber dimensions\nSarcoidosis: Granulomatous infiltration produces conduction defects and ventricular arrhythmias with patchy wall motion abnormalities, does not cause nephrotic proteinuria or diffuse granular sparkling pattern"
+  },
+  {
+    "id": "boardmd_s2_8128",
+    "deck": "boardmd_s2",
+    "topic": "Toddler gross motor skills",
+    "system": "Nervous System & Special Senses",
+    "q": "A 24-month-old boy presents for a well-child visit. He was born at 39 weeks without complications. His mother reports he occasionally has difficulty stacking blocks. On examination, he walks steadily across the room, squats to pick up a toy, and kicks a ball forward when encouraged. He speaks in two-word phrases and scribbles with a crayon. What is the expected age at which a typically developing toddler first demonstrates the ability to kick a ball?",
+    "c": "24 months",
+    "w": [
+      "18 months",
+      "30 months",
+      "36 months"
+    ],
+    "e": "This 24-month-old boy demonstrates age-appropriate gross motor development with ball kicking. The ability to kick a ball forward emerges at 24 months and requires integration of balance, lower extremity strength, and motor planning. To execute a kick, the toddler must maintain single-leg stance while generating coordinated hip flexion and knee extension with the contralateral limb. At 18 months, children walk and climb but lack the postural stability for kicking. By 30-36 months, kicking becomes more refined with directional accuracy and increased force, representing skill advancement beyond initial emergence. This milestone serves as a clinical marker for appropriate cerebellar and motor cortex maturation during the second year of life.",
+    "kp": "Ball kicking at 24 months is an important gross motor milestone reflecting development of balance and lower extremity coordination in toddlers.",
+    "d": "18 months — toddlers are walking and climbing well but lack the coordination and strength needed for kicking\n30 months — toddlers at this age demonstrate more advanced kicking with accuracy and power, indicating this is beyond the initial emergence of the skill\n36 months — children at this age have refined directional control and purposeful kicking toward targets, representing further advancement rather than initial emergence"
+  },
+  {
+    "id": "boardmd_s2_8764",
+    "deck": "boardmd_s2",
+    "topic": "Vasovagal syncope diagnosis",
+    "system": "Cardiovascular",
+    "q": "A 32-year-old woman presents after three episodes of losing consciousness over the past year. Each episode occurred during blood draws or while standing in crowded spaces. Before losing consciousness, she felt nauseated, sweaty, and saw spots in her vision. She denies chest pain or palpitations. Her mother has type 2 diabetes. Examination shows blood pressure 118/72 mmHg and heart rate 76/min while supine and standing. What is the most likely diagnosis?",
+    "c": "Vasovagal syncope",
+    "w": [
+      "Cardiac arrhythmia",
+      "Orthostatic hypotension",
+      "Seizure disorder"
+    ],
+    "e": "This 32-year-old woman with recurrent syncope triggered by situational stressors (blood draws, crowded spaces) and preceded by autonomic symptoms (nausea, diaphoresis, visual changes) has vasovagal syncope. The mechanism involves excessive vagal tone leading to bradycardia and peripheral vasodilation, causing cerebral hypoperfusion. The prodromal autonomic symptoms and specific triggers (venipuncture, prolonged standing, emotional stress) are characteristic. Normal orthostatic vital signs exclude orthostatic hypotension. Cardiac arrhythmias typically cause sudden syncope without warning. Seizures produce prolonged unconsciousness with postictal confusion and possible tongue-biting or incontinence, unlike the brief unconsciousness and rapid recovery seen in vasovagal syncope. Management includes trigger avoidance and physical counterpressure maneuvers during prodromal symptoms.",
+    "kp": "Vasovagal syncope is recognized by emotional or situational triggers combined with prodromal symptoms including nausea and diaphoresis.",
+    "d": "Cardiac arrhythmia — Cardiac arrhythmia typically presents without prodrome and with sudden onset without warning signs\nOrthostatic hypotension — Orthostatic hypotension occurs with positional changes and lacks emotional triggers\nSeizure disorder — Seizures cause prolonged unconsciousness with postictal confusion and potential injury, distinguishing them from the brief unconsciousness of syncope"
+  },
+  {
+    "id": "boardmd_s2_1011",
+    "deck": "boardmd_s2",
+    "topic": "Alpha-1 Antitrypsin Deficiency",
+    "system": "Respiratory",
+    "q": "A 34-year-old man presents with 2-year progressive dyspnea and occasional epigastric pain. His father had liver disease. He never smoked but enjoys weekend hiking. Examination reveals decreased breath sounds bilaterally and mild hepatomegaly. ALT 78 U/L (7-56), AST 92 U/L (8-48). Chest CT shows basilar-predominant panacinar emphysema. Liver biopsy demonstrates PAS-positive, diastase-resistant intracytoplasmic globules in periportal hepatocytes. What is the most likely diagnosis?",
+    "c": "Alpha-1 antitrypsin",
+    "w": [
+      "Ceruloplasmin",
+      "Alpha-2 macroglobulin",
+      "Alpha-1 fetoprotein"
+    ],
+    "e": "This 34-year-old non-smoking man with basilar panacinar emphysema and PAS-positive hepatocyte globules has alpha-1 antitrypsin deficiency. The Z-allele mutation causes protein misfolding, leading to intracellular accumulation in hepatocytes as PAS-positive, diastase-resistant globules visible on liver biopsy. This retained protein causes progressive liver injury ranging from neonatal hepatitis to adult cirrhosis. Simultaneously, inadequate circulating AAT fails to protect lung tissue from neutrophil elastase, producing premature panacinar emphysema predominantly at the lung bases. The combination of early-onset emphysema in a non-smoker with liver disease showing characteristic hepatocyte inclusions confirms AAT deficiency. Serum AAT level and phenotyping establish the diagnosis. Treatment includes AAT replacement therapy for lung disease and liver transplantation for end-stage hepatic disease.",
+    "kp": "Alpha-1 antitrypsin deficiency: misfolded Z-allele protein accumulates as PAS-positive globules in hepatocytes causing liver disease, while reduced circulating AAT leads to basilar panacinar emphysema in young non-smokers",
+    "d": "Ceruloplasmin: Deficiency causes Wilson disease with copper accumulation in liver and brain, presenting with Kayser-Fleischer rings and hepatic copper deposition on rhodanine staining, not PAS-positive protein globules or emphysema.\nAlpha-2 macroglobulin: Functions as a plasma protease inhibitor with no known deficiency syndrome causing hepatocyte inclusions; deficiency does not produce liver disease or pulmonary manifestations.\nAlpha-1 fetoprotein: A fetal glycoprotein and tumor marker elevated in hepatocellular carcinoma and germ cell tumors; it is not a protease inhibitor and its deficiency does not cause hepatocyte accumulation or emphysema."
+  },
+  {
+    "id": "boardmd_s2_1075",
+    "deck": "boardmd_s2",
+    "topic": "Neonatal RDS Pathophysiology",
+    "system": "Respiratory",
+    "q": "A 2-hour-old male infant born at 35 weeks gestational age to a 32-year-old woman with gestational diabetes presents with tachypnea, nasal flaring, and intercostal retractions. The mother's hemoglobin A1c was 7.8% during pregnancy. The infant's glucose is 38 mg/dL (70-100). Chest X-ray reveals bilateral ground-glass opacities with air bronchograms. Echocardiogram shows no structural abnormalities. Which elevated fetal hormone most likely impaired surfactant production in this infant?",
+    "c": "Insulin",
+    "w": [
+      "Cortisol",
+      "Thyroxine",
+      "Epinephrine"
+    ],
+    "e": "This 35-week preterm infant born to a mother with poorly controlled gestational diabetes demonstrates respiratory distress syndrome due to surfactant deficiency. Maternal hyperglycemia causes fetal hyperglycemia, triggering excessive fetal insulin secretion. Elevated insulin antagonizes cortisol's normal stimulation of type II pneumocyte surfactant production by interfering with glucocorticoid receptor signaling and phospholipid synthesis pathways. This mechanism explains why infants of diabetic mothers have increased RDS risk even at gestational ages when surfactant production is typically adequate. The bilateral ground-glass opacities on chest X-ray reflect diffuse atelectasis from inadequate surfactant. Management includes exogenous surfactant administration, respiratory support, and glucose monitoring given the associated neonatal hypoglycemia from persistent hyperinsulinemia after delivery.",
+    "kp": "Fetal hyperinsulinemia from maternal diabetes antagonizes cortisol-driven surfactant synthesis causing RDS",
+    "d": "Cortisol: Cortisol promotes surfactant synthesis and is not elevated in this scenario; insulin antagonizes its normal action rather than cortisol being elevated itself.\nThyroxine: While thyroxine supports fetal lung maturation, it does not directly regulate surfactant production and is not elevated secondary to maternal diabetes.\nEpinephrine: Epinephrine stimulates surfactant secretion after birth but does not affect prenatal synthesis and is not elevated due to maternal hyperglycemia."
+  },
+  {
+    "id": "boardmd_s2_675",
+    "deck": "boardmd_s2",
+    "topic": "WPW Tachyarrhythmia",
+    "system": "Cardiovascular",
+    "q": "A 22-year-old man presents with palpitations and dizziness that began 45 minutes ago during basketball. He has had similar episodes that resolved spontaneously. Temperature is 37.1°C, blood pressure 108/68 mmHg, pulse regular at 185 bpm. His father has hypertension. ECG shows regular narrow complex tachycardia. A baseline ECG 6 months ago revealed PR interval 0.08 seconds with slurred QRS upstroke. What is the most likely diagnosis?",
+    "c": "Orthodromic AVRT",
+    "w": [
+      "Ventricular fibrillation",
+      "Torsades de pointes",
+      "Accelerated idioventricular rhythm"
+    ],
+    "e": "This 22-year-old man with prior delta waves and short PR interval has Wolff-Parkinson-White syndrome with an accessory pathway. His current narrow complex tachycardia at 185 bpm represents orthodromic AVRT, where impulses travel antegradely down the AV node (producing narrow QRS) and retrogradely up the accessory pathway, creating a re-entrant circuit. This is the most common arrhythmia in WPW, accounting for 95% of tachycardias. The narrow QRS occurs because ventricular activation proceeds normally through the His-Purkinje system. Delta waves disappear during orthodromic AVRT because the accessory pathway is used only for retrograde conduction. Initial management includes vagal maneuvers, followed by adenosine if unsuccessful. Definitive treatment is catheter ablation of the accessory pathway.",
+    "kp": "Orthodromic AVRT is the most common WPW arrhythmia presenting as narrow complex tachycardia",
+    "d": "Ventricular fibrillation: Chaotic ventricular rhythm without organized QRS complexes, occurring in WPW only when atrial fibrillation conducts rapidly through the accessory pathway with extremely short R-R intervals, not presenting as regular narrow complex tachycardia.\nTorsades de pointes: Polymorphic ventricular tachycardia with characteristic twisting QRS morphology around the baseline, associated with prolonged QT interval, not accessory pathway-mediated re-entry circuits seen in WPW.\nAccelerated idioventricular rhythm: Ventricular escape rhythm at 60-120 bpm typically occurring during reperfusion after myocardial infarction, presenting as wide complex rhythm unrelated to accessory pathway conduction."
+  },
+  {
+    "id": "boardmd_s2_13462",
+    "deck": "boardmd_s2",
+    "topic": "Diabetes with elevated LDL",
+    "system": "Renal/Urinary & Reproductive",
+    "q": "A 58-year-old woman with type 2 diabetes for 7 years presents for routine follow-up. She reports occasional paresthesias in her hands. Current medications include metformin and lisinopril. Blood pressure is 128/78 mmHg. HbA1c is 6.8%. Urine albumin-to-creatinine ratio is 18 mg/g (<30). LDL cholesterol is 215 mg/dL (<100), HDL 45 mg/dL (>40), triglycerides 160 mg/dL (<150). What is the most appropriate next step in management?",
+    "c": "Statin",
+    "w": [
+      "ACE inhibitor",
+      "Diuretic",
+      "Beta-blocker"
+    ],
+    "e": "This 58-year-old diabetic woman with LDL 215 mg/dL requires high-intensity statin therapy regardless of albuminuria status. Statins inhibit HMG-CoA reductase, reducing hepatic cholesterol synthesis and upregulating LDL receptors to lower circulating LDL. Diabetes itself is considered a coronary heart disease risk equivalent, and LDL >190 mg/dL represents severe hypercholesterolemia requiring pharmacologic intervention independent of other risk factors. While her blood pressure is controlled on lisinopril and she lacks albuminuria (making additional ACE inhibition unnecessary), her markedly elevated LDL substantially increases atherosclerotic cardiovascular disease risk. Statin therapy has proven mortality benefit in diabetic patients through plaque stabilization and reduced thrombotic events. Target LDL reduction should be ≥50% with high-intensity statin therapy.",
+    "kp": "Diabetic patients with LDL >190 mg/dL require statin therapy for cardiovascular prevention.",
+    "d": "ACE inhibitor — ACE inhibitors are renoprotective and useful in patients with diabetes and albuminuria or hypertension but do not address lipid levels\nDiuretic — Diuretics are antihypertensive agents not indicated for lipid management and can worsen glucose control\nBeta-blocker — Beta-blockers are useful for hypertension or post-myocardial infarction management but do not treat dyslipidemia. The absence of albuminuria does not eliminate the need for statin therapy when LDL is significantly elevated"
+  },
+  {
+    "id": "boardmd_s2_13231",
+    "deck": "boardmd_s2",
+    "topic": "Listeria meningitis risk",
+    "system": "Nervous System & Special Senses",
+    "q": "A 5-day-old term male infant born via uncomplicated vaginal delivery presents with irritability, decreased feeding, and temperature of 38.9°C (102°F). The mother had adequate prenatal care and was GBS-negative at 36 weeks. On examination, the anterior fontanelle is tense and bulging. Blood cultures are drawn and lumbar puncture is performed. What organism necessitates empiric antibiotic coverage beyond standard cephalosporin-based therapy?",
+    "c": "Listeria monocytogenes",
+    "w": [
+      "Streptococcus agalactiae",
+      "Escherichia coli",
+      "Staphylococcus aureus"
+    ],
+    "e": "This 5-day-old infant with fever, poor feeding, and bulging fontanelle has clinical meningitis. Listeria monocytogenes is a critical pathogen in neonates that requires ampicillin for adequate coverage, as third-generation cephalosporins (the standard for Gram-negative coverage in neonatal meningitis) have no activity against this Gram-positive bacillus. Listeria is acquired transplacentally or during passage through the birth canal and causes early-onset (first week) or late-onset disease. Standard neonatal meningitis therapy includes ampicillin plus either gentamicin or cefotaxime to cover Group B Streptococcus, E. coli, and Listeria. The ampicillin component specifically targets Listeria. Without ampicillin, Listeria meningitis would go untreated despite cephalosporin administration, leading to severe neurologic sequelae or death.",
+    "kp": "Neonatal meningitis requires ampicillin addition to standard therapy for Listeria monocytogenes coverage, as cephalosporins alone are inadequate against this gram-positive bacillus.",
+    "d": "Staphylococcus aureus — Staphylococcus aureus is more common in older children and immunocompromised hosts. The neonatal age group in this vignette combined with classic meningitis symptoms makes Listeria the key organism requiring specific coverage"
+  },
+  {
+    "id": "boardmd_s2_884",
+    "deck": "boardmd_s2",
+    "topic": "Distributive Shock",
+    "system": "Nervous System & Special Senses",
+    "q": "A 45-year-old man presents after a motor vehicle collision with neck pain and bilateral upper extremity weakness. He takes medication for hypertension. Blood pressure is 78/42 mmHg, heart rate 54 bpm, temperature 37.1°C (98.8°F). Examination shows decreased upper extremity strength, absent reflexes below C5, warm dry skin, and strong peripheral pulses. FAST exam is negative. Chest X-ray shows no rib fractures. What is the most likely diagnosis?",
+    "c": "Distributive shock",
+    "w": [
+      "Hypovolemic shock",
+      "Cardiogenic shock",
+      "Obstructive shock"
+    ],
+    "e": "This 45-year-old man with cervical spinal cord injury at C5 presents with classic neurogenic shock from sympathetic denervation below the injury level. Loss of sympathetic tone causes unopposed parasympathetic activity, resulting in arterial and venous vasodilation that produces hypotension with warm, dry skin and bradycardia from unopposed vagal tone. This triad distinguishes neurogenic shock from other shock states. Hypovolemic shock would trigger compensatory tachycardia and cool, pale skin from intact sympathetic vasoconstriction. The negative FAST exam and strong pulses exclude significant blood loss. Management requires vasopressors with alpha-agonist properties to restore vascular tone and careful fluid resuscitation to maintain spinal cord perfusion while avoiding volume overload.",
+    "kp": "Neurogenic shock causes warm skin hypotension and bradycardia from sympathetic denervation below spinal injury",
+    "d": "Hypovolemic shock: Would present with tachycardia and cool, pale skin from compensatory sympathetic vasoconstriction, not bradycardia and warm extremities seen in neurogenic shock.\nCardiogenic shock: Requires primary cardiac dysfunction (MI, arrhythmia, heart failure) causing pump failure with cool, clammy skin from sympathetic activation, not spinal cord injury with warm skin.\nObstructive shock: Caused by mechanical impediment to venous return or cardiac output (tension pneumothorax, tamponade, massive PE), which is excluded by physical examination in this trauma patient."
+  },
+  {
+    "id": "boardmd_s2_5782",
+    "deck": "boardmd_s2",
+    "topic": "Bell palsy definition",
+    "system": "Nervous System & Special Senses",
+    "q": "A 50-year-old man with hypertension presents with sudden right-sided facial weakness that began this morning. He denies ear pain or recent upper respiratory infection. Examination reveals complete right facial weakness affecting forehead and lower face, with inability to wrinkle forehead or close the right eye. No vesicles are visible. Brain MRI is unremarkable. What is the most likely diagnosis?",
+    "c": "Bell palsy",
+    "w": [
+      "Ramsay Hunt syndrome",
+      "Melkersson-Rosenthal syndrome",
+      "Moebius syndrome"
+    ],
+    "e": "This 50-year-old man with acute unilateral facial weakness affecting both upper and lower face has Bell palsy, an idiopathic peripheral facial nerve (CN VII) palsy. The key feature is complete hemifacial paralysis without an identifiable secondary cause after appropriate workup. Peripheral CN VII lesions cause ipsilateral forehead involvement because the facial nerve nucleus receives only contralateral input for lower face but bilateral input for upper face. The absence of vesicles excludes Ramsay Hunt syndrome (herpes zoster oticus). The acute onset and lack of chronic facial swelling or tongue fissuring excludes Melkersson-Rosenthal syndrome. Management includes eye protection with artificial tears and lubricating ointment to prevent corneal abrasion, with corticosteroids initiated within 72 hours to improve recovery outcomes.",
+    "kp": "Bell palsy is idiopathic facial nerve palsy with no identifiable secondary cause.",
+    "d": "Ramsay Hunt syndrome — Ramsay Hunt syndrome includes herpes zoster vesicles\nMelkersson-Rosenthal syndrome — Melkersson-Rosenthal syndrome involves chronic facial swelling and fissured tongue\nMoebius syndrome — Moebius syndrome is a rare congenital condition"
+  },
+  {
+    "id": "boardmd_s2_6205",
+    "deck": "boardmd_s2",
+    "topic": "Acute ischemic stroke treatment",
+    "system": "Nervous System & Special Senses",
+    "q": "A 61-year-old woman presents to the emergency department 2 hours after sudden onset of right-sided weakness and slurred speech. She has a history of hypertension and osteoarthritis. Vital signs show blood pressure 165/92 mmHg. Neurological examination reveals right hemiparesis and facial droop with NIHSS score of 14. Noncontrast head CT shows no hemorrhage or early infarct signs. Serum glucose is 118 mg/dL (70-100). What is the most appropriate immediate treatment?",
+    "c": "Alteplase (tPA)",
+    "w": [
+      "Aspirin monotherapy",
+      "Warfarin anticoagulation",
+      "Supportive care only"
+    ],
+    "e": "This 61-year-old woman presenting within 2 hours of acute ischemic stroke onset is an ideal candidate for thrombolytic therapy. Alteplase (tPA) works by activating plasminogen to plasmin, which dissolves fibrin clots and restores cerebral perfusion. The therapeutic window is 3 to 4.5 hours from symptom onset, and earlier administration correlates with better outcomes. Her noncontrast CT excluded hemorrhage, the primary contraindication. Blood pressure is acceptable for tPA administration. After tPA, she should be monitored closely for hemorrhagic transformation and neurological changes. Antiplatelet therapy like aspirin would be initiated 24 hours post-thrombolysis for secondary prevention. Warfarin has no role in acute management and may increase bleeding risk. Supportive care alone wastes the critical treatment window when definitive therapy can significantly reduce disability.",
+    "kp": "tPA within 3 to 4.5 hours of acute ischemic stroke onset is the standard thrombolytic treatment.",
+    "d": "Aspirin monotherapy — Aspirin monotherapy is used for secondary stroke prevention and acute management but is less effective than tPA in the hyperacute phase\nWarfarin anticoagulation — Warfarin anticoagulation is not indicated for acute ischemic stroke and has not been shown to improve outcomes\nSupportive care only — Supportive care alone is insufficient when thrombolytics are available and indicated"
+  }
+]

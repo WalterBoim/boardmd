@@ -14996,6 +14996,7 @@ function bmdSetupDrag(){
 .bs-fz span{font-size:11px;color:var(--text-dim);padding:0 8px;min-width:54px;text-align:center;font-weight:700}
 .bs-ib{width:38px;height:38px;border-radius:10px;border:1px solid var(--border);background:transparent;color:var(--text-dim);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;font-family:inherit}
 .bs-ib:hover{border-color:var(--accent);color:var(--accent)}
+.bs-ib-cfg{height:36px;gap:6px;font-size:12px;font-weight:700;padding:0 12px}
 .bs-body{padding:24px 28px;max-width:1100px;margin:0 auto;width:100%}
 .bs-sh{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text-dim);margin-bottom:12px}
 .bs-modes{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:24px}
@@ -15079,15 +15080,17 @@ function bmdSetupDrag(){
   .bs-body{padding:16px}.bs-modes{grid-template-columns:1fr 1fr}
   .bs-ctrl{padding:12px 14px;gap:6px}.bs-btn{padding:9px 14px;font-size:12px}
 }
-.bmd-bottom-nav .nav-center-btn.bs-storm-btn{width:62px!important;height:62px!important;border-radius:19px!important}
-.bmd-bottom-nav .nav-center-btn.bs-storm-btn svg{width:38px!important;height:38px!important;fill:none!important;stroke:none!important}
+.bmd-bottom-nav .nav-center-btn.bs-storm-btn{width:66px!important;height:66px!important;border-radius:20px!important;background:linear-gradient(135deg,#1a2540,#0d1f40)!important;border:2px solid rgba(59,127,255,.35)!important;box-shadow:0 4px 20px rgba(59,127,255,.25),0 0 0 1px rgba(232,168,54,.15)!important;transition:all .2s!important}
+.bmd-bottom-nav .nav-center-btn.bs-storm-btn:active{transform:scale(.93)!important}
+.bmd-bottom-nav .nav-center-btn.bs-storm-btn svg{width:40px!important;height:40px!important;fill:none!important;stroke:none!important}
 .bmd-bottom-nav .nav-center-btn.bs-storm-btn svg path[stroke="white"]{stroke:#fff!important;fill:none!important}
 .bmd-bottom-nav .nav-center-btn.bs-storm-btn svg path[fill="#e8a836"]{fill:#e8a836!important;stroke:none!important}
+.bmd-bottom-nav .nav-center{position:relative;margin-top:-26px!important}
 @media (max-width:600px){
-  .bmd-bottom-nav .nav-center-btn.bs-storm-btn{width:54px!important;height:54px!important}
-  .bmd-bottom-nav .nav-center-btn.bs-storm-btn svg{width:32px!important;height:32px!important}
+  .bmd-bottom-nav .nav-center-btn.bs-storm-btn{width:58px!important;height:58px!important}
+  .bmd-bottom-nav .nav-center-btn.bs-storm-btn svg{width:34px!important;height:34px!important}
 }
-.bs-storm-lbl{font-size:10px;color:var(--gold);font-weight:700;text-align:center;margin-top:5px;letter-spacing:.04em;font-family:'Sora','Lato',sans-serif}
+.bs-storm-lbl{font-size:10px;color:var(--gold);font-weight:700;text-align:center;margin-top:6px;letter-spacing:.05em;font-family:'Sora','Lato',sans-serif;text-shadow:0 0 8px rgba(232,168,54,.4)}
 
 .bs-cr-occlude{
   position:relative;cursor:pointer;
@@ -15237,6 +15240,50 @@ function bmdSetupDrag(){
 .fz-lg .bs-cr-fallback{font-size:19px}
 .fz-xl .bs-cr-fallback{font-size:23px}
 
+/* Key Point Cloze */
+.bs-kp-cloze{
+  display:inline;cursor:pointer;border-radius:4px;
+  border:1px dashed rgba(59,127,255,.5);
+  background:rgba(59,127,255,.08);
+  padding:0 4px;margin:0 1px;
+  transition:all .2s;
+  font-weight:700;
+}
+.bs-kp-cloze:hover:not([data-revealed="1"]){background:rgba(59,127,255,.18);border-color:var(--accent)}
+.bs-kp-cloze-mask{color:var(--accent);font-family:'JetBrains Mono',monospace;font-size:.85em;letter-spacing:.03em}
+.bs-kp-cloze-word{color:var(--emerald);font-weight:700}
+@keyframes bsKpPop{0%{transform:scale(0.8);opacity:0}70%{transform:scale(1.08)}100%{transform:scale(1);opacity:1}}
+
+/* BrainStorm Attending AI button */
+.bs-attending-btn{
+  display:flex;align-items:center;gap:7px;
+  margin:10px 24px 0;padding:10px 16px;
+  border-radius:10px;border:1px solid rgba(59,127,255,.3);
+  background:rgba(59,127,255,.06);
+  cursor:pointer;color:var(--accent);
+  font-size:12px;font-weight:700;font-family:inherit;
+  transition:all .2s;width:calc(100% - 48px);justify-content:center;
+}
+.bs-attending-btn:hover{background:rgba(59,127,255,.15);border-color:var(--accent)}
+.bs-attending-btn svg{width:14px;height:14px;flex-shrink:0}
+
+/* Config search bar */
+.bs-search-wrap{margin-bottom:20px;position:relative}
+.bs-search-input{
+  width:100%;padding:10px 16px 10px 38px;
+  border-radius:10px;border:1px solid var(--border);
+  background:var(--surface);color:var(--text);
+  font-size:13px;font-family:inherit;
+  outline:none;transition:border-color .2s;
+}
+.bs-search-input:focus{border-color:var(--accent)}
+.bs-search-input::placeholder{color:var(--text-faint)}
+.bs-search-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--text-faint)}
+.bs-search-icon svg{width:14px;height:14px}
+
+/* Review errors mode tag */
+.bs-mode[data-mode="errors"] .bs-mode-n::after{content:' + Flagged';font-size:9px;color:var(--gold);font-weight:700;letter-spacing:.05em;margin-left:4px;opacity:.8}
+
 </style>
 
 
@@ -15269,6 +15316,7 @@ function bmdSetupDrag(){
 .bs-fz span{font-size:11px;color:var(--text-dim);padding:0 8px;min-width:54px;text-align:center;font-weight:700}
 .bs-ib{width:38px;height:38px;border-radius:10px;border:1px solid var(--border);background:transparent;color:var(--text-dim);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;font-family:inherit}
 .bs-ib:hover{border-color:var(--accent);color:var(--accent)}
+.bs-ib-cfg{height:36px;gap:6px;font-size:12px;font-weight:700;padding:0 12px}
 .bs-body{padding:24px 28px;max-width:1100px;margin:0 auto;width:100%}
 .bs-sh{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text-dim);margin-bottom:12px}
 .bs-modes{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:24px}
@@ -15352,15 +15400,17 @@ function bmdSetupDrag(){
   .bs-body{padding:16px}.bs-modes{grid-template-columns:1fr 1fr}
   .bs-ctrl{padding:12px 14px;gap:6px}.bs-btn{padding:9px 14px;font-size:12px}
 }
-.bmd-bottom-nav .nav-center-btn.bs-storm-btn{width:62px!important;height:62px!important;border-radius:19px!important}
-.bmd-bottom-nav .nav-center-btn.bs-storm-btn svg{width:38px!important;height:38px!important;fill:none!important;stroke:none!important}
+.bmd-bottom-nav .nav-center-btn.bs-storm-btn{width:66px!important;height:66px!important;border-radius:20px!important;background:linear-gradient(135deg,#1a2540,#0d1f40)!important;border:2px solid rgba(59,127,255,.35)!important;box-shadow:0 4px 20px rgba(59,127,255,.25),0 0 0 1px rgba(232,168,54,.15)!important;transition:all .2s!important}
+.bmd-bottom-nav .nav-center-btn.bs-storm-btn:active{transform:scale(.93)!important}
+.bmd-bottom-nav .nav-center-btn.bs-storm-btn svg{width:40px!important;height:40px!important;fill:none!important;stroke:none!important}
 .bmd-bottom-nav .nav-center-btn.bs-storm-btn svg path[stroke="white"]{stroke:#fff!important;fill:none!important}
 .bmd-bottom-nav .nav-center-btn.bs-storm-btn svg path[fill="#e8a836"]{fill:#e8a836!important;stroke:none!important}
+.bmd-bottom-nav .nav-center{position:relative;margin-top:-26px!important}
 @media (max-width:600px){
-  .bmd-bottom-nav .nav-center-btn.bs-storm-btn{width:54px!important;height:54px!important}
-  .bmd-bottom-nav .nav-center-btn.bs-storm-btn svg{width:32px!important;height:32px!important}
+  .bmd-bottom-nav .nav-center-btn.bs-storm-btn{width:58px!important;height:58px!important}
+  .bmd-bottom-nav .nav-center-btn.bs-storm-btn svg{width:34px!important;height:34px!important}
 }
-.bs-storm-lbl{font-size:10px;color:var(--gold);font-weight:700;text-align:center;margin-top:5px;letter-spacing:.04em;font-family:'Sora','Lato',sans-serif}
+.bs-storm-lbl{font-size:10px;color:var(--gold);font-weight:700;text-align:center;margin-top:6px;letter-spacing:.05em;font-family:'Sora','Lato',sans-serif;text-shadow:0 0 8px rgba(232,168,54,.4)}
 
 .bs-cr-occlude{
   position:relative;cursor:pointer;
@@ -15515,24 +15565,31 @@ function bmdSetupDrag(){
 <div class="bs-overlay" id="bs-overlay">
   <div class="bs-h">
     <div class="bs-t">
-      <svg viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M10 4C7.5 4 6 5.5 6 7.5c0 .8.3 1.5.8 2-.5.5-.8 1.2-.8 2 0 1.5 1 2.5 2.5 2.5-.3.5-.5 1.1-.5 1.7 0 1.7 1.3 3 3 3h0V4zM18 4c2.5 0 4 1.5 4 3.5 0 .8-.3 1.5-.8 2 .5.5.8 1.2.8 2 0 1.5-1 2.5-2.5 2.5.3.5.5 1.1.5 1.7 0 1.7-1.3 3-3 3h0V4z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
-        <path d="M16 6L11 14h3L11 22l8-10h-3l1-6z" fill="#e8a836"/>
+      <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" style="filter:drop-shadow(0 0 6px rgba(232,168,54,.3))">
+        <path d="M11 5C8 5 6 6.8 6 9.2c0 1 .35 1.9 1 2.55C6.35 12.4 6 13.3 6 14.3c0 1.9 1.2 3.1 3 3.2-.35.65-.6 1.4-.6 2.2 0 2.1 1.6 3.7 3.7 3.7L12 5h-1zM21 5c3 0 5 1.8 5 4.2 0 1-.35 1.9-1 2.55.65.65 1 1.55 1 2.55 0 1.9-1.2 3.1-3 3.2.35.65.6 1.4.6 2.2 0 2.1-1.6 3.7-3.7 3.7L20 5h1z" stroke="white" stroke-width="1.6" stroke-linejoin="round"/>
+        <path d="M18 7L12 16.5h4L12 26l10-12.5h-4L18 7z" fill="#e8a836"/>
       </svg>
       BrainStorm Mode
     </div>
     <div class="bs-hr">
       <div class="bs-fz">
-        <button onclick="bsFz(-1)">A−</button>
+        <button onclick="bsFz(-1)" title="Decrease font size">A−</button>
         <span id="bs-fz-l">Large</span>
-        <button onclick="bsFz(1)">A+</button>
+        <button onclick="bsFz(1)" title="Increase font size">A+</button>
       </div>
-      <button class="bs-ib" onclick="bsConfig()">⚙</button>
-      <button class="bs-ib" onclick="closeBrainStorm()">✕</button>
+      <button class="bs-ib bs-ib-cfg" onclick="bsConfig()" title="Back to settings" style="gap:5px;width:auto;padding:0 12px;font-size:12px;font-weight:700;color:var(--text-dim)">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+        Settings
+      </button>
+      <button class="bs-ib" onclick="closeBrainStorm()" title="Close BrainStorm" style="font-size:18px;font-weight:300">✕</button>
     </div>
   </div>
 
   <div class="bs-body" id="bs-cfg">
+    <div class="bs-search-wrap">
+      <span class="bs-search-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg></span>
+      <input class="bs-search-input" id="bs-search" type="text" placeholder="Search topic, keyword, QID…" oninput="bsSearch(this.value)" autocomplete="off">
+    </div>
     <div class="bs-sh">Review Mode</div>
     <div class="bs-modes">
       
@@ -15606,7 +15663,8 @@ function setupNav(){
   btn.dataset.bsReady='1';
   btn.classList.add('bs-storm-btn');
   btn.removeAttribute('onclick');
-  btn.innerHTML='<svg viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M10 4C7.5 4 6 5.5 6 7.5c0 .8.3 1.5.8 2-.5.5-.8 1.2-.8 2 0 1.5 1 2.5 2.5 2.5-.3.5-.5 1.1-.5 1.7 0 1.7 1.3 3 3 3h0V4zM18 4c2.5 0 4 1.5 4 3.5 0 .8-.3 1.5-.8 2 .5.5.8 1.2.8 2 0 1.5-1 2.5-2.5 2.5.3.5.5 1.1.5 1.7 0 1.7-1.3 3-3 3h0V4z" stroke="white" stroke-width="1.8" stroke-linejoin="round"/><path d="M16 6L11 14h3L11 22l8-10h-3l1-6z" fill="#e8a836"/></svg>';
+  // Larger, bolder brain+bolt SVG (32x32 viewBox)
+  btn.innerHTML='<svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M11 5C8 5 6 6.8 6 9.2c0 1 .35 1.9 1 2.55C6.35 12.4 6 13.3 6 14.3c0 1.9 1.2 3.1 3 3.2-.35.65-.6 1.4-.6 2.2 0 2.1 1.6 3.7 3.7 3.7L12 5h-1zM21 5c3 0 5 1.8 5 4.2 0 1-.35 1.9-1 2.55.65.65 1 1.55 1 2.55 0 1.9-1.2 3.1-3 3.2.35.65.6 1.4.6 2.2 0 2.1-1.6 3.7-3.7 3.7L20 5h1z" stroke="white" stroke-width="1.6" stroke-linejoin="round"/><path d="M18 7L12 16.5h4L12 26l10-12.5h-4L18 7z" fill="#e8a836"/></svg>';
   btn.onclick=function(e){e.preventDefault();e.stopPropagation();openBrainStorm();return false;};
   const nc=btn.parentElement;
   if(nc&&!nc.querySelector('.bs-storm-lbl')){
@@ -15615,7 +15673,7 @@ function setupNav(){
 }
 function loop(){setupNav();}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',loop);else loop();
-[300,800,2000,5000].forEach(t=>setTimeout(loop,t));
+[300,800,1500,3000,6000].forEach(t=>setTimeout(loop,t));
 
 function applyFz(){
   const ov=document.getElementById('bs-overlay');
@@ -15660,10 +15718,29 @@ window.bsSpd=function(v){
 
 function getCards(){
   const D=window.DECKS||{};
-  let c=BS.deck==='all'?[...(D.boardmd_s2||[]),...(D.core||[])]:D[BS.deck]||[];
+  let pool;
+  if(BS.deck==='all'){
+    pool=[...(D.boardmd_s2||[]),...(D.core||[]),...(D.boardmd_s1||[]),...(D.s1_core||[])];
+  } else {
+    pool=D[BS.deck]||[];
+  }
+  let c=pool;
   if(BS.mode==='errors'){
-    const ago=Date.now()-86400000;const fs=window.fsrsState||{};
-    c=c.filter(x=>{const s=fs[x.id];return s&&s.lastRating==='again'&&s.lastReview>ago;});
+    const ago=Date.now()-86400000;
+    const fs=window.fsrsState||{};
+    // Include: cards rated "again" in last 24h OR flagged cards
+    const flagSet=window._bsFlaggedGlobal||new Set();
+    c=c.filter(x=>{
+      const s=fs[x.id];
+      const wasAgain=s&&s.lastRating==='again'&&s.lastReview>ago;
+      const isFlagged=flagSet.has(x.id);
+      return wasAgain||isFlagged;
+    });
+    if(!c.length){
+      // fallback: just "again" last 72h
+      const ago3=Date.now()-259200000;
+      c=pool.filter(x=>{const s=fs[x.id];return s&&s.lastRating==='again'&&s.lastReview>ago3;});
+    }
   }
   return c.slice().sort(()=>Math.random()-.5);
 }
@@ -15724,14 +15801,12 @@ function render(){
   if(ph==='vignette'){
     h+='<div class="bs-sl">Vignette</div><div class="bs-vg">'+hlVignette(card.q||'',card.phrase||'')+'</div>';
   }else if(ph==='active'){
-    // Active Recall mode
-    const tempAR = document.createElement('div');
-    renderActiveRecall(card, tempAR);
-    h += tempAR.innerHTML;
-    // Header ja esta em h, nao duplicar
-    el.innerHTML = h;
+    // Active Recall mode — renderiza direto no el para garantir que os IDs existem no DOM
+    el.innerHTML = h; // header primeiro
+    const arWrap = document.createElement('div');
+    el.appendChild(arWrap);
+    renderActiveRecall(card, arWrap);
     const fbAR=document.getElementById('bs-flag-btn');if(fbAR)fbAR.classList.toggle('on',BS.flagged.has(card.id));
-    setTimeout(function(){const hy=document.getElementById('ar-hy');if(hy)hy.classList.add('show');},80);
     return;
   }else if(ph==='phrase'){
     // Clinical Reasoning mode — usa campo brainstorm (Sonnet) ou fallback para phrase
@@ -15766,8 +15841,22 @@ function render(){
     h+='</div>';
     if(card.e)h+='<div class="bs-exp">'+card.e+'</div>';
   }else if(ph==='kp'){
-    if(card.kp)h+='<div class="bs-kp"><div class="bs-kpl">Key Point</div><div class="bs-kpt">'+card.kp+'</div></div>';
+    if(card.kp){
+      // Cloze clicável: palavras em **bold** viram oclusões clicáveis
+      let kpHtml=card.kp;
+      let clozeCnt=0;
+      kpHtml=kpHtml.replace(/\*\*(.+?)\*\*/g,function(m,word){
+        clozeCnt++;
+        return '<span class="bs-kp-cloze" onclick="bsKpReveal(this)" data-revealed="0" title="Tap to reveal"><span class="bs-kp-cloze-mask">[...] </span><span class="bs-kp-cloze-word" style="display:none">'+word+'</span></span>';
+      });
+      h+='<div class="bs-kp"><div class="bs-kpl">Key Point'+(clozeCnt>0?' <span style="font-size:9px;opacity:.6">tap to reveal</span>':'')+'</div><div class="bs-kpt">'+kpHtml+'</div></div>';
+    }
     if(card.phrase&&BS.mode!=='kp')h+='<div class="bs-exp"><strong>Phrase:</strong> '+hl(card.phrase)+'</div>';
+    // Attending AI button — always visible after Key Point reveal
+    const qTopic=card.topic||card.subject||'this topic';
+    h+='<button class="bs-attending-btn" onclick="bsOpenAttending('+(JSON.stringify(qTopic))+','+(JSON.stringify(card.kp||card.phrase||'')).replace(/'/g,"\\'")+')">'+
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/><path d="M12 6v6l4 2"/></svg>'+
+      'Ask Attending AI about this topic</button>';
   }
   el.innerHTML=h;
   const fb=document.getElementById('bs-flag-btn');if(fb)fb.classList.toggle('on',BS.flagged.has(card.id));
@@ -15790,9 +15879,25 @@ function showDone(){
 }
 
 window.bsStart=function(){
-  BS.cards=getCards();BS.cur=0;BS.ph=0;BS.seen.clear();BS.flagged.clear();BS.elapsed=0;
+  BS.cards=getCards();
+  // Apply search filter if active
+  if(BS._searchFilter){
+    const q=BS._searchFilter;
+    BS.cards=BS.cards.filter(c=>{
+      const t=(c.topic||c.subject||'').toLowerCase();
+      const kp=(c.kp||'').toLowerCase();
+      const q2=(c.q||'').toLowerCase();
+      const qid=String(c.qid||'');
+      return t.includes(q)||kp.includes(q)||q2.includes(q)||qid.includes(q);
+    });
+  }
+  BS.cur=0;BS.ph=0;BS.seen.clear();BS.flagged.clear();BS.elapsed=0;
   const t=document.getElementById('bs-n-time');if(t)t.textContent='0:00';
-  if(!BS.cards.length){alert('No cards available for this mode/deck.');return;}
+  if(!BS.cards.length){
+    const q=BS._searchFilter;
+    alert(q?'No cards match "'+q+'" in this deck. Try a different search.':'No cards available for this mode/deck.');
+    return;
+  }
   document.getElementById('bs-cfg').style.display='none';
   document.getElementById('bs-ses').style.display='block';
   document.getElementById('bs-ctrl').style.display='flex';
@@ -15830,10 +15935,74 @@ window.bsDoFlag=function(){
   if(BS.flagged.has(card.id))BS.flagged.delete(card.id);else BS.flagged.add(card.id);
   const fn=document.getElementById('bs-n-flag');if(fn)fn.textContent=BS.flagged.size;
   const fb=document.getElementById('bs-flag-btn');if(fb)fb.classList.toggle('on',BS.flagged.has(card.id));
+  // Sync with global flag set for Review errors mode
+  if(!window._bsFlaggedGlobal)window._bsFlaggedGlobal=new Set();
+  if(BS.flagged.has(card.id))window._bsFlaggedGlobal.add(card.id);
+  else window._bsFlaggedGlobal.delete(card.id);
+  // Also sync with main app flagged cards if available
+  if(window.flaggedCards){
+    if(BS.flagged.has(card.id))window.flaggedCards.add(card.id);
+    else window.flaggedCards.delete(card.id);
+  }
   if(window._supa&&BS.flagged.has(card.id)){
     try{window._supa.from('card_errors').insert({card_id:card.id,deck:card.deck,qid:card.qid,topic:card.topic||card.subject,field:'brainstorm_flag',note:'flagged in BrainStorm'}).then(function(){}).catch(function(){});}catch(e){}
   }
+  // Visual feedback
+  const fc=document.createElement('div');
+  fc.style.cssText='position:fixed;bottom:110px;left:50%;transform:translateX(-50%);background:var(--gold-dim);border:1px solid var(--gold);color:var(--gold);font-size:12px;font-weight:700;padding:6px 16px;border-radius:20px;z-index:10000;pointer-events:none;transition:opacity .3s';
+  fc.textContent=BS.flagged.has(card.id)?'⚑ Flagged for Review errors':'Flag removed';
+  document.body.appendChild(fc);
+  setTimeout(()=>{fc.style.opacity='0';setTimeout(()=>fc.remove(),300);},1500);
 };
+window.bsSearch=function(q){
+  // Filter cards by search query (topic, subject, QID, keyword)
+  q=(q||'').trim().toLowerCase();
+  if(!q){BS._searchFilter='';return;}
+  BS._searchFilter=q;
+  // Visual feedback: show match count
+  const D=window.DECKS||{};
+  let pool=[];
+  if(BS.deck==='all'){pool=[...(D.boardmd_s2||[]),...(D.core||[]),...(D.boardmd_s1||[]),...(D.s1_core||[])];}
+  else pool=D[BS.deck]||[];
+  const matches=pool.filter(c=>{
+    const t=(c.topic||c.subject||'').toLowerCase();
+    const kp=(c.kp||'').toLowerCase();
+    const q2=(c.q||'').toLowerCase();
+    const qid=String(c.qid||'');
+    return t.includes(q)||kp.includes(q)||q2.includes(q)||qid.includes(q);
+  });
+  // Update search placeholder to show count
+  const inp=document.getElementById('bs-search');
+  if(inp)inp.style.borderColor=matches.length?'var(--accent)':'var(--rose)';
+  const sh=document.querySelector('#bs-cfg .bs-sh');
+  if(sh&&matches.length)sh.textContent='Review Mode — '+matches.length+' cards match';
+  else if(sh)sh.textContent='Review Mode — no matches';
+};
+
+window.bsOpenAttending=function(topic,kp){
+  // Open the main Attending AI panel pre-filled with the current topic
+  const attBtn=document.getElementById('attending-btn')||document.querySelector('.attending-trigger')||document.querySelector('[onclick*="attending"],[onclick*="Attending"]');
+  const attInput=document.getElementById('attending-input')||document.querySelector('.attending-q-input');
+  if(attInput){
+    attInput.value='Explain '+topic+(kp?' — context: '+kp.replace(/<[^>]+>/g,'').slice(0,80):'');
+  }
+  // Try to open attending panel
+  if(typeof window.openAttending==='function')window.openAttending(topic);
+  else if(attBtn)attBtn.click();
+  else{
+    // Fallback: close BrainStorm and show a toast with topic
+    closeBrainStorm();
+    const container=document.getElementById('xp-toast');
+    if(container){
+      const item=document.createElement('div');
+      item.className='xp-toast-item';
+      item.innerHTML='<div class="xp-toast-dot" style="background:#06b6d4"></div><span>Attending AI: <strong>'+topic+'</strong></span>';
+      container.appendChild(item);
+      setTimeout(()=>{item.classList.add('fade-out');setTimeout(()=>item.remove(),400);},3000);
+    }
+  }
+};
+
 window.openBrainStorm=function(){
   const ov=document.getElementById('bs-overlay');if(!ov)return;
   ov.classList.add('on');document.body.style.overflow='hidden';
@@ -15928,22 +16097,95 @@ const AR = {
   cardId: null
 };
 
+// Fallback para cards sem brainstorm/distractor — mostra HY → Dx reveal → FSRS
+function renderARFallback(card, el, bs) {
+  const hy = (bs && bs.hy_clue) || card.phrase || '';
+  const dx = (bs && bs.diagnosis) || card.kp || '';
+  const atype = bs ? (bs.action_type||'NONE').toUpperCase() : 'NONE';
+  const action = bs ? (bs.action_content||''): '';
+  const ACTION_COLORS = {NEXT_STEP:'#a855f7',BEST_TEST:'#06b6d4',TREATMENT:'#22c55e',MECHANISM:'#f97316',PROGNOSIS:'#ec4899'};
+  const ACTION_LABELS = {NEXT_STEP:'Next Step',BEST_TEST:'Best Test',TREATMENT:'Treatment',MECHANISM:'Mechanism',PROGNOSIS:'Prognosis'};
+  const hasAction = atype !== 'NONE' && action;
+  const acolor = ACTION_COLORS[atype]||'#22c55e';
+  const alabel = ACTION_LABELS[atype]||'Action';
+
+  let html = '<div class="bs-ar" id="bs-ar-wrap">';
+
+  // HY Clue
+  html += '<div class="bs-ar-hy" id="ar-hy"><div class="bs-ar-hy-l">HY Clue</div>';
+  html += '<div class="bs-ar-hy-t">' + hlBold(hy||'No HY clue') + '</div></div>';
+
+  // Dx — reveal clicável
+  html += '<div class="bs-ar-q show" id="ar-dx-q" style="margin-top:4px">';
+  html += '<div class="bs-ar-q-l" style="color:var(--text-dim);font-size:11px;font-weight:700;margin-bottom:8px">What is the most likely diagnosis?</div>';
+  html += '<div class="bs-cr-occlude bs-ar-opt" style="padding:14px 18px;border-radius:10px;border:1.5px solid var(--border);display:block;cursor:pointer;font-size:15px;text-align:center;color:var(--accent);font-weight:700" onclick="arRevealFallbackDx(this)">Tap to reveal diagnosis</div></div>';
+  
+  // Dx confirmed (hidden)
+  html += '<div class="bs-ar-confirmed dx-confirmed" id="ar-dx-confirmed" style="border-left:3px solid #3b7fff;display:none">';
+  html += '<span style="font-size:9.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#3b7fff;display:block;margin-bottom:5px">Diagnosis</span>';
+  html += hlBold(dx) + '</div>';
+
+  if (hasAction) {
+    html += '<div class="bs-ar-confirmed action-confirmed" id="ar-act-confirmed" style="display:none;border-left:3px solid '+acolor+';background:'+acolor+'18">';
+    html += '<span style="font-size:9.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:'+acolor+';display:block;margin-bottom:5px">'+alabel+'</span>';
+    html += hlBold(action) + '</div>';
+  }
+
+  // FSRS
+  html += '<div class="bs-ar-fsrs" id="ar-fsrs" style="display:none">';
+  html += '<button class="bs-ar-fsrs-btn again" onclick="arFsrs(\'again\',\''+(card.id||'')+'\')">Again<span class="bs-ar-fsrs-label">1m</span></button>';
+  html += '<button class="bs-ar-fsrs-btn hard" onclick="arFsrs(\'hard\',\''+(card.id||'')+'\')">Hard<span class="bs-ar-fsrs-label">~10m</span></button>';
+  html += '<button class="bs-ar-fsrs-btn good" onclick="arFsrs(\'good\',\''+(card.id||'')+'\')">Good<span class="bs-ar-fsrs-label">~1d</span></button>';
+  html += '<button class="bs-ar-fsrs-btn easy" onclick="arFsrs(\'easy\',\''+(card.id||'')+'\')">Easy<span class="bs-ar-fsrs-label">~4d</span></button>';
+  html += '</div></div>';
+
+  el.innerHTML = html;
+
+  setTimeout(() => {
+    const hyEl = el.querySelector('#ar-hy');
+    if (hyEl) hyEl.classList.add('show');
+  }, 80);
+
+  AR.dxAnswered = false;
+  AR.actionAnswered = !hasAction;
+  AR.dxCorrect = false;
+  AR.actionCorrect = !hasAction;
+  AR.cardId = card.id;
+}
+
+window.arRevealFallbackDx = function(el) {
+  el.style.display = 'none';
+  const wrap = el.closest('#bs-ar-wrap')||el.closest('.bs-ar');
+  const confirmed = wrap ? wrap.querySelector('#ar-dx-confirmed') : document.getElementById('ar-dx-confirmed');
+  if (confirmed) { confirmed.style.display='block'; setTimeout(()=>confirmed.classList.add('show'),50); }
+  AR.dxAnswered = true;
+  AR.dxCorrect = true; // auto-correct for fallback
+  // Show action if exists
+  const actConf = wrap ? wrap.querySelector('#ar-act-confirmed') : null;
+  if (actConf && actConf.style.display==='none') {
+    setTimeout(()=>{ actConf.style.display='block'; setTimeout(()=>actConf.classList.add('show'),50); },400);
+    AR.actionAnswered = true;
+    AR.actionCorrect = true;
+  }
+  setTimeout(()=>arCheckComplete(),700);
+};
+
 function renderActiveRecall(card, el) {
   const raw = card.brainstorm;
   if (!raw) {
-    // Fallback para Clinical Reasoning normal
-    renderClinicalReasoning(card, el);
+    // Fallback: mostrar phrase/kp com reveal manual
+    renderARFallback(card, el);
     return;
   }
   let bs;
   try {
     bs = typeof raw === 'string' ? JSON.parse(raw) : raw;
     if (typeof bs === 'string') bs = JSON.parse(bs);
-  } catch(e) { renderClinicalReasoning(card, el); return; }
+  } catch(e) { renderARFallback(card, el); return; }
 
-  // Se nao tem distractor, usa Clinical Reasoning
+  // Se nao tem distractor, usa fallback mas com dados do brainstorm
   if (!bs || !bs.dx_distractor) {
-    renderClinicalReasoning(card, el);
+    renderARFallback(card, el, bs);
     return;
   }
 
@@ -16071,11 +16313,20 @@ function renderActiveRecall(card, el) {
   html += '</div>';
   el.innerHTML = html;
 
-  // Animate HY Clue in
+  // Animate HY Clue in (el agora está no DOM real)
+  const arEl = el;
   setTimeout(() => {
-    const hy = document.getElementById('ar-hy');
-    if (hy) hy.classList.add('show');
+    const hyEl = arEl.querySelector('#ar-hy');
+    if (hyEl) hyEl.classList.add('show');
   }, 80);
+
+  // Mostrar Dx question com pequeno delay após HY clue
+  setTimeout(() => {
+    const dxQ = arEl.querySelector('#ar-dx-q');
+    if (dxQ) {
+      dxQ.classList.add('show');
+    }
+  }, 320);
 
   // If no dx question, show action question and check completion
   if (!dxOpts) {
@@ -16089,6 +16340,8 @@ function arPickDx(btn, cardId) {
   const isCorrect = btn.dataset.correct === 'true';
   AR.dxCorrect = isCorrect;
 
+  const wrap = btn.closest('#bs-ar-wrap') || btn.closest('.bs-ar');
+
   // Disable all buttons and show feedback
   const opts = btn.closest('.bs-ar-opts').querySelectorAll('.bs-ar-opt');
   opts.forEach(opt => {
@@ -16097,14 +16350,21 @@ function arPickDx(btn, cardId) {
     else opt.classList.add('wrong');
   });
 
+  // Award coin for correct AR answer
+  arAwardCorrect(isCorrect);
+
   // Show confirmed dx after delay
   setTimeout(() => {
-    const confirmed = document.getElementById('ar-dx-confirmed');
+    const confirmed = wrap ? wrap.querySelector('#ar-dx-confirmed') : document.getElementById('ar-dx-confirmed');
     if (confirmed) { confirmed.classList.add('show'); }
+
+    // Dim the dx question block
+    const dxQ = wrap ? wrap.querySelector('#ar-dx-q') : document.getElementById('ar-dx-q');
+    if (dxQ) dxQ.style.opacity = '.45';
 
     // Show action question
     setTimeout(() => {
-      const actQ = document.getElementById('ar-act-q');
+      const actQ = wrap ? wrap.querySelector('#ar-act-q') : document.getElementById('ar-act-q');
       if (actQ) {
         actQ.style.display = 'block';
         setTimeout(() => actQ.classList.add('show'), 50);
@@ -16122,6 +16382,10 @@ function arPickAction(btn, cardId) {
   const isCorrect = btn.dataset.correct === 'true';
   AR.actionCorrect = isCorrect;
 
+  // Award coin for correct action answer
+  arAwardCorrect(isCorrect);
+
+  const wrap = btn.closest('#bs-ar-wrap') || btn.closest('.bs-ar');
   const opts = btn.closest('.bs-ar-opts').querySelectorAll('.bs-ar-opt');
   opts.forEach(opt => {
     opt.disabled = true;
@@ -16130,7 +16394,7 @@ function arPickAction(btn, cardId) {
   });
 
   setTimeout(() => {
-    const confirmed = document.getElementById('ar-act-confirmed');
+    const confirmed = wrap ? wrap.querySelector('#ar-act-confirmed') : document.getElementById('ar-act-confirmed');
     if (confirmed) {
       confirmed.style.display = 'block';
       setTimeout(() => confirmed.classList.add('show'), 50);
@@ -16141,22 +16405,26 @@ function arPickAction(btn, cardId) {
 
 function arCheckComplete() {
   if (!AR.dxAnswered) return;
-  const actQ = document.getElementById('ar-act-q');
+  // Busca o wrap no DOM atual
+  const wrap = document.getElementById('bs-ar-wrap') || document.querySelector('.bs-ar');
+  const actQ = wrap ? wrap.querySelector('#ar-act-q') : document.getElementById('ar-act-q');
   const hasActionQ = actQ !== null;
   if (hasActionQ && !AR.actionAnswered) return;
 
   // Show FSRS
   setTimeout(() => {
-    const fsrs = document.getElementById('ar-fsrs');
+    const fsrs = wrap ? wrap.querySelector('#ar-fsrs') : document.getElementById('ar-fsrs');
     if (fsrs) {
       fsrs.style.display = 'flex';
       setTimeout(() => fsrs.classList.add('show'), 50);
 
       // Pre-select based on performance
       if (!AR.dxCorrect || !AR.actionCorrect) {
-        fsrs.querySelector('.again').style.outline = '2px solid #f43f5e';
+        const againBtn = fsrs.querySelector('.again');
+        if (againBtn) againBtn.style.outline = '2px solid #f43f5e';
       } else if (AR.dxCorrect && AR.actionCorrect) {
-        fsrs.querySelector('.good').style.outline = '2px solid #22c55e';
+        const goodBtn = fsrs.querySelector('.good');
+        if (goodBtn) goodBtn.style.outline = '2px solid #22c55e';
       }
     }
   }, 300);
@@ -16165,10 +16433,38 @@ function arCheckComplete() {
 function arFsrs(rating, cardId) {
   const ratingMap = {'again':1,'hard':2,'good':3,'easy':4};
   const r = typeof rating === 'string' ? ratingMap[rating] : rating;
+  // MDCoins: award based on FSRS rating (good/easy = 2 coins, hard = 1, again = 0)
+  const coinMap = {'again':0,'hard':1,'good':2,'easy':2};
+  const coins = coinMap[rating]||0;
+  if(coins > 0 && typeof window.awardCoins === 'function'){
+    window.awardCoins(coins, 'BrainStorm Active Recall');
+  }
   if (typeof window.rate === 'function') {
     window.rate(r);
   }
   bsGo(1);
+}
+
+function arAwardCorrect(isCorrect) {
+  // Award 1 MDCoin per correct answer in Active Recall (before FSRS)
+  if(isCorrect && typeof window.awardCoins === 'function'){
+    // Small toast only — no full awardCoins (that triggers on FSRS below)
+    const container = document.getElementById('xp-toast');
+    if(container){
+      const item = document.createElement('div');
+      item.className = 'xp-toast-item';
+      item.innerHTML = '<div class="xp-toast-dot" style="background:#e8a836"></div><span><span class="xp-toast-pts">+1 BC</span> · Active Recall correct</span>';
+      container.appendChild(item);
+      setTimeout(()=>{ item.classList.add('fade-out'); setTimeout(()=>item.remove(), 400); }, 2000);
+      // Actually add coin to gami state
+      try{
+        const g=window.getGami?window.getGami():{};
+        g.coins=(g.coins||0)+1;
+        if(window.saveGami)window.saveGami(g);
+        if(window.updateGamiUI)window.updateGamiUI(g);
+      }catch(e){}
+    }
+  }
 }
 
 
@@ -16278,10 +16574,23 @@ window.crFsrs = function(rating, cardId) {
   bsGo(1);
 };
 
-console.log('BoardMD BrainStorm v5 loaded');
+window.bsKpReveal=function(el){
+  if(el.dataset.revealed==='1')return;
+  el.dataset.revealed='1';
+  el.style.cursor='default';
+  const mask=el.querySelector('.bs-kp-cloze-mask');
+  const word=el.querySelector('.bs-kp-cloze-word');
+  if(mask)mask.style.display='none';
+  if(word){word.style.display='inline';word.style.animation='bsKpPop .3s ease';}
+  el.style.background='rgba(59,127,255,.15)';
+  el.style.borderColor='var(--accent)';
+  // Micro coin reward for actively revealing a cloze
+  try{const g=window.getGami?window.getGami():{};g.coins=(g.coins||0)+1;if(window.saveGami)window.saveGami(g);if(window.updateGamiUI)window.updateGamiUI(g);}catch(e){}
+};
+console.log('BoardMD BrainStorm v6 loaded — fixes: icon, search, cloze-KP, attending, flagged-review, AR-coins');
 })();
 </script>
 
 </body>
 </html>
-<!-- v2 --><!-- redeploy --><!-- redeploy -->
+<!-- v6-brainstorm-fixes -->

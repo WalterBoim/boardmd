@@ -1,0 +1,901 @@
+[
+  {
+    "id": "boardmd_s2_14824",
+    "topic": "Chronic subdural hematoma",
+    "system": "Nervous System & Special Senses",
+    "stem": "A 68-year-old man with atrial fibrillation on warfarin presents with progressive headache, confusion, and right-sided weakness over the past 10 days. His wife mentions he tripped over their dog 2 weeks ago and bumped his head but seemed fine afterward. Vital signs are temperature 37.1°C (98.8°F), blood pressure 148/82 mmHg, pulse 76/min, and respirations 16/min. Neurological examination shows right upper extremity weakness (4/5 strength) and decreased alertness. INR is 2.8 (therapeutic range 2.0-3.0). What is the most likely diagnosis?",
+    "correct": "Chronic subdural hematoma",
+    "distractors": [
+      "Acute epidural hematoma",
+      "Subarachnoid hemorrhage",
+      "Transient ischemic attack"
+    ],
+    "filter_decision": {
+      "worthy": true,
+      "best_pair_left": "Chronic subdural hematoma",
+      "best_pair_right": "Acute epidural hematoma",
+      "reason": "Both are traumatic intracranial hemorrhages that present with headache and focal neurological deficits, but differ critically in timeline (chronic vs acute), patient population (elderly/anticoagulated vs young), clinical progression (insidious vs rapid), and imaging findings—a clinically important distinction that commonly confuses students."
+    },
+    "filter_raw": null,
+    "lens_haiku": {
+      "left_label": "Chronic Subdural Hematoma",
+      "right_label": "Acute Epidural Hematoma",
+      "left": [
+        "Insidious onset over days-weeks",
+        "Minor head trauma or no recall",
+        "Elderly/anticoagulated patients at risk",
+        "Crescent-shaped collection on imaging"
+      ],
+      "shared": [
+        "Presents with headache and focal deficits",
+        "Can cause altered mental status",
+        "Requires emergent surgical evacuation"
+      ],
+      "right": [
+        "Sudden onset within hours",
+        "Severe initial head trauma typically",
+        "Middle meningeal artery laceration (usual)",
+        "Lens-shaped (biconvex) on CT"
+      ]
+    },
+    "lens_sonnet": {
+      "left_label": "Chronic subdural hematoma",
+      "right_label": "Acute epidural hematoma",
+      "left": [
+        "Crescent-shaped, crosses suture lines",
+        "Weeks after minor trauma",
+        "Elderly, alcoholics, anticoagulated patients",
+        "Fluctuating confusion, gradual decline"
+      ],
+      "shared": [
+        "Headache and focal neurologic deficits",
+        "May require surgical evacuation",
+        "Mass effect with midline shift"
+      ],
+      "right": [
+        "Lens-shaped, does not cross sutures",
+        "Hours after high-impact trauma",
+        "Lucid interval then rapid deterioration",
+        "Middle meningeal artery injury"
+      ]
+    }
+  },
+  {
+    "id": "boardmd_s2_13775",
+    "topic": "Cervical trauma intubation",
+    "system": "Nervous System & Special Senses",
+    "stem": "A 45-year-old man is brought to the emergency department following a motor vehicle collision. He is alert but has paradoxical breathing and progressive stridor. CT imaging reveals a C5-C6 fracture-dislocation without cord compression. He has no midface or mandibular injuries. Oxygen saturation is 88% on non-rebreather mask. What is the most appropriate next step in management?",
+    "correct": "Orotracheal intubation",
+    "distractors": [
+      "Nasotracheal intubation",
+      "Tracheostomy",
+      "Blind digital intubation"
+    ],
+    "filter_decision": {
+      "worthy": true,
+      "best_pair_left": "Orotracheal intubation",
+      "best_pair_right": "Nasotracheal intubation",
+      "reason": "Both are emergency airway techniques that could theoretically be used in trauma, but nasotracheal intubation is contraindicated in C-spine injury (risk of intracranial placement) and basilar skull fracture (cribriform plate disruption). This is a high-yield differential that tests understanding of when each technique is appropriate in trauma airway management."
+    },
+    "filter_raw": null,
+    "lens_haiku": {
+      "left_label": "Orotracheal Intubation",
+      "right_label": "Nasotracheal Intubation",
+      "left": [
+        "Requires mouth opening access",
+        "Risk of dental trauma, tongue injury",
+        "Easier tube passage, larger diameter",
+        "Contraindicated in trismus/jaw clenching"
+      ],
+      "shared": [
+        "Bypass upper airway obstruction",
+        "Avoid cervical spine manipulation",
+        "Maintain spontaneous ventilation initially"
+      ],
+      "right": [
+        "Blind technique possible (awake patient)",
+        "Preferred with C-spine immobilization",
+        "Risk of epistaxis, sinusitis",
+        "Smaller tube diameter limitations"
+      ]
+    },
+    "lens_sonnet": {
+      "left_label": "Orotracheal intubation",
+      "right_label": "Nasotracheal intubation",
+      "left": [
+        "Requires neck extension for visualization",
+        "Faster, preferred in emergencies",
+        "Larger tube diameter possible",
+        "Direct laryngoscopy or video-assisted"
+      ],
+      "shared": [
+        "Secures definitive airway",
+        "Risk of cervical spine movement",
+        "Can cause airway trauma"
+      ],
+      "right": [
+        "Minimal neck manipulation required",
+        "Blind technique, needs spontaneous breathing",
+        "Contraindicated in basilar skull fracture",
+        "Preferred in trismus or mandible fractures"
+      ]
+    }
+  },
+  {
+    "id": "boardmd_s2_1344",
+    "topic": "Brown Pigment Gallstone Imaging",
+    "system": "Gastrointestinal",
+    "stem": "A 62-year-old woman with prior biliary sphincterotomy presents with fever to 38.7°C, right upper quadrant pain, and jaundice. She has had three episodes of ascending cholangitis over 18 months. Laboratory studies show total bilirubin 4.2 mg/dL (0.3-1.2), alkaline phosphatase 385 U/L (30-120). ERCP demonstrates multiple filling defects in the common bile duct with several stones extracted. What is the expected appearance of these stones on plain abdominal radiograph?",
+    "correct": "Radiolucent",
+    "distractors": [
+      "Radiopaque",
+      "Laminated appearance",
+      "Hyperechoic with posterior shadowing"
+    ],
+    "filter_decision": {
+      "worthy": false,
+      "best_pair_left": "",
+      "best_pair_right": "",
+      "reason": "This card tests a single factual property (radiolucency of pigment stones) rather than a differential diagnosis. The distractors are radiologic descriptors or unrelated stone types, not clinically confusable entities that students would misdiagnose in practice. A LENS comparison requires two distinct clinical diagnoses or syndromes that are genuinely confused; this is a radiographic property identification question."
+    },
+    "filter_raw": null,
+    "lens_haiku": null,
+    "lens_sonnet": null
+  },
+  {
+    "id": "boardmd_s2_15290",
+    "topic": "Hypothyroidism presentation",
+    "system": "Endocrine",
+    "stem": "A 62-year-old woman with type 2 diabetes presents with 6-month history of fatigue, cold intolerance, and difficulty buttoning shirts. She reports constipation requiring daily laxatives and occasional muscle cramps. Examination shows hoarse voice, bradycardia, and nonpitting edema of lower extremities with cool, doughy skin. Temperature is 36.1°C (97.0°F), heart rate 54/min. TSH 68 mIU/L (0.4-4.0), free T4 0.3 ng/dL (0.8-1.8). What is the most likely diagnosis?",
+    "correct": "Myxedema secondary to hypothyroidism",
+    "distractors": [
+      "Graves disease with thyroid storm",
+      "Primary hyperparathyroidism",
+      "Systemic sclerosis with cardiac involvement"
+    ],
+    "filter_decision": {
+      "worthy": true,
+      "best_pair_left": "Myxedema secondary to hypothyroidism",
+      "best_pair_right": "Systemic sclerosis with cardiac involvement",
+      "reason": "Both present with skin changes (nonpitting edema/doughy skin in myxedema vs. fibrosis in scleroderma), fatigue, cold intolerance, and can cause bradycardia and GI dysmotility. Students commonly confuse autoimmune systemic diseases; a LENS clarifies that myxedema's edema is non-pitting with elevated TSH, while scleroderma shows pitting/fibrotic skin without thyroid dysfunction."
+    },
+    "filter_raw": null,
+    "lens_haiku": {
+      "left_label": "Myxedema (Hypothyroidism)",
+      "right_label": "Systemic Sclerosis with Cardiac Involvement",
+      "left": [
+        "TSH elevated, free T4 low",
+        "Nonpitting edema from mucopolysaccharide deposition",
+        "Bradycardia with decreased contractility",
+        "Constipation from decreased GI motility"
+      ],
+      "shared": [
+        "Fatigue and cold intolerance",
+        "Skin thickening and tightness",
+        "Cardiac dysfunction (arrhythmias/conduction)"
+      ],
+      "right": [
+        "Anti-centromere or anti-Scl-70 antibodies positive",
+        "Raynaud phenomenon with digital ulcers",
+        "Restrictive lung disease from fibrosis",
+        "Progressive skin fibrosis with sclerodactyly"
+      ]
+    },
+    "lens_sonnet": {
+      "left_label": "Myxedema (Hypothyroidism)",
+      "right_label": "Systemic Sclerosis (Cardiac)",
+      "left": [
+        "Nonpitting edema from GAG accumulation",
+        "Bradycardia with decreased cardiac output",
+        "Cool, doughy skin texture",
+        "Elevated TSH, low free T4"
+      ],
+      "right": [
+        "Pitting edema from restrictive cardiomyopathy",
+        "Arrhythmias (heart block, VT)",
+        "Tight, thickened skin (sclerodactyly)",
+        "Anti-Scl-70 or anticentromere antibodies positive"
+      ],
+      "shared": [
+        "Fatigue and cold intolerance",
+        "Difficulty with fine motor tasks",
+        "Edema of lower extremities"
+      ]
+    }
+  },
+  {
+    "id": "boardmd_s2_3304",
+    "topic": "Graves Ophthalmopathy Treatment",
+    "system": "Endocrine",
+    "stem": "A 42-year-old woman with Graves disease presents with worsening bilateral eye protrusion and diplopia over 9 months. She has difficulty closing her eyes at night. She takes methimazole and selenium. Temperature 37.0°C, pulse 78/min, BP 128/82 mmHg. TSH <0.01 mIU/L (0.5-5.0), free T4 1.2 ng/dL (0.8-1.8). Examination shows 6 mm bilateral proptosis, restricted extraocular movements, and corneal epithelial defects with positive fluorescein staining. What is the most appropriate definitive treatment?",
+    "correct": "Thyroidectomy",
+    "distractors": [
+      "Radioactive iodine ablation",
+      "Orbital radiation therapy",
+      "Continue methimazole therapy"
+    ],
+    "filter_decision": {
+      "worthy": false,
+      "best_pair_left": "",
+      "best_pair_right": "",
+      "reason": "This card tests a single clinical decision (definitive treatment for severe thyroid eye disease in Graves disease) rather than comparing two commonly confused entities. While radioactive iodine is a distractor, it's not clinically confusable with thyroidectomy in this context—both are ablative therapies, but thyroidectomy is clearly superior when TED is severe and active. The distinction is based on clinical severity/indication, not overlapping presentation or mechanism."
+    },
+    "filter_raw": null,
+    "lens_haiku": null,
+    "lens_sonnet": null
+  },
+  {
+    "id": "boardmd_s2_1334",
+    "topic": "Gallstone Types",
+    "system": "Gastrointestinal",
+    "stem": "A 48-year-old woman with BMI 34 kg/m² and type 2 diabetes presents with episodic right upper quadrant pain 30-60 minutes after fatty meals over 3 months. Examination shows mild right upper quadrant tenderness. Total bilirubin 0.9 mg/dL (0.3-1.2), LDL 165 mg/dL (0-100). Ultrasound reveals a 2.5 cm gallbladder stone with posterior acoustic shadowing; abdominal radiograph shows no radiopaque densities. What is the most likely diagnosis?",
+    "correct": "Cholesterol stone",
+    "distractors": [
+      "Black pigment stone",
+      "Brown pigment stone",
+      "Mixed calcium bilirubinate stone"
+    ],
+    "filter_decision": {
+      "worthy": true,
+      "best_pair_left": "Cholesterol stone",
+      "best_pair_right": "Black pigment stone",
+      "reason": "Both are common gallstone types with overlapping risk factors (obesity, diabetes, female gender), but differ in pathophysiology, clinical presentation, and imaging findings. Students commonly confuse which stone types associate with which risk factors and imaging characteristics, making a side-by-side comparison high-yield for differential diagnosis."
+    },
+    "filter_raw": null,
+    "lens_haiku": {
+      "left_label": "Cholesterol Stone",
+      "right_label": "Black Pigment Stone",
+      "left": [
+        "Risk: obesity, female, fertile, fat",
+        "Radiolucent on plain film",
+        "Associated with hyperlipidemia",
+        "Solitary or few stones"
+      ],
+      "shared": [
+        "Gallbladder stones causing RUQ pain",
+        "Acoustic shadowing on ultrasound",
+        "Can cause biliary colic"
+      ],
+      "right": [
+        "Risk: hemolysis, cirrhosis, sepsis",
+        "Multiple small stones (pigment mud)",
+        "Unconjugated bilirubin precipitation",
+        "Radio-opaque in ~10% cases"
+      ]
+    },
+    "lens_sonnet": {
+      "left_label": "Cholesterol stone",
+      "right_label": "Black pigment stone",
+      "left": [
+        "Radiolucent on plain radiograph",
+        "Associated with obesity and diabetes",
+        "4F risk factors (female, forty, fertile, fat)",
+        "Contains >50% cholesterol crystal"
+      ],
+      "shared": [
+        "Causes biliary colic with fatty meals",
+        "Posterior acoustic shadowing on ultrasound"
+      ],
+      "right": [
+        "Radiopaque (50% calcified)",
+        "Associated with chronic hemolysis",
+        "Seen in cirrhosis and prosthetic valves",
+        "Contains calcium bilirubinate"
+      ]
+    }
+  },
+  {
+    "id": "boardmd_s2_3412",
+    "topic": "Hepatitis B Post-Exposure Prophylaxis",
+    "system": "Gastrointestinal",
+    "stem": "A 29-year-old female emergency department nurse sustains a needlestick injury while drawing blood from a patient with known chronic hepatitis B infection. She reports never completing any hepatitis B vaccination series. Serology shows undetectable anti-HBs antibodies. She has a history of seasonal allergies managed with antihistamines. What is the most appropriate next step in management?",
+    "correct": "Administer HBIG and initiate hepatitis B vaccine series",
+    "distractors": [
+      "Administer hepatitis B vaccine series only",
+      "Administer HBIG only",
+      "Initiate tenofovir prophylaxis for 4 weeks"
+    ],
+    "filter_decision": {
+      "worthy": true,
+      "best_pair_left": "HBIG + hepatitis B vaccine series (post-exposure prophylaxis for unvaccinated exposure)",
+      "best_pair_right": "Hepatitis B vaccine series only (incomplete post-exposure prophylaxis)",
+      "reason": "Students commonly confuse whether post-exposure HBV prophylaxis requires both HBIG and vaccine versus vaccine alone. The distinction hinges on vaccination status and exposure source—a critical differential that a LENS clarifies by contrasting the two approaches, their indications, and why combination therapy is necessary for unvaccinated, high-risk exposures."
+    },
+    "filter_raw": null,
+    "lens_haiku": {
+      "left_label": "HBIG + Vaccine Series (Complete PEP)",
+      "right_label": "Vaccine Series Only (Incomplete PEP)",
+      "left": [
+        "Passive immunity from HBIG antibodies",
+        "Effective within 24 hours post-exposure",
+        "Unvaccinated exposure requires both agents",
+        "HBIG given as single IM dose"
+      ],
+      "shared": [
+        "Initiates active immunity via vaccination",
+        "Three-dose hepatitis B vaccine schedule",
+        "Prevents chronic HBsAg carrier state"
+      ],
+      "right": [
+        "Active immunity only, no passive protection",
+        "Delayed protection (4-6 weeks for response)",
+        "Insufficient for unvaccinated high-risk exposures",
+        "Inadequate monotherapy in this scenario"
+      ]
+    },
+    "lens_sonnet": {
+      "left_label": "HBIG + Vaccine Series",
+      "right_label": "Vaccine Series Only",
+      "left": [
+        "Immediate passive immunity via immunoglobulins",
+        "Used for unvaccinated high-risk exposures",
+        "HBIG within 24 hours preferred",
+        "90-95% protection after known exposure"
+      ],
+      "shared": [
+        "Start vaccine series immediately",
+        "Repeat anti-HBs at completion",
+        "Prevents chronic hepatitis B infection"
+      ],
+      "right": [
+        "No immediate passive protection",
+        "Used for low-risk or uncertain exposures",
+        "Adequate if source HBsAg negative",
+        "Routine pre-exposure prophylaxis strategy"
+      ]
+    }
+  },
+  {
+    "id": "boardmd_s2_11716",
+    "topic": "Pseudodementia definition",
+    "system": "Behavioral Health",
+    "stem": "A 62-year-old woman presents with 4 months of forgetfulness and difficulty making decisions. Her daughter reports she stopped attending her book club and rarely leaves home. She has hypertension controlled with lisinopril. Neuropsychological testing reveals impaired attention and processing speed. Brain MRI shows age-appropriate volume loss. CBC, CMP, TSH, and vitamin B12 are all within normal limits. She admits to sleeping 10-12 hours daily and has lost interest in gardening. What is the most likely diagnosis?",
+    "correct": "Major depressive disorder",
+    "distractors": [
+      "Mild cognitive impairment",
+      "Frontotemporal dementia",
+      "Delirium from metabolic causes"
+    ],
+    "filter_decision": {
+      "worthy": true,
+      "best_pair_left": "Major depressive disorder",
+      "best_pair_right": "Mild cognitive impairment",
+      "reason": "Both present with cognitive complaints (forgetfulness, impaired attention) in older adults with normal structural imaging, creating a common diagnostic pitfall. A LENS clarifies that depression causes reversible cognitive dysfunction with prominent mood/neurovegetative symptoms, while MCI involves isolated memory decline with preserved function and mood. This distinction is high-yield for differentiating pseudodementia from true neurodegenerative disease."
+    },
+    "filter_raw": null,
+    "lens_haiku": {
+      "left_label": "Major Depressive Disorder",
+      "right_label": "Mild Cognitive Impairment",
+      "left": [
+        "Mood symptoms (anhedonia, hopelessness) prominent",
+        "Sleep disturbance (hypersomnia or insomnia)",
+        "Subjective complaint worse than objective deficits",
+        "Reversible with antidepressant treatment"
+      ],
+      "shared": [
+        "Cognitive impairment on testing",
+        "Social withdrawal and isolation",
+        "Attention/processing speed deficits"
+      ],
+      "right": [
+        "Objective cognitive decline > subjective awareness",
+        "Memory loss primary feature",
+        "Progressive neurodegenerative course",
+        "Normal mood and sleep patterns"
+      ]
+    },
+    "lens_sonnet": {
+      "left_label": "Major Depressive Disorder",
+      "right_label": "Mild Cognitive Impairment",
+      "left": [
+        "Reversible with antidepressant treatment",
+        "Subjective memory worse than objective",
+        "Prominent anhedonia and sleep changes",
+        "Impaired attention and processing speed"
+      ],
+      "shared": [
+        "Forgetfulness and poor concentration",
+        "Social withdrawal and apathy",
+        "Executive dysfunction on testing"
+      ],
+      "right": [
+        "Objective memory worse than subjective",
+        "Preserved ADLs despite complaints",
+        "Progresses to dementia (10-15%/year)",
+        "Hippocampal atrophy on MRI"
+      ]
+    }
+  },
+  {
+    "id": "boardmd_s2_2516",
+    "topic": "Duchenne Muscular Dystrophy Genetics",
+    "system": "Musculoskeletal/Skin & Subcutaneous Tissue",
+    "stem": "A 4-year-old boy has difficulty climbing stairs and frequent falls for 6 months. He uses his hands to push up from sitting. His older sister had similar symptoms that resolved. Examination shows enlarged calves, hip flexor weakness, and reduced reflexes. Creatine kinase is 18,500 U/L (22-198). Genetic testing reveals a frameshift deletion in the dystrophin gene on chromosome Xp21. What is the most likely diagnosis?",
+    "correct": "Duchenne muscular dystrophy",
+    "distractors": [
+      "Becker muscular dystrophy",
+      "Emery-Dreifuss muscular dystrophy",
+      "Limb-girdle muscular dystrophy"
+    ],
+    "filter_decision": {
+      "worthy": true,
+      "best_pair_left": "Duchenne muscular dystrophy",
+      "best_pair_right": "Becker muscular dystrophy",
+      "reason": "Both are X-linked dystrophinopathies caused by dystrophin gene mutations on Xp21 with overlapping clinical features (proximal weakness, elevated CK, calf hypertrophy), but differ critically in mutation type (frameshift/out-of-frame vs. in-frame), severity, and age of onset—a USMLE-high-yield distinction that commonly confuses students."
+    },
+    "filter_raw": null,
+    "lens_haiku": {
+      "left_label": "Duchenne Muscular Dystrophy",
+      "right_label": "Becker Muscular Dystrophy",
+      "left": [
+        "Frameshift mutation causes premature stop codon",
+        "Symptom onset before age 5 years",
+        "Wheelchair-bound by age 12-13 years",
+        "Death by age 20-30 from cardiac/respiratory"
+      ],
+      "shared": [
+        "Xp21 dystrophin gene mutation (X-linked recessive)",
+        "Elevated CK >1000 U/L, pseudohypertrophic calves",
+        "Gower maneuver, proximal muscle weakness pattern"
+      ],
+      "right": [
+        "In-frame deletion preserves reading frame",
+        "Symptom onset after age 5 years",
+        "Ambulation maintained into adulthood (20s-30s)",
+        "Normal or near-normal lifespan with management"
+      ]
+    },
+    "lens_sonnet": {
+      "left_label": "Duchenne Muscular Dystrophy",
+      "right_label": "Becker Muscular Dystrophy",
+      "left": [
+        "Absent or nonfunctional dystrophin protein",
+        "Frameshift or nonsense mutations",
+        "Wheelchair-bound by age 12",
+        "Dilated cardiomyopathy in teens"
+      ],
+      "shared": [
+        "X-linked recessive dystrophin gene mutation",
+        "Calf pseudohypertrophy and Gower sign",
+        "Markedly elevated creatine kinase"
+      ],
+      "right": [
+        "Reduced or partially functional dystrophin",
+        "In-frame deletions or missense mutations",
+        "Ambulation preserved into 20s-30s",
+        "Milder later-onset cardiac involvement"
+      ]
+    }
+  },
+  {
+    "id": "boardmd_s2_3127",
+    "topic": "Cardiac Amyloidosis",
+    "system": "Renal/Urinary & Reproductive",
+    "stem": "A 64-year-old man with type 2 diabetes presents with 6 months of progressive exertional dyspnea and bilateral leg edema. He denies chest pain. Examination shows jugular venous distension and 2+ pitting edema to the knees. Blood pressure is 118/76 mmHg. Labs reveal creatinine 1.8 mg/dL (0.7-1.3), albumin 2.4 g/dL (3.5-5.5), and 24-hour urine protein 4.8 g. Echocardiogram shows LVEF 38%, concentric left ventricular hypertrophy with normal chamber size, and granular sparkling myocardial appearance. What is the most likely diagnosis?",
+    "correct": "Amyloidosis",
+    "distractors": [
+      "Hypertrophic cardiomyopathy",
+      "Hemochromatosis",
+      "Sarcoidosis"
+    ],
+    "filter_decision": {
+      "worthy": true,
+      "best_pair_left": "Amyloidosis",
+      "best_pair_right": "Hypertrophic cardiomyopathy",
+      "reason": "Both present with concentric LVH, reduced EF, and diastolic dysfunction causing heart failure symptoms, but amyloidosis uniquely features the pathognomonic 'granular sparkling' appearance, restrictive physiology with severe proteinuria/nephrotic syndrome, and different etiologies—making this a classic USMLE differential that benefits from side-by-side comparison."
+    },
+    "filter_raw": null,
+    "lens_haiku": {
+      "left_label": "Amyloidosis",
+      "right_label": "Hypertrophic Cardiomyopathy",
+      "left": [
+        "Granular sparkling appearance on echo",
+        "Low voltage on ECG",
+        "Nephrotic syndrome with proteinuria",
+        "Infiltrative process, restrictive physiology"
+      ],
+      "shared": [
+        "Concentric LV hypertrophy with normal cavity",
+        "Preserved or mildly reduced LVEF",
+        "Heart failure with preserved diastolic dysfunction"
+      ],
+      "right": [
+        "Systolic anterior mitral leaflet motion",
+        "Left ventricular outflow tract obstruction",
+        "Genetic mutations (sarcomeric proteins)",
+        "Risk of sudden cardiac death in young"
+      ]
+    },
+    "lens_sonnet": {
+      "left_label": "Cardiac Amyloidosis",
+      "right_label": "Hypertrophic Cardiomyopathy",
+      "left": [
+        "Granular sparkling myocardium on echo",
+        "Low-voltage ECG despite LVH",
+        "Restrictive filling pattern predominates",
+        "Proteinuria and multiorgan infiltration"
+      ],
+      "shared": [
+        "Concentric left ventricular hypertrophy",
+        "Diastolic heart failure presentation",
+        "Increased ventricular wall thickness"
+      ],
+      "right": [
+        "Systolic anterior motion of mitral valve",
+        "Asymmetric septal hypertrophy classic",
+        "Dynamic LVOT obstruction possible",
+        "Sarcomere gene mutations (familial)"
+      ]
+    }
+  },
+  {
+    "id": "boardmd_s2_8128",
+    "topic": "Toddler gross motor skills",
+    "system": "Nervous System & Special Senses",
+    "stem": "A 24-month-old boy presents for a well-child visit. He was born at 39 weeks without complications. His mother reports he occasionally has difficulty stacking blocks. On examination, he walks steadily across the room, squats to pick up a toy, and kicks a ball forward when encouraged. He speaks in two-word phrases and scribbles with a crayon. What is the expected age at which a typically developing toddler first demonstrates the ability to kick a ball?",
+    "correct": "24 months",
+    "distractors": [
+      "18 months",
+      "30 months",
+      "36 months"
+    ],
+    "filter_decision": {
+      "worthy": false,
+      "best_pair_left": "",
+      "best_pair_right": "",
+      "reason": "This card tests isolated developmental milestone knowledge (the specific age of ball-kicking acquisition) rather than differentiation between two clinically similar entities. The distractors are simply incorrect ages, not confusable clinical conditions or syndromes that would benefit from comparative analysis."
+    },
+    "filter_raw": null,
+    "lens_haiku": null,
+    "lens_sonnet": null
+  },
+  {
+    "id": "boardmd_s2_8764",
+    "topic": "Vasovagal syncope diagnosis",
+    "system": "Cardiovascular",
+    "stem": "A 32-year-old woman presents after three episodes of losing consciousness over the past year. Each episode occurred during blood draws or while standing in crowded spaces. Before losing consciousness, she felt nauseated, sweaty, and saw spots in her vision. She denies chest pain or palpitations. Her mother has type 2 diabetes. Examination shows blood pressure 118/72 mmHg and heart rate 76/min while supine and standing. What is the most likely diagnosis?",
+    "correct": "Vasovagal syncope",
+    "distractors": [
+      "Cardiac arrhythmia",
+      "Orthostatic hypotension",
+      "Seizure disorder"
+    ],
+    "filter_decision": {
+      "worthy": true,
+      "best_pair_left": "Vasovagal syncope",
+      "best_pair_right": "Orthostatic hypotension",
+      "reason": "Both present with syncope and occur in specific positional contexts, but vasovagal syncope is triggered by emotional/pain stimuli with prodromal symptoms and stable vital signs, while orthostatic hypotension is caused by postural blood pressure drops with abnormal orthostatic vital signs—a clinically important distinction students frequently confuse."
+    },
+    "filter_raw": null,
+    "lens_haiku": {
+      "left_label": "Vasovagal Syncope",
+      "right_label": "Orthostatic Hypotension",
+      "left": [
+        "Triggered by emotional/situational stressors",
+        "Prodrome: nausea, diaphoresis, blurred vision",
+        "Vagal-mediated sudden bradycardia + vasodilation",
+        "Normal vital signs between episodes"
+      ],
+      "shared": [
+        "Transient loss of consciousness when upright",
+        "Rapid recovery without post-ictal confusion",
+        "Supine position prevents/terminates syncope"
+      ],
+      "right": [
+        "BP drop >20/10 mmHg on standing",
+        "Occurs within 3 minutes of position change",
+        "Caused by autonomic dysfunction or dehydration",
+        "Persistent orthostatic vital sign changes"
+      ]
+    },
+    "lens_sonnet": {
+      "left_label": "Vasovagal syncope",
+      "right_label": "Orthostatic hypotension",
+      "left": [
+        "Emotional or painful stimuli trigger",
+        "Prodrome: nausea, diaphoresis, pallor, warmth",
+        "Bradycardia during episode",
+        "Normal orthostatic vital signs"
+      ],
+      "shared": [
+        "Syncope while standing",
+        "Presyncope with visual changes",
+        "Benign recurrent episodes"
+      ],
+      "right": [
+        "Positional change trigger (lying to standing)",
+        "Minimal or absent prodrome",
+        "BP drop ≥20/10 mmHg standing",
+        "Tachycardia compensatory response"
+      ]
+    }
+  },
+  {
+    "id": "boardmd_s2_1011",
+    "topic": "Alpha-1 Antitrypsin Deficiency",
+    "system": "Respiratory",
+    "stem": "A 34-year-old man presents with 2-year progressive dyspnea and occasional epigastric pain. His father had liver disease. He never smoked but enjoys weekend hiking. Examination reveals decreased breath sounds bilaterally and mild hepatomegaly. ALT 78 U/L (7-56), AST 92 U/L (8-48). Chest CT shows basilar-predominant panacinar emphysema. Liver biopsy demonstrates PAS-positive, diastase-resistant intracytoplasmic globules in periportal hepatocytes. What is the most likely diagnosis?",
+    "correct": "Alpha-1 antitrypsin",
+    "distractors": [
+      "Ceruloplasmin",
+      "Alpha-2 macroglobulin",
+      "Alpha-1 fetoprotein"
+    ],
+    "filter_decision": {
+      "worthy": false,
+      "best_pair_left": "",
+      "best_pair_right": "",
+      "reason": "The distractors (ceruloplasmin, alpha-2 macroglobulin, alpha-1 fetoprotein) are unrelated proteins with distinct clinical presentations and pathophysiology. None present with early-onset emphysema + liver disease with PAS-positive globules. There is no clinically meaningful differential diagnosis being tested here—this is a straightforward recognition question of alpha-1 antitrypsin deficiency based on pathognomonic findings."
+    },
+    "filter_raw": null,
+    "lens_haiku": null,
+    "lens_sonnet": null
+  },
+  {
+    "id": "boardmd_s2_1075",
+    "topic": "Neonatal RDS Pathophysiology",
+    "system": "Respiratory",
+    "stem": "A 2-hour-old male infant born at 35 weeks gestational age to a 32-year-old woman with gestational diabetes presents with tachypnea, nasal flaring, and intercostal retractions. The mother's hemoglobin A1c was 7.8% during pregnancy. The infant's glucose is 38 mg/dL (70-100). Chest X-ray reveals bilateral ground-glass opacities with air bronchograms. Echocardiogram shows no structural abnormalities. Which elevated fetal hormone most likely impaired surfactant production in this infant?",
+    "correct": "Insulin",
+    "distractors": [
+      "Cortisol",
+      "Thyroxine",
+      "Epinephrine"
+    ],
+    "filter_decision": {
+      "worthy": false,
+      "best_pair_left": "",
+      "best_pair_right": "",
+      "reason": "This card tests a single mechanistic fact (insulin inhibits surfactant production in IDM) rather than comparing two clinically confusable entities. The distractors are hormones that have no clinical similarity to insulin's role in respiratory distress of infants of diabetic mothers—they don't cause surfactant impairment or present with this clinical picture. No meaningful differential diagnosis exists here."
+    },
+    "filter_raw": null,
+    "lens_haiku": null,
+    "lens_sonnet": null
+  },
+  {
+    "id": "boardmd_s2_675",
+    "topic": "WPW Tachyarrhythmia",
+    "system": "Cardiovascular",
+    "stem": "A 22-year-old man presents with palpitations and dizziness that began 45 minutes ago during basketball. He has had similar episodes that resolved spontaneously. Temperature is 37.1°C, blood pressure 108/68 mmHg, pulse regular at 185 bpm. His father has hypertension. ECG shows regular narrow complex tachycardia. A baseline ECG 6 months ago revealed PR interval 0.08 seconds with slurred QRS upstroke. What is the most likely diagnosis?",
+    "correct": "Orthodromic AVRT",
+    "distractors": [
+      "Ventricular fibrillation",
+      "Torsades de pointes",
+      "Accelerated idioventricular rhythm"
+    ],
+    "filter_decision": {
+      "worthy": false,
+      "best_pair_left": "",
+      "best_pair_right": "",
+      "reason": "The distractors (ventricular fibrillation, torsades de pointes, accelerated idioventricular rhythm) are all wide-complex or chaotic rhythms that are clinically and electrocardiographically distinct from narrow-complex orthodromic AVRT. There is no meaningful clinical confusion here—students would not reasonably confuse these entities based on the presentation of regular narrow-complex tachycardia with a baseline delta wave."
+    },
+    "filter_raw": null,
+    "lens_haiku": null,
+    "lens_sonnet": null
+  },
+  {
+    "id": "boardmd_s2_13462",
+    "topic": "Diabetes with elevated LDL",
+    "system": "Renal/Urinary & Reproductive",
+    "stem": "A 58-year-old woman with type 2 diabetes for 7 years presents for routine follow-up. She reports occasional paresthesias in her hands. Current medications include metformin and lisinopril. Blood pressure is 128/78 mmHg. HbA1c is 6.8%. Urine albumin-to-creatinine ratio is 18 mg/g (<30). LDL cholesterol is 215 mg/dL (<100), HDL 45 mg/dL (>40), triglycerides 160 mg/dL (<150). What is the most appropriate next step in management?",
+    "correct": "Statin",
+    "distractors": [
+      "ACE inhibitor",
+      "Diuretic",
+      "Beta-blocker"
+    ],
+    "filter_decision": {
+      "worthy": false,
+      "best_pair_left": "",
+      "best_pair_right": "",
+      "reason": "This card tests medication selection based on lipid panel interpretation and cardiovascular risk reduction in diabetes—a single management decision, not a differential diagnosis between confusable entities. The distractors are different drug classes used for different indications (HTN, proteinuria, arrhythmia), not clinically similar conditions students confuse with each other."
+    },
+    "filter_raw": null,
+    "lens_haiku": null,
+    "lens_sonnet": null
+  },
+  {
+    "id": "boardmd_s2_13231",
+    "topic": "Listeria meningitis risk",
+    "system": "Nervous System & Special Senses",
+    "stem": "A 5-day-old term male infant born via uncomplicated vaginal delivery presents with irritability, decreased feeding, and temperature of 38.9°C (102°F). The mother had adequate prenatal care and was GBS-negative at 36 weeks. On examination, the anterior fontanelle is tense and bulging. Blood cultures are drawn and lumbar puncture is performed. What organism necessitates empiric antibiotic coverage beyond standard cephalosporin-based therapy?",
+    "correct": "Listeria monocytogenes",
+    "distractors": [
+      "Streptococcus agalactiae",
+      "Escherichia coli",
+      "Staphylococcus aureus"
+    ],
+    "filter_decision": {
+      "worthy": true,
+      "best_pair_left": "Listeria monocytogenes",
+      "best_pair_right": "Streptococcus agalactiae",
+      "reason": "Both are major causes of neonatal meningitis (age <3 months) with overlapping presentations, but differ critically in antibiotic coverage: GBS is covered by cephalosporins while Listeria requires ampicillin addition, making this a high-yield differential that directly impacts empiric therapy decisions."
+    },
+    "filter_raw": null,
+    "lens_haiku": {
+      "left_label": "Listeria monocytogenes",
+      "right_label": "Streptococcus agalactiae",
+      "left": [
+        "Cephalosporin-resistant; requires ampicillin",
+        "Maternal vaginal colonization unpredictable",
+        "Rod-shaped gram-positive bacillus",
+        "Risk: immunocompromised, pregnant, elderly"
+      ],
+      "shared": [
+        "Gram-positive cocci/bacilli in CSF",
+        "Neonatal meningitis in first week",
+        "Vertical transmission during delivery"
+      ],
+      "right": [
+        "Killed by cephalosporin monotherapy",
+        "Screened at 36 weeks prenatally",
+        "Cocci arranged in chains",
+        "Risk: term infants, colonized mothers"
+      ]
+    },
+    "lens_sonnet": {
+      "left_label": "Listeria monocytogenes",
+      "right_label": "Streptococcus agalactiae (GBS)",
+      "left": [
+        "Requires ampicillin (cephalosporin-resistant)",
+        "Gram-positive rod (bacillus)",
+        "Tumbling motility at 25°C",
+        "Associated with unpasteurized dairy products"
+      ],
+      "shared": [
+        "Neonatal meningitis pathogen",
+        "Beta-hemolytic on blood agar",
+        "Can cause late-onset sepsis"
+      ],
+      "right": [
+        "Sensitive to penicillin and cephalosporins",
+        "Gram-positive cocci in chains",
+        "CAMP test positive",
+        "Intrapartum prophylaxis prevents early-onset disease"
+      ]
+    }
+  },
+  {
+    "id": "boardmd_s2_884",
+    "topic": "Distributive Shock",
+    "system": "Nervous System & Special Senses",
+    "stem": "A 45-year-old man presents after a motor vehicle collision with neck pain and bilateral upper extremity weakness. He takes medication for hypertension. Blood pressure is 78/42 mmHg, heart rate 54 bpm, temperature 37.1°C (98.8°F). Examination shows decreased upper extremity strength, absent reflexes below C5, warm dry skin, and strong peripheral pulses. FAST exam is negative. Chest X-ray shows no rib fractures. What is the most likely diagnosis?",
+    "correct": "Distributive shock",
+    "distractors": [
+      "Hypovolemic shock",
+      "Cardiogenic shock",
+      "Obstructive shock"
+    ],
+    "filter_decision": {
+      "worthy": false,
+      "best_pair_left": "",
+      "best_pair_right": "",
+      "reason": "This card tests recognition of a specific shock type (distributive/spinal shock) based on clinical presentation and exam findings, not a meaningful differential between two commonly confused entities. The distractors are eliminated by objective findings (negative FAST, no hemorrhage; strong pulses; normal vitals trajectory for spinal injury), making this a straightforward diagnosis rather than a true clinical confusion point."
+    },
+    "filter_raw": null,
+    "lens_haiku": null,
+    "lens_sonnet": null
+  },
+  {
+    "id": "boardmd_s2_5782",
+    "topic": "Bell palsy definition",
+    "system": "Nervous System & Special Senses",
+    "stem": "A 50-year-old man with hypertension presents with sudden right-sided facial weakness that began this morning. He denies ear pain or recent upper respiratory infection. Examination reveals complete right facial weakness affecting forehead and lower face, with inability to wrinkle forehead or close the right eye. No vesicles are visible. Brain MRI is unremarkable. What is the most likely diagnosis?",
+    "correct": "Bell palsy",
+    "distractors": [
+      "Ramsay Hunt syndrome",
+      "Melkersson-Rosenthal syndrome",
+      "Moebius syndrome"
+    ],
+    "filter_decision": {
+      "worthy": true,
+      "best_pair_left": "Bell palsy",
+      "best_pair_right": "Ramsay Hunt syndrome",
+      "reason": "Both present with acute-onset complete facial nerve paralysis affecting forehead and lower face, making them clinically confusable. The key distinguishing feature is the presence of vesicles and recent URI/ear pain in Ramsay Hunt (varicella-zoster reactivation) versus absence of vesicles in Bell palsy, which is high-yield for differential diagnosis and commonly tested."
+    },
+    "filter_raw": null,
+    "lens_haiku": {
+      "left_label": "Bell Palsy",
+      "right_label": "Ramsay Hunt Syndrome",
+      "left": [
+        "Idiopathic etiology (presumed viral)",
+        "No vesicles or otologic findings",
+        "No severe otalgia",
+        "Better prognosis with corticosteroids alone"
+      ],
+      "shared": [
+        "Acute unilateral facial nerve paralysis",
+        "Affects forehead and lower face equally",
+        "CN VII dysfunction with hyperacusis possible"
+      ],
+      "right": [
+        "Herpes zoster oticus (VZV reactivation)",
+        "Vesicles in ear canal/auricle/palate",
+        "Severe otalgia often precedes paralysis",
+        "Requires antivirals + corticosteroids for best outcome"
+      ]
+    },
+    "lens_sonnet": {
+      "left_label": "Bell Palsy",
+      "right_label": "Ramsay Hunt Syndrome",
+      "left": [
+        "Idiopathic facial nerve inflammation",
+        "No vesicles or rash",
+        "No ear pain or vesicles",
+        "HSV-1 association (controversial)"
+      ],
+      "right": [
+        "VZV reactivation in geniculate ganglion",
+        "Vesicles in ear canal/auricle",
+        "Severe otalgia often present",
+        "Hearing loss and vertigo common"
+      ],
+      "shared": [
+        "Unilateral peripheral CN VII palsy",
+        "Forehead weakness (differentiates from central)",
+        "Treated with corticosteroids and antivirals"
+      ]
+    }
+  },
+  {
+    "id": "boardmd_s2_6205",
+    "topic": "Acute ischemic stroke treatment",
+    "system": "Nervous System & Special Senses",
+    "stem": "A 61-year-old woman presents to the emergency department 2 hours after sudden onset of right-sided weakness and slurred speech. She has a history of hypertension and osteoarthritis. Vital signs show blood pressure 165/92 mmHg. Neurological examination reveals right hemiparesis and facial droop with NIHSS score of 14. Noncontrast head CT shows no hemorrhage or early infarct signs. Serum glucose is 118 mg/dL (70-100). What is the most appropriate immediate treatment?",
+    "correct": "Alteplase (tPA)",
+    "distractors": [
+      "Aspirin monotherapy",
+      "Warfarin anticoagulation",
+      "Supportive care only"
+    ],
+    "filter_decision": {
+      "worthy": true,
+      "best_pair_left": "Alteplase (tPA)",
+      "best_pair_right": "Aspirin monotherapy",
+      "reason": "Both are acute ischemic stroke treatments that students commonly confuse regarding timing and efficacy; tPA is thrombolytic (within 4.5-hour window with superior outcomes) while aspirin is antiplatelet (used outside thrombolytic window or as adjunct), making a side-by-side comparison clinically valuable for understanding acute stroke management decisions."
+    },
+    "filter_raw": null,
+    "lens_haiku": {
+      "left_label": "Alteplase (tPA)",
+      "right_label": "Aspirin Monotherapy",
+      "left": [
+        "Fibrinolytic: dissolves clot directly",
+        "Window: 4.5 hours from onset",
+        "High risk intracranial hemorrhage",
+        "IV bolus then infusion dosing"
+      ],
+      "shared": [
+        "Acute ischemic stroke treatment",
+        "Antiplatelet/thrombolytic mechanism",
+        "Contraindicated in hemorrhagic stroke"
+      ],
+      "right": [
+        "Antiplatelet: inhibits aggregation only",
+        "No time window constraint",
+        "Minimal hemorrhage risk profile",
+        "Oral tablet, long-term use"
+      ]
+    },
+    "lens_sonnet": {
+      "left_label": "Alteplase (tPA)",
+      "right_label": "Aspirin monotherapy",
+      "left": [
+        "IV fibrinolytic, breaks down clots",
+        "Must give within 4.5 hours",
+        "6-7% intracranial hemorrhage risk",
+        "Contraindicated if recent surgery/bleeding"
+      ],
+      "shared": [
+        "Used in acute ischemic stroke",
+        "Requires hemorrhage exclusion on CT",
+        "Reduces stroke disability and mortality"
+      ],
+      "right": [
+        "Antiplatelet, inhibits COX-1 irreversibly",
+        "Give after tPA or if tPA contraindicated",
+        "Minimal bleeding risk compared to tPA",
+        "Standard within 24-48 hours of onset"
+      ]
+    }
+  }
+]
