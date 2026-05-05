@@ -15459,9 +15459,9 @@ function v2kp(card){
   let cnt=0;
   const h=raw.replace(/\*\*(.+?)\*\*/g,function(m,w){cnt++;return '<span class="v2cl" onclick="v2reveal(this)"><span class="v2clm">―――</span><span class="v2clw">'+w+'</span></span>';});
   window._v2kt=cnt;el.innerHTML=h;
-  const ci=document.getElementById('v2kpcoins');if(ci)ci.textContent=cnt>0?'0 / '+cnt+' coins':'';
+  const ci=document.getElementById('v2kpcoins');if(ci)ci.textContent='0 / '+cnt+' coins';
   const dn=document.getElementById('v2kpdone');if(dn)dn.classList.remove('on');
-  // Show KeyPoint whenever there is text — cloze is a bonus if ** markers exist
+  // Show whenever kp text exists — cloze is a bonus
   if(outer)outer.style.display='';
   if(oldkp)oldkp.style.display='none';
 }
@@ -15489,7 +15489,8 @@ function v2reset(){
 }
 console.log('[BoardMD v2] loaded');
 </script>
-
+  }
+}
 
 </body>
 ═══════════════════════════════════════════════════════════════════════
@@ -16735,10 +16736,10 @@ function renderClinicalReasoningReveal(card, el) {
 
   // FSRS
   html += '<div class="bs-cr-fsrs">' +
-    '<button class="bs-cr-fsrs-btn again" onclick="crFsrs(\'again\','' + card.id + '\')">Again<span class="bs-cr-fsrs-sub">1m</span></button>' +
-    '<button class="bs-cr-fsrs-btn hard" onclick="crFsrs(\'hard\','' + card.id + '\')">Hard<span class="bs-cr-fsrs-sub">~10m</span></button>' +
-    '<button class="bs-cr-fsrs-btn good" onclick="crFsrs(\'good\','' + card.id + '\')">Good<span class="bs-cr-fsrs-sub">~1d</span></button>' +
-    '<button class="bs-cr-fsrs-btn easy" onclick="crFsrs(\'easy\','' + card.id + '\')">Easy<span class="bs-cr-fsrs-sub">~4d</span></button>' +
+    '<button class="bs-cr-fsrs-btn again" onclick="crFsrs(\'again\',' + JSON.stringify(card.id||'') + ')">Again<span class="bs-cr-fsrs-sub">1m</span></button>' +
+    '<button class="bs-cr-fsrs-btn hard" onclick="crFsrs(\'hard\',' + JSON.stringify(card.id||'') + ')">Hard<span class="bs-cr-fsrs-sub">~10m</span></button>' +
+    '<button class="bs-cr-fsrs-btn good" onclick="crFsrs(\'good\',' + JSON.stringify(card.id||'') + ')">Good<span class="bs-cr-fsrs-sub">~1d</span></button>' +
+    '<button class="bs-cr-fsrs-btn easy" onclick="crFsrs(\'easy\',' + JSON.stringify(card.id||'') + ')">Easy<span class="bs-cr-fsrs-sub">~4d</span></button>' +
   '</div>';
 
   html += '</div>';
@@ -16878,9 +16879,9 @@ function v2kp(card){
   let cnt=0;
   const h=raw.replace(/\*\*(.+?)\*\*/g,function(m,w){cnt++;return '<span class="v2cl" onclick="v2reveal(this)"><span class="v2clm">―――</span><span class="v2clw">'+w+'</span></span>';});
   window._v2kt=cnt;el.innerHTML=h;
-  const ci=document.getElementById('v2kpcoins');if(ci)ci.textContent=cnt>0?'0 / '+cnt+' coins':'';
+  const ci=document.getElementById('v2kpcoins');if(ci)ci.textContent='0 / '+cnt+' coins';
   const dn=document.getElementById('v2kpdone');if(dn)dn.classList.remove('on');
-  // Show KeyPoint whenever there is text — cloze is a bonus if ** markers exist
+  // Show whenever kp text exists — cloze is a bonus
   if(outer)outer.style.display='';
   if(oldkp)oldkp.style.display='none';
 }
@@ -16908,7 +16909,8 @@ function v2reset(){
 }
 console.log('[BoardMD v2] loaded');
 </script>
-
+  }
+}
 
 </body>
 </html>
