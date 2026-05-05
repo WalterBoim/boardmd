@@ -4973,7 +4973,7 @@ html.dark .hl-btn-active { border-color:#fff!important; }
             <div id="v2-tabs">
               <button class="v2t on" onclick="v2tab(0,this)">&#9654; Visual</button>
               <button class="v2t" onclick="v2tab(1,this)">Full text</button>
-            </div>
+              </div>
             <div class="v2p on" id="v2p0">
               <div style="padding:12px 14px">
                 <div class="v2dots" id="v2dots"></div>
@@ -7234,14 +7234,14 @@ function revealAnswer(sel,card){
   const dw=document.getElementById('exp-dist-wrap');
   const dd=document.getElementById('exp-dist');
   if(dw&&dd){
-    const _wwPanel=document.getElementById('v2p2');
+    var _wp=document.getElementById('v2p2');
     if(distHtml){
       dd.innerHTML = distHtml;
       dw.style.display = '';
-      if(_wwPanel) _wwPanel.style.display = 'block';
+      if(_wp)_wp.style.display='block';
     } else {
       dw.style.display='none';
-      if(_wwPanel) _wwPanel.style.display = 'none';
+      if(_wp)_wp.style.display='none';
     }
   }
 
@@ -15399,10 +15399,7 @@ function v2stoptimer(){clearInterval(window._v2ti);}
 
 function v2tab(i,btn){
   document.querySelectorAll('.v2t').forEach((b,j)=>b.classList.toggle('on',j===i));
-  [0,1].forEach(function(j){
-    var p=document.getElementById('v2p'+j);
-    if(p){p.classList.toggle('on',j===i);}
-  });
+  [0,1].forEach(function(j){var p=document.getElementById('v2p'+j);if(p)p.classList.toggle('on',j===i);});
 }
 
 window._v2bi=0;window._v2bl=[];
@@ -16059,8 +16056,9 @@ function render(){
     if(card.phrase&&BS.mode!=='kp')h+='<div class="bs-exp"><strong>Phrase:</strong> '+hl(card.phrase)+'</div>';
     // Attending AI button — always visible after Key Point reveal
     const qTopic=card.topic||card.subject||'this topic';
-    h+='<button class="bs-attending-btn" onclick="bsOpenAttending('+JSON.stringify(qTopic)+',\'\')">'+'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>'+'Ask Attending AI about this topic</button>';
-      '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>'+
+    h+='<button class="bs-attending-btn" onclick="bsOpenAttending('+JSON.stringify(qTopic)+',\'\')">'+'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>Ask Attending AI about this topic</button>';
+
+
   }
   el.innerHTML=h;
   const fb=document.getElementById('bs-flag-btn');if(fb)fb.classList.toggle('on',BS.flagged.has(card.id));
@@ -16820,10 +16818,7 @@ function v2stoptimer(){clearInterval(window._v2ti);}
 
 function v2tab(i,btn){
   document.querySelectorAll('.v2t').forEach((b,j)=>b.classList.toggle('on',j===i));
-  [0,1].forEach(function(j){
-    var p=document.getElementById('v2p'+j);
-    if(p){p.classList.toggle('on',j===i);}
-  });
+  [0,1].forEach(function(j){var p=document.getElementById('v2p'+j);if(p)p.classList.toggle('on',j===i);});
 }
 
 window._v2bi=0;window._v2bl=[];
