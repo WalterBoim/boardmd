@@ -6039,6 +6039,7 @@ function openApp(dk){
   document.getElementById('landing').style.display='none';
   document.getElementById('app').classList.add('active');
   applyFont();
+  try{ if(dk && dk !== '_search') localStorage.setItem('bmd_last_deck', dk); }catch(e){}
   if(STEP2_DECKS.includes(dk)){
     currentStep='s2';
   } else {
@@ -10588,6 +10589,11 @@ async function updateAdminStatus(){
     _supa.auth.onAuthStateChange(async (event, session) => {
       console.log('[Auth] event=', event, 'email=', session?.user?.email, 'uid=', session?.user?.id);
       if(event === 'SIGNED_IN' && session){
+        // Auto-open app after OAuth login
+        const lastDk = localStorage.getItem('bmd_last_deck') || 's2';
+        if(document.getElementById('landing') && document.getElementById('landing').style.display !== 'none'){
+          if(typeof openApp === 'function') openApp(lastDk);
+        }
         // Wait 1s for session to propagate fully, then check admin status
         await new Promise(r => setTimeout(r, 1000));
         const isAdmin = await checkIsAdmin();
@@ -10769,6 +10775,9 @@ function syncRetentionHeader(){
     _supaUser = session.user;
     // Carrega progresso FSRS da nuvem
     await loadFsrsFromSupabase();
+    // Auto-open app if coming from OAuth redirect or already logged in
+    const lastDeck = localStorage.getItem('bmd_last_deck') || 's2';
+    if(typeof openApp === 'function') openApp(lastDeck);
     // Mostra nome do usuário na nav se existir
     const nameEl = document.getElementById('lb-my-name');
     if(nameEl && session.user.email){
@@ -16737,10 +16746,10 @@ function renderClinicalReasoningReveal(card, el) {
 
   // FSRS
   html += '<div class="bs-cr-fsrs">' +
-    '<button class="bs-cr-fsrs-btn again" onclick="crFsrs(\'again\','+String(card.id||'')+')">Again<span class="bs-cr-fsrs-sub">1m</span></button>' +
-    '<button class="bs-cr-fsrs-btn hard" onclick="crFsrs(\'hard\','+String(card.id||'')+')">Hard<span class="bs-cr-fsrs-sub">~10m</span></button>' +
-    '<button class="bs-cr-fsrs-btn good" onclick="crFsrs(\'good\','+String(card.id||'')+')">Good<span class="bs-cr-fsrs-sub">~1d</span></button>' +
-    '<button class="bs-cr-fsrs-btn easy" onclick="crFsrs(\'easy\','+String(card.id||'')+')">Easy<span class="bs-cr-fsrs-sub">~4d</span></button>' +
+    '<button class="bs-cr-fsrs-btn again" onclick="crFsrs(\'again\',' + JSON.stringify(String(card.id||'')) + ')">Again<span class="bs-cr-fsrs-sub">1m</span></button>' +
+    '<button class="bs-cr-fsrs-btn hard" onclick="crFsrs(\'hard\',' + JSON.stringify(String(card.id||'')) + ')">Hard<span class="bs-cr-fsrs-sub">~10m</span></button>' +
+    '<button class="bs-cr-fsrs-btn good" onclick="crFsrs(\'good\',' + JSON.stringify(String(card.id||'')) + ')">Good<span class="bs-cr-fsrs-sub">~1d</span></button>' +
+    '<button class="bs-cr-fsrs-btn easy" onclick="crFsrs(\'easy\',' + JSON.stringify(String(card.id||'')) + ')">Easy<span class="bs-cr-fsrs-sub">~4d</span></button>' +
   '</div>';
 
   html += '</div>';
