@@ -4973,7 +4973,6 @@ html.dark .hl-btn-active { border-color:#fff!important; }
             <div id="v2-tabs">
               <button class="v2t on" onclick="v2tab(0,this)">&#9654; Visual</button>
               <button class="v2t" onclick="v2tab(1,this)">Full text</button>
-              <button class="v2t" onclick="v2tab(2,this)">Why wrong</button>
             </div>
             <div class="v2p on" id="v2p0">
               <div style="padding:12px 14px">
@@ -4988,7 +4987,7 @@ html.dark .hl-btn-active { border-color:#fff!important; }
                 <div class="exp-text hl-zone" id="exp-txt"></div>
               </div>
             </div>
-            <div class="v2p" id="v2p2">
+            <div id="v2p2" style="display:none">
               <div class="exp-section" id="exp-dist-wrap">
                 <div class="exp-label"><span class="exp-label-icon" style="background:rgba(244,63,94,.15);color:var(--rose)"></span>Why the others are wrong</div>
                 <div class="exp-dist hl-zone" id="exp-dist"></div>
@@ -5261,7 +5260,7 @@ html.dark .hl-btn-active { border-color:#fff!important; }
       <div class="nav-label">Home</div>
     </div>
     <div class="nav-item" id="bnav-search" onclick="bmdNavGo('search',this)">
-      <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+      <svg width="24" height="24" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
       <div class="nav-label">Search</div>
     </div>
         <div class="nav-center" id="nav-center-wrap">
@@ -7235,11 +7234,14 @@ function revealAnswer(sel,card){
   const dw=document.getElementById('exp-dist-wrap');
   const dd=document.getElementById('exp-dist');
   if(dw&&dd){
+    const _wwPanel=document.getElementById('v2p2');
     if(distHtml){
       dd.innerHTML = distHtml;
       dw.style.display = '';
+      if(_wwPanel) _wwPanel.style.display = 'block';
     } else {
       dw.style.display='none';
+      if(_wwPanel) _wwPanel.style.display = 'none';
     }
   }
 
@@ -15397,12 +15399,10 @@ function v2stoptimer(){clearInterval(window._v2ti);}
 
 function v2tab(i,btn){
   document.querySelectorAll('.v2t').forEach((b,j)=>b.classList.toggle('on',j===i));
-  document.querySelectorAll('.v2p').forEach((p,j)=>p.classList.toggle('on',j===i));
-  // Why wrong tab: garantir que exp-dist-wrap fica visível
-  if(i===2){
-    const dw=document.getElementById('exp-dist-wrap');
-    if(dw) dw.style.display='';
-  }
+  [0,1].forEach(function(j){
+    var p=document.getElementById('v2p'+j);
+    if(p){p.classList.toggle('on',j===i);}
+  });
 }
 
 window._v2bi=0;window._v2bl=[];
@@ -15484,10 +15484,12 @@ function v2reset(){
   const nb=document.getElementById('v2next');if(nb){nb.style.display='';nb.className='';nb.textContent='Next ›';nb.onclick=v2next;}
   const ok=document.getElementById('v2kp');if(ok)ok.style.display='none';
   document.querySelectorAll('.v2t').forEach((b,i)=>b.classList.toggle('on',i===0));
-  document.querySelectorAll('.v2p').forEach((p,i)=>p.classList.toggle('on',i===0));
+  [0,1].forEach(function(j){var p=document.getElementById('v2p'+j);if(p)p.classList.toggle('on',j===0);});
+  var _wp2=document.getElementById('v2p2');if(_wp2)_wp2.style.display='none';
 }
 console.log('[BoardMD v2] loaded');
 </script>
+
   }
 }
 
@@ -15768,7 +15770,7 @@ console.log('[BoardMD v2] loaded');
 <div class="bs-overlay" id="bs-overlay">
   <div class="bs-h">
     <div class="bs-t">
-      <svg width="42" height="42" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" style="filter:drop-shadow(0 0 6px rgba(232,168,54,.3));flex-shrink:0;">
+      <svg width="42" height="42" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" style="filter:drop-shadow(0 0 6px rgba(232,168,54,.3));flex-shrink:0">
         <path d="M11 5C8 5 6 6.8 6 9.2c0 1 .35 1.9 1 2.55C6.35 12.4 6 13.3 6 14.3c0 1.9 1.2 3.1 3 3.2-.35.65-.6 1.4-.6 2.2 0 2.1 1.6 3.7 3.7 3.7L12 5h-1zM21 5c3 0 5 1.8 5 4.2 0 1-.35 1.9-1 2.55.65.65 1 1.55 1 2.55 0 1.9-1.2 3.1-3 3.2.35.65.6 1.4.6 2.2 0 2.1-1.6 3.7-3.7 3.7L20 5h1z" stroke="white" stroke-width="1.6" stroke-linejoin="round"/>
         <path d="M18 7L12 16.5h4L12 26l10-12.5h-4L18 7z" fill="#e8a836"/>
       </svg>
@@ -16057,9 +16059,8 @@ function render(){
     if(card.phrase&&BS.mode!=='kp')h+='<div class="bs-exp"><strong>Phrase:</strong> '+hl(card.phrase)+'</div>';
     // Attending AI button — always visible after Key Point reveal
     const qTopic=card.topic||card.subject||'this topic';
-    h+='<button class="bs-attending-btn" onclick="bsOpenAttending('+(JSON.stringify(qTopic))+','+(JSON.stringify(card.kp||card.phrase||'')).replace(/'/g,"\\'")+')">'+
-      '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/><path d="M12 6v6l4 2"/></svg>'+
-      'Ask Attending AI about this topic</button>';
+    h+='<button class="bs-attending-btn" onclick="bsOpenAttending('+JSON.stringify(qTopic)+',\'\')">'+'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>'+'Ask Attending AI about this topic</button>';
+      '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>'+
   }
   el.innerHTML=h;
   const fb=document.getElementById('bs-flag-btn');if(fb)fb.classList.toggle('on',BS.flagged.has(card.id));
@@ -16289,7 +16290,6 @@ function renderClinicalReasoning(card, el) {
 function hlBold(t) {
   return t ? String(t).replace(/\*\*(.+?)\*\*/g, '<span class="bs-hlb">$1</span>') : '';
 }
-// stripBold: para opções do AR — remove ** sem destacar (não entrega a resposta)
 function stripBold(t) {
   return t ? String(t).replace(/\*\*(.+?)\*\*/g, '$1') : '';
 }
@@ -16820,12 +16820,10 @@ function v2stoptimer(){clearInterval(window._v2ti);}
 
 function v2tab(i,btn){
   document.querySelectorAll('.v2t').forEach((b,j)=>b.classList.toggle('on',j===i));
-  document.querySelectorAll('.v2p').forEach((p,j)=>p.classList.toggle('on',j===i));
-  // Why wrong tab: garantir que exp-dist-wrap fica visível
-  if(i===2){
-    const dw=document.getElementById('exp-dist-wrap');
-    if(dw) dw.style.display='';
-  }
+  [0,1].forEach(function(j){
+    var p=document.getElementById('v2p'+j);
+    if(p){p.classList.toggle('on',j===i);}
+  });
 }
 
 window._v2bi=0;window._v2bl=[];
@@ -16907,10 +16905,12 @@ function v2reset(){
   const nb=document.getElementById('v2next');if(nb){nb.style.display='';nb.className='';nb.textContent='Next ›';nb.onclick=v2next;}
   const ok=document.getElementById('v2kp');if(ok)ok.style.display='none';
   document.querySelectorAll('.v2t').forEach((b,i)=>b.classList.toggle('on',i===0));
-  document.querySelectorAll('.v2p').forEach((p,i)=>p.classList.toggle('on',i===0));
+  [0,1].forEach(function(j){var p=document.getElementById('v2p'+j);if(p)p.classList.toggle('on',j===0);});
+  var _wp2=document.getElementById('v2p2');if(_wp2)_wp2.style.display='none';
 }
 console.log('[BoardMD v2] loaded');
 </script>
+
   }
 }
 
