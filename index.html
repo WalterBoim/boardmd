@@ -15461,7 +15461,6 @@ function v2kp(card){
   window._v2kt=cnt;el.innerHTML=h;
   const ci=document.getElementById('v2kpcoins');if(ci)ci.textContent='0 / '+cnt+' coins';
   const dn=document.getElementById('v2kpdone');if(dn)dn.classList.remove('on');
-  // Show whenever kp text exists — cloze is a bonus
   if(outer)outer.style.display='';
   if(oldkp)oldkp.style.display='none';
 }
@@ -15769,7 +15768,7 @@ console.log('[BoardMD v2] loaded');
 <div class="bs-overlay" id="bs-overlay">
   <div class="bs-h">
     <div class="bs-t">
-      <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" style="filter:drop-shadow(0 0 6px rgba(232,168,54,.3))">
+      <svg width="42" height="42" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" style="filter:drop-shadow(0 0 6px rgba(232,168,54,.3));flex-shrink:0;">
         <path d="M11 5C8 5 6 6.8 6 9.2c0 1 .35 1.9 1 2.55C6.35 12.4 6 13.3 6 14.3c0 1.9 1.2 3.1 3 3.2-.35.65-.6 1.4-.6 2.2 0 2.1 1.6 3.7 3.7 3.7L12 5h-1zM21 5c3 0 5 1.8 5 4.2 0 1-.35 1.9-1 2.55.65.65 1 1.55 1 2.55 0 1.9-1.2 3.1-3 3.2.35.65.6 1.4.6 2.2 0 2.1-1.6 3.7-3.7 3.7L20 5h1z" stroke="white" stroke-width="1.6" stroke-linejoin="round"/>
         <path d="M18 7L12 16.5h4L12 26l10-12.5h-4L18 7z" fill="#e8a836"/>
       </svg>
@@ -15868,7 +15867,7 @@ function setupNav(){
   btn.classList.add('bs-storm-btn');
   btn.removeAttribute('onclick');
   // Larger, bolder brain+bolt SVG (32x32 viewBox)
-  btn.innerHTML='<svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M11 5C8 5 6 6.8 6 9.2c0 1 .35 1.9 1 2.55C6.35 12.4 6 13.3 6 14.3c0 1.9 1.2 3.1 3 3.2-.35.65-.6 1.4-.6 2.2 0 2.1 1.6 3.7 3.7 3.7L12 5h-1zM21 5c3 0 5 1.8 5 4.2 0 1-.35 1.9-1 2.55.65.65 1 1.55 1 2.55 0 1.9-1.2 3.1-3 3.2.35.65.6 1.4.6 2.2 0 2.1-1.6 3.7-3.7 3.7L20 5h1z" stroke="white" stroke-width="1.6" stroke-linejoin="round"/><path d="M18 7L12 16.5h4L12 26l10-12.5h-4L18 7z" fill="#e8a836"/></svg>';
+  btn.innerHTML='<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M11 5C8 5 6 6.8 6 9.2c0 1 .35 1.9 1 2.55C6.35 12.4 6 13.3 6 14.3c0 1.9 1.2 3.1 3 3.2-.35.65-.6 1.4-.6 2.2 0 2.1 1.6 3.7 3.7 3.7L12 5h-1zM21 5c3 0 5 1.8 5 4.2 0 1-.35 1.9-1 2.55.65.65 1 1.55 1 2.55 0 1.9-1.2 3.1-3 3.2.35.65.6 1.4.6 2.2 0 2.1-1.6 3.7-3.7 3.7L20 5h1z" stroke="white" stroke-width="1.6" stroke-linejoin="round"/><path d="M18 7L12 16.5h4L12 26l10-12.5h-4L18 7z" fill="#e8a836"/></svg>';
   btn.onclick=function(e){e.preventDefault();e.stopPropagation();openBrainStorm();return false;};
   const nc=btn.parentElement;
   if(nc&&!nc.querySelector('.bs-storm-lbl')){
@@ -16059,7 +16058,7 @@ function render(){
     // Attending AI button — always visible after Key Point reveal
     const qTopic=card.topic||card.subject||'this topic';
     h+='<button class="bs-attending-btn" onclick="bsOpenAttending('+(JSON.stringify(qTopic))+','+(JSON.stringify(card.kp||card.phrase||'')).replace(/'/g,"\\'")+')">'+
-      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/><path d="M12 6v6l4 2"/></svg>'+
+      '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/><path d="M12 6v6l4 2"/></svg>'+
       'Ask Attending AI about this topic</button>';
   }
   el.innerHTML=h;
@@ -16290,6 +16289,10 @@ function renderClinicalReasoning(card, el) {
 function hlBold(t) {
   return t ? String(t).replace(/\*\*(.+?)\*\*/g, '<span class="bs-hlb">$1</span>') : '';
 }
+// stripBold: para opções do AR — remove ** sem destacar (não entrega a resposta)
+function stripBold(t) {
+  return t ? String(t).replace(/\*\*(.+?)\*\*/g, '$1') : '';
+}
 
 
 /* Active Recall State */
@@ -16444,7 +16447,7 @@ function renderActiveRecall(card, el) {
       const letter = i === 0 ? 'A' : 'B';
       html += `<button class="bs-ar-opt" data-correct="${opt.isCorrect}" onclick="arPickDx(this,'${card.id}')" data-full="${encodeURIComponent(dx)}">
         <span class="bs-ar-opt-letter">${letter}</span>
-        ${hlBold(opt.text)}
+        ${stripBold(opt.text)}
       </button>`;
     });
     html += `</div></div>`;
@@ -16477,7 +16480,7 @@ function renderActiveRecall(card, el) {
       const letter = i === 0 ? 'A' : 'B';
       html += `<button class="bs-ar-opt" data-correct="${opt.isCorrect}" onclick="arPickAction(this,'${card.id}')" data-full="${encodeURIComponent(action)}">
         <span class="bs-ar-opt-letter">${letter}</span>
-        ${hlBold(opt.text)}
+        ${stripBold(opt.text)}
       </button>`;
     });
     html += `</div></div>`;
@@ -16736,10 +16739,10 @@ function renderClinicalReasoningReveal(card, el) {
 
   // FSRS
   html += '<div class="bs-cr-fsrs">' +
-    '<button class="bs-cr-fsrs-btn again" onclick="crFsrs(\'again\',' + JSON.stringify(card.id||'') + ')">Again<span class="bs-cr-fsrs-sub">1m</span></button>' +
-    '<button class="bs-cr-fsrs-btn hard" onclick="crFsrs(\'hard\',' + JSON.stringify(card.id||'') + ')">Hard<span class="bs-cr-fsrs-sub">~10m</span></button>' +
-    '<button class="bs-cr-fsrs-btn good" onclick="crFsrs(\'good\',' + JSON.stringify(card.id||'') + ')">Good<span class="bs-cr-fsrs-sub">~1d</span></button>' +
-    '<button class="bs-cr-fsrs-btn easy" onclick="crFsrs(\'easy\',' + JSON.stringify(card.id||'') + ')">Easy<span class="bs-cr-fsrs-sub">~4d</span></button>' +
+    '<button class="bs-cr-fsrs-btn again" onclick="crFsrs(\'again\',' + JSON.stringify(String(card.id||'')) + ')">Again<span class="bs-cr-fsrs-sub">1m</span></button>' +
+    '<button class="bs-cr-fsrs-btn hard" onclick="crFsrs(\'hard\',' + JSON.stringify(String(card.id||'')) + ')">Hard<span class="bs-cr-fsrs-sub">~10m</span></button>' +
+    '<button class="bs-cr-fsrs-btn good" onclick="crFsrs(\'good\',' + JSON.stringify(String(card.id||'')) + ')">Good<span class="bs-cr-fsrs-sub">~1d</span></button>' +
+    '<button class="bs-cr-fsrs-btn easy" onclick="crFsrs(\'easy\',' + JSON.stringify(String(card.id||'')) + ')">Easy<span class="bs-cr-fsrs-sub">~4d</span></button>' +
   '</div>';
 
   html += '</div>';
@@ -16881,7 +16884,6 @@ function v2kp(card){
   window._v2kt=cnt;el.innerHTML=h;
   const ci=document.getElementById('v2kpcoins');if(ci)ci.textContent='0 / '+cnt+' coins';
   const dn=document.getElementById('v2kpdone');if(dn)dn.classList.remove('on');
-  // Show whenever kp text exists — cloze is a bonus
   if(outer)outer.style.display='';
   if(oldkp)oldkp.style.display='none';
 }
