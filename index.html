@@ -16036,13 +16036,13 @@ function renderARFallback(card, el, bs) {
   }
 
   // FSRS
+  var cid=JSON.stringify(String(card.id||''));
   html += '<div class="bs-ar-fsrs" id="ar-fsrs" style="display:none">';
-  html += '<button class="bs-ar-fsrs-btn again" onclick="arFsrs(\'again\',\''+(card.id||'')+'\')">Again<span class="bs-ar-fsrs-label">1m</span></button>';
-  html += '<button class="bs-ar-fsrs-btn hard" onclick="arFsrs(\'hard\',\''+(card.id||'')+'\')">Hard<span class="bs-ar-fsrs-label">~10m</span></button>';
-  html += '<button class="bs-ar-fsrs-btn good" onclick="arFsrs(\'good\',\''+(card.id||'')+'\')">Good<span class="bs-ar-fsrs-label">~1d</span></button>';
-  html += '<button class="bs-ar-fsrs-btn easy" onclick="arFsrs(\'easy\',\''+(card.id||'')+'\')">Easy<span class="bs-ar-fsrs-label">~4d</span></button>';
-  html += '</div></div>';
-
+  html += '<button class="bs-ar-fsrs-btn again" onclick="arFsrs(\'again\',' + cid + ')">Again<span class="bs-ar-fsrs-label">1m</span></button>';
+  html += '<button class="bs-ar-fsrs-btn hard" onclick="arFsrs(\'hard\',' + cid + ')">Hard<span class="bs-ar-fsrs-label">~10m</span></button>';
+  html += '<button class="bs-ar-fsrs-btn good" onclick="arFsrs(\'good\',' + cid + ')">Good<span class="bs-ar-fsrs-label">~1d</span></button>';
+  html += '<button class="bs-ar-fsrs-btn easy" onclick="arFsrs(\'easy\',' + cid + ')">Easy<span class="bs-ar-fsrs-label">~4d</span></button>';
+  html += '</div>';
   el.innerHTML = html;
 
   setTimeout(() => {
@@ -16076,167 +16076,113 @@ window.arRevealFallbackDx = function(el) {
 
 function renderActiveRecall(card, el) {
   const raw = card.brainstorm;
-  if (!raw) {
-    // Fallback: mostrar phrase/kp com reveal manual
-    renderARFallback(card, el);
-    return;
-  }
+  if (!raw) { renderARFallback(card, el); return; }
   let bs;
   try {
     bs = typeof raw === 'string' ? JSON.parse(raw) : raw;
     if (typeof bs === 'string') bs = JSON.parse(bs);
   } catch(e) { renderARFallback(card, el); return; }
+  if (!bs || !bs.dx_distractor) { renderARFallback(card, el, bs); return; }
 
-  // Se nao tem distractor, usa fallback mas com dados do brainstorm
-  if (!bs || !bs.dx_distractor) {
-    renderARFallback(card, el, bs);
-    return;
-  }
-
-  // Reset AR state
   AR.dxAnswered = false;
   AR.actionAnswered = false;
   AR.dxCorrect = false;
   AR.actionCorrect = false;
   AR.cardId = card.id;
 
-  const hy       = bs.hy_clue || '';
-  const dx       = bs.diagnosis || '';
-  const dxDist   = bs.dx_distractor || '';
-  const atype    = (bs.action_type || 'NONE').toUpperCase();
-  const action   = bs.action_content || '';
-  const actDist  = bs.action_distractor || '';
+  const hy      = bs.hy_clue || '';
+  const dx      = bs.diagnosis || '';
+  const dxDist  = bs.dx_distractor || '';
+  const atype   = (bs.action_type || 'NONE').toUpperCase();
+  const action  = bs.action_content || '';
+  const actDist = bs.action_distractor || '';
 
-  const ACTION_LABELS = {
-    NEXT_STEP: 'Next Step', BEST_TEST: 'Best Test',
-    TREATMENT: 'Treatment', MECHANISM: 'Mechanism', PROGNOSIS: 'Prognosis'
-  };
-  const ACTION_COLORS = {
-    NEXT_STEP:'#a855f7', BEST_TEST:'#06b6d4',
-    TREATMENT:'#22c55e', MECHANISM:'#f97316', PROGNOSIS:'#ec4899'
-  };
+  const ACTION_LABELS = {NEXT_STEP:'Next Step',BEST_TEST:'Best Test',TREATMENT:'Treatment',MECHANISM:'Mechanism',PROGNOSIS:'Prognosis'};
+  const ACTION_COLORS = {NEXT_STEP:'#a855f7',BEST_TEST:'#06b6d4',TREATMENT:'#22c55e',MECHANISM:'#f97316',PROGNOSIS:'#ec4899'};
 
-  // Shuffle 2 options
-  function shuffleTwo(correct, wrong) {
+  function shuffleTwo(a, b) {
     return Math.random() > 0.5
-      ? [{text: correct, isCorrect: true}, {text: wrong, isCorrect: false}]
-      : [{text: wrong, isCorrect: false}, {text: correct, isCorrect: true}];
+      ? [{text:a,isCorrect:true},{text:b,isCorrect:false}]
+      : [{text:b,isCorrect:false},{text:a,isCorrect:true}];
   }
 
-  const dxOpts = dxDist ? shuffleTwo(dx, dxDist) : null;
+  const dxOpts  = dxDist  ? shuffleTwo(dx, dxDist) : null;
   const actOpts = (atype !== 'NONE' && action && actDist) ? shuffleTwo(action, actDist) : null;
   const hasAction = atype !== 'NONE' && action;
+  const acolor = ACTION_COLORS[atype] || '#22c55e';
+  const alabel = ACTION_LABELS[atype] || 'Action';
 
-  let html = '<div class="bs-ar" id="bs-ar-wrap">';
+  let html = '<div class="bs-ar show" id="bs-ar-wrap">';
 
-  // 1. HY Clue
-  html += `<div class="bs-ar-hy" id="ar-hy">
-    <div class="bs-ar-hy-l">HY Clue</div>
-    <div class="bs-ar-hy-t">${hlBold(hy)}</div>
-  </div>`;
+  // HY Clue — always visible
+  html += '<div class="bs-ar-hy show" id="ar-hy">';
+  html += '<div class="bs-ar-hy-l">HY Clue</div>';
+  html += '<div class="bs-ar-hy-t">' + hlBold(hy) + '</div>';
+  html += '</div>';
 
-  // 2. Dx Question
+  // Dx options — always visible immediately
   if (dxOpts) {
-    html += `<div class="bs-ar-q" id="ar-dx-q">
-      <div class="bs-ar-q-l">What is the most likely diagnosis?</div>
-      <div class="bs-ar-opts">`;
+    html += '<div class="bs-ar-q show" id="ar-dx-q">';
+    html += '<div class="bs-ar-q-l">What is the most likely diagnosis?</div>';
+    html += '<div class="bs-ar-opts">';
     dxOpts.forEach((opt, i) => {
       const letter = i === 0 ? 'A' : 'B';
-      html += `<button class="bs-ar-opt" data-correct="${opt.isCorrect}" onclick="arPickDx(this,'${card.id}')" data-full="${encodeURIComponent(dx)}">
-        <span class="bs-ar-opt-letter">${letter}</span>
-        ${stripBold(opt.text)}
-      </button>`;
+      html += '<button class="bs-ar-opt" data-correct="' + opt.isCorrect + '" onclick="arPickDx(this,\'' + String(card.id||'') + '\')" >';
+      html += '<span class="bs-ar-opt-letter">' + letter + '</span>';
+      html += stripBold(opt.text);
+      html += '</button>';
     });
-    html += `</div></div>`;
+    html += '</div></div>';
+    // Confirmed dx (hidden until answered)
+    html += '<div class="bs-ar-confirmed dx-confirmed" id="ar-dx-confirmed" style="display:none;border-left:3px solid #3b7fff">';
+    html += '<span style="font-size:9.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#3b7fff;display:block;margin-bottom:5px">Diagnosis</span>';
+    html += hlBold(dx);
+    html += '</div>';
   } else {
-    // No distractor — show dx directly
-    html += `<div class="bs-ar-confirmed dx-confirmed show" id="ar-dx-confirmed" style="border-left:3px solid #3b7fff">
-      <span style="font-size:9.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#3b7fff;display:block;margin-bottom:5px">Diagnosis</span>
-      ${hlBold(dx)}
-    </div>`;
-    AR.dxAnswered = true;
-    AR.dxCorrect = true;
+    AR.dxAnswered = true; AR.dxCorrect = true;
+    html += '<div class="bs-ar-confirmed dx-confirmed show" id="ar-dx-confirmed" style="border-left:3px solid #3b7fff">';
+    html += '<span style="font-size:9.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#3b7fff;display:block;margin-bottom:5px">Diagnosis</span>';
+    html += hlBold(dx) + '</div>';
   }
 
-  // 3. Dx Confirmed (hidden until answered)
-  if (dxOpts) {
-    html += `<div class="bs-ar-confirmed dx-confirmed" id="ar-dx-confirmed">
-      <span style="font-size:9.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#3b7fff;display:block;margin-bottom:5px">Diagnosis</span>
-      ${hlBold(dx)}
-    </div>`;
-  }
-
-  // 4. Action Question (hidden until dx answered)
+  // Action options (hidden until dx answered)
   if (actOpts) {
-    const acolor = ACTION_COLORS[atype] || '#22c55e';
-    const alabel = ACTION_LABELS[atype] || 'Action';
-    html += `<div class="bs-ar-q" id="ar-act-q" style="display:none">
-      <div class="bs-ar-q-l">What is the ${alabel.toLowerCase()}?</div>
-      <div class="bs-ar-opts">`;
+    html += '<div class="bs-ar-q" id="ar-act-q" style="display:none">';
+    html += '<div class="bs-ar-q-l">What is the ' + alabel.toLowerCase() + '?</div>';
+    html += '<div class="bs-ar-opts">';
     actOpts.forEach((opt, i) => {
       const letter = i === 0 ? 'A' : 'B';
-      html += `<button class="bs-ar-opt" data-correct="${opt.isCorrect}" onclick="arPickAction(this,'${card.id}')" data-full="${encodeURIComponent(action)}">
-        <span class="bs-ar-opt-letter">${letter}</span>
-        ${stripBold(opt.text)}
-      </button>`;
+      html += '<button class="bs-ar-opt" data-correct="' + opt.isCorrect + '" onclick="arPickAction(this,\'' + String(card.id||'') + '\')" >';
+      html += '<span class="bs-ar-opt-letter">' + letter + '</span>';
+      html += stripBold(opt.text);
+      html += '</button>';
     });
-    html += `</div></div>`;
-    // Action confirmed
-    html += `<div class="bs-ar-confirmed action-confirmed" id="ar-act-confirmed" style="display:none;border-left:3px solid ${acolor};background:${acolor}18">
-      <span style="font-size:9.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:${acolor};display:block;margin-bottom:5px">${alabel}</span>
-      ${hlBold(action)}
-    </div>`;
+    html += '</div></div>';
+    html += '<div class="bs-ar-confirmed action-confirmed" id="ar-act-confirmed" style="display:none;border-left:3px solid ' + acolor + ';background:' + acolor + '18">';
+    html += '<span style="font-size:9.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:' + acolor + ';display:block;margin-bottom:5px">' + alabel + '</span>';
+    html += hlBold(action) + '</div>';
   } else if (hasAction) {
-    // Has action but no distractor
-    const acolor = ACTION_COLORS[atype] || '#22c55e';
-    const alabel = ACTION_LABELS[atype] || 'Action';
-    html += `<div class="bs-ar-confirmed action-confirmed" id="ar-act-confirmed" style="border-left:3px solid ${acolor};background:${acolor}18">
-      <span style="font-size:9.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:${acolor};display:block;margin-bottom:5px">${alabel}</span>
-      ${hlBold(action)}
-    </div>`;
-    AR.actionAnswered = true;
-    AR.actionCorrect = true;
+    AR.actionAnswered = true; AR.actionCorrect = true;
+    html += '<div class="bs-ar-confirmed action-confirmed" id="ar-act-confirmed" style="border-left:3px solid ' + acolor + ';background:' + acolor + '18">';
+    html += '<span style="font-size:9.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:' + acolor + ';display:block;margin-bottom:5px">' + alabel + '</span>';
+    html += hlBold(action) + '</div>';
   }
 
-  // 5. FSRS buttons (hidden until all answered)
-  html += `<div class="bs-ar-fsrs" id="ar-fsrs" style="display:none">
-    <button class="bs-ar-fsrs-btn again" onclick="arFsrs('again','${card.id}')">
-      Again<span class="bs-ar-fsrs-label">1m</span>
-    </button>
-    <button class="bs-ar-fsrs-btn hard" onclick="arFsrs('hard','${card.id}')">
-      Hard<span class="bs-ar-fsrs-label">~10m</span>
-    </button>
-    <button class="bs-ar-fsrs-btn good" onclick="arFsrs('good','${card.id}')">
-      Good<span class="bs-ar-fsrs-label">~1d</span>
-    </button>
-    <button class="bs-ar-fsrs-btn easy" onclick="arFsrs('easy','${card.id}')">
-      Easy<span class="bs-ar-fsrs-label">~4d</span>
-    </button>
-  </div>`;
+  // FSRS (hidden until all answered)
+  var cid2=JSON.stringify(String(card.id||''));
+  html += '<div class="bs-ar-fsrs" id="ar-fsrs" style="display:none">';
+  html += '<button class="bs-ar-fsrs-btn again" onclick="arFsrs(\'again\',' + cid2 + ')">Again<span class="bs-ar-fsrs-label">1m</span></button>';
+  html += '<button class="bs-ar-fsrs-btn hard" onclick="arFsrs(\'hard\',' + cid2 + ')">Hard<span class="bs-ar-fsrs-label">~10m</span></button>';
+  html += '<button class="bs-ar-fsrs-btn good" onclick="arFsrs(\'good\',' + cid2 + ')">Good<span class="bs-ar-fsrs-label">~1d</span></button>';
+  html += '<button class="bs-ar-fsrs-btn easy" onclick="arFsrs(\'easy\',' + cid2 + ')">Easy<span class="bs-ar-fsrs-label">~4d</span></button>';
+  html += '</div>';
 
   html += '</div>';
   el.innerHTML = html;
 
-  // Animate HY Clue in (el agora está no DOM real)
-  const arEl = el;
-  setTimeout(() => {
-    const hyEl = arEl.querySelector('#ar-hy');
-    if (hyEl) hyEl.classList.add('show');
-  }, 80);
-
-  // Mostrar Dx question com pequeno delay após HY clue
-  setTimeout(() => {
-    const dxQ = arEl.querySelector('#ar-dx-q');
-    if (dxQ) {
-      dxQ.classList.add('show');
-    }
-  }, 320);
-
-  // If no dx question, show action question and check completion
-  if (!dxOpts) {
-    setTimeout(() => arCheckComplete(), 200);
-  }
+  if (!dxOpts) { setTimeout(() => arCheckComplete(), 100); }
 }
+
 
 function arPickDx(btn, cardId) {
   if (AR.dxAnswered) return;
@@ -16257,27 +16203,19 @@ function arPickDx(btn, cardId) {
   // Award coin for correct AR answer
   arAwardCorrect(isCorrect);
 
-  // Show confirmed dx after delay
+  // Show confirmed dx
   setTimeout(() => {
     const confirmed = wrap ? wrap.querySelector('#ar-dx-confirmed') : document.getElementById('ar-dx-confirmed');
-    if (confirmed) { confirmed.classList.add('show'); }
-
-    // Dim the dx question block
+    if (confirmed) { confirmed.style.display = 'block'; confirmed.style.opacity = '1'; }
     const dxQ = wrap ? wrap.querySelector('#ar-dx-q') : document.getElementById('ar-dx-q');
     if (dxQ) dxQ.style.opacity = '.45';
-
     // Show action question
     setTimeout(() => {
       const actQ = wrap ? wrap.querySelector('#ar-act-q') : document.getElementById('ar-act-q');
-      if (actQ) {
-        actQ.style.display = 'block';
-        setTimeout(() => actQ.classList.add('show'), 50);
-      } else {
-        AR.actionAnswered = true;
-        arCheckComplete();
-      }
+      if (actQ) { actQ.style.display = 'block'; }
+      else { AR.actionAnswered = true; arCheckComplete(); }
     }, 400);
-  }, 600);
+  }, 400);
 }
 
 function arPickAction(btn, cardId) {
@@ -16299,12 +16237,9 @@ function arPickAction(btn, cardId) {
 
   setTimeout(() => {
     const confirmed = wrap ? wrap.querySelector('#ar-act-confirmed') : document.getElementById('ar-act-confirmed');
-    if (confirmed) {
-      confirmed.style.display = 'block';
-      setTimeout(() => confirmed.classList.add('show'), 50);
-    }
-    setTimeout(() => arCheckComplete(), 400);
-  }, 600);
+    if (confirmed) { confirmed.style.display = 'block'; confirmed.style.opacity = '1'; }
+    setTimeout(() => arCheckComplete(), 300);
+  }, 400);
 }
 
 function arCheckComplete() {
