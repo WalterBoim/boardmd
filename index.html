@@ -10572,14 +10572,28 @@ async function updateAdminStatus(){
         }
         // Implicit OAuth flow: #access_token=... (Google OAuth returns this)
         if(window.location.hash.includes('access_token')){
-          // Force SDK to process hash: getSession() triggers token parsing
-          await _supa.auth.getSession();
-          // Give SDK extra time, then clean URL
-          setTimeout(() => {
-            if(window.location.hash.includes('access_token')){
+          // Parse hash manually and call setSession
+          const hashParams = new URLSearchParams(window.location.hash.slice(1));
+          const access_token = hashParams.get('access_token');
+          const refresh_token = hashParams.get('refresh_token');
+          if(access_token && refresh_token){
+            const { data, error } = await _supa.auth.setSession({ access_token, refresh_token });
+            if(!error && data?.session){
+              console.log('[Auth] setSession OK:', data.session.user?.email);
               history.replaceState(null, '', window.location.pathname);
+              // Open app immediately
+              const lastDk = localStorage.getItem('bmd_last_deck') || 's2';
+              if(typeof openApp === 'function') openApp(lastDk);
+            } else {
+              console.warn('[Auth] setSession error:', error);
             }
-          }, 1500);
+          } else {
+            // Fallback: let SDK try
+            await _supa.auth.getSession();
+            setTimeout(() => {
+              history.replaceState(null, '', window.location.pathname);
+            }, 1500);
+          }
         }
       } catch(e){ console.warn('BoardMD: auth return handler', e); }
     }
