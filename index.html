@@ -4923,25 +4923,19 @@ html.dark .hl-btn-active { border-color:#fff!important; }
             <span style="flex:1;"></span>
             <span class="card-qid" id="c-qid" style="font-size:9px;flex-shrink:0;"></span>
           </div>
-          <!-- Back / Skip + Timer inline -->
-          <div id="bmd-card-nav" class="bmd-card-nav" style="display:flex;align-items:center;justify-content:space-between;padding:3px 18px 3px;border-bottom:1px solid var(--border);">
-            <div style="display:flex;align-items:center;gap:6px;">
-              <button class="bmd-nav-link" id="bmd-nav-back" onclick="bmdNavBack()" title="Previous card (←)">
-                <span class="bmd-nav-arrow">←</span> Back
-              </button>
-              <span class="bmd-nav-sep">·</span>
-              <button class="bmd-nav-link" id="bmd-nav-skip" onclick="bmdNavSkip()" title="Skip without rating (→)">
-                Skip <span class="bmd-nav-arrow">→</span>
-              </button>
-            </div>
-            <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
-              <span id="bmd-timer-secs" style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-faint);">0:00</span>
-              <div id="bmd-timer-wrap" style="width:56px;height:3px;background:var(--surface2);border-radius:2px;overflow:hidden;">
-                <div id="bmd-timer-bar" style="height:3px;width:100%;background:#22c55e;transition:width .3s linear,background .5s"></div>
-              </div>
-              <span id="bmd-coins-preview" class="tcp-l" style="font-family:'JetBrains Mono',monospace;font-size:10px;">+8 coins</span>
-            </div>
+          <!-- SETOR B (item 5): Back / Skip discretos abaixo do header -->
+          <div id="bmd-card-nav" class="bmd-card-nav">
+            <button class="bmd-nav-link" id="bmd-nav-back" onclick="bmdNavBack()" title="Previous card (←)">
+              <span class="bmd-nav-arrow">←</span> Back
+            </button>
+            <span class="bmd-nav-sep">·</span>
+            <button class="bmd-nav-link" id="bmd-nav-skip" onclick="bmdNavSkip()" title="Skip without rating (→)">
+              Skip <span class="bmd-nav-arrow">→</span>
+            </button>
           </div>
+          <!-- V2 TIMER -->
+          <div id="bmd-timer-wrap"><div id="bmd-timer-bar" style="background:#22c55e"></div></div>
+          <div id="bmd-timer-label"><span id="bmd-timer-secs">0:00</span><span id="bmd-coins-preview" class="tcp-l">+8 coins if correct</span></div>
           <div id="bmd-cols-row">
           <div id="bmd-q-col">
           <div id="bmd-q-inner">
@@ -4979,6 +4973,7 @@ html.dark .hl-btn-active { border-color:#fff!important; }
             <div id="v2-tabs">
               <button class="v2t on" onclick="v2tab(0,this)">&#9654; Visual</button>
               <button class="v2t" onclick="v2tab(1,this)">Full text</button>
+              <button class="v2t" onclick="v2tab(2,this)">Why wrong</button>
             </div>
             <div class="v2p on" id="v2p0">
               <div style="padding:12px 14px">
@@ -4993,8 +4988,7 @@ html.dark .hl-btn-active { border-color:#fff!important; }
                 <div class="exp-text hl-zone" id="exp-txt"></div>
               </div>
             </div>
-            <!-- Why wrong: sempre fixo, aparece automaticamente quando há distractors -->
-            <div id="v2p2" style="display:none;">
+            <div class="v2p" id="v2p2">
               <div class="exp-section" id="exp-dist-wrap">
                 <div class="exp-label"><span class="exp-label-icon" style="background:rgba(244,63,94,.15);color:var(--rose)"></span>Why the others are wrong</div>
                 <div class="exp-dist hl-zone" id="exp-dist"></div>
@@ -7237,18 +7231,15 @@ function revealAnswer(sel,card){
   const expTxt=document.getElementById('exp-txt');
   if(expTxt) expTxt.innerHTML=mdToHtml(expHtml);
 
-  // Renderizar Why the Others Are Wrong — sempre fixo abaixo do KP
+  // Renderizar Why the Others Are Wrong
   const dw=document.getElementById('exp-dist-wrap');
   const dd=document.getElementById('exp-dist');
-  const _wwPanel=document.getElementById('v2p2');
   if(dw&&dd){
     if(distHtml){
       dd.innerHTML = distHtml;
       dw.style.display = '';
-      if(_wwPanel) _wwPanel.style.display = 'block';
     } else {
       dw.style.display='none';
-      if(_wwPanel) _wwPanel.style.display = 'none';
     }
   }
 
@@ -7415,13 +7406,6 @@ function revealAnswer(sel,card){
   if(i1b) i1b.textContent=ivs.hard.label;
   if(i2b) i2b.textContent=ivs.good.label;
   if(i3b) i3b.textContent=ivs.easy.label;
-  // Sync visual-panel FSRS
-  var v0=document.getElementById('v2int0');var v1=document.getElementById('v2int1');
-  var v2=document.getElementById('v2int2');var v3=document.getElementById('v2int3');
-  if(v0) v0.textContent=ivs.again.label;
-  if(v1) v1.textContent=ivs.hard.label;
-  if(v2) v2.textContent=ivs.good.label;
-  if(v3) v3.textContent=ivs.easy.label;
 }
 
 async function prefetchPubmedAbstracts(card){
@@ -15413,11 +15397,12 @@ function v2stoptimer(){clearInterval(window._v2ti);}
 
 function v2tab(i,btn){
   document.querySelectorAll('.v2t').forEach((b,j)=>b.classList.toggle('on',j===i));
-  // Only toggle v2p0 (Visual) and v2p1 (Full text) — v2p2 (Why wrong) is always visible
-  [0,1].forEach(function(j){
-    var p=document.getElementById('v2p'+j);
-    if(p){p.classList.toggle('on',j===i);}
-  });
+  document.querySelectorAll('.v2p').forEach((p,j)=>p.classList.toggle('on',j===i));
+  // Why wrong tab: garantir que exp-dist-wrap fica visível
+  if(i===2){
+    const dw=document.getElementById('exp-dist-wrap');
+    if(dw) dw.style.display='';
+  }
 }
 
 window._v2bi=0;window._v2bl=[];
@@ -15474,9 +15459,10 @@ function v2kp(card){
   let cnt=0;
   const h=raw.replace(/\*\*(.+?)\*\*/g,function(m,w){cnt++;return '<span class="v2cl" onclick="v2reveal(this)"><span class="v2clm">―――</span><span class="v2clw">'+w+'</span></span>';});
   window._v2kt=cnt;el.innerHTML=h;
-  const ci=document.getElementById('v2kpcoins');if(ci)ci.textContent='0 / '+cnt+' coins';
+  const ci=document.getElementById('v2kpcoins');if(ci)ci.textContent=cnt>0?'0 / '+cnt+' coins':'';
   const dn=document.getElementById('v2kpdone');if(dn)dn.classList.remove('on');
-  if(outer)outer.style.display=cnt>0?'':'none';
+  // Show KeyPoint whenever there is text — cloze is a bonus if ** markers exist
+  if(outer)outer.style.display='';
   if(oldkp)oldkp.style.display='none';
 }
 function v2reveal(el){
@@ -15485,7 +15471,7 @@ function v2reveal(el){
   const ci=document.getElementById('v2kpcoins');if(ci)ci.textContent=window._v2kc+' / '+window._v2kt+' coins';
   v2burst(el,'+1');
   if(typeof window.awardCoins==='function')window.awardCoins(1,'Key Point');
-  if(window._v2kr>=window._v2kt){const dn=document.getElementById('v2kpdone');const tot=document.getElementById('v2kptot');if(tot)tot.textContent=window._v2kc;if(dn)dn.classList.add('on');var fn=document.getElementById('fsrs-nav');if(fn&&!fn.classList.contains('visible'))fn.classList.add('visible');}
+  if(window._v2kr>=window._v2kt){const dn=document.getElementById('v2kpdone');const tot=document.getElementById('v2kptot');if(tot)tot.textContent=window._v2kc;if(dn)dn.classList.add('on');}
 }
 function v2burst(el,txt){
   const r=el.getBoundingClientRect();const d=document.createElement('div');d.className='v2burst';d.textContent=txt;
@@ -15499,14 +15485,11 @@ function v2reset(){
   const nb=document.getElementById('v2next');if(nb){nb.style.display='';nb.className='';nb.textContent='Next ›';nb.onclick=v2next;}
   const ok=document.getElementById('v2kp');if(ok)ok.style.display='none';
   document.querySelectorAll('.v2t').forEach((b,i)=>b.classList.toggle('on',i===0));
-  [0,1].forEach(function(j){var p=document.getElementById('v2p'+j);if(p){p.classList.toggle('on',j===0);}});
-  var _wp=document.getElementById('v2p2');if(_wp)_wp.style.display='none';
-  var _vf=document.getElementById('v2-visual-fsrs');if(_vf)_vf.style.display='none';
+  document.querySelectorAll('.v2p').forEach((p,i)=>p.classList.toggle('on',i===0));
 }
 console.log('[BoardMD v2] loaded');
 </script>
-}
-}
+
 
 </body>
 ═══════════════════════════════════════════════════════════════════════
@@ -16021,22 +16004,11 @@ function render(){
   if(ph==='vignette'){
     h+='<div class="bs-sl">Vignette</div><div class="bs-vg">'+hlVignette(card.q||'',card.phrase||'')+'</div>';
   }else if(ph==='active'){
-    // Active Recall mode
+    // Active Recall mode — renderiza direto no el para garantir que os IDs existem no DOM
     el.innerHTML = h; // header primeiro
     const arWrap = document.createElement('div');
     el.appendChild(arWrap);
     renderActiveRecall(card, arWrap);
-    // Force show animations after DOM is attached
-    requestAnimationFrame(function(){
-      requestAnimationFrame(function(){
-        var hyEl=arWrap.querySelector('#ar-hy');
-        if(hyEl&&!hyEl.classList.contains('show'))hyEl.classList.add('show');
-        setTimeout(function(){
-          var dxQ=arWrap.querySelector('#ar-dx-q');
-          if(dxQ&&!dxQ.classList.contains('show'))dxQ.classList.add('show');
-        },300);
-      });
-    });
     const fbAR=document.getElementById('bs-flag-btn');if(fbAR)fbAR.classList.toggle('on',BS.flagged.has(card.id));
     return;
   }else if(ph==='phrase'){
@@ -16372,7 +16344,11 @@ function renderARFallback(card, el, bs) {
 
   el.innerHTML = html;
 
-  // Show animation handled by caller after DOM attach
+  setTimeout(() => {
+    const hyEl = el.querySelector('#ar-hy');
+    if (hyEl) hyEl.classList.add('show');
+  }, 80);
+
   AR.dxAnswered = false;
   AR.actionAnswered = !hasAction;
   AR.dxCorrect = false;
@@ -16540,8 +16516,22 @@ function renderActiveRecall(card, el) {
   html += '</div>';
   el.innerHTML = html;
 
-  // Animations handled by caller (rAF) for DOM attachment timing
-  // If no dx question, check completion immediately
+  // Animate HY Clue in (el agora está no DOM real)
+  const arEl = el;
+  setTimeout(() => {
+    const hyEl = arEl.querySelector('#ar-hy');
+    if (hyEl) hyEl.classList.add('show');
+  }, 80);
+
+  // Mostrar Dx question com pequeno delay após HY clue
+  setTimeout(() => {
+    const dxQ = arEl.querySelector('#ar-dx-q');
+    if (dxQ) {
+      dxQ.classList.add('show');
+    }
+  }, 320);
+
+  // If no dx question, show action question and check completion
   if (!dxOpts) {
     setTimeout(() => arCheckComplete(), 200);
   }
@@ -16826,11 +16816,12 @@ function v2stoptimer(){clearInterval(window._v2ti);}
 
 function v2tab(i,btn){
   document.querySelectorAll('.v2t').forEach((b,j)=>b.classList.toggle('on',j===i));
-  // Only toggle v2p0 (Visual) and v2p1 (Full text) — v2p2 (Why wrong) is always visible
-  [0,1].forEach(function(j){
-    var p=document.getElementById('v2p'+j);
-    if(p){p.classList.toggle('on',j===i);}
-  });
+  document.querySelectorAll('.v2p').forEach((p,j)=>p.classList.toggle('on',j===i));
+  // Why wrong tab: garantir que exp-dist-wrap fica visível
+  if(i===2){
+    const dw=document.getElementById('exp-dist-wrap');
+    if(dw) dw.style.display='';
+  }
 }
 
 window._v2bi=0;window._v2bl=[];
@@ -16887,9 +16878,10 @@ function v2kp(card){
   let cnt=0;
   const h=raw.replace(/\*\*(.+?)\*\*/g,function(m,w){cnt++;return '<span class="v2cl" onclick="v2reveal(this)"><span class="v2clm">―――</span><span class="v2clw">'+w+'</span></span>';});
   window._v2kt=cnt;el.innerHTML=h;
-  const ci=document.getElementById('v2kpcoins');if(ci)ci.textContent='0 / '+cnt+' coins';
+  const ci=document.getElementById('v2kpcoins');if(ci)ci.textContent=cnt>0?'0 / '+cnt+' coins':'';
   const dn=document.getElementById('v2kpdone');if(dn)dn.classList.remove('on');
-  if(outer)outer.style.display=cnt>0?'':'none';
+  // Show KeyPoint whenever there is text — cloze is a bonus if ** markers exist
+  if(outer)outer.style.display='';
   if(oldkp)oldkp.style.display='none';
 }
 function v2reveal(el){
@@ -16898,7 +16890,7 @@ function v2reveal(el){
   const ci=document.getElementById('v2kpcoins');if(ci)ci.textContent=window._v2kc+' / '+window._v2kt+' coins';
   v2burst(el,'+1');
   if(typeof window.awardCoins==='function')window.awardCoins(1,'Key Point');
-  if(window._v2kr>=window._v2kt){const dn=document.getElementById('v2kpdone');const tot=document.getElementById('v2kptot');if(tot)tot.textContent=window._v2kc;if(dn)dn.classList.add('on');var fn=document.getElementById('fsrs-nav');if(fn&&!fn.classList.contains('visible'))fn.classList.add('visible');}
+  if(window._v2kr>=window._v2kt){const dn=document.getElementById('v2kpdone');const tot=document.getElementById('v2kptot');if(tot)tot.textContent=window._v2kc;if(dn)dn.classList.add('on');}
 }
 function v2burst(el,txt){
   const r=el.getBoundingClientRect();const d=document.createElement('div');d.className='v2burst';d.textContent=txt;
@@ -16912,14 +16904,11 @@ function v2reset(){
   const nb=document.getElementById('v2next');if(nb){nb.style.display='';nb.className='';nb.textContent='Next ›';nb.onclick=v2next;}
   const ok=document.getElementById('v2kp');if(ok)ok.style.display='none';
   document.querySelectorAll('.v2t').forEach((b,i)=>b.classList.toggle('on',i===0));
-  [0,1].forEach(function(j){var p=document.getElementById('v2p'+j);if(p){p.classList.toggle('on',j===0);}});
-  var _wp=document.getElementById('v2p2');if(_wp)_wp.style.display='none';
-  var _vf=document.getElementById('v2-visual-fsrs');if(_vf)_vf.style.display='none';
+  document.querySelectorAll('.v2p').forEach((p,i)=>p.classList.toggle('on',i===0));
 }
 console.log('[BoardMD v2] loaded');
 </script>
-}
-}
+
 
 </body>
 </html>
