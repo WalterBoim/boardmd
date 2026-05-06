@@ -10876,7 +10876,10 @@ function syncRetentionHeader(){
 
   // Register Service Worker for PWA
   if('serviceWorker' in navigator){
-    navigator.serviceWorker.register('/sw.js')
+    // Unregister any existing service workers - they cause caching issues
+    navigator.serviceWorker.getRegistrations().then(regs => regs.forEach(r => r.unregister()));
+    // DO NOT register sw.js - it breaks Supabase queries
+    if(false && navigator.serviceWorker.register('/sw.js'))
       .then(reg => console.log('BoardMD SW registered:', reg.scope))
       .catch(err => console.log('SW registration failed:', err));
   }
