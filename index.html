@@ -3876,7 +3876,7 @@ html.dark .hl-btn-active { border-color:#fff!important; }
   </nav>
 
   <div class="hero">
-    <div class="hero-badge">FSRS · USMLE Step 1 &amp; Step 2 CK</div>
+    <div class="hero-badge">FSRS · USMLE Step 2 CK</div>
     <h1>The <em>smarter</em> way<br>to pass the boards</h1>
     <p class="hero-sub">Intelligent MCQ flashcards with adaptive spaced repetition — designed to build the clinical reasoning skills that matter most on exam day.</p>
     <div class="hero-cta">
@@ -3896,7 +3896,7 @@ html.dark .hl-btn-active { border-color:#fff!important; }
 
   <div class="section" id="decks">
     <div class="section-label">Our Decks</div>
-    <div class="section-title">Everything you need.<br>Step 1 &amp; Step 2 CK.</div>
+    <div class="section-title">Everything you need.<br>Step 2 CK.</div>
     <p class="section-sub">From rapid review to high-yield concept mastery — organized by exam, built for performance.</p>
     <div class="decks-step-label">
       <div class="decks-step-badge step1-badge">Step 1</div>
@@ -10068,13 +10068,18 @@ function setIDBMeta(count){
 async function fetchAllFromSupabase(onProgress){
   const PAGE = 1000;
   const SELECT_FIELDS = 'id,deck,system,topic,subject,qid,q,c,w,e,kp,phrase,brainstorm,d,img,pubmed_query,cochrane_pmid';
-  // FAST START: load only first 2 pages (2000 cards) immediately
-  // so user can start studying in <5 seconds, rest loads in background
-  const FAST_START_PAGES = 2;
 
+  // Descobre o total atual no Supabase (ground truth pro caller)
   let total = 0;
-  // Skip count() to reduce IO — we'll figure out total as we fetch
-  console.log('BoardMD: iniciando fetch rapido (primeiros 2000 cards)...');
+  try {
+    const countResp = await _supa
+      .from('cards')
+      .select('id', { count: 'exact', head: true });
+    total = countResp.count || 0;
+  } catch(e){
+    console.warn('BoardMD: count() falhou', e);
+  }
+  console.log('BoardMD: total reportado pelo Supabase: ' + total);
 
   const allCards = [];
   let lastId = null;
@@ -10087,7 +10092,8 @@ async function fetchAllFromSupabase(onProgress){
   while(pageIdx < MAX_PAGES_SAFETY){
     let data, error;
     try {
-      let q = _supa.from('cards').select(SELECT_FIELDS).order('id').limit(PAGE);
+      // Constroi a query: primeira pagina sem WHERE, demais com gt('id', lastId)
+      let q = _supa.from('cards').select(SELECT_FIELDS).in('deck', ['boardmd_s2','core']).order('id').limit(PAGE);
       if(lastId !== null) q = q.gt('id', lastId);
       const resp = await q;
       data = resp.data; error = resp.error;
@@ -10096,6 +10102,7 @@ async function fetchAllFromSupabase(onProgress){
       pagesFail++;
       consecutiveFails++;
       pageIdx++;
+      // 3 falhas seguidas no inicio = problema serio, paramos
       if(consecutiveFails >= 3) break;
       continue;
     }
@@ -10110,51 +10117,32 @@ async function fetchAllFromSupabase(onProgress){
     }
 
     consecutiveFails = 0;
+
+    // data === [] significa que chegamos no fim do dataset (id > ultimo) — fim natural
     if(!data || data.length === 0) break;
 
     allCards.push(...data);
     pagesOk++;
     pageIdx++;
+
+    // O proximo cursor e o id do ultimo card desta pagina
     lastId = data[data.length - 1].id;
 
     if(onProgress){
-      onProgress(0, allCards.length, data);
+      const pct = total ? Math.round(allCards.length / total * 100) : 0;
+      onProgress(pct, allCards.length, data);
     }
 
+    // Se sabemos o total e ja chegamos, paramos (defesa em profundidade)
+    if(total && allCards.length >= total) break;
+
+    // Se a pagina veio incompleta (< PAGE), e fim natural do dataset
     if(data.length < PAGE) break;
-
-    // After FAST_START_PAGES, yield to browser so UI shows cards immediately
-    if(pageIdx === FAST_START_PAGES){
-      console.log('BoardMD: fast start — ' + allCards.length + ' cards prontos, rest in background');
-      // Continue loading rest in background without blocking UI
-      setTimeout(async function(){
-        while(pageIdx < MAX_PAGES_SAFETY){
-          try {
-            let q2 = _supa.from('cards').select(SELECT_FIELDS).order('id').limit(PAGE);
-            if(lastId !== null) q2 = q2.gt('id', lastId);
-            const resp2 = await q2;
-            if(resp2.error || !resp2.data || resp2.data.length === 0) break;
-            allCards.push(...resp2.data);
-            lastId = resp2.data[resp2.data.length-1].id;
-            pageIdx++;
-            if(resp2.data.length < PAGE) break;
-            // Small delay between background pages to not hammer the DB
-            await new Promise(r => setTimeout(r, 500));
-          } catch(e){ break; }
-        }
-        console.log('BoardMD: background fetch done — total ' + allCards.length + ' cards');
-        allCards._supabaseTotal = allCards.length;
-        // Save full cache silently
-        if(typeof saveIDBCards === 'function') saveIDBCards(allCards);
-        if(typeof setIDBMeta === 'function') setIDBMeta(allCards.length);
-      }, 100);
-      allCards._supabaseTotal = allCards.length;
-      return allCards;
-    }
   }
 
-  console.log('BoardMD: fetch terminado — ' + allCards.length + ' cards');
-  allCards._supabaseTotal = total || allCards.length;
+  console.log('BoardMD: fetch terminado — ' + allCards.length + '/' + total +
+              ' cards (ok: ' + pagesOk + ', fail: ' + pagesFail + ', keyset)');
+  allCards._supabaseTotal = total;
   return allCards;
 }
 
