@@ -10126,8 +10126,6 @@ async function fetchAllFromSupabase(onProgress){
     // After FAST_START_PAGES, yield to browser so UI shows cards immediately
     if(pageIdx === FAST_START_PAGES){
       console.log('BoardMD: fast start — ' + allCards.length + ' cards prontos, rest in background');
-      // Save what we have so far and build UI
-      if(typeof buildDecks === 'function') buildDecks([...allCards]);
       // Continue loading rest in background without blocking UI
       setTimeout(async function(){
         while(pageIdx < MAX_PAGES_SAFETY){
@@ -10146,10 +10144,9 @@ async function fetchAllFromSupabase(onProgress){
         }
         console.log('BoardMD: background fetch done — total ' + allCards.length + ' cards');
         allCards._supabaseTotal = allCards.length;
-        // Save full cache
+        // Save full cache silently
         if(typeof saveIDBCards === 'function') saveIDBCards(allCards);
         if(typeof setIDBMeta === 'function') setIDBMeta(allCards.length);
-        if(typeof buildDecks === 'function') buildDecks(allCards);
       }, 100);
       allCards._supabaseTotal = allCards.length;
       return allCards;
