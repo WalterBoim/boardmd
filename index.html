@@ -10074,7 +10074,8 @@ async function fetchAllFromSupabase(onProgress){
   try {
     const countResp = await _supa
       .from('cards')
-      .select('id', { count: 'exact', head: true });
+      .select('id', { count: 'exact', head: true })
+      .in('deck', ['boardmd_s2','core']);
     total = countResp.count || 0;
   } catch(e){
     console.warn('BoardMD: count() falhou', e);
@@ -10093,7 +10094,7 @@ async function fetchAllFromSupabase(onProgress){
     let data, error;
     try {
       // Constroi a query: primeira pagina sem WHERE, demais com gt('id', lastId)
-      let q = _supa.from('cards').select(SELECT_FIELDS).order('id').limit(PAGE);
+      let q = _supa.from('cards').select(SELECT_FIELDS).in('deck',['boardmd_s2','core']).order('id').limit(PAGE);
       if(lastId !== null) q = q.gt('id', lastId);
       const resp = await q;
       data = resp.data; error = resp.error;
