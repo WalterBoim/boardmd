@@ -10057,6 +10057,9 @@ async function setIDBCards(cards){
 function getIDBMeta(){
   try { return JSON.parse(localStorage.getItem(IDB_META_KEY) || 'null'); } catch(e){ return null; }
 }
+function setIDBMeta(count){
+  try { localStorage.setItem(IDB_META_KEY, JSON.stringify({count: count, ts: Date.now()})); } catch(e){}
+}
 
 // ── FETCH ADAPTATIVO COM KEYSET PAGINATION ──
 // Em vez de OFFSET (lento, O(N) por pagina), usa WHERE id > last_id (O(1) sempre).
@@ -10309,19 +10312,42 @@ function updateBackgroundSpinner(stepLabel){
 // Sem constante hardcoded. Funciona com qualquer numero de cards no banco.
 async function loadCardsFromSupabase(){
   const meta = getIDBMeta();
+  const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000;
+  const ONE_DAY_MS = 24 * 60 * 60 * 1000;
+  const cacheAgeMs = meta ? (Date.now() - (meta.ts || 0)) : Infinity;
+  const cacheIsRecent = meta && meta.count > 1000 && cacheAgeMs < SEVEN_DAYS_MS;
 
-  // Pega count atual do Supabase para decidir se o cache é válido
+  // CRITICAL OPTIMIZATION: if cache is recent (< 7 days) and has cards,
+  // skip the count() query entirely — trust the local cache
+  // This eliminates the Supabase IO cost for every page load
+  if(cacheIsRecent){
+    try {
+      const cached = await getIDBCards();
+      if(cached && cached.length > 1000){
+        console.log('BoardMD: ' + cached.length + ' cards from cache (age: ' + Math.round(cacheAgeMs/3600000) + 'h) — skipping Supabase count');
+        buildDecks(cached);
+        if(window._bmdSavedTheme === 'light') document.documentElement.classList.add('light');
+        if(typeof updateThemeIcons === 'function') updateThemeIcons();
+        // Background refresh only if cache > 24h old
+        if(cacheAgeMs > ONE_DAY_MS){
+          console.log('BoardMD: cache > 24h, refresh em background em 10s');
+          setTimeout(() => backgroundRefresh(cached.length), 10000);
+        }
+        return cached.length;
+      }
+    } catch(e){ console.warn('BoardMD: IDB read falhou, baixando do Supabase'); }
+  }
+
+  // Cache missing/old/small — check count from Supabase
   let currentTotal = 0;
   try {
     const r = await _supa.from('cards').select('id', { count: 'exact', head: true });
     currentTotal = r.count || 0;
   } catch(e){ console.warn('BoardMD: count check falhou', e); }
 
-  // Cache válido se: existe E cobre >= 90% do total atual do Supabase
-  // Se count falhou (currentTotal=0), aceitamos qualquer cache > 0 (evita ciclo)
   const cacheCovers = (cnt) => {
     if(!cnt || cnt <= 0) return false;
-    if(currentTotal <= 0) return cnt > 0; // count falhou, cache > 0 vale
+    if(currentTotal <= 0) return cnt > 0;
     return cnt >= currentTotal * 0.9;
   };
 
@@ -10329,26 +10355,18 @@ async function loadCardsFromSupabase(){
     try {
       const cached = await getIDBCards();
       if(cacheCovers(cached.length)){
-        console.log('BoardMD: ' + cached.length + ' cards from cache (cobre ' +
-                    (currentTotal ? Math.round(cached.length/currentTotal*100) + '% do banco' : 'banco offline') + ')');
+        console.log('BoardMD: ' + cached.length + ' cards from cache');
         buildDecks(cached);
         if(window._bmdSavedTheme === 'light') document.documentElement.classList.add('light');
         if(typeof updateThemeIcons === 'function') updateThemeIcons();
-
-        // Refresh em background apenas se cache antigo (>24h)
-        const cacheAgeMs = Date.now() - (meta.ts || 0);
-        const ONE_DAY_MS = 24 * 60 * 60 * 1000;
         if(cacheAgeMs > ONE_DAY_MS){
-          console.log('BoardMD: cache > 24h, refresh em background em 5s');
-          setTimeout(() => backgroundRefresh(cached.length), 5000);
+          setTimeout(() => backgroundRefresh(cached.length), 10000);
         }
         return cached.length;
       }
     } catch(e){ console.warn('BoardMD: IDB read falhou, baixando do Supabase'); }
   } else if(meta && meta.count > 0){
-    // Cache existe mas é parcial. Avisa e segue para re-download.
-    console.warn('BoardMD: cache parcial (' + meta.count + ' de ' + currentTotal +
-                 ') — sera substituido por fetch completo');
+    console.warn('BoardMD: cache parcial (' + meta.count + ' de ' + currentTotal + ') — sera substituido');
   }
 
   // Fetch completo
