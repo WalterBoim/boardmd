@@ -10574,6 +10574,7 @@ async function updateAdminStatus(){
 // OAuth/magic link return handler + admin auth listener
 (function(){
   try {
+    console.log('[Auth] IIFE starting, hash:', location.hash.slice(0,30));
     async function handleAuthReturn(){
       try {
         // PKCE flow: ?code=...
