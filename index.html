@@ -10453,7 +10453,7 @@ async function getSession(){
   return data?.session;
 }
 
-async function signInWithGoogle(){
+window.signInWithGoogle = async function signInWithGoogle(){
   await _supa.auth.signInWithOAuth({
     provider: 'google',
     options: { redirectTo: window.location.origin }
