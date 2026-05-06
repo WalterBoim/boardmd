@@ -7,6 +7,7 @@
 <!-- PWA -->
 <link rel="manifest" href="/manifest.json">
 <meta name="theme-color" content="#080c12">
+<meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="BoardMD">
@@ -10879,9 +10880,8 @@ function syncRetentionHeader(){
     // Unregister any existing service workers - they cause caching issues
     navigator.serviceWorker.getRegistrations().then(regs => regs.forEach(r => r.unregister()));
     // DO NOT register sw.js - it breaks Supabase queries
-    if(false && navigator.serviceWorker.register('/sw.js'))
-      .then(reg => console.log('BoardMD SW registered:', reg.scope))
-      .catch(err => console.log('SW registration failed:', err));
+    // Service worker disabled to avoid caching issues with Supabase queries
+    // navigator.serviceWorker.register('/sw.js');
   }
 })();
 
