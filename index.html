@@ -10599,24 +10599,27 @@ async function updateAdminStatus(){
         const params = new URLSearchParams(window.location.search);
         const code = params.get('code');
         if(code){
-          const { error } = await _supa.auth.exchangeCodeForSession(window.location.href);
-          if(!error){
+          const { data: pkceData, error } = await _supa.auth.exchangeCodeForSession(window.location.href);
+          if(!error && pkceData?.session){
+            // Sessão OK — salva flag e abre direto sem reload
+            _supaUser = pkceData.session.user;
             history.replaceState(null, '', window.location.pathname);
-            // PKCE: onAuthStateChange vai disparar SIGNED_IN e abrir o app
-            // mas se cards ainda não carregaram, espera e abre
             const lastDk = localStorage.getItem('bmd_last_deck') || 's2';
+            // Espera cards carregarem (loadCardsFromSupabase roda em paralelo no init)
             const tryOpen = () => {
-              if(window.cardsLoaded && typeof openApp === 'function'){
-                if(document.getElementById('landing') && document.getElementById('landing').style.display !== 'none'){
+              if(window.cardsLoaded){
+                const landing = document.getElementById('landing');
+                if(landing && landing.style.display !== 'none' && typeof openApp === 'function'){
                   openApp(lastDk);
                 }
               } else {
-                setTimeout(tryOpen, 300);
+                setTimeout(tryOpen, 200);
               }
             };
-            setTimeout(tryOpen, 600);
+            tryOpen();
           } else {
             console.warn('BoardMD: exchangeCodeForSession error', error);
+            history.replaceState(null, '', window.location.pathname);
           }
           return;
         }
