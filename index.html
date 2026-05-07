@@ -15760,26 +15760,17 @@ window.bsSearch=function(q){
 };
 
 window.bsRate=function(rating){
-  // FSRS rating from BrainStorm
+  // FSRS rating from BrainStorm — usa applyRating() real do FSRS-5
   const card=BS.cards&&BS.cards[BS.cur];if(!card)return;
-  const fs=window.fsrsState||window.fsrs||{};
-  const SK='bmd_fsrs5';
   try{
-    const stored=JSON.parse(localStorage.getItem(SK)||'{}');
-    const now=Date.now();
-    let s=stored[card.id]||{state:0,stability:0,difficulty:0,interval:0,due:0,reps:0,lapses:0,stepIdx:0};
-    // Simple FSRS-lite update
-    const INIT_STAB=[0.4,0.6,2.4,5.8];
-    const INIT_DIFF=[0.3,0.5,0.7,0.9];
-    if(s.state===0){s.stability=INIT_STAB[rating]||2.4;s.difficulty=INIT_DIFF[rating]||0.5;}
-    else{const r=[1,3,14,21][rating]||1;s.stability*=(1+(r/s.stability)*0.9);}
-    const INTS=[1,3,14,21];s.interval=Math.round(s.stability*(INTS[rating]||1));
-    s.due=now+s.interval*86400000;s.reps++;if(rating===0)s.lapses++;s.state=rating===0?1:2;
-    s.lastRating=rating===0?'again':rating===1?'hard':rating===2?'good':'easy';s.lastReview=now;
-    stored[card.id]=s;
-    localStorage.setItem(SK,JSON.stringify(stored));
-    if(window.fsrsState)window.fsrsState[card.id]=s;
-  }catch(e){}
+    const rtMap=[RT_AGAIN,RT_HARD,RT_GOOD,RT_EASY];
+    const rt=rtMap[rating]||RT_GOOD;
+    const s=getState(card.id);
+    const ns=applyRating(s,rt);
+    fsrs[card.id]=ns;
+    saveFsrs();
+    if(typeof buildDeckHomeTable==='function') setTimeout(buildDeckHomeTable,100);
+  }catch(e){ console.warn('BrainStorm FSRS error',e); }
   // Visual feedback + advance
   const overlay=document.createElement('div');
   const clrs={0:'#f43f5e',1:'#f97316',2:'#22c55e',3:'#3b7fff'};
