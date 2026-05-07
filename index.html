@@ -16024,8 +16024,6 @@ window.bsSearch=function(q){
     m.className='bs-int-match '+(matches.length?'hit':'miss');
     m.textContent=matches.length?matches.length+' cards match':'no matches';
   } else if(m){m.style.display='none';}
-  const inp=document.getElementById('bs-search');
-  if(inp)inp.style.borderColor=q?(matches.length?'var(--accent)':'var(--rose)'):'';
 };
 
 window.bsRate=function(rating){
