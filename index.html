@@ -15546,6 +15546,8 @@ function render(){
     if(i===1)e.textContent=BS.flagged.size;
     if(i===2)e.textContent=BS.cards.length;
   });
+  // Update FSRS counter on every card advance
+  if(typeof bsUpdateFsrsCounter==='function') bsUpdateFsrsCounter();
   const pf=document.getElementById('bs-pf');if(pf)pf.style.width=Math.round(BS.cur/BS.cards.length*100)+'%';
   const phn={vignette:'Vignette',choices:'Choices',answer:'Answer',kp:'Key Point',phrase:'Phrase'};
   const st=document.getElementById('bs-stxt');if(st)st.textContent='Card '+(BS.cur+1)+' of '+BS.cards.length+' · '+(phn[ph]||'');
@@ -15799,6 +15801,26 @@ window.bsSearch=function(q){
   } else if(m){m.style.display='none';}
 };
 
+
+// ── UPDATE BRAINSTORM FSRS COUNTER ───────────────────────────────────
+function bsUpdateFsrsCounter(){
+  try{
+    var now=Date.now();
+    var cards=BS.cards||[];
+    var remaining=cards.slice(BS.cur+1); // cards not yet seen
+    var nw=0,due=0;
+    remaining.forEach(function(c){
+      var s=typeof getState==='function'?getState(c.id):{state:0};
+      if(!s||s.state===0) nw++;
+      else if(s.due&&s.due<=now+86400000) due++;
+    });
+    var newEl=document.getElementById('bs-fsrs-new');
+    var dueEl=document.getElementById('bs-fsrs-due');
+    if(newEl) newEl.textContent=nw;
+    if(dueEl) dueEl.textContent=due;
+  }catch(e){}
+}
+
 window.bsRate=function(rating){
   // FSRS rating from BrainStorm — FSRS-5 real
   const card=BS.cards&&BS.cards[BS.cur];if(!card)return;
@@ -15810,8 +15832,9 @@ window.bsRate=function(rating){
     fsrs[card.id]=ns;
     saveFsrs();
     if(typeof buildDeckHomeTable==='function') setTimeout(buildDeckHomeTable,100);
-    // Update main FSRS header counter
+    // Update main FSRS header counter + BS counter
     if(typeof updateStats==='function') setTimeout(updateStats,150);
+    setTimeout(bsUpdateFsrsCounter,50);
   }catch(e){ console.warn('BrainStorm FSRS error',e); }
   // Visual feedback + advance
   const overlay=document.createElement('div');
@@ -16340,8 +16363,9 @@ window.arFsrs=function(rating, cardId) {
     fsrs[cardId]=ns;
     saveFsrs();
     if(typeof buildDeckHomeTable==='function') setTimeout(buildDeckHomeTable,100);
-    // Also call updateStats so the main FSRS counter updates
+    // Also call updateStats + BS counter
     if(typeof updateStats==='function') setTimeout(updateStats,150);
+    setTimeout(function(){ if(typeof bsUpdateFsrsCounter==='function') bsUpdateFsrsCounter(); },50);
   }catch(e){ console.warn('arFsrs error',e); }
   // MDCoins: award based on FSRS rating (good/easy = 2 coins, hard = 1, again = 0)
   const coinMap = {'again':0,'hard':1,'good':2,'easy':2};
@@ -16485,8 +16509,9 @@ window.crFsrs = function(rating, cardId) {
     fsrs[cardId]=ns;
     saveFsrs();
     if(typeof buildDeckHomeTable==='function') setTimeout(buildDeckHomeTable,100);
-    // Update main FSRS counter in header
+    // Update main FSRS counter in header + BS counter
     if(typeof updateStats==='function') setTimeout(updateStats,150);
+    setTimeout(bsUpdateFsrsCounter,50);
   }catch(e){ console.warn('crFsrs error',e); }
   bsGo(1);
 };
