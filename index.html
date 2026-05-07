@@ -2169,7 +2169,7 @@ mark.hb{background:rgba(79,142,247,.28);border-bottom:2px solid rgba(40,100,220,
 }
 /* Hide old done-wrap decorations */
 .done-wrap { padding: 32px 20px !important; }
-/* Eliminate old anki-counter bar */
+/* old anki-counter hidden (legacy) */
 .anki-counter { display: none !important; }
 /* Filter bar */
 .filter-bar { display: none !important; }
@@ -3602,7 +3602,10 @@ html.light .qs-val { color: inherit; }
   #bmd-ans-col:not(.has-answer) #key-point-wrap,
   #bmd-ans-col:not(.has-answer) #card-pubmed-wrap,
   #bmd-ans-col:not(.has-answer) #att-inline-wrap,
+  /* card-footer-counter in answer column: hide before answer, show after */
   #bmd-ans-col:not(.has-answer) .card-footer-counter { display: none !important; }
+  /* card-footer-counter in question column: ALWAYS visible */
+  #bmd-q-col .card-footer-counter { display: flex !important; }
 }
 
 #report-modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:9999;align-items:center;justify-content:center;}
@@ -7787,14 +7790,24 @@ function updateStats(){
   _syncFC(nw,lrn,du,_cardState);
 }
 
+
 function _syncFC(nw,lrn,du,st){
-  const n=document.getElementById('cfc-new'),l=document.getElementById('cfc-lrn'),d=document.getElementById('cfc-due');
-  if(!n) return;
-  n.textContent=nw;l.textContent=lrn;d.textContent=du;
-  n.classList.remove('cfc-active');l.classList.remove('cfc-active');d.classList.remove('cfc-active');
-  if(st===0) n.classList.add('cfc-active');
-  else if(st===1||st===3) l.classList.add('cfc-active');
-  else if(st===2) d.classList.add('cfc-active');
+  // Update ALL cfc counters (there are duplicates in Q and Ans columns)
+  document.querySelectorAll('.cfc-new').forEach(function(n){
+    n.textContent=nw;
+    n.classList.remove('cfc-active');
+    if(st===0) n.classList.add('cfc-active');
+  });
+  document.querySelectorAll('.cfc-lrn').forEach(function(l){
+    l.textContent=lrn;
+    l.classList.remove('cfc-active');
+    if(st===1||st===3) l.classList.add('cfc-active');
+  });
+  document.querySelectorAll('.cfc-due').forEach(function(d){
+    d.textContent=du;
+    d.classList.remove('cfc-active');
+    if(st===2) d.classList.add('cfc-active');
+  });
 }
 
 // ── UPDATE PROGRESS BAR ───────────────────────────────────────────────
@@ -9186,13 +9199,18 @@ window.openApp = function(dk){
 
 _cardState=0;
 function _syncFC(nw,lrn,du,st){
-  var n=document.getElementById('cfc-new'),l=document.getElementById('cfc-lrn'),d=document.getElementById('cfc-due');
-  if(!n)return;
-  n.textContent=nw;l.textContent=lrn;d.textContent=du;
-  n.classList.remove('cfc-active');l.classList.remove('cfc-active');d.classList.remove('cfc-active');
-  if(st===0)n.classList.add('cfc-active');
-  else if(st===1||st===3)l.classList.add('cfc-active');
-  else if(st===2)d.classList.add('cfc-active');
+  document.querySelectorAll('.cfc-new').forEach(function(n){
+    n.textContent=nw;n.classList.remove('cfc-active');
+    if(st===0)n.classList.add('cfc-active');
+  });
+  document.querySelectorAll('.cfc-lrn').forEach(function(l){
+    l.textContent=lrn;l.classList.remove('cfc-active');
+    if(st===1||st===3)l.classList.add('cfc-active');
+  });
+  document.querySelectorAll('.cfc-due').forEach(function(d){
+    d.textContent=du;d.classList.remove('cfc-active');
+    if(st===2)d.classList.add('cfc-active');
+  });
 }
 
 var _sR=[],_sD='all',_s1=['boardmd_s1','s1_core','s1','s1core','fa_s1','arrows','hy1','ethics'],_s2=['boardmd_s2','s2','core','hy'],_shelf=['shelf_surgery','shelf_em'];
@@ -15355,6 +15373,12 @@ console.log('[BoardMD v2] loaded');
       flagged <b id="bs-n-flag">0</b> &nbsp;·&nbsp;
       time <b id="bs-n-time">0:00</b> &nbsp;·&nbsp;
       total <b id="bs-n-tot">0</b>
+      &nbsp;·&nbsp;
+      <span style="color:#3b82f6;font-weight:700" id="bs-fsrs-new" title="New cards">0</span>
+      <span style="color:var(--text-faint);font-weight:400"> new</span>
+      &nbsp;
+      <span style="color:#22c55e;font-weight:700" id="bs-fsrs-due" title="Due for review">0</span>
+      <span style="color:var(--text-faint);font-weight:400"> due</span>
     </div>
     <div class="bs-prog"><div class="bs-pf" id="bs-pf"></div></div>
     <div class="bs-sr">
@@ -15623,6 +15647,20 @@ function showDone(){
 
 window.bsStart=function(){
   BS.cards=getCards();
+  // Update FSRS counters for the session
+  try{
+    var _bsNow=Date.now();
+    var _bsNw=0,_bsDue=0;
+    BS.cards.forEach(function(c){
+      var s=typeof getState==='function'?getState(c.id):{state:0};
+      if(!s||s.state===0) _bsNw++;
+      else if(s.due&&s.due<=_bsNow+86400000) _bsDue++;
+    });
+    var _newEl=document.getElementById('bs-fsrs-new');
+    var _dueEl=document.getElementById('bs-fsrs-due');
+    if(_newEl) _newEl.textContent=_bsNw;
+    if(_dueEl) _dueEl.textContent=_bsDue;
+  }catch(e){}
   // Apply search filter if active
   if(BS._searchFilter){
     const q=BS._searchFilter;
@@ -15772,6 +15810,8 @@ window.bsRate=function(rating){
     fsrs[card.id]=ns;
     saveFsrs();
     if(typeof buildDeckHomeTable==='function') setTimeout(buildDeckHomeTable,100);
+    // Update main FSRS header counter
+    if(typeof updateStats==='function') setTimeout(updateStats,150);
   }catch(e){ console.warn('BrainStorm FSRS error',e); }
   // Visual feedback + advance
   const overlay=document.createElement('div');
@@ -15910,13 +15950,33 @@ function renderClinicalReasoning(card, el) {
     '</div>';
   }
 
+  // FSRS buttons — shown after last chunk reveals
+  (function(){
+    try{
+      var _s=typeof getState==='function'?getState(card.id):{state:0,stability:0,difficulty:0};
+      var _iv=typeof getIntervals==='function'?getIntervals(_s):{again:{label:'1m'},hard:{label:'~10m'},good:{label:'~1d'},easy:{label:'~4d'}};
+      html += '<div class="bs-cr-fsrs" id="bs-cr-fsrs-auto">' +
+        '<button class="bs-cr-fsrs-btn again" onclick="crFsrs('again','+String(card.id||'null')+')">Again<span class="bs-cr-fsrs-sub">'+_iv.again.label+'</span></button>' +
+        '<button class="bs-cr-fsrs-btn hard" onclick="crFsrs('hard','+String(card.id||'null')+')">Hard<span class="bs-cr-fsrs-sub">'+_iv.hard.label+'</span></button>' +
+        '<button class="bs-cr-fsrs-btn good" onclick="crFsrs('good','+String(card.id||'null')+')">Good<span class="bs-cr-fsrs-sub">'+_iv.good.label+'</span></button>' +
+        '<button class="bs-cr-fsrs-btn easy" onclick="crFsrs('easy','+String(card.id||'null')+')">Easy<span class="bs-cr-fsrs-sub">'+_iv.easy.label+'</span></button>' +
+      '</div>';
+    }catch(e){}
+  })();
+
   html += '</div>';
   el.innerHTML = html;
 
   // Reveal animation: 600ms entre chunks
-  el.querySelectorAll('.bs-crk').forEach(function(c,i){
+  // FSRS buttons appear after the last chunk
+  var chunks = el.querySelectorAll('.bs-crk');
+  var fsrsBtn = el.querySelector('#bs-cr-fsrs-auto');
+  chunks.forEach(function(c,i){
     setTimeout(function(){ c.classList.add('show'); }, i * 600 + 80);
   });
+  // Show FSRS after all chunks revealed
+  var lastDelay = (chunks.length - 1) * 600 + 80 + 500;
+  if(fsrsBtn){ setTimeout(function(){ fsrsBtn.classList.add('show'); }, lastDelay); }
 }
 
 function hlBold(t) {
@@ -16270,16 +16330,23 @@ window.arCheckComplete=function() {
 }
 
 window.arFsrs=function(rating, cardId) {
-  const ratingMap = {'again':1,'hard':2,'good':3,'easy':4};
-  const r = typeof rating === 'string' ? ratingMap[rating] : rating;
+  // Apply FSRS-5 rating directly (NOT window.rate which is main study session)
+  try{
+    const rtMap={'again':RT_AGAIN,'hard':RT_HARD,'good':RT_GOOD,'easy':RT_EASY};
+    const rt=rtMap[rating]||RT_GOOD;
+    const s=getState(cardId);
+    const ns=applyRating(s,rt);
+    fsrs[cardId]=ns;
+    saveFsrs();
+    if(typeof buildDeckHomeTable==='function') setTimeout(buildDeckHomeTable,100);
+    // Also call updateStats so the main FSRS counter updates
+    if(typeof updateStats==='function') setTimeout(updateStats,150);
+  }catch(e){ console.warn('arFsrs error',e); }
   // MDCoins: award based on FSRS rating (good/easy = 2 coins, hard = 1, again = 0)
   const coinMap = {'again':0,'hard':1,'good':2,'easy':2};
   const coins = coinMap[rating]||0;
   if(coins > 0 && typeof window.awardCoins === 'function'){
     window.awardCoins(coins, 'BrainStorm Active Recall');
-  }
-  if (typeof window.rate === 'function') {
-    window.rate(r);
   }
   bsGo(1);
 }
@@ -16417,6 +16484,8 @@ window.crFsrs = function(rating, cardId) {
     fsrs[cardId]=ns;
     saveFsrs();
     if(typeof buildDeckHomeTable==='function') setTimeout(buildDeckHomeTable,100);
+    // Update main FSRS counter in header
+    if(typeof updateStats==='function') setTimeout(updateStats,150);
   }catch(e){ console.warn('crFsrs error',e); }
   bsGo(1);
 };
