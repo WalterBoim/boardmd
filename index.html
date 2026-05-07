@@ -3221,6 +3221,7 @@ mark.hb{background:rgba(79,142,247,.28);border-bottom:2px solid rgba(40,100,220,
   align-items: center;
   z-index: 200;
   backdrop-filter: blur(20px);
+  overflow: visible !important;
 }
 /* Mobile: show at full width */
 @media(max-width:600px){
@@ -5003,6 +5004,7 @@ html.dark .hl-btn-active { border-color:#fff!important; }
             </div>
           </div>
           <div id="key-point-wrap" style="display:none;padding:0 18px 14px;"></div>
+          <div id="venn-placeholder" style="display:none;margin:0 18px 14px;"></div>
           <div id="card-pubmed-wrap" style="display:none;"></div>
           <div id="card-cochrane-wrap" style="display:none;"></div>
           <div style="display:flex;justify-content:flex-end;padding:4px 18px 6px;">
@@ -15205,6 +15207,15 @@ function v2kp(card){
   const dn=document.getElementById('v2kpdone');if(dn)dn.classList.remove('on');
   if(outer)outer.style.display='';
   if(oldkp)oldkp.style.display='none';
+  // Show venn placeholder after key point
+  const vp=document.getElementById('venn-placeholder');
+  if(vp){
+    vp.style.display='';
+    if(!vp.hasChildNodes()||vp.dataset.loaded!=='1'){
+      vp.dataset.loaded='1';
+      vp.innerHTML='<div style="border:1.5px dashed rgba(59,127,255,.25);border-radius:12px;padding:14px 18px;display:flex;align-items:center;gap:10px;"><svg width=32 height=32 viewBox='0 0 32 32' fill='none' style='flex-shrink:0'><circle cx=12 cy=16 r=9 stroke='rgba(59,127,255,.35)' stroke-width=1.5/><circle cx=20 cy=16 r=9 stroke='rgba(34,197,94,.35)' stroke-width=1.5/></svg><span style='font-size:11px;color:var(--text-faint);font-family:Sora,sans-serif;font-weight:600'>Venn diagram · coming soon</span></div>';
+    }
+  }
 }
 window.v2reveal=function(el){
   if(el.classList.contains('rev'))return;
@@ -15228,6 +15239,7 @@ function v2reset(){
   document.querySelectorAll('.v2t').forEach((b,i)=>b.classList.toggle('on',i===0));
   [0,1].forEach(function(j){var p=document.getElementById('v2p'+j);if(p)p.classList.toggle('on',j===0);});
   var _wp2=document.getElementById('v2p2');if(_wp2)_wp2.style.display='none';
+  var vp=document.getElementById('venn-placeholder');if(vp)vp.style.display='none';
 }
 console.log('[BoardMD v2] loaded');
 </script>
@@ -15322,6 +15334,7 @@ console.log('[BoardMD v2] loaded');
 .bs-exp{padding:16px 24px;background:var(--surface2);border-top:1px solid var(--border);line-height:1.8;color:var(--text-dim)}
 .fz-md .bs-exp{font-size:14px}.fz-lg .bs-exp{font-size:16px}.fz-xl .bs-exp{font-size:18.5px}
 .bs-kp{margin:14px 24px;padding:15px 18px;background:var(--accent-dim);border-left:3px solid var(--accent);border-radius:0 10px 10px 0}
+.bs-attending-btn{display:none!important}
 .bs-kpl{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:6px}
 .bs-kpt{font-weight:600;line-height:1.7;color:var(--text)}
 .fz-md .bs-kpt{font-size:15px}.fz-lg .bs-kpt{font-size:17px}.fz-xl .bs-kpt{font-size:20px}
@@ -15359,6 +15372,41 @@ console.log('[BoardMD v2] loaded');
 }
 .bs-storm-lbl{font-size:10px;color:var(--gold);font-weight:700;text-align:center;margin-top:6px;letter-spacing:.05em;font-family:'Sora','Lato',sans-serif;text-shadow:0 0 8px rgba(232,168,54,.4)}
 
+/* ── Venn placeholder ── */
+#venn-placeholder > div {
+  animation: fadeIn .3s ease;
+}
+@keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+
+/* ── BrainStorm Integrated Search ── */
+.bs-int-search{margin-bottom:22px}
+.bs-int-search-bar{display:flex;align-items:center;gap:10px;background:var(--surface);border:1.5px solid var(--border);border-radius:12px;padding:10px 16px;transition:border-color .2s}
+.bs-int-search-bar:focus-within{border-color:var(--accent)}
+.bs-int-search-bar svg{color:var(--text-dim);flex-shrink:0}
+.bs-int-search-input{flex:1;background:none;border:none;outline:none;font-family:'Lato',sans-serif;font-size:14px;color:var(--text);min-width:0}
+.bs-int-search-input::placeholder{color:var(--text-faint)}
+.bs-int-clear{background:none;border:none;color:var(--text-dim);cursor:pointer;font-size:14px;padding:0;line-height:1;opacity:.6;transition:opacity .15s}
+.bs-int-clear:hover{opacity:1}
+.bs-int-chips{display:flex;gap:7px;flex-wrap:wrap;margin-top:10px}
+.bs-chip{padding:5px 14px;border-radius:18px;background:var(--surface);border:1px solid var(--border);font-size:12px;font-weight:700;cursor:pointer;color:var(--text-dim);font-family:'Lato',sans-serif;transition:all .15s}
+.bs-chip:hover{border-color:var(--accent);color:var(--text)}
+.bs-chip.active{background:var(--accent-dim);border-color:var(--accent);color:var(--accent)}
+.bs-int-match{font-size:12px;color:var(--text-dim);margin-top:8px;font-family:'JetBrains Mono',monospace;font-weight:700}
+.bs-int-match.hit{color:var(--emerald)}.bs-int-match.miss{color:var(--rose)}
+
+/* ── BrainStorm Attending Floating Button ── */
+.bs-attending-float{position:sticky;bottom:0;left:0;right:0;display:flex;justify-content:center;padding:10px 0 4px;background:linear-gradient(transparent,var(--bg) 40%);pointer-events:none;z-index:5}
+.bs-attending-float button{pointer-events:all;display:inline-flex;align-items:center;gap:8px;padding:9px 18px;border-radius:22px;background:rgba(59,127,255,.12);border:1px solid rgba(59,127,255,.35);color:var(--accent);font-size:12px;font-weight:700;cursor:pointer;font-family:'Lato',sans-serif;transition:all .2s;backdrop-filter:blur(8px)}
+.bs-attending-float button:hover{background:rgba(59,127,255,.22);border-color:var(--accent)}
+.bs-attending-float button svg{width:13px;height:13px;flex-shrink:0}
+
+/* ── BrainStorm FSRS counters on deck cards ── */
+.bs-deck-wrap{position:relative;display:inline-flex;flex-direction:column;align-items:center}
+.bs-deck-cnt{font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:700;margin-top:2px;display:flex;gap:4px}
+.bs-deck-cnt .bdc-n{color:#3b82f6}.bs-deck-cnt .bdc-d{color:#22c55e}
+.bs-deck-cnt .bdc-sep{color:var(--text-faint);font-weight:400}
+.bs-deck-sub{display:block;font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:700;margin-top:2px;opacity:.7}
+
 .bs-cr-occlude{
   position:relative;cursor:pointer;
   border-radius:0 10px 10px 0;
@@ -15381,6 +15429,7 @@ console.log('[BoardMD v2] loaded');
   opacity:0;transform:translateY(8px);
   transition:opacity .4s,transform .4s;
   display:flex;gap:8px;margin-top:4px;
+  padding:0 18px 6px;
 }
 .bs-cr-fsrs.show{opacity:1;transform:translateY(0);}
 .bs-cr-fsrs-btn{
@@ -15533,9 +15582,20 @@ console.log('[BoardMD v2] loaded');
   </div>
 
   <div class="bs-body" id="bs-cfg">
-    <div class="bs-search-wrap">
-      <span class="bs-search-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg></span>
-      <input class="bs-search-input" id="bs-search" type="text" placeholder="Search topic, keyword, QID…" oninput="bsSearch(this.value)" autocomplete="off">
+    <div class="bs-int-search">
+      <div class="bs-int-search-bar">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+        <input class="bs-int-search-input" id="bs-search" type="text" placeholder="Search topic, keyword, QID…" oninput="bsSearch(this.value)" autocomplete="off">
+        <button class="bs-int-clear" id="bs-int-clear" onclick="bsIntClear()" style="display:none">✕</button>
+      </div>
+      <div class="bs-int-chips">
+        <button class="bs-chip active" onclick="bsChip(this,'')">All</button>
+        <button class="bs-chip" onclick="bsChip(this,'hy s2')">HY S2</button>
+        <button class="bs-chip" onclick="bsChip(this,'hy s1')">HY S1</button>
+        <button class="bs-chip" onclick="bsChip(this,'ethics')">Ethics</button>
+        <button class="bs-chip" onclick="bsChip(this,'again')" style="color:var(--rose);border-color:rgba(244,63,94,.3)">🔁 Errors</button>
+      </div>
+      <div class="bs-int-match" id="bs-int-match" style="display:none"></div>
     </div>
     <div class="bs-sh">Review Mode</div>
     <div class="bs-modes">
@@ -15546,19 +15606,12 @@ console.log('[BoardMD v2] loaded');
       <div class="bs-mode" data-mode="errors"><div class="bs-mode-n">Review errors</div><div class="bs-mode-d">Last 24h "Again" cards</div></div>
     </div>
     <div class="bs-sh">Deck</div>
-    <div class="bs-decks">
-      <button class="bs-deck on" data-deck="all">Step 2 Complete</button>
-      <button class="bs-deck" data-deck="boardmd_s2">BoardMD S2</button>
-      <button class="bs-deck" data-deck="core">Core S2</button>
-      <button class="bs-deck" data-deck="boardmd_s1">BoardMD S1</button>
-      <button class="bs-deck" data-deck="s1_core">Core S1</button>
-    </div>
-    <div class="bs-sh">Speed</div>
-    <div class="bs-spd">
-      <span class="l">per card</span>
-      <input type="range" min="1" max="7" value="3" id="bs-spd-cfg">
-      <span class="v" id="bs-spd-v">3s</span>
-      <span class="w" id="bs-spd-w">≈ 20/min</span>
+    <div class="bs-decks" id="bs-decks-wrap">
+      <button class="bs-deck on" data-deck="all">Step 2 Complete<span class="bs-deck-sub" id="bdc-all"></span></button>
+      <button class="bs-deck" data-deck="boardmd_s2">BoardMD S2<span class="bs-deck-sub" id="bdc-s2"></span></button>
+      <button class="bs-deck" data-deck="core">Core S2<span class="bs-deck-sub" id="bdc-core"></span></button>
+      <button class="bs-deck" data-deck="boardmd_s1">BoardMD S1<span class="bs-deck-sub" id="bdc-s1"></span></button>
+      <button class="bs-deck" data-deck="s1_core">Core S1<span class="bs-deck-sub" id="bdc-s1c"></span></button>
     </div>
     <button class="bs-cta" onclick="bsStart()">▶  Start BrainStorm</button>
   </div>
@@ -15576,26 +15629,25 @@ console.log('[BoardMD v2] loaded');
       <div class="bs-stxt" id="bs-stxt"></div>
     </div>
     <div class="bs-card" id="bs-cb"></div>
+    <div class="bs-attending-float" id="bs-att-float" style="display:none">
+      <button onclick="bsOpenAttendingCurrent()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        Ask Attending AI
+      </button>
+    </div>
   </div>
 
   <div class="bs-ctrl" id="bs-ctrl" style="display:none">
     <button class="bs-btn" onclick="bsGo(-1)">← Back</button>
-    <button class="bs-btn pr" id="bs-play-btn" onclick="bsTogglePlay()">▶ Play</button>
     <button class="bs-btn fl" id="bs-flag-btn" onclick="bsDoFlag()">⚑ Flag</button>
-    <button class="bs-btn" onclick="bsConfig()">⚙</button>
     <button class="bs-btn pr" onclick="bsGo(1)">Next →</button>
-    <div class="bs-spd2">
-      <span>speed</span>
-      <input type="range" min="1" max="7" value="3" id="bs-spd-mini">
-      <b id="bs-spd-v2">3s</b>
-    </div>
   </div>
 </div>
 
 <script>
 (function(){
 'use strict';
-const BS={mode:'phrase',deck:'all',spd:3000,cards:[],cur:0,ph:0,playing:false,timer:null,clock:null,elapsed:0,flagged:new Set(),seen:new Set(),fz:'lg'};
+const BS={mode:'phrase',deck:'all',spd:3000,cards:[],cur:0,ph:0,playing:false,timer:null,clock:null,elapsed:0,flagged:new Set(),seen:new Set(),fz:'lg',fsrsActive:false};
 const SPDS={1:800,2:1500,3:3000,4:5000,5:8000,6:12000,7:20000};
 const SLBL={1:'0.8s',2:'1.5s',3:'3s',4:'5s',5:'8s',6:'12s',7:'20s'};
 const SWPM={1:'≈75/min',2:'≈40/min',3:'≈20/min',4:'≈12/min',5:'≈7/min',6:'≈5/min',7:'≈3/min'};
@@ -15797,11 +15849,20 @@ function render(){
         return '<span class="bs-kp-cloze" onclick="bsKpReveal(this)" data-revealed="0" title="Tap to reveal"><span class="bs-kp-cloze-mask">[...] </span><span class="bs-kp-cloze-word" style="display:none">'+word+'</span></span>';
       });
       h+='<div class="bs-kp"><div class="bs-kpl">Key Point'+(clozeCnt>0?' <span style="font-size:9px;opacity:.6">tap to reveal</span>':'')+'</div><div class="bs-kpt">'+kpHtml+'</div></div>';
+      // FSRS buttons after Key Point
+      const fsInt=window.fsrsState||window.fsrs||{};const csId=card.id;
+      const fss=fsInt[csId];const fsDue=fss&&fss.due?(fss.due>Date.now()?'in '+(Math.round((fss.due-Date.now())/86400000)||'<1')+'d':'due'):'';
+      h+='<div class="bs-cr-fsrs show" style="padding:0 18px 6px;display:flex;gap:8px;">'+
+        '<button class="bs-cr-fsrs-btn again" onclick="bsRate(0)"><span>Again</span><span class="bs-cr-fsrs-sub">&lt;1d</span></button>'+
+        '<button class="bs-cr-fsrs-btn hard" onclick="bsRate(1)"><span>Hard</span><span class="bs-cr-fsrs-sub">~3d</span></button>'+
+        '<button class="bs-cr-fsrs-btn good" onclick="bsRate(2)"><span>Good</span><span class="bs-cr-fsrs-sub">~14d</span></button>'+
+        '<button class="bs-cr-fsrs-btn easy" onclick="bsRate(3)"><span>Easy</span><span class="bs-cr-fsrs-sub">~21d</span></button>'+
+        '</div>';
     }
     if(card.phrase&&BS.mode!=='kp')h+='<div class="bs-exp"><strong>Phrase:</strong> '+hl(card.phrase)+'</div>';
     // Attending AI button — always visible after Key Point reveal
     const qTopic=card.topic||card.subject||'this topic';
-    h+='<button class="bs-attending-btn" onclick="bsOpenAttending('+JSON.stringify(qTopic)+',\'\')">'+'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>Ask Attending AI about this topic</button>';
+    // Attending AI now available via float button in session footer
 
 
   }
@@ -15840,6 +15901,12 @@ window.bsStart=function(){
   }
   BS.cur=0;BS.ph=0;BS.seen.clear();BS.flagged.clear();BS.elapsed=0;
   const t=document.getElementById('bs-n-time');if(t)t.textContent='0:00';
+  // Start clock automatically (not only on play)
+  if(BS.clock)clearInterval(BS.clock);
+  BS.clock=setInterval(function(){
+    BS.elapsed++;const m=Math.floor(BS.elapsed/60),s=BS.elapsed%60;
+    const ti=document.getElementById('bs-n-time');if(ti)ti.textContent=m+':'+(s<10?'0':'')+s;
+  },1000);
   if(!BS.cards.length){
     const q=BS._searchFilter;
     alert(q?'No cards match "'+q+'" in this deck. Try a different search.':'No cards available for this mode/deck.');
@@ -15848,6 +15915,7 @@ window.bsStart=function(){
   document.getElementById('bs-cfg').style.display='none';
   document.getElementById('bs-ses').style.display='block';
   document.getElementById('bs-ctrl').style.display='flex';
+  const attFloat=document.getElementById('bs-att-float');if(attFloat)attFloat.style.display='flex';
   render();
 };
 window.bsConfig=function(){
@@ -15855,6 +15923,7 @@ window.bsConfig=function(){
   document.getElementById('bs-cfg').style.display='block';
   document.getElementById('bs-ses').style.display='none';
   document.getElementById('bs-ctrl').style.display='none';
+  const attFloat=document.getElementById('bs-att-float');if(attFloat)attFloat.style.display='none';
 };
 window.bsGo=function(d){
   const phs=PHS[BS.mode]||PHS.flash;
@@ -15901,6 +15970,33 @@ window.bsDoFlag=function(){
   document.body.appendChild(fc);
   setTimeout(()=>{fc.style.opacity='0';setTimeout(()=>fc.remove(),300);},1500);
 };
+window.bsIntClear=function(){
+  const inp=document.getElementById('bs-search');if(inp){inp.value='';inp.style.borderColor='';}
+  const clr=document.getElementById('bs-int-clear');if(clr)clr.style.display='none';
+  const m=document.getElementById('bs-int-match');if(m){m.style.display='none';m.textContent='';}
+  BS._searchFilter='';
+  // Reset chips
+  document.querySelectorAll('.bs-chip').forEach((c,i)=>c.classList.toggle('active',i===0));
+};
+window.bsChip=function(el,val){
+  document.querySelectorAll('.bs-chip').forEach(c=>c.classList.remove('active'));
+  el.classList.add('active');
+  // Map chip val to deck/mode filter
+  if(val==='again'){BS.mode='errors';document.querySelectorAll('.bs-mode').forEach(m=>m.classList.toggle('on',m.dataset.mode==='errors'));}
+  else if(val){
+    const inp=document.getElementById('bs-search');if(inp){inp.value=val;inp.dispatchEvent(new Event('input'));}
+  } else {
+    const inp=document.getElementById('bs-search');if(inp&&inp.value){inp.value='';inp.dispatchEvent(new Event('input'));}
+    BS._searchFilter='';
+    const m=document.getElementById('bs-int-match');if(m)m.style.display='none';
+  }
+};
+window.bsOpenAttendingCurrent=function(){
+  const card=BS.cards&&BS.cards[BS.cur];
+  if(!card)return;
+  const topic=card.topic||card.subject||'this topic';
+  bsOpenAttending(topic,'');
+};
 window.bsSearch=function(q){
   // Filter cards by search query (topic, subject, QID, keyword)
   q=(q||'').trim().toLowerCase();
@@ -15921,11 +16017,47 @@ window.bsSearch=function(q){
   // Update search placeholder to show count
   const inp=document.getElementById('bs-search');
   if(inp)inp.style.borderColor=matches.length?'var(--accent)':'var(--rose)';
-  const sh=document.querySelector('#bs-cfg .bs-sh');
-  if(sh&&matches.length)sh.textContent='Review Mode — '+matches.length+' cards match';
-  else if(sh)sh.textContent='Review Mode — no matches';
+  const clr=document.getElementById('bs-int-clear');if(clr)clr.style.display=q?'':'none';
+  const m=document.getElementById('bs-int-match');
+  if(m&&q){
+    m.style.display='';
+    m.className='bs-int-match '+(matches.length?'hit':'miss');
+    m.textContent=matches.length?matches.length+' cards match':'no matches';
+  } else if(m){m.style.display='none';}
+  const inp=document.getElementById('bs-search');
+  if(inp)inp.style.borderColor=q?(matches.length?'var(--accent)':'var(--rose)'):'';
 };
 
+window.bsRate=function(rating){
+  // FSRS rating from BrainStorm
+  const card=BS.cards&&BS.cards[BS.cur];if(!card)return;
+  const fs=window.fsrsState||window.fsrs||{};
+  const SK='bmd_fsrs5';
+  try{
+    const stored=JSON.parse(localStorage.getItem(SK)||'{}');
+    const now=Date.now();
+    let s=stored[card.id]||{state:0,stability:0,difficulty:0,interval:0,due:0,reps:0,lapses:0,stepIdx:0};
+    // Simple FSRS-lite update
+    const INIT_STAB=[0.4,0.6,2.4,5.8];
+    const INIT_DIFF=[0.3,0.5,0.7,0.9];
+    if(s.state===0){s.stability=INIT_STAB[rating]||2.4;s.difficulty=INIT_DIFF[rating]||0.5;}
+    else{const r=[1,3,14,21][rating]||1;s.stability*=(1+(r/s.stability)*0.9);}
+    const INTS=[1,3,14,21];s.interval=Math.round(s.stability*(INTS[rating]||1));
+    s.due=now+s.interval*86400000;s.reps++;if(rating===0)s.lapses++;s.state=rating===0?1:2;
+    s.lastRating=rating===0?'again':rating===1?'hard':rating===2?'good':'easy';s.lastReview=now;
+    stored[card.id]=s;
+    localStorage.setItem(SK,JSON.stringify(stored));
+    if(window.fsrsState)window.fsrsState[card.id]=s;
+  }catch(e){}
+  // Visual feedback + advance
+  const overlay=document.createElement('div');
+  const clrs={0:'#f43f5e',1:'#f97316',2:'#22c55e',3:'#3b7fff'};
+  overlay.style.cssText='position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:'+clrs[rating]+';color:#fff;font-size:12px;font-weight:800;padding:7px 20px;border-radius:20px;z-index:10001;pointer-events:none;opacity:1;transition:opacity .3s';
+  overlay.textContent=['Again','Hard','Good','Easy'][rating];
+  document.body.appendChild(overlay);
+  setTimeout(()=>{overlay.style.opacity='0';setTimeout(()=>overlay.remove(),300);},700);
+  setTimeout(()=>bsGo(1),200);
+};
 window.bsOpenAttending=function(topic,kp){
   // Open the main Attending AI panel pre-filled with the current topic
   const attBtn=document.getElementById('attending-btn')||document.querySelector('.attending-trigger')||document.querySelector('[onclick*="attending"],[onclick*="Attending"]');
@@ -15954,10 +16086,43 @@ window.openBrainStorm=function(){
   const ov=document.getElementById('bs-overlay');if(!ov)return;
   ov.classList.add('on');document.body.style.overflow='hidden';
   attachConfigClicks();
-  const sv=localStorage.getItem('bs-spd');if(sv)bsSpd(sv);else bsSpd('3');
   const fz=localStorage.getItem('bs-fz');if(fz&&FZL.indexOf(fz)>=0)BS.fz=fz;
   applyFz();bsConfig();
+  // Populate FSRS counters for each deck
+  bsUpdateDeckCounters();
 };
+function bsUpdateDeckCounters(){
+  const D=window.DECKS||{};
+  const fs=window.fsrsState||window.fsrs||{};
+  const now=Date.now();
+  const ST_NEW=0,ST_DUE=2;
+  function getCount(pool){
+    let nw=0,due=0;
+    pool.forEach(function(c){
+      const s=fs[c.id];
+      if(!s||s.state===ST_NEW)nw++;
+      else if(s.due&&s.due<=now)due++;
+    });
+    return {nw,due};
+  }
+  const decks={
+    'all':[...(D.boardmd_s2||[]),...(D.core||[]),...(D.boardmd_s1||[]),...(D.s1_core||[])],
+    's2':D.boardmd_s2||[],
+    'core':D.core||[],
+    's1':D.boardmd_s1||[],
+    's1c':D.s1_core||[]
+  };
+  Object.keys(decks).forEach(function(k){
+    const el=document.getElementById('bdc-'+k);
+    if(!el)return;
+    const {nw,due}=getCount(decks[k]);
+    if(nw||due){
+      el.innerHTML=(nw?'<span style="color:#3b82f6">'+nw+' new</span>':'')+(nw&&due?' · ':'')+(due?'<span style="color:#22c55e">'+due+' due</span>':'');
+    } else {
+      el.textContent='';
+    }
+  });
+}
 window.closeBrainStorm=function(){
   stopPlay();clearInterval(BS.clock);BS.clock=null;
   const ov=document.getElementById('bs-overlay');if(ov)ov.classList.remove('on');
