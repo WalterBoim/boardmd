@@ -15583,14 +15583,16 @@ function render(){
       });
       h+='<div class="bs-kp"><div class="bs-kpl">Key Point'+(clozeCnt>0?' <span style="font-size:9px;opacity:.6">tap to reveal</span>':'')+'</div><div class="bs-kpt">'+kpHtml+'</div></div>';
       // FSRS buttons after Key Point
-      const fsInt=window.fsrsState||window.fsrs||{};const csId=card.id;
-      const fss=fsInt[csId];const fsDue=fss&&fss.due?(fss.due>Date.now()?'in '+(Math.round((fss.due-Date.now())/86400000)||'<1')+'d':'due'):'';
-      h+='<div class="bs-cr-fsrs show" style="padding:0 18px 6px;display:flex;gap:8px;">'+
-        '<button class="bs-cr-fsrs-btn again" onclick="bsRate(0)"><span>Again</span><span class="bs-cr-fsrs-sub">&lt;1d</span></button>'+
-        '<button class="bs-cr-fsrs-btn hard" onclick="bsRate(1)"><span>Hard</span><span class="bs-cr-fsrs-sub">~3d</span></button>'+
-        '<button class="bs-cr-fsrs-btn good" onclick="bsRate(2)"><span>Good</span><span class="bs-cr-fsrs-sub">~14d</span></button>'+
-        '<button class="bs-cr-fsrs-btn easy" onclick="bsRate(3)"><span>Easy</span><span class="bs-cr-fsrs-sub">~21d</span></button>'+
-        '</div>';
+      (function(){
+        const _s=getState(card.id);
+        const _iv=getIntervals(_s);
+        h+='<div class="bs-cr-fsrs show" style="padding:0 18px 6px;display:flex;gap:8px;">'+
+          '<button class="bs-cr-fsrs-btn again" onclick="bsRate(0)"><span>Again</span><span class="bs-cr-fsrs-sub">'+_iv.again.label+'</span></button>'+
+          '<button class="bs-cr-fsrs-btn hard" onclick="bsRate(1)"><span>Hard</span><span class="bs-cr-fsrs-sub">'+_iv.hard.label+'</span></button>'+
+          '<button class="bs-cr-fsrs-btn good" onclick="bsRate(2)"><span>Good</span><span class="bs-cr-fsrs-sub">'+_iv.good.label+'</span></button>'+
+          '<button class="bs-cr-fsrs-btn easy" onclick="bsRate(3)"><span>Easy</span><span class="bs-cr-fsrs-sub">'+_iv.easy.label+'</span></button>'+
+          '</div>';
+      })();
     }
     if(card.phrase&&BS.mode!=='kp')h+='<div class="bs-exp"><strong>Phrase:</strong> '+hl(card.phrase)+'</div>';
     // Attending AI button — always visible after Key Point reveal
@@ -15760,7 +15762,7 @@ window.bsSearch=function(q){
 };
 
 window.bsRate=function(rating){
-  // FSRS rating from BrainStorm — usa applyRating() real do FSRS-5
+  // FSRS rating from BrainStorm — FSRS-5 real
   const card=BS.cards&&BS.cards[BS.cur];if(!card)return;
   try{
     const rtMap=[RT_AGAIN,RT_HARD,RT_GOOD,RT_EASY];
@@ -16367,13 +16369,17 @@ function renderClinicalReasoningReveal(card, el) {
       '</div></div>';
   }
 
-  // FSRS
-  html += '<div class="bs-cr-fsrs">' +
-    '<button class="bs-cr-fsrs-btn again" onclick="crFsrs(\'again\','+String(card.id||'')+')">Again<span class="bs-cr-fsrs-sub">1m</span></button>' +
-    '<button class="bs-cr-fsrs-btn hard" onclick="crFsrs(\'hard\','+String(card.id||'')+')">Hard<span class="bs-cr-fsrs-sub">~10m</span></button>' +
-    '<button class="bs-cr-fsrs-btn good" onclick="crFsrs(\'good\','+String(card.id||'')+')">Good<span class="bs-cr-fsrs-sub">~1d</span></button>' +
-    '<button class="bs-cr-fsrs-btn easy" onclick="crFsrs(\'easy\','+String(card.id||'')+')">Easy<span class="bs-cr-fsrs-sub">~4d</span></button>' +
-  '</div>';
+  // FSRS — intervalos reais
+  (function(){
+    var _si=getState(card.id);
+    var _ivi=getIntervals(_si);
+    html += '<div class="bs-cr-fsrs">' +
+      '<button class="bs-cr-fsrs-btn again" onclick="crFsrs(\'again\',' + String(card.id||'') + ')">Again<span class="bs-cr-fsrs-sub">' + _ivi.again.label + '</span></button>' +
+      '<button class="bs-cr-fsrs-btn hard" onclick="crFsrs(\'hard\',' + String(card.id||'') + ')">Hard<span class="bs-cr-fsrs-sub">' + _ivi.hard.label + '</span></button>' +
+      '<button class="bs-cr-fsrs-btn good" onclick="crFsrs(\'good\',' + String(card.id||'') + ')">Good<span class="bs-cr-fsrs-sub">' + _ivi.good.label + '</span></button>' +
+      '<button class="bs-cr-fsrs-btn easy" onclick="crFsrs(\'easy\',' + String(card.id||'') + ')">Easy<span class="bs-cr-fsrs-sub">' + _ivi.easy.label + '</span></button>' +
+    '</div>';
+  })();
 
   html += '</div>';
   el.innerHTML = html;
@@ -16403,11 +16409,15 @@ window.crReveal = function(el, isLast, type) {
 };
 
 window.crFsrs = function(rating, cardId) {
-  const ratingMap = {'again':1,'hard':2,'good':3,'easy':4};
-  const r = ratingMap[rating] || 3;
-  if (typeof window.rate === 'function') {
-    window.rate(r);
-  }
+  try{
+    const rtMap={'again':RT_AGAIN,'hard':RT_HARD,'good':RT_GOOD,'easy':RT_EASY};
+    const rt=rtMap[rating]||RT_GOOD;
+    const s=getState(cardId);
+    const ns=applyRating(s,rt);
+    fsrs[cardId]=ns;
+    saveFsrs();
+    if(typeof buildDeckHomeTable==='function') setTimeout(buildDeckHomeTable,100);
+  }catch(e){ console.warn('crFsrs error',e); }
   bsGo(1);
 };
 
