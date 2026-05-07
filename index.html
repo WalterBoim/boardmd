@@ -15955,11 +15955,12 @@ function renderClinicalReasoning(card, el) {
     try{
       var _s=typeof getState==='function'?getState(card.id):{state:0,stability:0,difficulty:0};
       var _iv=typeof getIntervals==='function'?getIntervals(_s):{again:{label:'1m'},hard:{label:'~10m'},good:{label:'~1d'},easy:{label:'~4d'}};
+      var _cid=String(card.id||'');
       html += '<div class="bs-cr-fsrs" id="bs-cr-fsrs-auto">' +
-        '<button class="bs-cr-fsrs-btn again" onclick="crFsrs('again','+String(card.id||'null')+')">Again<span class="bs-cr-fsrs-sub">'+_iv.again.label+'</span></button>' +
-        '<button class="bs-cr-fsrs-btn hard" onclick="crFsrs('hard','+String(card.id||'null')+')">Hard<span class="bs-cr-fsrs-sub">'+_iv.hard.label+'</span></button>' +
-        '<button class="bs-cr-fsrs-btn good" onclick="crFsrs('good','+String(card.id||'null')+')">Good<span class="bs-cr-fsrs-sub">'+_iv.good.label+'</span></button>' +
-        '<button class="bs-cr-fsrs-btn easy" onclick="crFsrs('easy','+String(card.id||'null')+')">Easy<span class="bs-cr-fsrs-sub">'+_iv.easy.label+'</span></button>' +
+        '<button class="bs-cr-fsrs-btn again" onclick="crFsrs(&quot;again&quot;,'+_cid+')">Again<span class="bs-cr-fsrs-sub">'+_iv.again.label+'</span></button>' +
+        '<button class="bs-cr-fsrs-btn hard" onclick="crFsrs(&quot;hard&quot;,'+_cid+')">Hard<span class="bs-cr-fsrs-sub">'+_iv.hard.label+'</span></button>' +
+        '<button class="bs-cr-fsrs-btn good" onclick="crFsrs(&quot;good&quot;,'+_cid+')">Good<span class="bs-cr-fsrs-sub">'+_iv.good.label+'</span></button>' +
+        '<button class="bs-cr-fsrs-btn easy" onclick="crFsrs(&quot;easy&quot;,'+_cid+')">Easy<span class="bs-cr-fsrs-sub">'+_iv.easy.label+'</span></button>' +
       '</div>';
     }catch(e){}
   })();
