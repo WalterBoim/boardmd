@@ -10637,30 +10637,33 @@ async function updateAdminStatus(){
     _supa.auth.onAuthStateChange(async (event, session) => {
       console.log('[Auth] event=', event, 'email=', session?.user?.email, 'uid=', session?.user?.id);
       if(event === 'SIGNED_IN' && session){
-        // Auto-open app after OAuth login
+        // Store user for FSRS sync & leaderboard
+        window._supaUser = session.user;
+        _supaUser = session.user;
+
+        // Auto-open app after OAuth login (ALL users, not just admins)
         const lastDk = localStorage.getItem('bmd_last_deck') || 's2';
         if(document.getElementById('landing') && document.getElementById('landing').style.display !== 'none'){
           if(typeof openApp === 'function') openApp(lastDk);
         }
-        // Wait 1s for session to propagate fully, then check admin status
-        await new Promise(r => setTimeout(r, 1000));
+
+        // Check admin status separately — never sign out non-admins
+        await new Promise(r => setTimeout(r, 800));
         const isAdmin = await checkIsAdmin();
         if(isAdmin){
           window._isBoardMDAdmin = true;
           showAdminBadge(true);
           showToast('Signed in as admin ✓ — edits save to server');
         } else {
-          showToast('This Google account is not authorized as admin.');
-          // Give user more time to read and avoid race conditions
-          setTimeout(async () => {
-            // Double-check one more time before signing out
-            const finalCheck = await checkIsAdmin({ retries: 2 });
-            if(!finalCheck) await _supa.auth.signOut();
-            else { window._isBoardMDAdmin = true; showAdminBadge(true); showToast('Signed in as admin ✓'); }
-          }, 4000);
+          // Normal user — signed in successfully, no sign-out
+          window._isBoardMDAdmin = false;
+          showAdminBadge(false);
+          showToast('Signed in as ' + (session.user?.email || 'user') + ' ✓');
         }
       } else if(event === 'SIGNED_OUT'){
         window._isBoardMDAdmin = false;
+        window._supaUser = null;
+        _supaUser = null;
         showAdminBadge(false);
       }
       try { updateAdminStatus(); } catch(e){}
