@@ -10070,76 +10070,65 @@ function getIDBMeta(){
   try { return JSON.parse(localStorage.getItem(IDB_META_KEY) || 'null'); } catch(e){ return null; }
 }
 
-// Keyset pagination — O(1) por página, não sobrecarrega o Supabase
 async function fetchAllFromSupabase(onProgress){
   const PAGE = 1000;
   const SELECT = 'id,deck,system,topic,subject,qid,q,c,w,e,kp,phrase,brainstorm,d,img,pubmed_query,cochrane_pmid';
   const allCards = [];
   let lastId = null;
-
   while(true){
     let q = _supa.from('cards').select(SELECT).order('id').limit(PAGE);
     if(lastId !== null) q = q.gt('id', lastId);
     const { data, error } = await q;
-    if(error){ console.warn('BoardMD: fetch error', error); break; }
+    if(error){ console.warn('BoardMD fetch error:', error.message); break; }
     if(!data || data.length === 0) break;
     allCards.push(...data);
     lastId = data[data.length - 1].id;
-    if(onProgress) onProgress(0, allCards.length, data);
+    if(onProgress) onProgress(Math.min(99, Math.round(allCards.length / 5000 * 100)), allCards.length, data);
     if(data.length < PAGE) break;
   }
   return allCards;
 }
 
 async function loadCardsFromSupabase(){
-  // 1) Verifica total atual no Supabase (query leve — só count)
-  let supaTotal = 0;
-  try {
-    const r = await _supa.from('cards').select('id', { count: 'exact', head: true });
-    supaTotal = r.count || 0;
-  } catch(e){ console.warn('BoardMD: count falhou', e); }
-
-  // 2) Verifica cache local
+  // Tenta cache primeiro
   const meta = getIDBMeta();
-  const cacheOk = meta && meta.count > 0 && supaTotal > 0 && meta.count >= supaTotal * 0.95;
-
-  if(cacheOk){
+  if(meta && meta.count > 100){
     try {
       const cached = await getIDBCards();
-      if(cached.length >= supaTotal * 0.95){
-        console.log('BoardMD: ' + cached.length + ' cards do cache (supaTotal=' + supaTotal + ')');
+      if(cached && cached.length > 100){
+        console.log('BoardMD: ' + cached.length + ' cards do cache');
         buildDecks(cached);
         if(window._bmdSavedTheme === 'light') document.documentElement.classList.add('light');
         if(typeof updateThemeIcons === 'function') updateThemeIcons();
-        // Refresh silencioso só se cache desatualizado
-        if(cached.length < supaTotal) backgroundRefresh(cached.length, supaTotal);
+        setTimeout(() => backgroundRefresh(cached.length), 5000);
         return cached.length;
       }
-    } catch(e){ console.warn('BoardMD: IDB falhou', e); }
+    } catch(e){ console.warn('BoardMD: cache falhou', e); }
   }
 
-  // 3) Download completo
-  console.log('BoardMD: baixando ' + supaTotal + ' cards do Supabase...');
+  // Download completo
+  console.log('BoardMD: baixando cards...');
   showLoadingOverlay();
-  const allCards = await fetchAllFromSupabase((_, n) => updateLoadingProgress(supaTotal ? Math.round(n/supaTotal*100) : 0, n, []));
+  const allCards = await fetchAllFromSupabase((pct, n) => updateLoadingProgress(pct, n, []));
   hideLoadingOverlay();
   console.log('BoardMD: ' + allCards.length + ' cards carregados');
-  buildDecks(allCards);
-  try { setIDBCards(allCards); } catch(e){}
+  if(allCards.length > 0){
+    buildDecks(allCards);
+    try { setIDBCards(allCards); } catch(e){}
+  }
   return allCards.length;
 }
 
-function backgroundRefresh(cachedCount, supaTotal){
+function backgroundRefresh(cachedCount){
   fetchAllFromSupabase().then(function(fresh){
     if(!fresh || fresh.length === 0) return;
     buildDecks(fresh);
     try { setIDBCards(fresh); } catch(e){}
-    console.log('BoardMD: cache atualizado ' + cachedCount + ' -> ' + fresh.length);
-  }).catch(function(e){
-    console.warn('BoardMD: background refresh falhou', e);
-  });
+    console.log('BoardMD: refresh ' + cachedCount + ' -> ' + fresh.length);
+  }).catch(e => console.warn('BoardMD: refresh falhou', e));
 }
 
+// Safety net — force remove overlay after 60s if stuck
 // Safety net — force remove overlay after 60s if stuck
 // Safety net — force remove overlay after 60s if stuck
 // Safety net — force remove overlay after 60s if stuck
