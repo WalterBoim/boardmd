@@ -9855,7 +9855,7 @@ document.getElementById('report-modal-overlay').addEventListener('click', functi
 const SUPA_URL = 'https://hwdcgbcnphkmxaasties.supabase.co';
 const SUPA_KEY = 'sb_publishable_kgmsWjn-0nH9qxCnNCv0kg_QtU4CEdI';
 const _supa = supabase.createClient(SUPA_URL, SUPA_KEY, {
-  auth: { flowType: 'pkce', detectSessionInUrl: true, persistSession: true }
+  auth: { flowType: 'implicit', detectSessionInUrl: true, persistSession: true }
 });
 
 // ── LOADING UI ───────────────────────────────────────────────────────
