@@ -10552,18 +10552,34 @@ function syncRetentionHeader(){
 
 // ── INIT ─────────────────────────────────────────────────────────────
 (async function init(){
-  // Carrega cards (IDB-first: instantâneo se cache existe)
-  // Paraleliza com auth check — são independentes
-  const [cardCount, session] = await Promise.all([
-    loadCardsFromSupabase(),
-    getSession()
-  ]);
+  // WHITELIST — só emails autorizados entram
+  const ALLOWED_EMAILS = ['wboim@hotmail.com'];
+
+  // Verifica sessão PRIMEIRO — só carrega cards se logado e autorizado
+  const session = await getSession();
+
+  if(!session){
+    // Não logado — fica na landing, não carrega nada
+    window.cardsLoaded = false;
+    const appLoginBtn = document.getElementById('app-login-btn');
+    if(appLoginBtn) appLoginBtn.style.display = 'flex';
+    return;
+  }
+
+  if(!ALLOWED_EMAILS.includes(session.user.email)){
+    await _supa.auth.signOut();
+    alert('Acesso restrito.');
+    return;
+  }
+
+  // Logado e autorizado — carrega cards
+  const cardCount = await loadCardsFromSupabase();
 
   if(session){
     _supaUser = session.user;
     // Carrega progresso FSRS da nuvem
     await loadFsrsFromSupabase();
-    // Auto-open app if coming from OAuth redirect or already logged in
+    // Abre o app
     const lastDeck = localStorage.getItem('bmd_last_deck') || 's2';
     if(typeof openApp === 'function') openApp(lastDeck);
     // Mostra nome do usuário na nav se existir
