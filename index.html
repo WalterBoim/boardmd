@@ -10323,7 +10323,13 @@ async function updateAdminStatus(){
             _supaUser = pkceData.session.user;
             history.replaceState(null, '', window.location.pathname);
             const lastDk = localStorage.getItem('bmd_last_deck') || 's2';
-            // Espera cards carregarem (loadCardsFromSupabase roda em paralelo no init)
+            // GATE: agora autenticado, baixa cards se ainda não foram baixados
+            if(!window.cardsLoaded){
+              try {
+                await loadCardsFromSupabase();
+                window.cardsLoaded = true;
+              } catch(e){ console.warn('BoardMD: PKCE post-login load falhou', e); }
+            }
             const tryOpen = () => {
               if(window.cardsLoaded){
                 const landing = document.getElementById('landing');
@@ -10352,6 +10358,13 @@ async function updateAdminStatus(){
             if(!error && data?.session){
               console.log('[Auth] setSession OK:', data.session.user?.email);
               history.replaceState(null, '', window.location.pathname);
+              // GATE: agora autenticado, baixa cards se ainda não foram baixados
+              if(!window.cardsLoaded){
+                try {
+                  await loadCardsFromSupabase();
+                  window.cardsLoaded = true;
+                } catch(e){ console.warn('BoardMD: implicit post-login load falhou', e); }
+              }
               // Open app immediately
               const lastDk = localStorage.getItem('bmd_last_deck') || 's2';
               if(typeof openApp === 'function') openApp(lastDk);
@@ -10377,6 +10390,14 @@ async function updateAdminStatus(){
         // Store user for FSRS sync & leaderboard
         window._supaUser = session.user;
         _supaUser = session.user;
+
+        // GATE: cards só são baixados após login. Se ainda não foram, baixa agora.
+        if(!window.cardsLoaded){
+          try {
+            await loadCardsFromSupabase();
+            window.cardsLoaded = true;
+          } catch(e){ console.warn('BoardMD: post-login load falhou', e); }
+        }
 
         // Auto-open app after OAuth login (ALL users, not just admins)
         const lastDk = localStorage.getItem('bmd_last_deck') || 's2';
@@ -10552,12 +10573,33 @@ function syncRetentionHeader(){
 
 // ── INIT ─────────────────────────────────────────────────────────────
 (async function init(){
-  // Carrega cards (IDB-first: instantâneo se cache existe)
-  // Paraleliza com auth check — são independentes
-  const [cardCount, session] = await Promise.all([
-    loadCardsFromSupabase(),
-    getSession()
-  ]);
+  // GATE: cards são privados — só baixa se houver sessão autenticada.
+  // Auth primeiro, cards depois.
+  const session = await getSession();
+
+  let cardCount = 0;
+  if(session){
+    // Usuário logado → libera download dos cards (cache IDB usado se disponível)
+    cardCount = await loadCardsFromSupabase();
+  } else {
+    // Sem sessão → não baixa nada do servidor.
+    // Se houver cache IDB local (do mesmo usuário em sessão anterior), pode usar.
+    // Caso contrário, deixa o app vazio até login.
+    try {
+      const meta = getIDBMeta();
+      if(meta && meta.count > 100){
+        const cached = await getIDBCards();
+        if(cached && cached.length > 100){
+          buildDecks(cached);
+          if(window._bmdSavedTheme === 'light') document.documentElement.classList.add('light');
+          if(typeof updateThemeIcons === 'function') updateThemeIcons();
+          cardCount = cached.length;
+        }
+      }
+    } catch(e){ console.warn('BoardMD: IDB cache check falhou', e); }
+    // Garante que nenhum overlay de loading fique pendurado
+    try { hideLoadingOverlay(); } catch(e){}
+  }
 
   if(session){
     _supaUser = session.user;
