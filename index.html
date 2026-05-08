@@ -9875,8 +9875,8 @@ document.getElementById('report-modal-overlay').addEventListener('click', functi
 <script>
 // ── SUPABASE CONFIG ──────────────────────────────────────────────────
 const SUPA_URL = 'https://hwdcgbcnphkmxaasties.supabase.co';
-const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh3ZGNnYmNucGhrbXhhYXN0aWVzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ4MzM1NzcsImV4cCI6MjA5MDQwOTU3N30.bC8A_Mt7LKmY_SrypxTHLTSD3HgAzfzKz2VZSzeb0i8';
-const _supa = supabase.createClient(SUPA_URL, SUPA_KEY, { auth: { detectSessionInUrl: true, persistSession: true } });
+const SUPA_KEY = 'sb_publishable_kgmsWjn-0nH9qxCnNCv0kg_QtU4CEdI';
+const _supa = supabase.createClient(SUPA_URL, SUPA_KEY);
 
 // ── LOADING UI ───────────────────────────────────────────────────────
 function showLoadingOverlay(){
@@ -10374,54 +10374,15 @@ async function updateAdminStatus(){
     _supa.auth.onAuthStateChange(async (event, session) => {
       console.log('[Auth] event=', event, 'email=', session?.user?.email, 'uid=', session?.user?.id);
       if(event === 'SIGNED_IN' && session){
-        const ALLOWED_EMAILS = ['wboim@hotmail.com'];
-        if(!ALLOWED_EMAILS.includes(session.user.email)){
-          await _supa.auth.signOut();
-          alert('Acesso restrito.');
-          return;
-        }
-
         // Store user for FSRS sync & leaderboard
         window._supaUser = session.user;
         _supaUser = session.user;
 
-        // Carrega cards + FSRS se ainda não carregou
-        if(!window.cardsLoaded){
-          await loadCardsFromSupabase();
-          window.cardsLoaded = true;
-        }
-        await loadFsrsFromSupabase();
-
-        // Atualiza UI de auth
-        const pill = document.getElementById('nav-user-pill');
-        const loginBtn = document.getElementById('nav-login-btn');
-        const nameEl = document.getElementById('nav-user-name');
-        if(pill) pill.style.display='flex';
-        if(loginBtn) loginBtn.style.display='none';
-        if(nameEl) nameEl.textContent = session.user.email.split('@')[0];
-        const appPill = document.getElementById('app-user-pill');
-        const appLoginBtn = document.getElementById('app-login-btn');
-        const appLabel = document.getElementById('app-user-label');
-        const appAvatar = document.getElementById('app-user-avatar');
-        if(appPill) appPill.style.display='flex';
-        if(appLoginBtn) appLoginBtn.style.display='none';
-        const username = session.user.user_metadata?.full_name || session.user.email.split('@')[0];
-        const shortName = username.split(' ')[0];
-        if(appLabel) appLabel.textContent = shortName;
-        if(appAvatar) appAvatar.textContent = shortName.charAt(0).toUpperCase();
-
-        // Abre o app
+        // Auto-open app after OAuth login (ALL users, not just admins)
         const lastDk = localStorage.getItem('bmd_last_deck') || 's2';
         if(document.getElementById('landing') && document.getElementById('landing').style.display !== 'none'){
           if(typeof openApp === 'function') openApp(lastDk);
         }
-
-        // Sync periódico
-        setInterval(syncFsrsToSupabase, 120000);
-        setInterval(syncLeaderboardToSupabase, 120000);
-        window.addEventListener('beforeunload', function(){ syncFsrsToSupabase(); syncLeaderboardToSupabase(); });
-        setTimeout(syncLeaderboardToSupabase, 3000);
-        setTimeout(syncRetentionHeader, 500);
 
         // Check admin status separately — never sign out non-admins
         await new Promise(r => setTimeout(r, 800));
@@ -10591,34 +10552,18 @@ function syncRetentionHeader(){
 
 // ── INIT ─────────────────────────────────────────────────────────────
 (async function init(){
-  // WHITELIST — só emails autorizados entram
-  const ALLOWED_EMAILS = ['wboim@hotmail.com'];
-
-  // Verifica sessão PRIMEIRO — só carrega cards se logado e autorizado
-  const session = await getSession();
-
-  if(!session){
-    // Não logado — fica na landing, não carrega nada
-    window.cardsLoaded = false;
-    const appLoginBtn = document.getElementById('app-login-btn');
-    if(appLoginBtn) appLoginBtn.style.display = 'flex';
-    return;
-  }
-
-  if(!ALLOWED_EMAILS.includes(session.user.email)){
-    await _supa.auth.signOut();
-    alert('Acesso restrito.');
-    return;
-  }
-
-  // Logado e autorizado — carrega cards
-  const cardCount = await loadCardsFromSupabase();
+  // Carrega cards (IDB-first: instantâneo se cache existe)
+  // Paraleliza com auth check — são independentes
+  const [cardCount, session] = await Promise.all([
+    loadCardsFromSupabase(),
+    getSession()
+  ]);
 
   if(session){
     _supaUser = session.user;
     // Carrega progresso FSRS da nuvem
     await loadFsrsFromSupabase();
-    // Abre o app
+    // Auto-open app if coming from OAuth redirect or already logged in
     const lastDeck = localStorage.getItem('bmd_last_deck') || 's2';
     if(typeof openApp === 'function') openApp(lastDeck);
     // Mostra nome do usuário na nav se existir
