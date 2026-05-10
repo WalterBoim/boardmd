@@ -4056,7 +4056,7 @@ html.dark .hl-btn-active { border-color:#fff!important; }
       <!-- lb-btn and level-badge-btn kept hidden — JS references them -->
       <button id="lb-btn" style="display:none" onclick="showLeaderboard()"></button>
       <button id="level-badge-btn" style="display:none" onclick="showProfile()"></button>
-      <div class="user-pill" id="app-user-pill" onclick="showAppAuthMenu()" style="display:flex"><div class="avatar" id="app-user-avatar">W</div><div class="user-name" id="app-user-label">Walter B.</div></div>
+      <div class="user-pill" id="app-user-pill" onclick="showAppAuthMenu()" style="display:none"><div class="avatar" id="app-user-avatar"></div><div class="user-name" id="app-user-label">Sign in</div></div>
     </div>
   </div>
   <div class="streak-bar">
@@ -5395,11 +5395,15 @@ function cfg(){
 
 // ── STATE STORAGE ────────────────────────────────────────────────────
 const SK='bmd_fsrs5';
-let fsrs={};
-try{fsrs=JSON.parse(localStorage.getItem(SK)||'{}');}catch(e){}
-function saveFsrs(){try{localStorage.setItem(SK,JSON.stringify(fsrs));}catch(e){}}
+// FIX 2026-05-10: fsrs precisa ser global (window.fsrs) para que loadFsrsFromSupabase
+// consiga atualizar a referência usada por getState(). Antes era `let fsrs={}` que
+// criava variável de escopo do <script>, separada de window.fsrs.
+window.fsrs = window.fsrs || {};
+try{ Object.assign(window.fsrs, JSON.parse(localStorage.getItem(SK)||'{}')); }catch(e){}
+var fsrs = window.fsrs; // alias para o código antigo continuar funcionando
+function saveFsrs(){try{localStorage.setItem(SK,JSON.stringify(window.fsrs));}catch(e){}}
 function getState(id){
-  return fsrs[id]||{state:ST_NEW,stability:0,difficulty:0,interval:0,due:0,reps:0,lapses:0,stepIdx:0};
+  return window.fsrs[id]||{state:ST_NEW,stability:0,difficulty:0,interval:0,due:0,reps:0,lapses:0,stepIdx:0};
 }
 
 // ── TODAY DATA ───────────────────────────────────────────────────────
@@ -10367,6 +10371,66 @@ async function updateAdminStatus(){
     // FIX 2026-05-10: Esse handler é a ÚNICA fonte de verdade para download de cards
     // pós-login. Tanto INITIAL_SESSION (sessão restaurada do storage) quanto SIGNED_IN
     // (login fresh) caem aqui. Usamos um lock para não duplicar download.
+
+    // BLOQUEIO DE COPYRIGHT 2026-05-10: durante a revisão de copyright, apenas o
+    // email autorizado abaixo pode acessar. Qualquer outro vê tela de manutenção
+    // e é deslogado automaticamente.
+    const BMD_ALLOWED_EMAILS = ['wboim@hotmail.com'];
+
+    function showMaintenanceLockScreen(email){
+      // Substitui TODO o conteúdo da página por uma tela de manutenção limpa.
+      try {
+        document.body.innerHTML =
+          '<div style="position:fixed;inset:0;background:#080c12;color:#e8edf5;'+
+          'display:flex;flex-direction:column;align-items:center;justify-content:center;'+
+          'font-family:Sora,system-ui,sans-serif;text-align:center;padding:24px;z-index:99999">'+
+          '<div style="font-size:34px;font-weight:800;letter-spacing:-1px;margin-bottom:8px">'+
+            'Board<span style="color:#3b7fff">MD</span>'+
+          '</div>'+
+          '<div style="font-size:14px;color:#7a8aa8;margin-bottom:32px;font-weight:500">'+
+            'The smarter way to pass the boards'+
+          '</div>'+
+          '<div style="max-width:440px;padding:28px 32px;border:1px solid #1e2a42;'+
+            'border-radius:14px;background:#0e1420">'+
+            '<div style="font-size:13px;font-weight:800;letter-spacing:2px;'+
+              'color:#e8a836;text-transform:uppercase;margin-bottom:14px">Under review</div>'+
+            '<div style="font-size:18px;font-weight:700;margin-bottom:14px;line-height:1.4">'+
+              'BoardMD is undergoing a content compliance review.</div>'+
+            '<div style="font-size:14px;color:#7a8aa8;line-height:1.6;margin-bottom:22px">'+
+              'Access is temporarily restricted while we audit the library for '+
+              'copyright and content quality. We will reopen access shortly.'+
+            '</div>'+
+            (email ? '<div style="font-size:11px;color:#3a4a68;margin-top:18px;'+
+              'border-top:1px solid #1e2a42;padding-top:14px">'+
+              'Signed in as <strong style="color:#7a8aa8">'+email+'</strong>'+
+              '</div>' : '')+
+          '</div>'+
+          '<div style="font-size:10px;color:#3a4a68;margin-top:24px">'+
+            '&copy; 2026 BoardMD &middot; All rights reserved'+
+          '</div>'+
+          '</div>';
+      } catch(e){}
+    }
+
+    async function enforceCopyrightLock(session){
+      const email = (session?.user?.email || '').toLowerCase().trim();
+      if(BMD_ALLOWED_EMAILS.indexOf(email) === -1){
+        console.warn('[Copyright lock] Email não autorizado:', email);
+        // Limpa qualquer cache local de cards antes de deslogar (evita vazamento)
+        try { localStorage.removeItem('bmd_fsrs5'); } catch(e){}
+        try {
+          // Apaga IDB de cards
+          if(typeof clearIDB === 'function') await clearIDB();
+        } catch(e){}
+        // Tela de manutenção primeiro (para feedback visual imediato)
+        showMaintenanceLockScreen(email);
+        // Desloga em background
+        try { await _supa.auth.signOut(); } catch(e){}
+        return false; // bloqueado
+      }
+      return true; // autorizado
+    }
+
     let _postLoginInFlight = false;
     async function handlePostLogin(session){
       if(_postLoginInFlight) { console.log('[Auth] postLogin já em andamento, pulando'); return; }
@@ -10376,6 +10440,11 @@ async function updateAdminStatus(){
         if(window.location.hash.includes('access_token')){
           try { history.replaceState(null, '', window.location.pathname); } catch(e){}
         }
+
+        // BLOQUEIO DE COPYRIGHT — checa email ANTES de baixar cards ou abrir app
+        const authorized = await enforceCopyrightLock(session);
+        if(!authorized) return; // tela de manutenção já está visível
+
         window._supaUser = session.user;
         _supaUser = session.user;
 
@@ -10407,8 +10476,10 @@ async function updateAdminStatus(){
           if(appAvatar) appAvatar.textContent = shortName.charAt(0).toUpperCase();
         } catch(e){ console.warn('BoardMD: UI auth update falhou', e); }
 
-        // Carrega progresso FSRS da nuvem (apenas no primeiro post-login)
-        try { if(typeof loadFsrsFromSupabase === 'function') await loadFsrsFromSupabase(); } catch(e){}
+        // Carrega progresso FSRS da nuvem (CRÍTICO — substitui in-place window.fsrs)
+        try {
+          if(typeof loadFsrsFromSupabase === 'function') await loadFsrsFromSupabase();
+        } catch(e){ console.warn('BoardMD: load FSRS falhou', e); }
 
         // Auto-open app após login (apenas se ainda está na landing)
         const lastDk = localStorage.getItem('bmd_last_deck') || 's2';
@@ -10416,6 +10487,13 @@ async function updateAdminStatus(){
         if(landing && landing.style.display !== 'none' && typeof openApp === 'function'){
           openApp(lastDk);
         }
+
+        // TOAST de feedback visual — confirmação real de login
+        try {
+          if(typeof showToast === 'function'){
+            showToast('Signed in as ' + session.user.email + ' ✓');
+          }
+        } catch(e){}
 
         // Check admin status separately — never sign out non-admins
         await new Promise(r => setTimeout(r, 600));
@@ -10551,7 +10629,10 @@ async function loadFsrsFromSupabase(){
     .select('card_id,state,stability,difficulty,interval,due,reps,lapses,step_idx')
     .eq('user_id', _supaUser.id);
 
-  if(error || !data?.length) return;
+  if(error){ console.warn('[FSRS] load error:', error); return; }
+  if(!data?.length){ console.log('[FSRS] sem dados no servidor (usuário novo?)'); return; }
+
+  console.log('[FSRS] carregando ' + data.length + ' registros do Supabase');
 
   const fsrsData = {};
   for(const r of data){
@@ -10566,9 +10647,24 @@ async function loadFsrsFromSupabase(){
       stepIdx:    r.step_idx
     };
   }
-  try{ localStorage.setItem('bmd_fsrs5', JSON.stringify(fsrsData)); }catch(e){}
-  // Reinicia o objeto fsrs em memória
-  try{ Object.assign(window.fsrs || {}, fsrsData); }catch(e){}
+  // FIX 2026-05-10: substitui in-place o conteúdo de window.fsrs (não cria objeto novo).
+  // Isso garante que getState() — que lê window.fsrs[id] — enxergue os dados do servidor.
+  // Estratégia segura: limpa entradas antigas que NÃO existem no servidor (evita estado
+  // "fantasma"), e depois assigna o que o servidor tem. Mantém entradas locais não
+  // sincronizadas ainda? Não — o servidor é a fonte de verdade após login.
+  Object.keys(window.fsrs).forEach(k => { delete window.fsrs[k]; });
+  Object.assign(window.fsrs, fsrsData);
+  try{ localStorage.setItem('bmd_fsrs5', JSON.stringify(window.fsrs)); }catch(e){}
+
+  // Recalcula UI: retention header, contadores de cards (new/due) em cada deck.
+  try{ if(typeof syncRetentionHeader === 'function') syncRetentionHeader(); }catch(e){}
+  try{ if(typeof renderDeckList === 'function') renderDeckList(); }catch(e){}
+  try{ if(typeof updateDeckCounts === 'function') updateDeckCounts(); }catch(e){}
+  // Re-render do app se estiver aberto (sem fechar)
+  try{
+    if(typeof rebuildQueue === 'function') rebuildQueue();
+    if(typeof refreshDecks === 'function') refreshDecks();
+  }catch(e){}
 }
 
 // ── RETENTION HEADER SYNC (lightweight — runs on init) ──────────────
@@ -10614,7 +10710,17 @@ function syncRetentionHeader(){
   }
 
   if(session){
-    // Usuário logado → libera download dos cards (cache IDB usado se disponível)
+    // BLOQUEIO DE COPYRIGHT — checa email ANTES de baixar cards
+    const emailLow = (session.user?.email || '').toLowerCase().trim();
+    const allowed = ['wboim@hotmail.com'].indexOf(emailLow) !== -1;
+    if(!allowed){
+      console.warn('[init] email não autorizado, ativando lock screen:', emailLow);
+      try { localStorage.removeItem('bmd_fsrs5'); } catch(e){}
+      if(typeof showMaintenanceLockScreen === 'function') showMaintenanceLockScreen(emailLow);
+      try { await _supa.auth.signOut(); } catch(e){}
+      return; // para o init aqui — não baixa nada
+    }
+    // Usuário logado E autorizado → libera download dos cards (cache IDB usado se disponível)
     // O onAuthStateChange (INITIAL_SESSION) também tentará — mas o lock _postLoginInFlight
     // evita download duplicado.
     try {
@@ -15461,6 +15567,9 @@ console.log('[BoardMD v2] loaded');
       <span style="color:#3b82f6;font-weight:700" id="bs-fsrs-new" title="New cards">0</span>
       <span style="color:var(--text-faint);font-weight:400"> new</span>
       &nbsp;
+      <span style="color:#f59e0b;font-weight:700" id="bs-fsrs-lrn" title="Learning/relearning">0</span>
+      <span style="color:var(--text-faint);font-weight:400"> lrn</span>
+      &nbsp;
       <span style="color:#22c55e;font-weight:700" id="bs-fsrs-due" title="Due for review">0</span>
       <span style="color:var(--text-faint);font-weight:400"> due</span>
     </div>
@@ -15733,20 +15842,6 @@ function showDone(){
 
 window.bsStart=function(){
   BS.cards=getCards();
-  // Update FSRS counters for the session
-  try{
-    var _bsNow=Date.now();
-    var _bsNw=0,_bsDue=0;
-    BS.cards.forEach(function(c){
-      var s=typeof getState==='function'?getState(c.id):{state:0};
-      if(!s||s.state===0) _bsNw++;
-      else if(s.due&&s.due<=_bsNow+86400000) _bsDue++;
-    });
-    var _newEl=document.getElementById('bs-fsrs-new');
-    var _dueEl=document.getElementById('bs-fsrs-due');
-    if(_newEl) _newEl.textContent=_bsNw;
-    if(_dueEl) _dueEl.textContent=_bsDue;
-  }catch(e){}
   // Apply search filter if active
   if(BS._searchFilter){
     const q=BS._searchFilter;
@@ -15759,6 +15854,9 @@ window.bsStart=function(){
     });
   }
   BS.cur=0;BS.ph=0;BS.seen.clear();BS.flagged.clear();BS.elapsed=0;
+  // FIX 2026-05-10: Atualiza contadores DEPOIS de aplicar filtros, com BS.cur=0
+  // (assim conta TODOS os cards da sessão, incluindo o atual)
+  try{ if(typeof bsUpdateFsrsCounter==='function') bsUpdateFsrsCounter(); }catch(e){}
   const t=document.getElementById('bs-n-time');if(t)t.textContent='0:00';
   // Start clock automatically (not only on play)
   if(BS.clock)clearInterval(BS.clock);
@@ -15888,19 +15986,29 @@ window.bsSearch=function(q){
 
 // ── UPDATE BRAINSTORM FSRS COUNTER ───────────────────────────────────
 function bsUpdateFsrsCounter(){
+  // FIX 2026-05-10: usa window.fsrs (única fonte real) e categoriza new/lrn/due
+  // igual o app principal. O contador mostra o que AINDA falta na sessão.
   try{
     var now=Date.now();
     var cards=BS.cards||[];
-    var remaining=cards.slice(BS.cur+1); // cards not yet seen
-    var nw=0,due=0;
+    var remaining=cards.slice(BS.cur+1);
+    var nw=0,lrn=0,due=0;
+    var fs=window.fsrs||{};
     remaining.forEach(function(c){
-      var s=typeof getState==='function'?getState(c.id):{state:0};
-      if(!s||s.state===0) nw++;
-      else if(s.due&&s.due<=now+86400000) due++;
+      var s=fs[c.id];
+      if(!s||s.state===0){ nw++; }
+      else if(s.state===1||s.state===3){
+        if(s.due && s.due<=now+1200000) lrn++;
+      }
+      else if(s.state===2){
+        if(s.due && s.due<=now+86400000) due++;
+      }
     });
     var newEl=document.getElementById('bs-fsrs-new');
+    var lrnEl=document.getElementById('bs-fsrs-lrn');
     var dueEl=document.getElementById('bs-fsrs-due');
     if(newEl) newEl.textContent=nw;
+    if(lrnEl) lrnEl.textContent=lrn;
     if(dueEl) dueEl.textContent=due;
   }catch(e){}
 }
@@ -15963,18 +16071,27 @@ window.openBrainStorm=function(){
   bsUpdateDeckCounters();
 };
 function bsUpdateDeckCounters(){
+  // FIX 2026-05-10: Antes lia window.fsrsState (que nunca existe) → sempre 0.
+  // Agora usa window.fsrs (a única fonte real) e a mesma fórmula do app principal:
+  //   new  = state 0
+  //   lrn  = state 1 ou 3 (learning/relearning) e due em ≤ 20min
+  //   due  = state 2 (review) e due em ≤ 24h
   const D=window.DECKS||{};
-  const fs=window.fsrsState||window.fsrs||{};
+  const fs=window.fsrs||{};
   const now=Date.now();
-  const ST_NEW=0,ST_DUE=2;
   function getCount(pool){
-    let nw=0,due=0;
+    let nw=0,lrn=0,due=0;
     pool.forEach(function(c){
       const s=fs[c.id];
-      if(!s||s.state===ST_NEW)nw++;
-      else if(s.due&&s.due<=now)due++;
+      if(!s||s.state===0){ nw++; }
+      else if(s.state===1||s.state===3){
+        if(s.due && s.due<=now+1200000) lrn++;
+      }
+      else if(s.state===2){
+        if(s.due && s.due<=now+86400000) due++;
+      }
     });
-    return {nw,due};
+    return {nw,lrn,due};
   }
   const decks={
     'all':[...(D.boardmd_s2||[]),...(D.core||[]),...(D.boardmd_s1||[]),...(D.s1_core||[])],
@@ -15986,12 +16103,12 @@ function bsUpdateDeckCounters(){
   Object.keys(decks).forEach(function(k){
     const el=document.getElementById('bdc-'+k);
     if(!el)return;
-    const {nw,due}=getCount(decks[k]);
-    if(nw||due){
-      el.innerHTML=(nw?'<span style="color:#3b82f6">'+nw+' new</span>':'')+(nw&&due?' · ':'')+(due?'<span style="color:#22c55e">'+due+' due</span>':'');
-    } else {
-      el.textContent='';
-    }
+    const {nw,lrn,due}=getCount(decks[k]);
+    const parts=[];
+    if(nw)  parts.push('<span style="color:#3b82f6">'+nw+' new</span>');
+    if(lrn) parts.push('<span style="color:#f59e0b">'+lrn+' lrn</span>');
+    if(due) parts.push('<span style="color:#22c55e">'+due+' due</span>');
+    el.innerHTML = parts.length ? parts.join(' &middot; ') : '<span style="color:var(--text-faint)">0</span>';
   });
 }
 window.closeBrainStorm=function(){
