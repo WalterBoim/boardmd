@@ -15810,8 +15810,11 @@ function render(){
     if(card.e)h+='<div class="bs-exp">'+card.e+'</div>';
   }else if(ph==='kp'){
     if(card.kp){
-      // Cloze clicável: palavras em **bold** viram oclusões clicáveis
-      let kpHtml=card.kp;
+      // Cloze clicável: palavras em **bold** OU <strong>...</strong> viram oclusões
+      // FIX 2026-05-10: normaliza HTML <strong>/<b> para **markdown** antes do regex
+      let kpHtml=card.kp
+        .replace(/<\s*strong\s*>([\s\S]+?)<\s*\/\s*strong\s*>/gi, '**$1**')
+        .replace(/<\s*b\s*>([\s\S]+?)<\s*\/\s*b\s*>/gi, '**$1**');
       let clozeCnt=0;
       kpHtml=kpHtml.replace(/\*\*(.+?)\*\*/g,function(m,word){
         clozeCnt++;
@@ -16047,6 +16050,7 @@ window.bsRate=function(rating){
   }catch(e){ console.warn('BrainStorm FSRS error',e); }
   // MDCoins (FIX 2026-05-10): mesma fórmula do Active Recall (arFsrs):
   // again=0, hard=1, good=2, easy=2 — mantém consistência no leaderboard.
+  // awardCoins já mostra toast no canto inferior direito, NÃO criamos overlay duplicado.
   try{
     const coinMap = [0, 1, 2, 2]; // again, hard, good, easy
     const coins = coinMap[rating] || 0;
@@ -16054,14 +16058,7 @@ window.bsRate=function(rating){
       window.awardCoins(coins, 'BrainStorm Clinical Reasoning');
     }
   }catch(e){}
-  // Visual feedback + advance
-  const overlay=document.createElement('div');
-  const clrs={0:'#f43f5e',1:'#f97316',2:'#22c55e',3:'#3b7fff'};
-  overlay.style.cssText='position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:'+clrs[rating]+';color:#fff;font-size:12px;font-weight:800;padding:7px 20px;border-radius:20px;z-index:10001;pointer-events:none;opacity:1;transition:opacity .3s';
-  const coinLabel = [0, 1, 2, 2][rating] || 0;
-  overlay.textContent = ['Again','Hard','Good','Easy'][rating] + (coinLabel > 0 ? ' · +' + coinLabel + ' BC' : '');
-  document.body.appendChild(overlay);
-  setTimeout(()=>{overlay.style.opacity='0';setTimeout(()=>overlay.remove(),300);},700);
+  // Advance to next card
   setTimeout(()=>bsGo(1),200);
 };
 window.bsOpenAttending=function(topic,kp){
@@ -16724,9 +16721,12 @@ function renderClinicalReasoningReveal(card, el) {
   }
 
   // KEY POINT com cloze — FIX 2026-05-10: adicionar KP clicável após Diagnosis/Action
-  // Palavras em **bold** viram [...] clicáveis (igual ao modo "kp" puro do Brainstorm)
+  // Palavras em **bold** OU <strong>...</strong> viram [...] clicáveis
   if(card.kp && card.kp.trim() && card.kp.trim().toLowerCase() !== 'null'){
-    let kpHtml = card.kp;
+    // Normaliza HTML <strong>/<b> para **markdown**
+    let kpHtml = card.kp
+      .replace(/<\s*strong\s*>([\s\S]+?)<\s*\/\s*strong\s*>/gi, '**$1**')
+      .replace(/<\s*b\s*>([\s\S]+?)<\s*\/\s*b\s*>/gi, '**$1**');
     let clozeCnt = 0;
     kpHtml = kpHtml.replace(/\*\*(.+?)\*\*/g, function(m, word){
       clozeCnt++;
@@ -16888,15 +16888,40 @@ function v2next(){window._v2bi++;v2show(window._v2bi);}
 
 window._v2kr=0;window._v2kt=0;window._v2kc=0;
 function v2kp(card){
-  const raw=(card.kp||'').trim();
+  let raw=(card.kp||'').trim();
   const outer=document.getElementById('v2kp'),oldkp=document.getElementById('key-point-wrap');
-  if(!raw||raw==='null'){if(outer)outer.style.display='none';return;}
+  // FIX 2026-05-10: Esconde AMBOS quando KP vazio (antes deixava key-point-wrap fantasma)
+  if(!raw||raw.toLowerCase()==='null'){
+    if(outer)outer.style.display='none';
+    if(oldkp)oldkp.style.display='none';
+    return;
+  }
   const el=document.getElementById('v2kptxt');if(!el)return;
   window._v2kr=0;window._v2kc=0;
+
+  // FIX 2026-05-10: KP no banco pode estar como **markdown** OU <strong>HTML</strong>.
+  // Converte <strong>X</strong> e <b>X</b> para **X** ANTES do regex de cloze,
+  // assim ambos os formatos viram cloze clicável.
+  raw = raw
+    .replace(/<\s*strong\s*>([\s\S]+?)<\s*\/\s*strong\s*>/gi, '**$1**')
+    .replace(/<\s*b\s*>([\s\S]+?)<\s*\/\s*b\s*>/gi, '**$1**');
+
   let cnt=0;
-  const h=raw.replace(/\*\*(.+?)\*\*/g,function(m,w){cnt++;return '<span class="v2cl" onclick="v2reveal(this)"><span class="v2clm">―――</span><span class="v2clw">'+w+'</span></span>';});
-  window._v2kt=cnt;el.innerHTML=h;
-  const ci=document.getElementById('v2kpcoins');if(ci)ci.textContent='0 / '+cnt+' coins';
+  let h;
+  if(/\*\*.+?\*\*/.test(raw)){
+    // Tem marcação → cloze clicável
+    h = raw.replace(/\*\*(.+?)\*\*/g, function(m,w){
+      cnt++;
+      return '<span class="v2cl" onclick="v2reveal(this)"><span class="v2clm">―――</span><span class="v2clw">'+w+'</span></span>';
+    });
+  } else {
+    // Sem marcação → mostra texto puro mesmo assim (KP aparece, só sem cloze)
+    h = raw;
+  }
+  window._v2kt=cnt;
+  el.innerHTML=h;
+  const ci=document.getElementById('v2kpcoins');
+  if(ci) ci.textContent = cnt > 0 ? '0 / '+cnt+' coins' : '';
   const dn=document.getElementById('v2kpdone');if(dn)dn.classList.remove('on');
   if(outer)outer.style.display='';
   if(oldkp)oldkp.style.display='none';
