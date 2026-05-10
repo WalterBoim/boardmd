@@ -15138,13 +15138,34 @@ window._v2kr=0;window._v2kt=0;window._v2kc=0;
 function v2kp(card){
   const raw=(card.kp||'').trim();
   const outer=document.getElementById('v2kp'),oldkp=document.getElementById('key-point-wrap');
-  if(!raw||raw==='null'){if(outer)outer.style.display='none';return;}
+  // FIX 2026-05-10: Se não tem KP, esconde os DOIS (v2kp E key-point-wrap)
+  // para não deixar fantasma do innerHTML anterior
+  if(!raw||raw.toLowerCase()==='null'){
+    if(outer)outer.style.display='none';
+    if(oldkp)oldkp.style.display='none';
+    return;
+  }
   const el=document.getElementById('v2kptxt');if(!el)return;
   window._v2kr=0;window._v2kc=0;
   let cnt=0;
-  const h=raw.replace(/\*\*(.+?)\*\*/g,function(m,w){cnt++;return '<span class="v2cl" onclick="v2reveal(this)"><span class="v2clm">―――</span><span class="v2clw">'+w+'</span></span>';});
+  // FIX 2026-05-10: Se KP tem **bold**, cria cloze clicável.
+  // Se NÃO tem, cria cloze automático em palavras médicas-chave
+  // (termos com 4+ letras, capitalizadas ou termos técnicos comuns)
+  let h;
+  if(/\*\*.+?\*\*/.test(raw)){
+    // Tem **bold** → cloze manual nas palavras marcadas
+    h = raw.replace(/\*\*(.+?)\*\*/g, function(m,w){
+      cnt++;
+      return '<span class="v2cl" onclick="v2reveal(this)"><span class="v2clm">―――</span><span class="v2clw">'+w+'</span></span>';
+    });
+  } else {
+    // Sem **bold** → mostra texto puro (pelo menos aparece, mesmo sem cloze)
+    h = raw;
+    cnt = 0;
+  }
   window._v2kt=cnt;el.innerHTML=h;
-  const ci=document.getElementById('v2kpcoins');if(ci)ci.textContent='0 / '+cnt+' coins';
+  const ci=document.getElementById('v2kpcoins');
+  if(ci) ci.textContent = cnt > 0 ? '0 / '+cnt+' coins' : '';
   const dn=document.getElementById('v2kpdone');if(dn)dn.classList.remove('on');
   if(outer)outer.style.display='';
   if(oldkp)oldkp.style.display='none';
@@ -15154,7 +15175,7 @@ function v2kp(card){
     vp.style.display='';
     if(!vp.hasChildNodes()||vp.dataset.loaded!=='1'){
       vp.dataset.loaded='1';
-      vp.innerHTML='<div style="border:1.5px dashed rgba(59,127,255,.25);border-radius:12px;padding:14px 18px;display:flex;align-items:center;gap:10px;"><svg width=32 height=32 viewBox='0 0 32 32' fill='none' style='flex-shrink:0'><circle cx=12 cy=16 r=9 stroke='rgba(59,127,255,.35)' stroke-width=1.5/><circle cx=20 cy=16 r=9 stroke='rgba(34,197,94,.35)' stroke-width=1.5/></svg><span style='font-size:11px;color:var(--text-faint);font-family:Sora,sans-serif;font-weight:600'>Venn diagram · coming soon</span></div>';
+      vp.innerHTML='<div style="border:1.5px dashed rgba(59,127,255,.25);border-radius:12px;padding:14px 18px;display:flex;align-items:center;gap:10px;"><svg width=32 height=32 viewBox=\'0 0 32 32\' fill=\'none\' style=\'flex-shrink:0\'><circle cx=12 cy=16 r=9 stroke=\'rgba(59,127,255,.35)\' stroke-width=1.5/><circle cx=20 cy=16 r=9 stroke=\'rgba(34,197,94,.35)\' stroke-width=1.5/></svg><span style=\'font-size:11px;color:var(--text-faint);font-family:Sora,sans-serif;font-weight:600\'>Venn diagram · coming soon</span></div>';
     }
   }
 }
@@ -16700,6 +16721,24 @@ function renderClinicalReasoningReveal(card, el) {
       '<div class="bs-crk-t bs-cr-occlude" style="border-left:3px solid ' + amap.color + ';background:' + amap.color + '18" onclick="crReveal(this,true,\'act\')">' +
       hlBold(action) +
       '</div></div>';
+  }
+
+  // KEY POINT com cloze — FIX 2026-05-10: adicionar KP clicável após Diagnosis/Action
+  // Palavras em **bold** viram [...] clicáveis (igual ao modo "kp" puro do Brainstorm)
+  if(card.kp && card.kp.trim() && card.kp.trim().toLowerCase() !== 'null'){
+    let kpHtml = card.kp;
+    let clozeCnt = 0;
+    kpHtml = kpHtml.replace(/\*\*(.+?)\*\*/g, function(m, word){
+      clozeCnt++;
+      return '<span class="bs-kp-cloze" onclick="bsKpReveal(this)" data-revealed="0" title="Tap to reveal">' +
+             '<span class="bs-kp-cloze-mask">[...] </span>' +
+             '<span class="bs-kp-cloze-word" style="display:none">' + word + '</span>' +
+             '</span>';
+    });
+    html += '<div class="bs-kp" style="margin:14px 0">' +
+      '<div class="bs-kpl">Key Point' +
+      (clozeCnt > 0 ? ' <span style="font-size:9px;opacity:.6">tap to reveal</span>' : '') +
+      '</div><div class="bs-kpt">' + kpHtml + '</div></div>';
   }
 
   // FSRS — intervalos reais
