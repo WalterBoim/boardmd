@@ -9876,7 +9876,18 @@ document.getElementById('report-modal-overlay').addEventListener('click', functi
 // ── SUPABASE CONFIG ──────────────────────────────────────────────────
 const SUPA_URL = 'https://hwdcgbcnphkmxaasties.supabase.co';
 const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh3ZGNnYmNucGhrbXhhYXN0aWVzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ4MzM1NzcsImV4cCI6MjA5MDQwOTU3N30.bC8A_Mt7LKmY_SrypxTHLTSD3HgAzfzKz2VZSzeb0i8';
-const _supa = supabase.createClient(SUPA_URL, SUPA_KEY);
+// FIX 2026-05-10: detectSessionInUrl=true → o próprio SDK processa #access_token automaticamente.
+// Sem isso o hash chegava e o IIFE tentava parsear manualmente, gerando race condition com o SDK.
+const _supa = supabase.createClient(SUPA_URL, SUPA_KEY, {
+  auth: {
+    autoRefreshToken: true,
+    persistSession: true,
+    detectSessionInUrl: true,
+    flowType: 'implicit',
+    storage: window.localStorage,
+    storageKey: 'sb-boardmd-auth'
+  }
+});
 
 // ── LOADING UI ───────────────────────────────────────────────────────
 function showLoadingOverlay(){
@@ -10308,9 +10319,14 @@ async function updateAdminStatus(){
 }
 
 // OAuth/magic link return handler + admin auth listener
+// FIX 2026-05-10:
+// — Implicit flow (#access_token=…) é processado pelo próprio SDK (detectSessionInUrl=true).
+//   Não parseamos o hash manualmente; apenas limpamos a URL após o SDK terminar.
+// — PKCE flow (?code=…) continua sendo trocado manualmente, pois pode chegar antes do auto.
+// — TODO o download de cards/abertura do app fica no onAuthStateChange para evitar race conditions.
 (function(){
   try {
-    console.log('[Auth] IIFE starting, hash:', location.hash.slice(0,30));
+    console.log('[Auth] IIFE starting, hash:', location.hash.slice(0,30), 'search:', location.search.slice(0,30));
     async function handleAuthReturn(){
       try {
         // PKCE flow: ?code=...
@@ -10318,76 +10334,48 @@ async function updateAdminStatus(){
         const code = params.get('code');
         if(code){
           const { data: pkceData, error } = await _supa.auth.exchangeCodeForSession(window.location.href);
-          if(!error && pkceData?.session){
-            // Sessão OK — salva flag e abre direto sem reload
-            _supaUser = pkceData.session.user;
-            history.replaceState(null, '', window.location.pathname);
-            const lastDk = localStorage.getItem('bmd_last_deck') || 's2';
-            // GATE: agora autenticado, baixa cards se ainda não foram baixados
-            if(!window.cardsLoaded){
-              try {
-                await loadCardsFromSupabase();
-                window.cardsLoaded = true;
-              } catch(e){ console.warn('BoardMD: PKCE post-login load falhou', e); }
-            }
-            const tryOpen = () => {
-              if(window.cardsLoaded){
-                const landing = document.getElementById('landing');
-                if(landing && landing.style.display !== 'none' && typeof openApp === 'function'){
-                  openApp(lastDk);
-                }
-              } else {
-                setTimeout(tryOpen, 200);
-              }
-            };
-            tryOpen();
-          } else {
+          if(error){
             console.warn('BoardMD: exchangeCodeForSession error', error);
-            history.replaceState(null, '', window.location.pathname);
+          } else if(pkceData?.session){
+            console.log('[Auth] PKCE OK:', pkceData.session.user?.email);
           }
+          history.replaceState(null, '', window.location.pathname);
+          // onAuthStateChange("SIGNED_IN") cuidará do resto.
           return;
         }
-        // Implicit OAuth flow: #access_token=... (Google OAuth returns this)
+        // Implicit OAuth flow: #access_token=…
+        // O SDK (detectSessionInUrl=true) processa o hash automaticamente quando _supa é criado.
+        // Aqui apenas limpamos a URL após pequena espera, e forçamos um getSession para garantir
+        // que o storage já foi populado (em alguns browsers o SDK leva alguns ms).
         if(window.location.hash.includes('access_token')){
-          // Parse hash manually and call setSession
-          const hashParams = new URLSearchParams(window.location.hash.slice(1));
-          const access_token = hashParams.get('access_token');
-          const refresh_token = hashParams.get('refresh_token');
-          if(access_token && refresh_token){
-            const { data, error } = await _supa.auth.setSession({ access_token, refresh_token });
-            if(!error && data?.session){
-              console.log('[Auth] setSession OK:', data.session.user?.email);
-              history.replaceState(null, '', window.location.pathname);
-              // GATE: agora autenticado, baixa cards se ainda não foram baixados
-              if(!window.cardsLoaded){
-                try {
-                  await loadCardsFromSupabase();
-                  window.cardsLoaded = true;
-                } catch(e){ console.warn('BoardMD: implicit post-login load falhou', e); }
-              }
-              // Open app immediately
-              const lastDk = localStorage.getItem('bmd_last_deck') || 's2';
-              if(typeof openApp === 'function') openApp(lastDk);
-            } else {
-              console.warn('[Auth] setSession error:', error);
+          // Pequena espera para o SDK terminar de processar
+          for(let i = 0; i < 30; i++){
+            const { data } = await _supa.auth.getSession();
+            if(data?.session){
+              console.log('[Auth] SDK processou hash OK:', data.session.user?.email);
+              break;
             }
-          } else {
-            // Fallback: let SDK try
-            await _supa.auth.getSession();
-            setTimeout(() => {
-              history.replaceState(null, '', window.location.pathname);
-            }, 1500);
+            await new Promise(r => setTimeout(r, 100));
           }
+          history.replaceState(null, '', window.location.pathname);
         }
       } catch(e){ console.warn('BoardMD: auth return handler', e); }
     }
     handleAuthReturn();
 
     // React to auth state changes
-    _supa.auth.onAuthStateChange(async (event, session) => {
-      console.log('[Auth] event=', event, 'email=', session?.user?.email, 'uid=', session?.user?.id);
-      if(event === 'SIGNED_IN' && session){
-        // Store user for FSRS sync & leaderboard
+    // FIX 2026-05-10: Esse handler é a ÚNICA fonte de verdade para download de cards
+    // pós-login. Tanto INITIAL_SESSION (sessão restaurada do storage) quanto SIGNED_IN
+    // (login fresh) caem aqui. Usamos um lock para não duplicar download.
+    let _postLoginInFlight = false;
+    async function handlePostLogin(session){
+      if(_postLoginInFlight) { console.log('[Auth] postLogin já em andamento, pulando'); return; }
+      _postLoginInFlight = true;
+      try {
+        // Limpa qualquer resíduo do hash OAuth na URL
+        if(window.location.hash.includes('access_token')){
+          try { history.replaceState(null, '', window.location.pathname); } catch(e){}
+        }
         window._supaUser = session.user;
         _supaUser = session.user;
 
@@ -10399,32 +10387,66 @@ async function updateAdminStatus(){
           } catch(e){ console.warn('BoardMD: post-login load falhou', e); }
         }
 
-        // Auto-open app after OAuth login (ALL users, not just admins)
+        // Atualiza UI da nav e do header do app
+        try {
+          const pill = document.getElementById('nav-user-pill');
+          const loginBtn = document.getElementById('nav-login-btn');
+          const nameEl = document.getElementById('nav-user-name');
+          if(pill) pill.style.display='flex';
+          if(loginBtn) loginBtn.style.display='none';
+          if(nameEl && session.user.email) nameEl.textContent = session.user.email.split('@')[0];
+          const appPill = document.getElementById('app-user-pill');
+          const appLoginBtn = document.getElementById('app-login-btn');
+          const appLabel = document.getElementById('app-user-label');
+          const appAvatar = document.getElementById('app-user-avatar');
+          if(appPill) appPill.style.display='flex';
+          if(appLoginBtn) appLoginBtn.style.display='none';
+          const username = session.user.user_metadata?.full_name || session.user.email.split('@')[0];
+          const shortName = username.split(' ')[0];
+          if(appLabel) appLabel.textContent = shortName;
+          if(appAvatar) appAvatar.textContent = shortName.charAt(0).toUpperCase();
+        } catch(e){ console.warn('BoardMD: UI auth update falhou', e); }
+
+        // Carrega progresso FSRS da nuvem (apenas no primeiro post-login)
+        try { if(typeof loadFsrsFromSupabase === 'function') await loadFsrsFromSupabase(); } catch(e){}
+
+        // Auto-open app após login (apenas se ainda está na landing)
         const lastDk = localStorage.getItem('bmd_last_deck') || 's2';
-        if(document.getElementById('landing') && document.getElementById('landing').style.display !== 'none'){
-          if(typeof openApp === 'function') openApp(lastDk);
+        const landing = document.getElementById('landing');
+        if(landing && landing.style.display !== 'none' && typeof openApp === 'function'){
+          openApp(lastDk);
         }
 
         // Check admin status separately — never sign out non-admins
-        await new Promise(r => setTimeout(r, 800));
-        const isAdmin = await checkIsAdmin();
-        if(isAdmin){
-          window._isBoardMDAdmin = true;
-          showAdminBadge(true);
-          showToast('Signed in as admin ✓ — edits save to server');
-        } else {
-          // Normal user — signed in successfully, no sign-out
-          window._isBoardMDAdmin = false;
-          showAdminBadge(false);
-          showToast('Signed in as ' + (session.user?.email || 'user') + ' ✓');
-        }
+        await new Promise(r => setTimeout(r, 600));
+        try {
+          const isAdmin = await checkIsAdmin();
+          if(isAdmin){
+            window._isBoardMDAdmin = true;
+            showAdminBadge(true);
+          } else {
+            window._isBoardMDAdmin = false;
+            showAdminBadge(false);
+          }
+        } catch(e){ console.warn('BoardMD: checkIsAdmin falhou', e); }
+        try { updateAdminStatus(); } catch(e){}
+      } finally {
+        _postLoginInFlight = false;
+      }
+    }
+
+    _supa.auth.onAuthStateChange(async (event, session) => {
+      console.log('[Auth] event=', event, 'email=', session?.user?.email, 'uid=', session?.user?.id);
+      if((event === 'SIGNED_IN' || event === 'INITIAL_SESSION' || event === 'TOKEN_REFRESHED') && session){
+        await handlePostLogin(session);
       } else if(event === 'SIGNED_OUT'){
         window._isBoardMDAdmin = false;
         window._supaUser = null;
         _supaUser = null;
+        window.cardsLoaded = false; // permite re-download em próximo login
         showAdminBadge(false);
+        try { updateAdminStatus(); } catch(e){}
       }
-      try { updateAdminStatus(); } catch(e){}
     });
 
     // /#admin shortcut reveals admin option + opens login
@@ -10573,18 +10595,34 @@ function syncRetentionHeader(){
 
 // ── INIT ─────────────────────────────────────────────────────────────
 (async function init(){
-  // GATE: cards são privados — só baixa se houver sessão autenticada.
-  // Auth primeiro, cards depois.
-  const session = await getSession();
+  // FIX 2026-05-10: Se o usuário acabou de chegar do Google OAuth (#access_token=…),
+  // o SDK precisa de alguns ms para processar o hash e popular o storage. Esperamos
+  // a sessão aparecer ANTES de decidir se estamos logados ou não, senão entramos
+  // como anônimo e setamos cardsLoaded=true, e o onAuthStateChange depois não baixa.
+  let session = null;
+  const hadOAuthHash = window.location.hash.includes('access_token') || new URLSearchParams(window.location.search).get('code');
+  if(hadOAuthHash){
+    console.log('[init] hash OAuth detectado, aguardando SDK processar…');
+    for(let i = 0; i < 50; i++){ // até ~5s
+      const { data } = await _supa.auth.getSession();
+      if(data?.session){ session = data.session; break; }
+      await new Promise(r => setTimeout(r, 100));
+    }
+    if(!session) console.warn('[init] timeout esperando sessão OAuth — seguindo sem ela');
+  } else {
+    session = await getSession();
+  }
 
-  let cardCount = 0;
   if(session){
     // Usuário logado → libera download dos cards (cache IDB usado se disponível)
-    cardCount = await loadCardsFromSupabase();
+    // O onAuthStateChange (INITIAL_SESSION) também tentará — mas o lock _postLoginInFlight
+    // evita download duplicado.
+    try {
+      await loadCardsFromSupabase();
+      window.cardsLoaded = true;
+    } catch(e){ console.warn('BoardMD: init load falhou', e); }
   } else {
-    // Sem sessão → não baixa nada do servidor.
-    // Se houver cache IDB local (do mesmo usuário em sessão anterior), pode usar.
-    // Caso contrário, deixa o app vazio até login.
+    // Sem sessão → não baixa nada do servidor. Tenta cache local.
     try {
       const meta = getIDBMeta();
       if(meta && meta.count > 100){
@@ -10593,7 +10631,8 @@ function syncRetentionHeader(){
           buildDecks(cached);
           if(window._bmdSavedTheme === 'light') document.documentElement.classList.add('light');
           if(typeof updateThemeIcons === 'function') updateThemeIcons();
-          cardCount = cached.length;
+          // OBS: NÃO setamos cardsLoaded=true aqui — quando logar, o onAuthStateChange
+          // deve baixar a versão fresca do servidor.
         }
       }
     } catch(e){ console.warn('BoardMD: IDB cache check falhou', e); }
@@ -10604,9 +10643,7 @@ function syncRetentionHeader(){
   if(session){
     _supaUser = session.user;
     // Carrega progresso FSRS da nuvem
-    await loadFsrsFromSupabase();
-    // App abre apenas via onAuthStateChange após login
-    const lastDeck = localStorage.getItem('bmd_last_deck') || 's2';
+    try { await loadFsrsFromSupabase(); } catch(e){}
     // Mostra nome do usuário na nav se existir
     const nameEl = document.getElementById('lb-my-name');
     if(nameEl && session.user.email){
@@ -10640,14 +10677,20 @@ function syncRetentionHeader(){
     const shortName = username.split(' ')[0];
     if(appLabel){ appLabel.textContent = shortName; }
     if(appAvatar){ appAvatar.textContent = shortName.charAt(0).toUpperCase(); }
+
+    // FIX 2026-05-10: Se já temos sessão e o usuário acabou de voltar do OAuth,
+    // ainda estamos na landing. Abre o app diretamente.
+    const lastDk = localStorage.getItem('bmd_last_deck') || 's2';
+    const landing = document.getElementById('landing');
+    if(landing && landing.style.display !== 'none' && typeof openApp === 'function'){
+      openApp(lastDk);
+    }
   } else {
     // Not logged in — show sync button in app
     const appLoginBtn = document.getElementById('app-login-btn');
     if(appLoginBtn){ appLoginBtn.style.display='flex'; }
   }
 
-  // Dispara o app
-  window.cardsLoaded = true;
   if(window.pendingInit) window.pendingInit();
   // Sync retention no header
   setTimeout(syncRetentionHeader, 300);
