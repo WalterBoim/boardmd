@@ -15564,14 +15564,9 @@ console.log('[BoardMD v2] loaded');
       time <b id="bs-n-time">0:00</b> &nbsp;·&nbsp;
       total <b id="bs-n-tot">0</b>
       &nbsp;·&nbsp;
-      <span style="color:#3b82f6;font-weight:700" id="bs-fsrs-new" title="New cards">0</span>
-      <span style="color:var(--text-faint);font-weight:400"> new</span>
-      &nbsp;
-      <span style="color:#f59e0b;font-weight:700" id="bs-fsrs-lrn" title="Learning/relearning">0</span>
-      <span style="color:var(--text-faint);font-weight:400"> lrn</span>
-      &nbsp;
-      <span style="color:#22c55e;font-weight:700" id="bs-fsrs-due" title="Due for review">0</span>
-      <span style="color:var(--text-faint);font-weight:400"> due</span>
+      <span title="New + Learning + Due" style="font-family:'JetBrains Mono',monospace;font-weight:700">
+        <span style="color:#3b82f6" id="bs-fsrs-new">0</span><span style="color:var(--text-faint);font-weight:400">+</span><span style="color:#f59e0b" id="bs-fsrs-lrn">0</span><span style="color:var(--text-faint);font-weight:400">+</span><span style="color:#22c55e" id="bs-fsrs-due">0</span>
+      </span>
     </div>
     <div class="bs-prog"><div class="bs-pf" id="bs-pf"></div></div>
     <div class="bs-sr">
@@ -16104,11 +16099,16 @@ function bsUpdateDeckCounters(){
     const el=document.getElementById('bdc-'+k);
     if(!el)return;
     const {nw,lrn,due}=getCount(decks[k]);
-    const parts=[];
-    if(nw)  parts.push('<span style="color:#3b82f6">'+nw+' new</span>');
-    if(lrn) parts.push('<span style="color:#f59e0b">'+lrn+' lrn</span>');
-    if(due) parts.push('<span style="color:#22c55e">'+due+' due</span>');
-    el.innerHTML = parts.length ? parts.join(' &middot; ') : '<span style="color:var(--text-faint)">0</span>';
+    if(nw||lrn||due){
+      el.innerHTML =
+        '<span style="color:#3b82f6">'+nw+'</span>' +
+        '<span style="color:var(--text-faint);font-weight:400">+</span>' +
+        '<span style="color:#f59e0b">'+lrn+'</span>' +
+        '<span style="color:var(--text-faint);font-weight:400">+</span>' +
+        '<span style="color:#22c55e">'+due+'</span>';
+    } else {
+      el.innerHTML = '<span style="color:var(--text-faint)">0+0+0</span>';
+    }
   });
 }
 window.closeBrainStorm=function(){
@@ -16663,14 +16663,18 @@ function renderClinicalReasoningReveal(card, el) {
   }
 
   // FSRS — intervalos reais
+  // FIX 2026-05-10: Antes chamava crFsrs('again', card.id) — mas card.id é string
+  // (ex: "boardmd_s2_xxxx") e era inserido SEM aspas no HTML, virando
+  // onclick="crFsrs('again', boardmd_s2_xxxx)" → ReferenceError → botão silencioso.
+  // Trocado para bsRate(0..3) que já funciona com BS.cards[BS.cur].
   (function(){
     var _si=getState(card.id);
     var _ivi=getIntervals(_si);
     html += '<div class="bs-cr-fsrs">' +
-      '<button class="bs-cr-fsrs-btn again" onclick="crFsrs(\'again\',' + String(card.id||'') + ')">Again<span class="bs-cr-fsrs-sub">' + _ivi.again.label + '</span></button>' +
-      '<button class="bs-cr-fsrs-btn hard" onclick="crFsrs(\'hard\',' + String(card.id||'') + ')">Hard<span class="bs-cr-fsrs-sub">' + _ivi.hard.label + '</span></button>' +
-      '<button class="bs-cr-fsrs-btn good" onclick="crFsrs(\'good\',' + String(card.id||'') + ')">Good<span class="bs-cr-fsrs-sub">' + _ivi.good.label + '</span></button>' +
-      '<button class="bs-cr-fsrs-btn easy" onclick="crFsrs(\'easy\',' + String(card.id||'') + ')">Easy<span class="bs-cr-fsrs-sub">' + _ivi.easy.label + '</span></button>' +
+      '<button class="bs-cr-fsrs-btn again" onclick="bsRate(0)">Again<span class="bs-cr-fsrs-sub">' + _ivi.again.label + '</span></button>' +
+      '<button class="bs-cr-fsrs-btn hard" onclick="bsRate(1)">Hard<span class="bs-cr-fsrs-sub">' + _ivi.hard.label + '</span></button>' +
+      '<button class="bs-cr-fsrs-btn good" onclick="bsRate(2)">Good<span class="bs-cr-fsrs-sub">' + _ivi.good.label + '</span></button>' +
+      '<button class="bs-cr-fsrs-btn easy" onclick="bsRate(3)">Easy<span class="bs-cr-fsrs-sub">' + _ivi.easy.label + '</span></button>' +
     '</div>';
   })();
 
