@@ -15236,7 +15236,7 @@ console.log('[BoardMD v2] loaded');
 .bs-spd .w{font-size:11px;color:var(--text-faint)}
 .bs-cta{width:100%;padding:16px;border:none;border-radius:12px;background:var(--accent);color:#fff;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;letter-spacing:.02em}
 .bs-cta:hover{filter:brightness(1.1)}
-.bs-stats{display:flex;gap:18px;justify-content:flex-end;padding:0 4px 12px;font-size:12px;color:var(--text-dim)}
+.bs-stats{display:flex;gap:18px;justify-content:center;padding:12px 4px 4px;font-size:12px;color:var(--text-dim)}
 .bs-stats b{color:var(--text);font-weight:700}
 .bs-prog{height:3px;background:var(--surface2);border-radius:2px;margin-bottom:10px;overflow:hidden}
 .bs-pf{height:100%;background:var(--accent);width:0%;transition:width .15s}
@@ -15558,16 +15558,6 @@ console.log('[BoardMD v2] loaded');
   </div>
 
   <div class="bs-body" id="bs-ses" style="display:none">
-    <div class="bs-stats">
-      seen <b id="bs-n-seen">0</b> &nbsp;·&nbsp;
-      flagged <b id="bs-n-flag">0</b> &nbsp;·&nbsp;
-      time <b id="bs-n-time">0:00</b> &nbsp;·&nbsp;
-      total <b id="bs-n-tot">0</b>
-      &nbsp;·&nbsp;
-      <span title="New + Learning + Due" style="font-family:'JetBrains Mono',monospace;font-weight:700">
-        <span style="color:#3b82f6" id="bs-fsrs-new">0</span><span style="color:var(--text-faint);font-weight:400">+</span><span style="color:#f59e0b" id="bs-fsrs-lrn">0</span><span style="color:var(--text-faint);font-weight:400">+</span><span style="color:#22c55e" id="bs-fsrs-due">0</span>
-      </span>
-    </div>
     <div class="bs-prog"><div class="bs-pf" id="bs-pf"></div></div>
     <div class="bs-sr">
       <div class="bs-dots" id="bs-dots"></div>
@@ -15579,6 +15569,17 @@ console.log('[BoardMD v2] loaded');
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
         Ask Attending AI
       </button>
+    </div>
+    <!-- FIX 2026-05-10: stats movidas para BAIXO do Attending button (mais limpo) -->
+    <div class="bs-stats">
+      seen <b id="bs-n-seen">0</b> &nbsp;·&nbsp;
+      flagged <b id="bs-n-flag">0</b> &nbsp;·&nbsp;
+      time <b id="bs-n-time">0:00</b> &nbsp;·&nbsp;
+      total <b id="bs-n-tot">0</b>
+      &nbsp;·&nbsp;
+      <span title="New + Learning + Due" style="font-family:'JetBrains Mono',monospace;font-weight:700">
+        <span style="color:#3b82f6" id="bs-fsrs-new">0</span><span style="color:var(--text-faint);font-weight:400">+</span><span style="color:#f59e0b" id="bs-fsrs-lrn">0</span><span style="color:var(--text-faint);font-weight:400">+</span><span style="color:#22c55e" id="bs-fsrs-due">0</span>
+      </span>
     </div>
   </div>
 
@@ -16023,36 +16024,75 @@ window.bsRate=function(rating){
     if(typeof updateStats==='function') setTimeout(updateStats,150);
     setTimeout(bsUpdateFsrsCounter,50);
   }catch(e){ console.warn('BrainStorm FSRS error',e); }
+  // MDCoins (FIX 2026-05-10): mesma fórmula do Active Recall (arFsrs):
+  // again=0, hard=1, good=2, easy=2 — mantém consistência no leaderboard.
+  try{
+    const coinMap = [0, 1, 2, 2]; // again, hard, good, easy
+    const coins = coinMap[rating] || 0;
+    if(coins > 0 && typeof window.awardCoins === 'function'){
+      window.awardCoins(coins, 'BrainStorm Clinical Reasoning');
+    }
+  }catch(e){}
   // Visual feedback + advance
   const overlay=document.createElement('div');
   const clrs={0:'#f43f5e',1:'#f97316',2:'#22c55e',3:'#3b7fff'};
   overlay.style.cssText='position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:'+clrs[rating]+';color:#fff;font-size:12px;font-weight:800;padding:7px 20px;border-radius:20px;z-index:10001;pointer-events:none;opacity:1;transition:opacity .3s';
-  overlay.textContent=['Again','Hard','Good','Easy'][rating];
+  const coinLabel = [0, 1, 2, 2][rating] || 0;
+  overlay.textContent = ['Again','Hard','Good','Easy'][rating] + (coinLabel > 0 ? ' · +' + coinLabel + ' BC' : '');
   document.body.appendChild(overlay);
   setTimeout(()=>{overlay.style.opacity='0';setTimeout(()=>overlay.remove(),300);},700);
   setTimeout(()=>bsGo(1),200);
 };
 window.bsOpenAttending=function(topic,kp){
-  // Open the main Attending AI panel pre-filled with the current topic
-  const attBtn=document.getElementById('attending-btn')||document.querySelector('.attending-trigger')||document.querySelector('[onclick*="attending"],[onclick*="Attending"]');
-  const attInput=document.getElementById('attending-input')||document.querySelector('.attending-q-input');
-  if(attInput){
-    attInput.value='Explain '+topic+(kp?' — context: '+kp.replace(/<[^>]+>/g,'').slice(0,80):'');
-  }
-  // Try to open attending panel
-  if(typeof window.openAttending==='function')window.openAttending(topic);
-  else if(attBtn)attBtn.click();
-  else{
-    // Fallback: close BrainStorm and show a toast with topic
-    closeBrainStorm();
-    const container=document.getElementById('xp-toast');
-    if(container){
-      const item=document.createElement('div');
-      item.className='xp-toast-item';
-      item.innerHTML='<div class="xp-toast-dot" style="background:#06b6d4"></div><span>Attending AI: <strong>'+topic+'</strong></span>';
-      container.appendChild(item);
-      setTimeout(()=>{item.classList.add('fade-out');setTimeout(()=>item.remove(),400);},3000);
-    }
+  // FIX 2026-05-10: Antes chamava window.openAttending (que NUNCA existiu).
+  // Versão simples e limpa para o Brainstorm: só "Explain better" + campo livre.
+  const card = BS.cards && BS.cards[BS.cur];
+  if(!card){ return; }
+
+  // Remove painel anterior se existir
+  const old = document.getElementById('att-inline-wrap');
+  if(old) old.remove();
+
+  // Cria painel simplificado
+  const wrap = document.createElement('div');
+  wrap.id = 'att-inline-wrap';
+  wrap.className = 'att-inline';
+  wrap.style.cssText = 'width:100%;max-width:760px;margin:18px auto 0;background:var(--surface);border:1px solid var(--border);border-radius:14px;overflow:hidden;';
+  wrap.innerHTML =
+    '<div class="att-inline-header" style="display:flex;justify-content:space-between;align-items:center;padding:12px 14px;border-bottom:1px solid var(--border);">' +
+      '<div style="display:flex;align-items:center;gap:8px;">' +
+        '<div style="width:24px;height:24px;border-radius:50%;background:rgba(139,92,246,.18);display:flex;align-items:center;justify-content:center;">' +
+          '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#8b5cf6" stroke-width="2"><path d="M9.663 17h4.673M12 3v1m6.364 1.636-.707.707M21 12h-1M4 12H3m3.343-5.657-.707-.707m2.828 9.9a5 5 0 1 1 7.072 0l-.548.547A3.374 3.374 0 0 0 14 18.469V19a2 2 0 1 1-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>' +
+        '</div>' +
+        '<span style="font-family:Inter,sans-serif;font-size:13px;font-weight:700;color:var(--text);">BoardMD Attending</span>' +
+      '</div>' +
+      '<button onclick="document.getElementById(\'att-inline-wrap\').remove()" style="background:none;border:none;color:var(--text-faint);font-size:18px;cursor:pointer;line-height:1;padding:0 4px;">&times;</button>' +
+    '</div>' +
+    '<div style="padding:14px;">' +
+      '<button onclick="askAttendingInline(\'explain\',this)" style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%;background:#185FA5;border:none;border-radius:10px;padding:11px 14px;font-size:13px;font-weight:700;color:#fff;cursor:pointer;font-family:Inter,sans-serif;transition:background .15s;margin-bottom:10px;" onmouseover="this.style.background=\'#0c3460\'" onmouseout="this.style.background=\'#185FA5\'">' +
+        '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/></svg>' +
+        'Explain better' +
+      '</button>' +
+      '<div style="display:flex;gap:8px;align-items:center;position:relative;">' +
+        '<input id="att-ask-input" type="text" placeholder="Ask anything about this topic…" style="flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:9px;color:var(--text);font-family:Inter,sans-serif;font-size:13px;padding:10px 12px;outline:none;transition:border-color .15s;" onfocus="this.style.borderColor=\'rgba(139,92,246,.5)\'" onblur="this.style.borderColor=\'var(--border)\'" onkeydown="if(event.key===\'Enter\'){event.preventDefault();askAttendingInline(\'custom\',null);}">' +
+        '<button onclick="askAttendingInline(\'custom\',null)" style="background:rgba(99,102,241,.14);border:1px solid rgba(139,92,246,.35);border-radius:9px;color:#8b5cf6;font-family:Inter,sans-serif;font-size:12px;font-weight:700;padding:10px 16px;cursor:pointer;white-space:nowrap;transition:all .15s;" onmouseover="this.style.background=\'rgba(99,102,241,.24)\'" onmouseout="this.style.background=\'rgba(99,102,241,.14)\'">Ask</button>' +
+      '</div>' +
+      '<div style="padding:8px 0 0;font-size:10px;color:var(--text-faint);font-family:Inter,sans-serif;line-height:1.4;">For educational purposes only. Not medical advice.</div>' +
+    '</div>' +
+    '<div class="att-inline-response" id="att-inline-response"></div>';
+
+  // Guarda contexto do card (askAttendingInline precisa de wrap._attCard)
+  wrap._attCard = card;
+  wrap._attSel  = undefined;
+
+  // Injeta no Brainstorm: depois do card content (#bs-cb)
+  const bsCb = document.getElementById('bs-cb');
+  if(bsCb && bsCb.parentNode){
+    bsCb.parentNode.insertBefore(wrap, bsCb.nextSibling);
+    // Scroll suave
+    setTimeout(() => {
+      try { wrap.scrollIntoView({behavior:'smooth', block:'start'}); } catch(e){}
+    }, 100);
   }
 };
 
