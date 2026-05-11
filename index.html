@@ -3866,6 +3866,17 @@ html.dark .hl-btn-active { border-color:#fff!important; }
 #v2kpdone.on{display:flex!important}
 .v2burst{position:fixed;z-index:9999;pointer-events:none;font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;color:var(--gold);animation:v2bst .8s forwards}
 @keyframes v2bst{0%{opacity:1;transform:translateY(0)}100%{opacity:0;transform:translateY(-36px)}}
+
+/* VENN DIAGRAM */
+.venn-wrap{display:flex;gap:8px;margin:8px 0;}
+.venn-col{flex:1;display:flex;flex-direction:column;gap:4px;}
+.venn-label{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--text-faint);text-align:center;margin-bottom:4px;}
+.venn-item{font-size:12px;padding:5px 8px;border-radius:8px;text-align:center;line-height:1.3;}
+.venn-only{background:var(--surface2);color:var(--text2);}
+.venn-shared{background:rgba(99,102,241,.12);color:var(--accent);font-weight:600;}
+.venn-left .venn-only{border-left:3px solid #3b82f6;}
+.venn-right .venn-only{border-right:3px solid #f59e0b;}
+
 </style>
 
 
@@ -5001,6 +5012,7 @@ html.dark .hl-btn-active { border-color:#fff!important; }
               <button class="v2t" onclick="v2tab(1,this)">Full text</button>
               </div>
             <div class="v2p on" id="v2p0">
+<div id="v2venn" style="display:none;margin-bottom:12px"></div>
               <div style="padding:12px 14px">
                 <div class="v2dots" id="v2dots"></div>
                 <div id="v2blocks"></div>
@@ -15112,6 +15124,28 @@ window._v2bi=0;window._v2bl=[];
 const V2TY={context:{l:'Clinical Clues',c:'vbt-cx'},mechanism:{l:'Why it fits',c:'vbt-me'},correct:{l:'Why this answer',c:'vbt-co'},trap:{l:'The board trap',c:'vbt-tr'},hook:{l:'Memory hook',c:'vbt-hk'}};
 
 function v2build(card){
+  // Renderizar Venn se existir
+  if(card.venn && card.venn.left_label){
+    const venn=card.venn;
+    const vEl=document.getElementById('v2venn');
+    if(vEl){
+      vEl.style.display='';
+      vEl.innerHTML=`<div class="venn-wrap">
+        <div class="venn-col venn-left">
+          <div class="venn-label">${venn.left_label||''}</div>
+          ${(venn.left||[]).map(x=>`<div class="venn-item venn-only">${x}</div>`).join('')}
+        </div>
+        <div class="venn-col venn-center">
+          <div class="venn-label">Both</div>
+          ${(venn.shared||[]).map(x=>`<div class="venn-item venn-shared">${x}</div>`).join('')}
+        </div>
+        <div class="venn-col venn-right">
+          <div class="venn-label">${venn.right_label||''}</div>
+          ${(venn.right||[]).map(x=>`<div class="venn-item venn-only">${x}</div>`).join('')}
+        </div>
+      </div>`;
+    }
+  }
   let bl=[];
   if(card.visual_blocks){try{bl=typeof card.visual_blocks==='string'?JSON.parse(card.visual_blocks):card.visual_blocks;}catch(e){}}
   if(!bl||!bl.length){
@@ -15548,7 +15582,8 @@ console.log('[BoardMD v2] loaded');
       <button class="bs-deck on" data-deck="all">Step 2 Complete<span class="bs-deck-sub" id="bdc-all"></span></button>
       <button class="bs-deck" data-deck="boardmd_s2">BoardMD S2<span class="bs-deck-sub" id="bdc-s2"></span></button>
       <button class="bs-deck" data-deck="core">Core S2<span class="bs-deck-sub" id="bdc-core"></span></button>
-      <button class="bs-deck" data-deck="boardmd_s1">BoardMD S1<span class="bs-deck-sub" id="bdc-s1"></span></button>
+      <button class="bs-deck" data-deck="new_s2ck">New S2 CK<span class="bs-deck-sub" id="bdc-new_s2ck"></span></button>
+<button class="bs-deck" data-deck="boardmd_s1">BoardMD S1<span class="bs-deck-sub" id="bdc-s1"></span></button>
       <button class="bs-deck" data-deck="s1_core">Core S1<span class="bs-deck-sub" id="bdc-s1c"></span></button>
     </div>
     <button class="bs-cta" onclick="bsStart()">▶  Start BrainStorm</button>
@@ -15597,7 +15632,7 @@ const SWPM={1:'≈75/min',2:'≈40/min',3:'≈20/min',4:'≈12/min',5:'≈7/min'
 const PHS={flash:['vignette','choices','answer','kp'],phrase:['phrase'],active:['active'],kp:['kp'],errors:['vignette','choices','answer','kp']};
 const FZL=['md','lg','xl'];
 const FZN={md:'Medium',lg:'Large',xl:'X-Large'};
-const DKL={boardmd_s2:'BoardMD S2',core:'Core S2',boardmd_s1:'BoardMD S1',s1_core:'Core S1'};
+const DKL={boardmd_s2:'BoardMD S2',core:'Core S2',new_s2ck:'New S2 CK',boardmd_s1:'BoardMD S1',s1_core:'Core S1'};
 
 function setupNav(){
   const btn=document.querySelector('.bmd-bottom-nav .nav-center-btn');
@@ -16797,6 +16832,28 @@ window._v2bi=0;window._v2bl=[];
 const V2TY={context:{l:'Clinical Clues',c:'vbt-cx'},mechanism:{l:'Why it fits',c:'vbt-me'},correct:{l:'Why this answer',c:'vbt-co'},trap:{l:'The board trap',c:'vbt-tr'},hook:{l:'Memory hook',c:'vbt-hk'}};
 
 function v2build(card){
+  // Renderizar Venn se existir
+  if(card.venn && card.venn.left_label){
+    const venn=card.venn;
+    const vEl=document.getElementById('v2venn');
+    if(vEl){
+      vEl.style.display='';
+      vEl.innerHTML=`<div class="venn-wrap">
+        <div class="venn-col venn-left">
+          <div class="venn-label">${venn.left_label||''}</div>
+          ${(venn.left||[]).map(x=>`<div class="venn-item venn-only">${x}</div>`).join('')}
+        </div>
+        <div class="venn-col venn-center">
+          <div class="venn-label">Both</div>
+          ${(venn.shared||[]).map(x=>`<div class="venn-item venn-shared">${x}</div>`).join('')}
+        </div>
+        <div class="venn-col venn-right">
+          <div class="venn-label">${venn.right_label||''}</div>
+          ${(venn.right||[]).map(x=>`<div class="venn-item venn-only">${x}</div>`).join('')}
+        </div>
+      </div>`;
+    }
+  }
   let bl=[];
   if(card.visual_blocks){try{bl=typeof card.visual_blocks==='string'?JSON.parse(card.visual_blocks):card.visual_blocks;}catch(e){}}
   if(!bl||!bl.length){
