@@ -4742,16 +4742,7 @@ html.dark .hl-btn-active { border-color:#fff!important; }
           <button class="study-btn" onclick="event.stopPropagation();switchDeckAndStudy('core')">Study</button>
         </div>
 
-        <div class="deck-row" onclick="switchDeckAndStudy('new_s2ck')" style="cursor:pointer">
-          <div class="deck-icon" style="background:rgba(16,185,129,.1);">
-            <svg viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
-          </div>
-          <div class="deck-info"><div class="deck-title">New Step 2 CK</div><div class="deck-sub">BoardMD Original · 343 cards</div><div class="deck-stats-line" id="stats-new_s2ck"></div></div>
-          <div class="deck-badges" id="badges-new_s2ck"></div>
-          <button class="study-btn" onclick="event.stopPropagation();switchDeckAndStudy('new_s2ck')">Study</button>
-        </div>
-
-                <div class="deck-row" onclick="switchDeckAndStudy('daily_review')" style="cursor:pointer">
+        <div class="deck-row" onclick="switchDeckAndStudy('daily_review')" style="cursor:pointer">
           <div class="deck-icon" style="background:rgba(14,165,233,.12);">
             <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#0ea5e9" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
           </div>
@@ -10048,6 +10039,18 @@ function buildDecks(allCards){
   };
   window.DECKS = {};
   for(const card of allCards){
+    // Parse w se vier como string JSON
+    if(typeof card.w === 'string'){
+      try { card.w = JSON.parse(card.w); } catch(e){ card.w = []; }
+    }
+    // Parse brainstorm se vier como string JSON
+    if(typeof card.brainstorm === 'string'){
+      try { card.brainstorm = JSON.parse(card.brainstorm); } catch(e){ card.brainstorm = {}; }
+    }
+    // Parse venn se vier como string JSON
+    if(typeof card.venn === 'string'){
+      try { card.venn = JSON.parse(card.venn); } catch(e){ card.venn = {}; }
+    }
     const dk = DECK_NAME_MAP[card.deck] || card.deck;
     if(!window.DECKS[dk]) window.DECKS[dk] = [];
     window.DECKS[dk].push(card);
