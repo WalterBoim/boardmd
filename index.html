@@ -4742,7 +4742,16 @@ html.dark .hl-btn-active { border-color:#fff!important; }
           <button class="study-btn" onclick="event.stopPropagation();switchDeckAndStudy('core')">Study</button>
         </div>
 
-        <div class="deck-row" onclick="switchDeckAndStudy('daily_review')" style="cursor:pointer">
+        <div class="deck-row" onclick="switchDeckAndStudy('new_s2ck')" style="cursor:pointer">
+          <div class="deck-icon" style="background:rgba(16,185,129,.1);">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+          </div>
+          <div class="deck-info"><div class="deck-title">New Step 2 CK</div><div class="deck-sub">BoardMD Original · 343 cards</div><div class="deck-stats-line" id="stats-new_s2ck"></div></div>
+          <div class="deck-badges" id="badges-new_s2ck"></div>
+          <button class="study-btn" onclick="event.stopPropagation();switchDeckAndStudy('new_s2ck')">Study</button>
+        </div>
+
+                <div class="deck-row" onclick="switchDeckAndStudy('daily_review')" style="cursor:pointer">
           <div class="deck-icon" style="background:rgba(14,165,233,.12);">
             <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#0ea5e9" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
           </div>
@@ -5789,7 +5798,7 @@ function saveHiddenDecks(){try{localStorage.setItem('bmd_hidden_decks',JSON.stri
 
 function buildDeckManage(){
   const s1Ids=['boardmd_s1','s1_core','s1','hy1','fa_step1','fa_s1','arrows','ethics'];
-  const s2Ids=['boardmd_s2','core','daily_review','s2','new_s2ck','shelf_surgery','shelf_em','shelf_fm','shelf_im','shelf_neuro','shelf_obgyn','shelf_peds','shelf_psych'];
+  const s2Ids=['boardmd_s2','core','daily_review','s2','new_s2ck','new_s2ck','shelf_surgery','shelf_em','shelf_fm','shelf_im','shelf_neuro','shelf_obgyn','shelf_peds','shelf_psych'];
   const s1Decks=[
     {id:'boardmd_s1',name:'BoardMD S1'},{id:'s1_core',name:'Core Review'},
     {id:'s1',name:'Rapid Review'},{id:'hy1',name:'HY Concepts'},
@@ -5866,6 +5875,7 @@ function buildDeckHomeTable(){
     {id:'arrows',     name:'Trends & Arrows',             sub:'Trends & Patterns · 390 cards',   step:'s1'},
     {id:'ethics',     name:'HY Ethics & Communication',   sub:'Social Sciences · 251 cards',     step:'s1'},
     {id:'boardmd_s2', name:'BoardMD · Step 2 CK',         sub:'Adaptive MCQs · 15,623 cards',    step:'s2'},
+{id:'new_s2ck',   name:'New Step 2 CK',               sub:'BoardMD Original · 343 cards',    step:'s2'},
 {id:'new_s2ck',   name:'New Step 2 CK',               sub:'BoardMD Original · 343 cards',    step:'s2'},
     {id:'s2',         name:'Step 2 CK · Rapid Review',    sub:'Clinical Essentials · 522 cards', step:'s2'},
     {id:'core',       name:'Step 2 CK · Core Review',     sub:'Board-Focused · 4,107 cards',     step:'s2'},
@@ -6519,7 +6529,7 @@ function renderCard(){
   if(deckLabelEl){
     const deckNames={
       's1_core':'Step 1 · Core Review','boardmd_s1':'BoardMD · Step 1',
-      'core':'Step 2 CK · Core Review','boardmd_s2':'BoardMD · Step 2 CK','new_s2ck':'New Step 2 CK',
+      'core':'Step 2 CK · Core Review','boardmd_s2':'BoardMD · Step 2 CK','new_s2ck':'New Step 2 CK','new_s2ck':'New Step 2 CK',
       's1':'Rapid Review S1','s2':'Rapid Review S2',
       'hy1':'HY Concepts S1','hy':'HY Concepts S2',
       'fa_step1':'Foundations S1','fa_s1':'Clinical Patterns',
@@ -6534,7 +6544,7 @@ function renderCard(){
       // Nomes curtos para o badge direito
       const badgeNames={
         's1_core':'S1 Core','boardmd_s1':'BoardMD S1',
-        'core':'S2 Core','boardmd_s2':'BoardMD S2','new_s2ck':'New S2 CK',
+        'core':'S2 Core','boardmd_s2':'BoardMD S2','new_s2ck':'New S2 CK','new_s2ck':'New S2 CK',
         's1':'Rapid S1','s2':'Rapid S2',
         'hy1':'HY S1','hy':'HY S2',
         'fa_step1':'FA S1','fa_s1':'Patterns',
@@ -10039,18 +10049,9 @@ function buildDecks(allCards){
   };
   window.DECKS = {};
   for(const card of allCards){
-    // Parse w se vier como string JSON
-    if(typeof card.w === 'string'){
-      try { card.w = JSON.parse(card.w); } catch(e){ card.w = []; }
-    }
-    // Parse brainstorm se vier como string JSON
-    if(typeof card.brainstorm === 'string'){
-      try { card.brainstorm = JSON.parse(card.brainstorm); } catch(e){ card.brainstorm = {}; }
-    }
-    // Parse venn se vier como string JSON
-    if(typeof card.venn === 'string'){
-      try { card.venn = JSON.parse(card.venn); } catch(e){ card.venn = {}; }
-    }
+    if(typeof card.w === 'string'){ try { card.w = JSON.parse(card.w); } catch(e){ card.w = []; } }
+    if(typeof card.brainstorm === 'string'){ try { card.brainstorm = JSON.parse(card.brainstorm); } catch(e){ card.brainstorm = {}; } }
+    if(typeof card.venn === 'string'){ try { card.venn = JSON.parse(card.venn); } catch(e){ card.venn = {}; } }
     const dk = DECK_NAME_MAP[card.deck] || card.deck;
     if(!window.DECKS[dk]) window.DECKS[dk] = [];
     window.DECKS[dk].push(card);
