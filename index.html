@@ -10033,9 +10033,13 @@ function setCachedCards(cards){
 }
 
 function buildDecks(allCards){
+  // Mapa: deck name no Supabase → id interno do JS
+  const DECK_NAME_MAP = {
+    'New Step 2 CK': 'new_s2ck',
+  };
   window.DECKS = {};
   for(const card of allCards){
-    const dk = card.deck;
+    const dk = DECK_NAME_MAP[card.deck] || card.deck;
     if(!window.DECKS[dk]) window.DECKS[dk] = [];
     window.DECKS[dk].push(card);
   }
