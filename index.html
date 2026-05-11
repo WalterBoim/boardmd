@@ -5789,7 +5789,7 @@ function saveHiddenDecks(){try{localStorage.setItem('bmd_hidden_decks',JSON.stri
 
 function buildDeckManage(){
   const s1Ids=['boardmd_s1','s1_core','s1','hy1','fa_step1','fa_s1','arrows','ethics'];
-  const s2Ids=['boardmd_s2','core','daily_review','s2','shelf_surgery','shelf_em','shelf_fm','shelf_im','shelf_neuro','shelf_obgyn','shelf_peds','shelf_psych'];
+  const s2Ids=['boardmd_s2','core','daily_review','s2','new_s2ck','shelf_surgery','shelf_em','shelf_fm','shelf_im','shelf_neuro','shelf_obgyn','shelf_peds','shelf_psych'];
   const s1Decks=[
     {id:'boardmd_s1',name:'BoardMD S1'},{id:'s1_core',name:'Core Review'},
     {id:'s1',name:'Rapid Review'},{id:'hy1',name:'HY Concepts'},
@@ -5798,7 +5798,7 @@ function buildDeckManage(){
   ];
   const s2Decks=[
     {id:'boardmd_s2',name:'BoardMD S2'},{id:'core',name:'Core Review'},
-    {id:'s2',name:'Rapid Review'},
+    {id:'s2',name:'Rapid Review'},{id:'new_s2ck',name:'New S2 CK'},
     {id:'shelf',name:'BoardMD Shelf'},
   ];
   const stepIds   = currentStep==='s1' ? s1Ids   : s2Ids;
@@ -5866,6 +5866,7 @@ function buildDeckHomeTable(){
     {id:'arrows',     name:'Trends & Arrows',             sub:'Trends & Patterns · 390 cards',   step:'s1'},
     {id:'ethics',     name:'HY Ethics & Communication',   sub:'Social Sciences · 251 cards',     step:'s1'},
     {id:'boardmd_s2', name:'BoardMD · Step 2 CK',         sub:'Adaptive MCQs · 15,623 cards',    step:'s2'},
+{id:'new_s2ck',   name:'New Step 2 CK',               sub:'BoardMD Original · 343 cards',    step:'s2'},
     {id:'s2',         name:'Step 2 CK · Rapid Review',    sub:'Clinical Essentials · 522 cards', step:'s2'},
     {id:'core',       name:'Step 2 CK · Core Review',     sub:'Board-Focused · 4,107 cards',     step:'s2'},
     {id:'daily_review',name:'Step 2 CK · Daily Review',    sub:'Daily Review Cards',               step:'s2'},
@@ -6518,7 +6519,7 @@ function renderCard(){
   if(deckLabelEl){
     const deckNames={
       's1_core':'Step 1 · Core Review','boardmd_s1':'BoardMD · Step 1',
-      'core':'Step 2 CK · Core Review','boardmd_s2':'BoardMD · Step 2 CK',
+      'core':'Step 2 CK · Core Review','boardmd_s2':'BoardMD · Step 2 CK','new_s2ck':'New Step 2 CK',
       's1':'Rapid Review S1','s2':'Rapid Review S2',
       'hy1':'HY Concepts S1','hy':'HY Concepts S2',
       'fa_step1':'Foundations S1','fa_s1':'Clinical Patterns',
@@ -6533,7 +6534,7 @@ function renderCard(){
       // Nomes curtos para o badge direito
       const badgeNames={
         's1_core':'S1 Core','boardmd_s1':'BoardMD S1',
-        'core':'S2 Core','boardmd_s2':'BoardMD S2',
+        'core':'S2 Core','boardmd_s2':'BoardMD S2','new_s2ck':'New S2 CK',
         's1':'Rapid S1','s2':'Rapid S2',
         'hy1':'HY S1','hy':'HY S2',
         'fa_step1':'FA S1','fa_s1':'Patterns',
@@ -10107,7 +10108,7 @@ function getIDBMeta(){
 
 async function fetchAllFromSupabase(onProgress){
   const PAGE = 1000;
-  const SELECT = 'id,deck,system,topic,subject,qid,q,c,w,e,kp,phrase,brainstorm,d,img,pubmed_query,cochrane_pmid';
+  const SELECT = 'id,deck,system,topic,subject,qid,q,c,w,e,kp,phrase,brainstorm,d,img,pubmed_query,cochrane_pmid,venn,kp_cloze';
   let total = 0;
   try {
     const cr = await _supa.from('cards').select('id', { count: 'exact', head: true });
