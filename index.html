@@ -3944,27 +3944,161 @@ html.light #venn-inline{ background:linear-gradient(180deg, rgba(37,99,235,0.04)
 #venn-inline-modal .vim-close:hover{ color:var(--text); background:var(--surface); }
 
 
-/* Storm This Card button */
-.storm-this-btn {
+/* ═══════════════════════════════════════════════════════════════════
+   BoardMD — Storm Split Button (premium, didactic, marketing-grade)
+   ═══════════════════════════════════════════════════════════════════ */
+#storm-this-wrap {
+  display: none;
+  text-align: center;
+  padding: 4px 0;
+  position: relative;
+}
+#storm-this-wrap.visible { display: block !important; }
+
+.storm-split {
   display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  background: linear-gradient(135deg, var(--accent), #2d6a4f);
-  color: #fff;
-  border: none;
-  border-radius: 10px;
-  padding: 8px 18px;
-  font-size: 12px;
-  font-weight: 700;
-  cursor: pointer;
-  letter-spacing: .04em;
-  font-family: 'Lato', sans-serif;
-  transition: transform .15s, opacity .15s;
+  align-items: stretch;
+  border-radius: 11px;
+  overflow: hidden;
+  background: linear-gradient(135deg, #1e3a5f 0%, #2563eb 50%, #1d4ed8 100%);
+  box-shadow: 0 2px 8px rgba(37,99,235,.18), 0 1px 2px rgba(0,0,0,.06);
+  transition: transform .15s ease, box-shadow .2s ease;
+  position: relative;
   margin: 6px auto 2px;
 }
-.storm-this-btn:active { transform: scale(.95); }
-#storm-this-wrap { display: none; text-align: center; padding: 4px 0; }
-#storm-this-wrap.visible { display: block !important; }
+.storm-split:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(37,99,235,.28), 0 1px 2px rgba(0,0,0,.06);
+}
+.storm-split-main {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 9px 16px 9px 18px;
+  background: transparent;
+  color: #fff;
+  border: none;
+  font-size: 12.5px;
+  font-weight: 700;
+  letter-spacing: .04em;
+  font-family: 'Lato', sans-serif;
+  cursor: pointer;
+  transition: background .15s ease;
+}
+.storm-split-main:hover { background: rgba(255,255,255,.08); }
+.storm-split-main:active { transform: scale(.97); }
+.storm-split-main .ss-bolt {
+  display:inline-block; font-size:13px; line-height:1;
+  filter: drop-shadow(0 0 6px rgba(232,168,54,.5));
+  color: #fbbf24;
+}
+.storm-split-divider {
+  width: 1px;
+  background: rgba(255,255,255,.18);
+  align-self: stretch;
+  margin: 4px 0;
+}
+.storm-split-mode {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 9px 13px 9px 12px;
+  background: transparent;
+  color: rgba(255,255,255,.92);
+  border: none;
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: .03em;
+  font-family: 'Lato', sans-serif;
+  cursor: pointer;
+  transition: background .15s ease;
+}
+.storm-split-mode:hover { background: rgba(255,255,255,.10); }
+.storm-split-mode:active { transform: scale(.97); }
+.storm-split-mode .ss-caret {
+  font-size: 9px;
+  opacity: .75;
+  transition: transform .2s ease;
+}
+.storm-split.menu-open .ss-caret { transform: rotate(180deg); }
+
+/* Dropdown — abre para CIMA porque botão fica acima do FSRS bar */
+.storm-menu {
+  position: absolute;
+  bottom: calc(100% + 6px);
+  right: 50%;
+  transform: translateX(50%);
+  background: var(--surface);
+  border: 1px solid var(--border-bright);
+  border-radius: 12px;
+  box-shadow: 0 8px 28px rgba(0,0,0,.18), 0 2px 6px rgba(0,0,0,.06);
+  padding: 6px;
+  min-width: 240px;
+  z-index: 100;
+  display: none;
+  animation: stormMenuIn .18s cubic-bezier(.34,1.56,.64,1);
+}
+@keyframes stormMenuIn {
+  from { opacity: 0; transform: translateX(50%) translateY(6px); }
+  to   { opacity: 1; transform: translateX(50%) translateY(0); }
+}
+.storm-menu.on { display: block; }
+.storm-menu-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  text-align: left;
+  transition: background .12s ease;
+  width: 100%;
+  background: none;
+  border: none;
+  font-family: 'Lato', sans-serif;
+}
+.storm-menu-item:hover { background: var(--surface2); }
+.storm-menu-item .smi-text {
+  display: flex; flex-direction: column; align-items: flex-start; gap: 2px;
+}
+.storm-menu-item .smi-title {
+  font-size: 13px; font-weight: 700; color: var(--text); letter-spacing: .01em;
+}
+.storm-menu-item .smi-sub {
+  font-size: 10.5px; color: var(--text-dim); letter-spacing: .02em;
+}
+.storm-menu-item .smi-check {
+  font-size: 13px; color: var(--accent); opacity: 0;
+  transition: opacity .15s ease;
+}
+.storm-menu-item.active .smi-check { opacity: 1; }
+.storm-menu-item.active .smi-title { color: var(--accent); }
+
+/* Toast minimalista */
+.storm-toast {
+  position: fixed;
+  bottom: 100px;
+  left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  background: var(--text);
+  color: var(--bg);
+  padding: 9px 18px;
+  border-radius: 22px;
+  font-family: 'Lato', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: .02em;
+  box-shadow: 0 6px 20px rgba(0,0,0,.18);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .25s ease, transform .25s cubic-bezier(.34,1.56,.64,1);
+  z-index: 9999;
+}
+.storm-toast.on {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
 
 </style>
 
@@ -5146,7 +5280,43 @@ html.light #venn-inline{ background:linear-gradient(180deg, rgba(37,99,235,0.04)
           </div><!-- /bmd-cols-row -->
 
           <!-- FSRS: flex-shrink:0 inside card-el, always visible at bottom -->
-          <div id="storm-this-wrap" style="display:none;text-align:center;padding:4px 0"><button class="storm-this-btn" onclick="stormThisCard(window._currentCard)">Storm this card</button></div>
+          <!-- Storm split button (Reasoning ou Active Recall) -->
+          <div id="storm-this-wrap" style="display:none;text-align:center;padding:4px 0">
+            <div class="storm-split" id="storm-split-btn">
+              <button class="storm-split-main" type="button" onclick="stormThisCard(window._currentCard)">
+                <span class="ss-bolt">⚡</span>
+                <span>Storm this card</span>
+              </button>
+              <div class="storm-split-divider"></div>
+              <button class="storm-split-mode" type="button" onclick="toggleStormMenu(event)">
+                <span id="storm-mode-label">Recall</span>
+                <span class="ss-caret">▾</span>
+              </button>
+              <div class="storm-menu" id="storm-menu">
+                <button class="storm-menu-item" type="button" data-mode="active" onclick="setStormMode('active', event)">
+                  <span class="smi-text">
+                    <span class="smi-title">Active Recall</span>
+                    <span class="smi-sub">Choose: HY → Dx → Action</span>
+                  </span>
+                  <span class="smi-check">✓</span>
+                </button>
+                <button class="storm-menu-item" type="button" data-mode="phrase" onclick="setStormMode('phrase', event)">
+                  <span class="smi-text">
+                    <span class="smi-title">Clinical Reasoning</span>
+                    <span class="smi-sub">HY Clue → Diagnosis → Action</span>
+                  </span>
+                  <span class="smi-check">✓</span>
+                </button>
+                <button class="storm-menu-item" type="button" data-mode="kp" onclick="setStormMode('kp', event)">
+                  <span class="smi-text">
+                    <span class="smi-title">Key Points</span>
+                    <span class="smi-sub">Ultra-fast review</span>
+                  </span>
+                  <span class="smi-check">✓</span>
+                </button>
+              </div>
+            </div>
+          </div>
             <div class="fsrs-nav" id="fsrs-nav">
             <div class="fsrs-row">
               <button class="fsrs-btn again" onclick="rate(0)"><span class="fsrs-lbl">Again</span><span class="fsrs-int" id="int0">&lt;1d</span></button>
@@ -17125,10 +17295,96 @@ window._bmdRenderVennInline = function(card){
    BoardMD — Storm This Card (v3 — vai direto pra sessão filtrada)
    ═══════════════════════════════════════════════════════════════════ */
 /* ═══════════════════════════════════════════════════════════════════
-   BoardMD — Storm This Card (v5 DEBUG — passa o card direto)
+   BoardMD — Storm This Card (v6 — split-button com 3 modos)
+   Aceita modo: 'active' (default), 'phrase', 'kp'
+   Lembra última escolha em localStorage.bmd_storm_mode
    ═══════════════════════════════════════════════════════════════════ */
-window.stormThisCard = function(card){
-  // === DEBUG: mostrar alert visível com info do card ===
+
+// Modo default — Active Recall força recordação ativa (didática máxima)
+window._stormGetMode = function(){
+  try {
+    var saved = localStorage.getItem('bmd_storm_mode');
+    if(saved && ['active','phrase','kp'].indexOf(saved) >= 0) return saved;
+  } catch(e){}
+  return 'active'; // default = Active Recall
+};
+
+window._stormGetModeLabel = function(m){
+  return m === 'phrase' ? 'Reasoning' :
+         m === 'kp'     ? 'Key Points' :
+                          'Recall';
+};
+
+window._stormUpdateUI = function(){
+  var mode = window._stormGetMode();
+  var lbl = document.getElementById('storm-mode-label');
+  if(lbl) lbl.textContent = window._stormGetModeLabel(mode);
+  document.querySelectorAll('.storm-menu-item').forEach(function(el){
+    el.classList.toggle('active', el.dataset.mode === mode);
+  });
+};
+
+window.toggleStormMenu = function(ev){
+  if(ev){ ev.stopPropagation(); ev.preventDefault(); }
+  var split = document.getElementById('storm-split-btn');
+  var menu = document.getElementById('storm-menu');
+  if(!menu || !split) return;
+  var isOpen = menu.classList.contains('on');
+  if(isOpen){
+    menu.classList.remove('on');
+    split.classList.remove('menu-open');
+  } else {
+    menu.classList.add('on');
+    split.classList.add('menu-open');
+    window._stormUpdateUI();
+    // Fecha ao clicar fora
+    setTimeout(function(){
+      document.addEventListener('click', window._stormCloseMenuOnce, { once: true });
+    }, 0);
+  }
+};
+
+window._stormCloseMenuOnce = function(){
+  var menu = document.getElementById('storm-menu');
+  var split = document.getElementById('storm-split-btn');
+  if(menu) menu.classList.remove('on');
+  if(split) split.classList.remove('menu-open');
+};
+
+window.setStormMode = function(mode, ev){
+  if(ev){ ev.stopPropagation(); ev.preventDefault(); }
+  if(['active','phrase','kp'].indexOf(mode) < 0) return;
+  try { localStorage.setItem('bmd_storm_mode', mode); } catch(e){}
+  window._stormUpdateUI();
+  // Fecha menu
+  var menu = document.getElementById('storm-menu');
+  var split = document.getElementById('storm-split-btn');
+  if(menu) menu.classList.remove('on');
+  if(split) split.classList.remove('menu-open');
+  // Toast de feedback
+  var modeNames = { active:'Active Recall', phrase:'Clinical Reasoning', kp:'Key Points' };
+  window._stormToast((modeNames[mode] || mode) + ' set as default');
+  // Inicia storm com o novo modo
+  window.stormThisCard(window._currentCard, mode);
+};
+
+window._stormToast = function(msg){
+  var existing = document.getElementById('storm-toast');
+  if(existing) existing.remove();
+  var t = document.createElement('div');
+  t.id = 'storm-toast';
+  t.className = 'storm-toast';
+  t.textContent = msg;
+  document.body.appendChild(t);
+  // Trigger animação
+  requestAnimationFrame(function(){ t.classList.add('on'); });
+  setTimeout(function(){
+    t.classList.remove('on');
+    setTimeout(function(){ if(t.parentNode) t.parentNode.removeChild(t); }, 300);
+  }, 2200);
+};
+
+window.stormThisCard = function(card, forceMode){
   if(!card){ card = window._currentCard; }
   if(!card){
     try {
@@ -17137,33 +17393,26 @@ window.stormThisCard = function(card){
       }
     } catch(e){}
   }
-
-  // Debug visual: mostra info do card que recebemos
-  var debugInfo = card ? ('id='+card.id+' qid='+card.qid+' deck='+card.deck+' topic='+(card.topic||'').substring(0,40)) : 'CARD NULO';
-  // alert('[DEBUG Storm] ' + debugInfo);
-  console.log('[Storm v5] card:', debugInfo);
-
   if(!card){
     alert('Storm cancelado: card não disponível.');
     return;
   }
+  var mode = forceMode || window._stormGetMode();
+  console.log('[Storm v6] card:', card.id, '| mode:', mode);
 
-  // 1. Abre overlay
   var ov = document.getElementById('bs-overlay');
   if(!ov){ alert('Storm cancelado: bs-overlay não existe no DOM.'); return; }
   ov.classList.add('on');
   document.body.style.overflow = 'hidden';
-  console.log('[Storm v5] overlay aberto');
 
-  // BS pode estar como window.BS ou só BS no escopo (depende de como foi declarado)
   var bs = window.BS;
   if(!bs){
-    alert('Storm cancelado: variável BS não acessível via window. Verifique inicialização.');
+    alert('Storm cancelado: variável BS não acessível.');
     return;
   }
 
-  // 2. Setup BS COM O CARD DIRETO
-  bs.mode = 'phrase';
+  // Setup BS com o modo escolhido e o card direto
+  bs.mode = mode;
   bs.deck = card.deck || 'all';
   bs.cards = [card];
   bs.cur = 0;
@@ -17172,35 +17421,29 @@ window.stormThisCard = function(card){
   if(bs.flagged && bs.flagged.clear) bs.flagged.clear();
   bs.elapsed = 0;
   bs._searchFilter = null;
-  console.log('[Storm v5] BS setado. bs.cards.length=', bs.cards.length);
 
-  // 3. UI dos seletores (mode)
+  // UI dos seletores de mode (dentro do BrainStorm)
   document.querySelectorAll('.bs-mode').forEach(function(el){
-    el.classList.toggle('on', el.dataset.mode === 'phrase');
+    el.classList.toggle('on', el.dataset.mode === mode);
   });
 
-  // 4. Limpa input
+  // Limpa input de busca
   var inp = document.getElementById('bs-search');
   if(inp){ inp.value = ''; inp.style.borderColor=''; }
   var clr = document.getElementById('bs-int-clear');  if(clr) clr.style.display = 'none';
   var matchLbl = document.getElementById('bs-int-match'); if(matchLbl) matchLbl.style.display = 'none';
 
-  // 5. SWITCH DE TELA: cfg → ses
+  // Switch de tela: cfg → ses
   var cfg  = document.getElementById('bs-cfg');
   var ses  = document.getElementById('bs-ses');
   var ctrl = document.getElementById('bs-ctrl');
   var attF = document.getElementById('bs-att-float');
-
-  console.log('[Storm v5] ANTES — cfg.display=', cfg && cfg.style.display, '| ses.display=', ses && ses.style.display);
-
   if(cfg)  cfg.style.display = 'none';
   if(ses)  ses.style.display = 'block';
   if(ctrl) ctrl.style.display = 'flex';
   if(attF) attF.style.display = 'flex';
 
-  console.log('[Storm v5] DEPOIS — cfg.display=', cfg && cfg.style.display, '| ses.display=', ses && ses.style.display);
-
-  // 6. Reset timer
+  // Reset timer
   var tNode = document.getElementById('bs-n-time');
   if(tNode) tNode.textContent = '0:00';
   if(bs.clock) clearInterval(bs.clock);
@@ -17211,36 +17454,34 @@ window.stormThisCard = function(card){
     if(ti) ti.textContent = m + ':' + (s<10?'0':'') + s;
   }, 1000);
 
-  // 7. Renderiza o card
+  // Render
   var renderFn = window.render || (typeof render === 'function' ? render : null);
   try {
     if(typeof renderFn === 'function'){
       renderFn();
-      console.log('[Storm v5] render() executado ok');
     } else {
-      console.warn('[Storm v5] função render() não existe!');
-      alert('Storm cancelado: função render() do BrainStorm não existe.');
+      console.warn('[Storm v6] render() não existe!');
     }
-  } catch(e){
-    console.warn('[Storm v5] render erro:', e);
-    alert('Storm erro no render(): ' + e.message);
-  }
+  } catch(e){ console.warn('[Storm v6] render erro:', e); }
 
   try { if(typeof window.bsUpdateFsrsCounter === 'function') window.bsUpdateFsrsCounter(); } catch(e){}
 
-  // === VERIFICAÇÃO FINAL após 200ms — vê se algo reverteu ===
+  // Auto-recovery após 200ms caso algo reverta a tela
   setTimeout(function(){
     var cfgFinal = document.getElementById('bs-cfg');
     var sesFinal = document.getElementById('bs-ses');
-    console.log('[Storm v5] APÓS 200ms — cfg.display=', cfgFinal && cfgFinal.style.display, '| ses.display=', sesFinal && sesFinal.style.display);
     if(cfgFinal && cfgFinal.style.display !== 'none'){
-      console.warn('[Storm v5] ALGUMA COISA RE-MOSTROU O CFG! Forçando novamente.');
       cfgFinal.style.display = 'none';
       if(sesFinal) sesFinal.style.display = 'block';
       try { if(typeof renderFn === 'function') renderFn(); } catch(e){}
     }
   }, 200);
 };
+
+// Inicializar UI do botão (label do modo) quando carrega
+document.addEventListener('DOMContentLoaded', function(){
+  setTimeout(window._stormUpdateUI, 300);
+});
 
 console.log('[BoardMD Venn + Storm] ready');
 </script>
