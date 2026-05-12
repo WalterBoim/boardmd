@@ -17021,16 +17021,27 @@ window._bmdRenderVennInline = function(card){
            'fill="rgba(59,127,255,0.12)" stroke="#3b7fff" stroke-width="1.6"/>';
     out += '<circle cx="'+cx2+'" cy="'+cy+'" r="'+rCircle+'" ' +
            'fill="rgba(245,158,11,0.12)" stroke="#f59e0b" stroke-width="1.6"/>';
-    // Labels topo
+    // Labels topo — truncar se muito longos para evitar colisão com BOTH
+    function truncLabel(s, maxC){
+      var u = String(s).toUpperCase();
+      if(u.length > maxC) return u.substring(0, maxC - 1) + '…';
+      return u;
+    }
+    // Calcula chars máximos do label baseado no espaço disponível em cada lado
+    // (largura útil de cada zona - 20px de margem)
+    var labelMaxChars = Math.max(10, Math.floor((leftZoneW - 30) / 7));
+    var leftLbl  = truncLabel(v.left_label,  labelMaxChars);
+    var rightLbl = truncLabel(v.right_label, labelMaxChars);
+
     out += '<text x="'+zL+'" y="'+(topPad - 18)+'" text-anchor="middle" ' +
            'font-family="Lato, sans-serif" font-size="'+labelSize+'" font-weight="700" ' +
-           'letter-spacing="1.4" fill="#3b7fff">' + esc(String(v.left_label).toUpperCase()) + '</text>';
+           'letter-spacing="1.4" fill="#3b7fff">' + esc(leftLbl) + '</text>';
     out += '<text x="'+zS+'" y="'+(topPad - 18)+'" text-anchor="middle" ' +
            'font-family="Lato, sans-serif" font-size="'+labelSize+'" font-weight="700" ' +
            'letter-spacing="1.4" fill="#8b5cf6">BOTH</text>';
     out += '<text x="'+zR+'" y="'+(topPad - 18)+'" text-anchor="middle" ' +
            'font-family="Lato, sans-serif" font-size="'+labelSize+'" font-weight="700" ' +
-           'letter-spacing="1.4" fill="#f59e0b">' + esc(String(v.right_label).toUpperCase()) + '</text>';
+           'letter-spacing="1.4" fill="#f59e0b">' + esc(rightLbl) + '</text>';
     // Itens
     out += renderZone(Lw, zL, '#1d4ed8', '500', hL);
     out += renderZone(Sw, zS, '#6d28d9', '700', hS);
@@ -17077,14 +17088,11 @@ window._bmdRenderVennInline = function(card){
    BoardMD — Storm This Card (v3 — vai direto pra sessão filtrada)
    ═══════════════════════════════════════════════════════════════════ */
 /* ═══════════════════════════════════════════════════════════════════
-   BoardMD — Storm This Card (v4 — passa o card direto, sem busca)
-   Filosofia: o card que o aluno está estudando AGORA vai direto pro
-   BrainStorm como sessão de 1 card. Não busca por QID/topic — usa a
-   referência ao objeto card. Funciona pra qualquer deck/formato.
+   BoardMD — Storm This Card (v5 DEBUG — passa o card direto)
    ═══════════════════════════════════════════════════════════════════ */
 window.stormThisCard = function(card){
+  // === DEBUG: mostrar alert visível com info do card ===
   if(!card){ card = window._currentCard; }
-  // Fallback: pega do estado global de estudo
   if(!card){
     try {
       if(typeof deck !== 'undefined' && Array.isArray(deck) && typeof idx !== 'undefined' && deck[idx]){
@@ -17092,53 +17100,66 @@ window.stormThisCard = function(card){
       }
     } catch(e){}
   }
+
+  // Debug visual: mostra info do card que recebemos
+  var debugInfo = card ? ('id='+card.id+' qid='+card.qid+' deck='+card.deck+' topic='+(card.topic||'').substring(0,40)) : 'CARD NULO';
+  // alert('[DEBUG Storm] ' + debugInfo);
+  console.log('[Storm v5] card:', debugInfo);
+
   if(!card){
-    console.warn('[Storm] sem card disponível');
-    alert('Não foi possível abrir o Storm — card não disponível.');
+    alert('Storm cancelado: card não disponível.');
     return;
   }
-  console.log('[Storm] abrindo card', card.id, '| qid:', card.qid, '| topic:', card.topic);
 
   // 1. Abre overlay
   var ov = document.getElementById('bs-overlay');
-  if(!ov){ console.warn('[Storm] bs-overlay não encontrado'); return; }
+  if(!ov){ alert('Storm cancelado: bs-overlay não existe no DOM.'); return; }
   ov.classList.add('on');
   document.body.style.overflow = 'hidden';
+  console.log('[Storm v5] overlay aberto');
 
-  if(typeof window.BS === 'undefined'){ console.warn('[Storm] BS não definido'); return; }
+  if(typeof window.BS === 'undefined'){
+    alert('Storm cancelado: variável BS não definida.');
+    return;
+  }
 
-  // 2. Setup BS — passa O CARD DIRETO (sem getCards, sem filter, sem search)
-  BS.mode = 'phrase';                  // Clinical Reasoning (HY → Dx → Action)
-  BS.deck = card.deck || 'all';        // só pra label visual
-  BS.cards = [card];                   // SÓ ESSE CARD
+  // 2. Setup BS COM O CARD DIRETO
+  BS.mode = 'phrase';
+  BS.deck = card.deck || 'all';
+  BS.cards = [card];
   BS.cur = 0;
   BS.ph = 0;
   if(BS.seen && BS.seen.clear) BS.seen.clear();
   if(BS.flagged && BS.flagged.clear) BS.flagged.clear();
   BS.elapsed = 0;
-  BS._searchFilter = null;             // limpa filtro pra não confundir
+  BS._searchFilter = null;
+  console.log('[Storm v5] BS setado. BS.cards.length=', BS.cards.length);
 
-  // 3. Atualiza UI dos seletores (mode)
+  // 3. UI dos seletores (mode)
   document.querySelectorAll('.bs-mode').forEach(function(el){
     el.classList.toggle('on', el.dataset.mode === 'phrase');
   });
 
-  // 4. Limpa input de busca (não estamos filtrando)
+  // 4. Limpa input
   var inp = document.getElementById('bs-search');
-  if(inp){
-    inp.value = '';
-    inp.style.borderColor = '';
-  }
-  var clr = document.getElementById('bs-int-clear');
-  if(clr) clr.style.display = 'none';
-  var matchLbl = document.getElementById('bs-int-match');
-  if(matchLbl) matchLbl.style.display = 'none';
+  if(inp){ inp.value = ''; inp.style.borderColor=''; }
+  var clr = document.getElementById('bs-int-clear');  if(clr) clr.style.display = 'none';
+  var matchLbl = document.getElementById('bs-int-match'); if(matchLbl) matchLbl.style.display = 'none';
 
-  // 5. Vai DIRETO pra tela de sessão (pula bs-cfg)
-  var cfg = document.getElementById('bs-cfg');     if(cfg) cfg.style.display = 'none';
-  var ses = document.getElementById('bs-ses');     if(ses) ses.style.display = 'block';
-  var ctrl= document.getElementById('bs-ctrl');    if(ctrl)ctrl.style.display = 'flex';
-  var attF= document.getElementById('bs-att-float');if(attF)attF.style.display = 'flex';
+  // 5. SWITCH DE TELA: cfg → ses
+  var cfg  = document.getElementById('bs-cfg');
+  var ses  = document.getElementById('bs-ses');
+  var ctrl = document.getElementById('bs-ctrl');
+  var attF = document.getElementById('bs-att-float');
+
+  console.log('[Storm v5] ANTES — cfg.display=', cfg && cfg.style.display, '| ses.display=', ses && ses.style.display);
+
+  if(cfg)  cfg.style.display = 'none';
+  if(ses)  ses.style.display = 'block';
+  if(ctrl) ctrl.style.display = 'flex';
+  if(attF) attF.style.display = 'flex';
+
+  console.log('[Storm v5] DEPOIS — cfg.display=', cfg && cfg.style.display, '| ses.display=', ses && ses.style.display);
 
   // 6. Reset timer
   var tNode = document.getElementById('bs-n-time');
@@ -17151,18 +17172,35 @@ window.stormThisCard = function(card){
     if(ti) ti.textContent = m + ':' + (s<10?'0':'') + s;
   }, 1000);
 
-  // 7. Renderiza o card no modo Clinical Reasoning
+  // 7. Renderiza o card
   try {
     if(typeof render === 'function'){
       render();
-      console.log('[Storm] render() ok — BS.cards =', BS.cards.length);
-    } else if(typeof window.render === 'function'){
-      window.render();
+      console.log('[Storm v5] render() executado ok');
+    } else {
+      console.warn('[Storm v5] função render() não existe!');
+      alert('Storm cancelado: função render() do BrainStorm não existe.');
     }
-  } catch(e){ console.warn('[Storm] render erro:', e); }
+  } catch(e){
+    console.warn('[Storm v5] render erro:', e);
+    alert('Storm erro no render(): ' + e.message);
+  }
 
-  // 8. Atualiza counters FSRS
   try { if(typeof bsUpdateFsrsCounter === 'function') bsUpdateFsrsCounter(); } catch(e){}
+
+  // === VERIFICAÇÃO FINAL após 200ms — vê se algo reverteu ===
+  setTimeout(function(){
+    var cfgFinal = document.getElementById('bs-cfg');
+    var sesFinal = document.getElementById('bs-ses');
+    console.log('[Storm v5] APÓS 200ms — cfg.display=', cfgFinal && cfgFinal.style.display, '| ses.display=', sesFinal && sesFinal.style.display);
+    if(cfgFinal && cfgFinal.style.display !== 'none'){
+      console.warn('[Storm v5] ALGUMA COISA RE-MOSTROU O CFG! Forçando novamente.');
+      // Tentativa #2: força DE NOVO
+      cfgFinal.style.display = 'none';
+      if(sesFinal) sesFinal.style.display = 'block';
+      try { if(typeof render === 'function') render(); } catch(e){}
+    }
+  }, 200);
 };
 
 console.log('[BoardMD Venn + Storm] ready');
