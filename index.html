@@ -3818,21 +3818,6 @@ html.dark .hl-btn-active { border-color:#fff!important; }
 #bmd-timer-bar{height:3px;width:100%;transition:width .3s linear,background .5s}
 #bmd-timer-label{display:flex;align-items:center;justify-content:space-between;padding:3px 0 6px;font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-faint)}
 #bmd-coins-preview{font-size:9px;font-weight:700;padding:2px 9px;border-radius:20px}
-/* Timer discreto após as opções (substitui a barra grossa do topo) */
-.bmd-timer-discreet{
-  display:flex; align-items:center; justify-content:flex-end; gap:8px;
-  padding:8px 20px 4px;
-  font-family:'JetBrains Mono', monospace;
-  font-size:10px; color:var(--text-faint);
-  opacity:.72; transition:opacity .2s ease;
-}
-.bmd-timer-discreet:hover{ opacity:1; }
-.bmd-timer-discreet .btd-time{ font-weight:600; letter-spacing:.04em; }
-.bmd-timer-discreet .btd-sep{ opacity:.5; font-weight:300; }
-.bmd-timer-discreet .btd-coins{
-  font-size:9px; font-weight:700; padding:2px 9px; border-radius:20px;
-  letter-spacing:.02em;
-}
 .tcp-l{background:rgba(34,197,94,.12)!important;color:#22c55e!important;border:1px solid rgba(34,197,94,.2)!important}
 .tcp-f{background:rgba(59,127,255,.1)!important;color:var(--accent)!important;border:1px solid rgba(59,127,255,.2)!important}
 .tcp-s{background:rgba(232,168,54,.1)!important;color:var(--gold)!important;border:1px solid rgba(232,168,54,.2)!important}
@@ -3964,7 +3949,6 @@ html.light #venn-inline{ background:linear-gradient(180deg, rgba(37,99,235,0.04)
 }
 .storm-this-btn:active { transform: scale(.95); }
 #storm-this-wrap { display: none; text-align: center; padding: 4px 0; }
-#storm-this-wrap.visible { display: block !important; }
 
 </style>
 
@@ -5059,21 +5043,15 @@ html.light #venn-inline{ background:linear-gradient(180deg, rgba(37,99,235,0.04)
               Skip <span class="bmd-nav-arrow">→</span>
             </button>
           </div>
-          <!-- V2 TIMER (mantido no DOM mas oculto - reaparece discreto logo abaixo das opções) -->
-          <div id="bmd-timer-wrap" style="display:none"><div id="bmd-timer-bar" style="background:#22c55e"></div></div>
-          <div id="bmd-timer-label" style="display:none"><span id="bmd-timer-secs">0:00</span><span id="bmd-coins-preview" class="tcp-l">+8 coins if correct</span></div>
+          <!-- V2 TIMER -->
+          <div id="bmd-timer-wrap"><div id="bmd-timer-bar" style="background:#22c55e"></div></div>
+          <div id="bmd-timer-label"><span id="bmd-timer-secs">0:00</span><span id="bmd-coins-preview" class="tcp-l">+8 coins if correct</span></div>
           <div id="bmd-cols-row">
           <div id="bmd-q-col">
           <div id="bmd-q-inner">
           <div class="card-body">
             <div class="card-question hl-zone" id="c-q">Loading…</div>
             <div class="options" id="c-opts"></div>
-            <!-- Timer discreto após as opções (substitui a faixa do topo) -->
-            <div id="bmd-timer-discreet" class="bmd-timer-discreet">
-              <span class="btd-time" id="bmd-timer-secs-2">0:00</span>
-              <span class="btd-sep">·</span>
-              <span class="btd-coins tcp-l" id="bmd-coins-preview-2">+8 coins if correct</span>
-            </div>
           </div>
           <div id="resp-dist-wrap" style="display:none;padding:14px 20px 10px;border-top:1px solid var(--border);">
             <div style="font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text-faint);font-family:'JetBrains Mono',monospace;margin-bottom:10px;">Response Distribution</div>
@@ -5487,7 +5465,7 @@ const DEFAULT_SETTINGS={
 let deckSettings={};
 (function(){
   try{deckSettings=JSON.parse(localStorage.getItem(SETTINGS_KEY)||'{}');}catch(e){}
-  const allDecks=['boardmd_s1','boardmd_s2','s1','s2','core','hy1','arrows','fa_s1','ethics','s1_core','fa_step1','shelf_surgery','shelf_em','shelf_fm','shelf_im','shelf_neuro','shelf_obgyn','shelf_peds','shelf_psych'];
+  const allDecks=['boardmd_s1','boardmd_s2','s1','s2','core','new_s2ck','hy1','arrows','fa_s1','ethics','s1_core','fa_step1','shelf_surgery','shelf_em','shelf_fm','shelf_im','shelf_neuro','shelf_obgyn','shelf_peds','shelf_psych'];
   allDecks.forEach(dk=>{
     if(!deckSettings[dk]) deckSettings[dk]={...DEFAULT_SETTINGS};
     Object.keys(DEFAULT_SETTINGS).forEach(k=>{
@@ -5530,7 +5508,7 @@ let todayData={};
 (function(){
   try{todayData=JSON.parse(localStorage.getItem(TODAY_KEY)||'{}');}catch(e){}
   const today=dayStamp();
-  const allDecks=['boardmd_s1','boardmd_s2','s1','s2','core','hy1','arrows','fa_s1','ethics','s1_core','fa_step1','shelf_surgery','shelf_em','shelf_fm','shelf_im','shelf_neuro','shelf_obgyn','shelf_peds','shelf_psych'];
+  const allDecks=['boardmd_s1','boardmd_s2','s1','s2','core','new_s2ck','hy1','arrows','fa_s1','ethics','s1_core','fa_step1','shelf_surgery','shelf_em','shelf_fm','shelf_im','shelf_neuro','shelf_obgyn','shelf_peds','shelf_psych'];
   allDecks.forEach(dk=>{
     if(!todayData[dk]||todayData[dk].date!==today) todayData[dk]={date:today,newSeen:0};
   });
@@ -5907,7 +5885,7 @@ function saveHiddenDecks(){try{localStorage.setItem('bmd_hidden_decks',JSON.stri
 
 function buildDeckManage(){
   const s1Ids=['boardmd_s1','s1_core','s1','hy1','fa_step1','fa_s1','arrows','ethics'];
-  const s2Ids=['boardmd_s2','core','daily_review','s2','new_s2ck','new_s2ck','shelf_surgery','shelf_em','shelf_fm','shelf_im','shelf_neuro','shelf_obgyn','shelf_peds','shelf_psych'];
+  const s2Ids=['boardmd_s2','core','daily_review','s2','new_s2ck','shelf_surgery','shelf_em','shelf_fm','shelf_im','shelf_neuro','shelf_obgyn','shelf_peds','shelf_psych'];
   const s1Decks=[
     {id:'boardmd_s1',name:'BoardMD S1'},{id:'s1_core',name:'Core Review'},
     {id:'s1',name:'Rapid Review'},{id:'hy1',name:'HY Concepts'},
@@ -5957,7 +5935,7 @@ function toggleAllStep(ids){
   saveHiddenDecks();buildDeckHomeTable();buildDeckManage();
 }
 function toggleAllDecks(){
-  const allIds=['boardmd_s1','s1_core','s1','hy1','fa_step1','fa_s1','arrows','ethics','boardmd_s2','core','s2','shelf_surgery','shelf_em','shelf_fm','shelf_im','shelf_neuro','shelf_obgyn','shelf_peds','shelf_psych'];
+  const allIds=['boardmd_s1','s1_core','s1','hy1','fa_step1','fa_s1','arrows','ethics','boardmd_s2','core','s2','new_s2ck','shelf_surgery','shelf_em','shelf_fm','shelf_im','shelf_neuro','shelf_obgyn','shelf_peds','shelf_psych'];
   const allActive=allIds.every(id=>!hiddenDecks.includes(id));
   hiddenDecks=allActive?[...allIds]:[];
   saveHiddenDecks();buildDeckHomeTable();buildDeckManage();
@@ -6174,7 +6152,7 @@ function goHome(){
 // Track which step the user is studying
 let currentStep = localStorage.getItem('bmd_step') || 's1'; // 's1' or 's2'
 const STEP1_DECKS = ['boardmd_s1','s1_core','s1','hy1','fa_step1','fa_s1','arrows','ethics'];
-const STEP2_DECKS = ['boardmd_s2','core','daily_review','s2','shelf','shelf_surgery','shelf_em','shelf_fm','shelf_im','shelf_neuro','shelf_obgyn','shelf_peds','shelf_psych'];
+const STEP2_DECKS = ['boardmd_s2','core','daily_review','s2','new_s2ck','shelf','shelf_surgery','shelf_em','shelf_fm','shelf_im','shelf_neuro','shelf_obgyn','shelf_peds','shelf_psych'];
 const SHELF_DECKS = ['shelf','shelf_surgery','shelf_em','shelf_obgyn','shelf_fm','shelf_im','shelf_neuro','shelf_peds','shelf_psych'];
 
 function openApp(dk){
@@ -6512,9 +6490,6 @@ function renderCard(){
   revealed=false;
   _cardStartTime = Date.now(); // track response time
   window._cardStartTime = _cardStartTime; // SETOR B v3: mirror to window for cross-script access
-  // Esconder botão Storm this card até a resposta ser revelada
-  var _stw = document.getElementById('storm-this-wrap');
-  if(_stw){ _stw.classList.remove('visible'); _stw.style.display = 'none'; }
   v2starttimer(); v2reset(); // V2
   // SETOR B v6: reseta acumulador de idle time (visibility pause) a cada novo card
   window._idleAccumMs = 0;
@@ -7521,7 +7496,7 @@ function revealAnswer(sel,card){
   if(rb2) rb2.classList.add('visible');
   // Mostrar botão Storm this card
   const stw = document.getElementById('storm-this-wrap');
-  if(stw){ stw.classList.add('visible'); stw.style.display = 'block'; }
+  if(stw) stw.style.display = '';
   // Mostrar dock no desktop
   const dock=document.getElementById('study-footer-dock');
   if(dock && window.innerWidth>=900) dock.classList.add('dock-visible');
@@ -15181,304 +15156,6 @@ function bmdSetupDrag(){
 // Setup drag after cards load
 [0,200,500,1000,2000].forEach(function(t){ setTimeout(bmdSetupDrag,t); });
 </script>
-<!--
-═══════════════════════════════════════════════════════════════════════
-  BoardMD — BrainStorm Mode (v2)
-  Substitui o botão Play central pelo BrainStorm (cérebro + raio amarelo)
-  Cole este bloco no index.html ANTES do 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<script>
-/* BOARDMD V2 */
-window._v2ti=null;
-function v2starttimer(){
-  clearInterval(window._v2ti);
-  const bar=document.getElementById('bmd-timer-bar'),lbl=document.getElementById('bmd-timer-secs'),prv=document.getElementById('bmd-coins-preview');
-  const lbl2=document.getElementById('bmd-timer-secs-2'),prv2=document.getElementById('bmd-coins-preview-2');
-  const st=Date.now();
-  function tick(){
-    const idle=typeof window._idleAccumMs==='number'?window._idleAccumMs:0;
-    const ms=Math.max(0,Date.now()-st-idle);
-    const s=Math.floor(ms/1000);
-    const txt=Math.floor(s/60)+':'+(''+(s%60)).padStart(2,'0');
-    if(lbl)lbl.textContent=txt;
-    if(lbl2)lbl2.textContent=txt;
-    if(bar){bar.style.width=Math.max(0,100-ms/300000*100)+'%';bar.style.background=ms<15000?'#22c55e':ms<45000?'var(--accent)':ms<120000?'var(--gold)':ms<300000?'#a855f7':'var(--text-faint)';}
-    if(prv){const[t,c]=ms<15000?['+8 coins if correct','tcp-l']:ms<45000?['+6 coins if correct','tcp-f']:ms<120000?['+5 coins if correct','tcp-s']:ms<300000?['+2 coins if correct','tcp-w']:['0 coins (idle)','tcp-i'];prv.textContent=t;prv.className=c;if(prv2){prv2.textContent=t;prv2.className='btd-coins '+c;}}
-  }
-  tick();window._v2ti=setInterval(tick,400);
-}
-function v2stoptimer(){clearInterval(window._v2ti);}
-
-function v2tab(i,btn){
-  document.querySelectorAll('.v2t').forEach((b,j)=>b.classList.toggle('on',j===i));
-  [0,1].forEach(function(j){var p=document.getElementById('v2p'+j);if(p)p.classList.toggle('on',j===i);});
-}
-
-window._v2bi=0;window._v2bl=[];
-const V2TY={context:{l:'Clinical Clues',c:'vbt-cx'},mechanism:{l:'Why it fits',c:'vbt-me'},correct:{l:'Why this answer',c:'vbt-co'},trap:{l:'The board trap',c:'vbt-tr'},hook:{l:'Memory hook',c:'vbt-hk'}};
-
-function v2build(card){
-  // Renderizar Venn SVG
-  if(card.venn && card.venn.left_label){
-    const venn=card.venn;
-    const vEl=document.getElementById('v2venn');
-    if(vEl){
-      function makeVennSVG(venn, w, h){
-        const L=venn.left||[], S=venn.shared||[], R=venn.right||[];
-        const cx1=Math.round(w*0.36), cx2=Math.round(w*0.64), cy=Math.round(h*0.55), r=Math.round(h*0.42);
-        // Larguras das zonas
-        const lw=cx1-20, sw=cx2-cx1+20, rw=w-cx2-20;
-        const ly=cy-r+30, sy=cy-r+30, ry=cy-r+30;
-        function foItems(items, x, y, fw, fill, bold){
-          return items.map((t,i)=>`<foreignObject x="${x}" y="${y+i*26}" width="${fw}" height="24">
-            <div xmlns="http://www.w3.org/1999/xhtml" style="font:${bold?'700':'400'} 11px/1.2 Lato,sans-serif;color:${fill};text-align:center;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;">${t}</div>
-          </foreignObject>`).join('');
-        }
-        return `<svg viewBox="0 0 ${w} ${h}" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block;">
-          <circle cx="${cx1}" cy="${cy}" r="${r}" fill="#3b82f6" fill-opacity="0.12" stroke="#3b82f6" stroke-width="1.5"/>
-          <circle cx="${cx2}" cy="${cy}" r="${r}" fill="#f59e0b" fill-opacity="0.12" stroke="#f59e0b" stroke-width="1.5"/>
-          <text x="${cx1-r/2}" y="20" text-anchor="middle" font-size="10" font-weight="800" font-family="Lato,sans-serif" fill="#3b82f6">${(venn.left_label||'').toUpperCase()}</text>
-          <text x="${w/2}" y="20" text-anchor="middle" font-size="10" font-weight="800" font-family="Lato,sans-serif" fill="#6366f1">BOTH</text>
-          <text x="${cx2+r/2}" y="20" text-anchor="middle" font-size="10" font-weight="800" font-family="Lato,sans-serif" fill="#f59e0b">${(venn.right_label||'').toUpperCase()}</text>
-          ${foItems(L, cx1-r+4, ly, lw, '#1d4ed8', false)}
-          ${foItems(S, w/2-sw/2, sy, sw, '#4f46e5', true)}
-          ${foItems(R, cx2+4, ry, rw, '#b45309', false)}
-        </svg>`;
-      }
-      const svgSmall = makeVennSVG(venn, 460, 200);
-      const svgLarge = makeVennSVG(venn, 560, 300);
-      vEl.innerHTML=`<div class="venn-container">
-        ${svgSmall}
-        <button class="venn-expand-btn" onclick="document.getElementById('venn-modal').classList.add('on')">⤢ Ampliar</button>
-      </div>
-      <div class="venn-modal" id="venn-modal">
-        <div class="venn-modal-inner">
-          <button class="venn-modal-close" onclick="document.getElementById('venn-modal').classList.remove('on')">✕</button>
-          <div style="margin-top:8px">${svgLarge}</div>
-        </div>
-      </div>`;
-    }
-  }
-  let bl=[];
-  if(card.visual_blocks){try{bl=typeof card.visual_blocks==='string'?JSON.parse(card.visual_blocks):card.visual_blocks;}catch(e){}}
-  if(!bl||!bl.length){
-    const exp=(card.e||'').replace(/<[^>]+>/g,' ').replace(/\s+/g,' ').trim();
-    const kp=(card.kp||'').replace(/<[^>]+>/g,' ').trim();
-    const sn=exp.match(/[^.!?]+[.!?]+/g)||[exp];
-    if(sn[0])bl.push({type:'context',content:sn.slice(0,2).join(' ')});
-    if(sn.length>2)bl.push({type:'correct',content:sn.slice(2,4).join(' ')});
-    if(sn.length>4)bl.push({type:'trap',content:sn.slice(4).join(' ')});
-    else if(kp)bl.push({type:'hook',content:kp});
-  }
-  if(!bl.length)return;
-  window._v2bl=bl;window._v2bi=0;
-  const cont=document.getElementById('v2blocks'),dots=document.getElementById('v2dots'),nb=document.getElementById('v2next');
-  if(!cont||!dots)return;
-  cont.innerHTML='';dots.innerHTML='';
-  if(nb){nb.style.display='';nb.className='';nb.textContent='Next ›';nb.onclick=v2next;}
-  bl.forEach((b,i)=>{
-    const d=document.createElement('div');d.className='v2dot'+(i===0?' ac':'');d.id='v2d'+i;dots.appendChild(d);
-    const dv=document.createElement('div');const ti=V2TY[b.type]||V2TY.context;
-    dv.className='v2b '+ti.c;dv.id='v2b'+i;
-    const ct=(b.content||'').replace(/<hl>(.*?)<\/hl>/g,'<span class="v2h">$1</span>');
-    dv.innerHTML='<div class="v2bl">'+ti.l+'</div><div class="v2bc">'+ct+'</div>';
-    cont.appendChild(dv);
-  });
-  v2show(0);
-}
-
-function v2show(i){
-  const bl=window._v2bl||[];
-  const b=document.getElementById('v2b'+i);if(!b)return;
-  b.classList.add('vis');
-  requestAnimationFrame(()=>requestAnimationFrame(()=>b.classList.add('rev')));
-  for(let j=0;j<bl.length;j++){const d=document.getElementById('v2d'+j);if(d)d.className='v2dot'+(j<i?' dn':j===i?' ac':'');}
-  const nb=document.getElementById('v2next');if(!nb)return;
-  if(i>=bl.length-1){nb.className='dn';nb.textContent='✓ Done';nb.onclick=()=>{nb.style.display='none';};setTimeout(()=>{nb.style.display='none';},500);}
-  else{nb.className='';nb.textContent='Next ›';nb.onclick=v2next;}
-}
-window.v2next=function(){window._v2bi++;v2show(window._v2bi);}
-
-window._v2kr=0;window._v2kt=0;window._v2kc=0;
-function v2kp(card){
-  // FIX 2026-05-10: Versão simplificada — usa SÓ #key-point-wrap (texto puro).
-  // O design v2 com cloze fica desativado até batch Haiku marcar **bold** nos KPs.
-  const outer = document.getElementById('v2kp');
-  if(outer) outer.style.display = 'none';
-}
-window.v2reveal=function(el){
-  // No-op suave: cloze desativado por enquanto
-  if(el && el.classList) el.classList.add('rev');
-}
-function v2burst(el,txt){
-  const r=el.getBoundingClientRect();const d=document.createElement('div');d.className='v2burst';d.textContent=txt;
-  d.style.left=(r.left+r.width/2)+'px';d.style.top=(r.top+window.scrollY)+'px';
-  document.body.appendChild(d);setTimeout(()=>d.remove(),900);
-}
-function v2reset(){
-  window._v2bi=0;window._v2bl=[];window._v2built=false;
-  const c=document.getElementById('v2blocks');if(c)c.innerHTML='';
-  const d=document.getElementById('v2dots');if(d)d.innerHTML='';
-  const nb=document.getElementById('v2next');if(nb){nb.style.display='';nb.className='';nb.textContent='Next ›';nb.onclick=v2next;}
-  const ok=document.getElementById('v2kp');if(ok)ok.style.display='none';
-  document.querySelectorAll('.v2t').forEach((b,i)=>b.classList.toggle('on',i===0));
-  [0,1].forEach(function(j){var p=document.getElementById('v2p'+j);if(p)p.classList.toggle('on',j===0);});
-  var _wp2=document.getElementById('v2p2');if(_wp2)_wp2.style.display='none';
-  // hide inline venn (será re-exibido em revealAnswer se o card tiver dados)
-  var vi=document.getElementById('venn-inline'); if(vi){ vi.style.display='none'; vi.innerHTML=''; }
-}
-
-/* ─── BoardMD Venn Inline ───────────────────────────────────────────────
-   Renderiza o diagrama de Venn dentro de #venn-inline logo após o bloco
-   "Correct answer". Chamado pelo revealAnswer(). Recebe `card` com
-   card.venn = { left_label, right_label, left:[], shared:[], right:[] }
-   (string JSON ou objeto). Se faltar dado, esconde silenciosamente.
-   ─────────────────────────────────────────────────────────────────────── */
-window._bmdRenderVennInline = function(card){
-  var host = document.getElementById('venn-inline');
-  if(!host){ console.warn('[Venn] #venn-inline host not found'); return; }
-  if(!card){ host.style.display='none'; host.innerHTML=''; return; }
-  var v = card.venn;
-  if(typeof v === 'string'){
-    try { v = JSON.parse(v); } catch(e){ console.warn('[Venn] parse error:', e, v); v = null; }
-  }
-  if(!v || !v.left_label || !v.right_label){
-    host.style.display='none'; host.innerHTML='';
-    console.log('[Venn] card sem dado venn válido — id=', card && card.id);
-    return;
-  }
-  var L = Array.isArray(v.left)   ? v.left   : [];
-  var S = Array.isArray(v.shared) ? v.shared : [];
-  var R = Array.isArray(v.right)  ? v.right  : [];
-  if(L.length + S.length + R.length === 0){
-    host.style.display='none'; host.innerHTML=''; return;
-  }
-  console.log('[Venn] renderizando para card', card.id, '— L:', L.length, 'S:', S.length, 'R:', R.length);
-
-  // util: escapa text para SVG (apenas < > & que quebram XML)
-  function esc(t){ return String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-
-  function buildSvg(W){
-    var rows = Math.max(L.length, S.length, R.length);
-    var itemH = 20;                          // espaçamento vertical entre itens
-    var topPad = 36;                         // espaço pros labels do topo
-    var diameter = Math.min(W * 0.46, 280);  // diâmetro dos círculos
-    var r = diameter / 2;
-    var contentH = rows * itemH + topPad + 24;
-    var H = Math.max(contentH, diameter + topPad + 20);
-    var cy = topPad + (H - topPad) / 2;
-    // overlap clássico de Venn (~30% do raio)
-    var cx1 = W * 0.36;
-    var cx2 = W * 0.64;
-
-    // X centers das 3 zonas (textos)
-    var zL = cx1 - r * 0.55;
-    var zS = (cx1 + cx2) / 2;
-    var zR = cx2 + r * 0.55;
-
-    // y inicial dos itens
-    var yStart = topPad + 6;
-
-    function renderItems(items, x, color, weight, maxChars){
-      var out = '';
-      items.forEach(function(t, i){
-        var y = yStart + i * itemH;
-        var txt = esc(t);
-        // Trunca textos muito longos para não vazar (sem suporte a quebra de linha em <text> puro)
-        if(txt.length > maxChars) txt = txt.substring(0, maxChars - 1) + '…';
-        out += '<text x="' + x + '" y="' + y + '" text-anchor="middle" ' +
-               'font-family="Lato, system-ui, sans-serif" font-size="11" ' +
-               'font-weight="' + weight + '" fill="' + color + '">' + txt + '</text>';
-      });
-      return out;
-    }
-
-    var svg = '';
-    svg += '<svg viewBox="0 0 ' + W + ' ' + H + '" xmlns="http://www.w3.org/2000/svg" ' +
-           'preserveAspectRatio="xMidYMid meet" role="img" ' +
-           'aria-label="Comparação Venn: ' + esc(v.left_label) + ' vs ' + esc(v.right_label) + '">';
-    // Círculos (preenchimento sutil, contorno definido)
-    svg += '<circle cx="' + cx1 + '" cy="' + cy + '" r="' + r + '" ' +
-           'fill="rgba(59,127,255,0.08)" stroke="#3b7fff" stroke-width="1.5"/>';
-    svg += '<circle cx="' + cx2 + '" cy="' + cy + '" r="' + r + '" ' +
-           'fill="rgba(245,158,11,0.08)" stroke="#f59e0b" stroke-width="1.5"/>';
-    // Labels topo (3 colunas)
-    svg += '<text x="' + zL + '" y="20" text-anchor="middle" ' +
-           'font-family="Lato, sans-serif" font-size="10.5" font-weight="800" ' +
-           'letter-spacing="1.2" fill="#3b7fff">' + esc(v.left_label).toUpperCase() + '</text>';
-    svg += '<text x="' + zS + '" y="20" text-anchor="middle" ' +
-           'font-family="Lato, sans-serif" font-size="10.5" font-weight="800" ' +
-           'letter-spacing="1.2" fill="#8b5cf6">BOTH</text>';
-    svg += '<text x="' + zR + '" y="20" text-anchor="middle" ' +
-           'font-family="Lato, sans-serif" font-size="10.5" font-weight="800" ' +
-           'letter-spacing="1.2" fill="#f59e0b">' + esc(v.right_label).toUpperCase() + '</text>';
-    // Itens (cores próximas dos labels, mas com contraste suficiente)
-    svg += renderItems(L, zL, '#1d4ed8', '500', 24);
-    svg += renderItems(S, zS, '#6d28d9', '700', 18);
-    svg += renderItems(R, zR, '#b45309', '500', 24);
-    svg += '</svg>';
-    return svg;
-  }
-
-  var svgSmall = buildSvg(700);
-  var svgLarge = buildSvg(900);
-
-  // Header com chip "Comparison" + botão ampliar
-  host.innerHTML =
-    '<div class="vi-head">' +
-      '<span class="vi-tag">◐ ' + esc(v.left_label).toUpperCase() + ' vs ' + esc(v.right_label).toUpperCase() + '</span>' +
-      '<button class="vi-expand" type="button" onclick="document.getElementById(\'venn-inline-modal\').classList.add(\'on\')">⤢ Expand</button>' +
-    '</div>' +
-    svgSmall;
-
-  // Garante (cria se ainda nao existe) o modal global do venn ampliado
-  var modal = document.getElementById('venn-inline-modal');
-  if(!modal){
-    modal = document.createElement('div');
-    modal.id = 'venn-inline-modal';
-    modal.addEventListener('click', function(ev){ if(ev.target === modal) modal.classList.remove('on'); });
-    modal.innerHTML = '<div class="vim-inner"><button class="vim-close" type="button" onclick="document.getElementById(\'venn-inline-modal\').classList.remove(\'on\')">✕ Close</button><div id="venn-inline-modal-body" style="clear:both;margin-top:8px"></div></div>';
-    document.body.appendChild(modal);
-  }
-  var body = document.getElementById('venn-inline-modal-body');
-  if(body) body.innerHTML = svgLarge;
-
-  // Forçar exibição (alguns CSS podem sobrepor)
-  host.style.cssText = 'display:block !important; margin:10px 18px 4px;';
-};
-console.log('[BoardMD v2] loaded');
-</script>
-
-</body>
-═══════════════════════════════════════════════════════════════════════
--->
-
-
-
-
-
-
-
-
-
-
-
-
 <style>
 .bs-overlay{display:none;position:fixed;left:0;right:0;top:0;bottom:88px;z-index:9000;background:var(--bg);flex-direction:column;font-family:'Lato',sans-serif;overflow-y:auto;-webkit-overflow-scrolling:touch}
 .bs-overlay.on{display:flex}
@@ -15942,7 +15619,7 @@ function getCards(){
   const D=window.DECKS||{};
   let pool;
   if(BS.deck==='all'){
-    pool=[...(D.boardmd_s2||[]),...(D.core||[]),...(D.boardmd_s1||[]),...(D.s1_core||[])];
+    pool=[...(D.boardmd_s2||[]),...(D.core||[]),...(D.boardmd_s1||[]),...(D.s1_core||[]),...(D.new_s2ck||[])];
   } else {
     pool=D[BS.deck]||[];
   }
@@ -16150,6 +15827,71 @@ window.bsConfig=function(){
   document.getElementById('bs-ctrl').style.display='none';
   const attFloat=document.getElementById('bs-att-float');if(attFloat)attFloat.style.display='none';
 };
+
+/* ─── Storm This Card ────────────────────────────────────────────────────
+   Abre o BrainStorm via o fluxo nativo de busca por QID:
+   1. Abre o overlay
+   2. Preenche o campo de busca com o QID do card
+   3. Dispara bsSearch() para criar o filtro
+   4. Chama bsStart() — que faz tudo: filtra cards, monta sessão,
+      inicia timer, renderiza modo Clinical Reasoning (default)
+   Resultado: o aluno cai exatamente como cairia se buscasse o QID,
+   herdando FSRS, modos, navegação — sem código duplicado.
+   ────────────────────────────────────────────────────────────────────── */
+window.stormThisCard = function(card){
+  if(!card){ card = window._currentCard; }
+  if(!card || !card.qid){
+    console.warn('[Storm this card] sem card/qid disponível', card);
+    return;
+  }
+
+  const qid = String(card.qid).trim();
+
+  // 1. Abre o overlay (chama o openBrainStorm para garantir setup completo)
+  if(typeof window.openBrainStorm === 'function'){
+    window.openBrainStorm();
+  } else {
+    const ov = document.getElementById('bs-overlay');
+    if(!ov){ console.warn('[Storm] bs-overlay não encontrado'); return; }
+    ov.classList.add('on'); document.body.style.overflow = 'hidden';
+  }
+
+  // 2. Garante modo Clinical Reasoning (default — "phrase")
+  BS.mode = 'phrase';
+  document.querySelectorAll('.bs-mode').forEach(function(el){
+    el.classList.toggle('on', el.dataset.mode === 'phrase');
+  });
+
+  // 3. Preenche o campo de busca com o QID e dispara o handler nativo
+  //    (que define BS._searchFilter para bsStart() consumir)
+  const inp = document.getElementById('bs-search');
+  if(inp){
+    inp.value = qid;
+    inp.style.borderColor = 'var(--accent)';
+    // dispara bsSearch via o evento input registrado no HTML
+    if(typeof window.bsSearch === 'function'){
+      window.bsSearch(qid);
+    } else {
+      inp.dispatchEvent(new Event('input', {bubbles:true}));
+    }
+  } else {
+    // fallback se o input não existir por algum motivo
+    BS._searchFilter = qid.toLowerCase();
+  }
+
+  // 4. Inicia a sessão (bsStart aplica o filtro e renderiza)
+  setTimeout(function(){
+    try {
+      if(typeof window.bsStart === 'function'){
+        window.bsStart();
+      } else {
+        console.warn('[Storm this card] bsStart não disponível');
+      }
+    } catch(e){
+      console.warn('[Storm this card] bsStart erro:', e);
+    }
+  }, 60); // pequeno delay para o overlay terminar o setup
+};
 window.bsGo=function(d){
   const phs=PHS[BS.mode]||PHS.flash;
   if(d>0)advance();
@@ -16230,7 +15972,7 @@ window.bsSearch=function(q){
   // Visual feedback: show match count
   const D=window.DECKS||{};
   let pool=[];
-  if(BS.deck==='all'){pool=[...(D.boardmd_s2||[]),...(D.core||[]),...(D.boardmd_s1||[]),...(D.s1_core||[])];}
+  if(BS.deck==='all'){pool=[...(D.boardmd_s2||[]),...(D.core||[]),...(D.boardmd_s1||[]),...(D.s1_core||[]),...(D.new_s2ck||[])];}
   else pool=D[BS.deck]||[];
   const matches=pool.filter(c=>{
     const t=(c.topic||c.subject||'').toLowerCase();
@@ -16395,7 +16137,7 @@ function bsUpdateDeckCounters(){
     return {nw,lrn,due};
   }
   const decks={
-    'all':[...(D.boardmd_s2||[]),...(D.core||[]),...(D.boardmd_s1||[]),...(D.s1_core||[])],
+    'all':[...(D.boardmd_s2||[]),...(D.core||[]),...(D.boardmd_s1||[]),...(D.s1_core||[]),...(D.new_s2ck||[])],
     's2':D.boardmd_s2||[],
     'core':D.core||[],
     's1':D.boardmd_s1||[],
@@ -17183,8 +16925,113 @@ function v2reset(){
 console.log('[BoardMD v2] loaded');
 </script>
 
+<script>
+/* ─── BoardMD Venn INLINE ─────────────────────────────────────────────────
+   Renderiza diagrama de Venn dentro de #venn-inline logo após o bloco
+   "Correct Answer". Chamado pelo revealAnswer(card). Usa SVG puro (sem
+   foreignObject) para máxima compatibilidade. Defensivo: silencia se
+   o card não tem dado venn válido.
+   ─────────────────────────────────────────────────────────────────────── */
+window._bmdRenderVennInline = function(card){
+  var host = document.getElementById('venn-inline');
+  if(!host){ console.warn('[Venn] #venn-inline host not found'); return; }
+  if(!card){ host.style.display='none'; host.innerHTML=''; return; }
+  var v = card.venn;
+  if(typeof v === 'string'){
+    try { v = JSON.parse(v); } catch(e){ console.warn('[Venn] parse error:', e); v = null; }
   }
-}
+  if(!v || !v.left_label || !v.right_label){
+    host.style.display='none'; host.innerHTML='';
+    console.log('[Venn] card sem dado venn válido — id=', card && card.id);
+    return;
+  }
+  var L = Array.isArray(v.left)   ? v.left   : [];
+  var S = Array.isArray(v.shared) ? v.shared : [];
+  var R = Array.isArray(v.right)  ? v.right  : [];
+  if(L.length + S.length + R.length === 0){
+    host.style.display='none'; host.innerHTML=''; return;
+  }
+  console.log('[Venn] renderizando card', card.id, '— L:', L.length, 'S:', S.length, 'R:', R.length);
+
+  function esc(t){ return String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+  function buildSvg(W){
+    var rows = Math.max(L.length, S.length, R.length);
+    var itemH = 20;
+    var topPad = 36;
+    var diameter = Math.min(W * 0.46, 280);
+    var r = diameter / 2;
+    var contentH = rows * itemH + topPad + 24;
+    var H = Math.max(contentH, diameter + topPad + 20);
+    var cy = topPad + (H - topPad) / 2;
+    var cx1 = W * 0.36;
+    var cx2 = W * 0.64;
+    var zL = cx1 - r * 0.55;
+    var zS = (cx1 + cx2) / 2;
+    var zR = cx2 + r * 0.55;
+    var yStart = topPad + 6;
+
+    function renderItems(items, x, color, weight, maxChars){
+      var out = '';
+      items.forEach(function(t, i){
+        var y = yStart + i * itemH;
+        var txt = esc(t);
+        if(txt.length > maxChars) txt = txt.substring(0, maxChars - 1) + '…';
+        out += '<text x="' + x + '" y="' + y + '" text-anchor="middle" ' +
+               'font-family="Lato, system-ui, sans-serif" font-size="11" ' +
+               'font-weight="' + weight + '" fill="' + color + '">' + txt + '</text>';
+      });
+      return out;
+    }
+
+    var svg = '<svg viewBox="0 0 ' + W + ' ' + H + '" xmlns="http://www.w3.org/2000/svg" ' +
+              'preserveAspectRatio="xMidYMid meet" role="img" ' +
+              'aria-label="Comparação Venn: ' + esc(v.left_label) + ' vs ' + esc(v.right_label) + '">';
+    svg += '<circle cx="' + cx1 + '" cy="' + cy + '" r="' + r + '" ' +
+           'fill="rgba(59,127,255,0.08)" stroke="#3b7fff" stroke-width="1.5"/>';
+    svg += '<circle cx="' + cx2 + '" cy="' + cy + '" r="' + r + '" ' +
+           'fill="rgba(245,158,11,0.08)" stroke="#f59e0b" stroke-width="1.5"/>';
+    svg += '<text x="' + zL + '" y="20" text-anchor="middle" ' +
+           'font-family="Lato, sans-serif" font-size="10.5" font-weight="800" ' +
+           'letter-spacing="1.2" fill="#3b7fff">' + esc(v.left_label).toUpperCase() + '</text>';
+    svg += '<text x="' + zS + '" y="20" text-anchor="middle" ' +
+           'font-family="Lato, sans-serif" font-size="10.5" font-weight="800" ' +
+           'letter-spacing="1.2" fill="#8b5cf6">BOTH</text>';
+    svg += '<text x="' + zR + '" y="20" text-anchor="middle" ' +
+           'font-family="Lato, sans-serif" font-size="10.5" font-weight="800" ' +
+           'letter-spacing="1.2" fill="#f59e0b">' + esc(v.right_label).toUpperCase() + '</text>';
+    svg += renderItems(L, zL, '#1d4ed8', '500', 24);
+    svg += renderItems(S, zS, '#6d28d9', '700', 18);
+    svg += renderItems(R, zR, '#b45309', '500', 24);
+    svg += '</svg>';
+    return svg;
+  }
+
+  var svgSmall = buildSvg(700);
+  var svgLarge = buildSvg(900);
+
+  host.innerHTML =
+    '<div class="vi-head">' +
+      '<span class="vi-tag">◐ ' + esc(v.left_label).toUpperCase() + ' vs ' + esc(v.right_label).toUpperCase() + '</span>' +
+      '<button class="vi-expand" type="button" onclick="document.getElementById(\'venn-inline-modal\').classList.add(\'on\')">⤢ Expand</button>' +
+    '</div>' +
+    svgSmall;
+
+  var modal = document.getElementById('venn-inline-modal');
+  if(!modal){
+    modal = document.createElement('div');
+    modal.id = 'venn-inline-modal';
+    modal.addEventListener('click', function(ev){ if(ev.target === modal) modal.classList.remove('on'); });
+    modal.innerHTML = '<div class="vim-inner"><button class="vim-close" type="button" onclick="document.getElementById(\'venn-inline-modal\').classList.remove(\'on\')">✕ Close</button><div id="venn-inline-modal-body" style="clear:both;margin-top:8px"></div></div>';
+    document.body.appendChild(modal);
+  }
+  var body = document.getElementById('venn-inline-modal-body');
+  if(body) body.innerHTML = svgLarge;
+
+  host.style.cssText = 'display:block !important; margin:10px 18px 4px;';
+};
+console.log('[BoardMD Venn Inline] ready');
+</script>
 
 </body>
 </html>
