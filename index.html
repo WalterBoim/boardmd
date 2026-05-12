@@ -3818,6 +3818,21 @@ html.dark .hl-btn-active { border-color:#fff!important; }
 #bmd-timer-bar{height:3px;width:100%;transition:width .3s linear,background .5s}
 #bmd-timer-label{display:flex;align-items:center;justify-content:space-between;padding:3px 0 6px;font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-faint)}
 #bmd-coins-preview{font-size:9px;font-weight:700;padding:2px 9px;border-radius:20px}
+/* Timer discreto após as opções (substitui a barra grossa do topo) */
+.bmd-timer-discreet{
+  display:flex; align-items:center; justify-content:flex-end; gap:8px;
+  padding:8px 20px 4px;
+  font-family:'JetBrains Mono', monospace;
+  font-size:10px; color:var(--text-faint);
+  opacity:.72; transition:opacity .2s ease;
+}
+.bmd-timer-discreet:hover{ opacity:1; }
+.bmd-timer-discreet .btd-time{ font-weight:600; letter-spacing:.04em; }
+.bmd-timer-discreet .btd-sep{ opacity:.5; font-weight:300; }
+.bmd-timer-discreet .btd-coins{
+  font-size:9px; font-weight:700; padding:2px 9px; border-radius:20px;
+  letter-spacing:.02em;
+}
 .tcp-l{background:rgba(34,197,94,.12)!important;color:#22c55e!important;border:1px solid rgba(34,197,94,.2)!important}
 .tcp-f{background:rgba(59,127,255,.1)!important;color:var(--accent)!important;border:1px solid rgba(59,127,255,.2)!important}
 .tcp-s{background:rgba(232,168,54,.1)!important;color:var(--gold)!important;border:1px solid rgba(232,168,54,.2)!important}
@@ -3949,6 +3964,7 @@ html.light #venn-inline{ background:linear-gradient(180deg, rgba(37,99,235,0.04)
 }
 .storm-this-btn:active { transform: scale(.95); }
 #storm-this-wrap { display: none; text-align: center; padding: 4px 0; }
+#storm-this-wrap.visible { display: block !important; }
 
 </style>
 
@@ -5043,15 +5059,21 @@ html.light #venn-inline{ background:linear-gradient(180deg, rgba(37,99,235,0.04)
               Skip <span class="bmd-nav-arrow">→</span>
             </button>
           </div>
-          <!-- V2 TIMER -->
-          <div id="bmd-timer-wrap"><div id="bmd-timer-bar" style="background:#22c55e"></div></div>
-          <div id="bmd-timer-label"><span id="bmd-timer-secs">0:00</span><span id="bmd-coins-preview" class="tcp-l">+8 coins if correct</span></div>
+          <!-- V2 TIMER (mantido no DOM mas oculto - reaparece discreto logo abaixo das opções) -->
+          <div id="bmd-timer-wrap" style="display:none"><div id="bmd-timer-bar" style="background:#22c55e"></div></div>
+          <div id="bmd-timer-label" style="display:none"><span id="bmd-timer-secs">0:00</span><span id="bmd-coins-preview" class="tcp-l">+8 coins if correct</span></div>
           <div id="bmd-cols-row">
           <div id="bmd-q-col">
           <div id="bmd-q-inner">
           <div class="card-body">
             <div class="card-question hl-zone" id="c-q">Loading…</div>
             <div class="options" id="c-opts"></div>
+            <!-- Timer discreto após as opções (substitui a faixa do topo) -->
+            <div id="bmd-timer-discreet" class="bmd-timer-discreet">
+              <span class="btd-time" id="bmd-timer-secs-2">0:00</span>
+              <span class="btd-sep">·</span>
+              <span class="btd-coins tcp-l" id="bmd-coins-preview-2">+8 coins if correct</span>
+            </div>
           </div>
           <div id="resp-dist-wrap" style="display:none;padding:14px 20px 10px;border-top:1px solid var(--border);">
             <div style="font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text-faint);font-family:'JetBrains Mono',monospace;margin-bottom:10px;">Response Distribution</div>
@@ -6490,6 +6512,9 @@ function renderCard(){
   revealed=false;
   _cardStartTime = Date.now(); // track response time
   window._cardStartTime = _cardStartTime; // SETOR B v3: mirror to window for cross-script access
+  // Esconder botão Storm this card até a resposta ser revelada
+  var _stw = document.getElementById('storm-this-wrap');
+  if(_stw){ _stw.classList.remove('visible'); _stw.style.display = 'none'; }
   v2starttimer(); v2reset(); // V2
   // SETOR B v6: reseta acumulador de idle time (visibility pause) a cada novo card
   window._idleAccumMs = 0;
@@ -7496,7 +7521,7 @@ function revealAnswer(sel,card){
   if(rb2) rb2.classList.add('visible');
   // Mostrar botão Storm this card
   const stw = document.getElementById('storm-this-wrap');
-  if(stw) stw.style.display = '';
+  if(stw){ stw.classList.add('visible'); stw.style.display = 'block'; }
   // Mostrar dock no desktop
   const dock=document.getElementById('study-footer-dock');
   if(dock && window.innerWidth>=900) dock.classList.add('dock-visible');
@@ -15183,14 +15208,17 @@ window._v2ti=null;
 function v2starttimer(){
   clearInterval(window._v2ti);
   const bar=document.getElementById('bmd-timer-bar'),lbl=document.getElementById('bmd-timer-secs'),prv=document.getElementById('bmd-coins-preview');
+  const lbl2=document.getElementById('bmd-timer-secs-2'),prv2=document.getElementById('bmd-coins-preview-2');
   const st=Date.now();
   function tick(){
     const idle=typeof window._idleAccumMs==='number'?window._idleAccumMs:0;
     const ms=Math.max(0,Date.now()-st-idle);
     const s=Math.floor(ms/1000);
-    if(lbl)lbl.textContent=Math.floor(s/60)+':'+(''+(s%60)).padStart(2,'0');
+    const txt=Math.floor(s/60)+':'+(''+(s%60)).padStart(2,'0');
+    if(lbl)lbl.textContent=txt;
+    if(lbl2)lbl2.textContent=txt;
     if(bar){bar.style.width=Math.max(0,100-ms/300000*100)+'%';bar.style.background=ms<15000?'#22c55e':ms<45000?'var(--accent)':ms<120000?'var(--gold)':ms<300000?'#a855f7':'var(--text-faint)';}
-    if(prv){const[t,c]=ms<15000?['+8 coins if correct','tcp-l']:ms<45000?['+6 coins if correct','tcp-f']:ms<120000?['+5 coins if correct','tcp-s']:ms<300000?['+2 coins if correct','tcp-w']:['0 coins (idle)','tcp-i'];prv.textContent=t;prv.className=c;}
+    if(prv){const[t,c]=ms<15000?['+8 coins if correct','tcp-l']:ms<45000?['+6 coins if correct','tcp-f']:ms<120000?['+5 coins if correct','tcp-s']:ms<300000?['+2 coins if correct','tcp-w']:['0 coins (idle)','tcp-i'];prv.textContent=t;prv.className=c;if(prv2){prv2.textContent=t;prv2.className='btd-coins '+c;}}
   }
   tick();window._v2ti=setInterval(tick,400);
 }
@@ -15323,14 +15351,16 @@ function v2reset(){
    ─────────────────────────────────────────────────────────────────────── */
 window._bmdRenderVennInline = function(card){
   var host = document.getElementById('venn-inline');
-  if(!host) return;
+  if(!host){ console.warn('[Venn] #venn-inline host not found'); return; }
   if(!card){ host.style.display='none'; host.innerHTML=''; return; }
   var v = card.venn;
   if(typeof v === 'string'){
-    try { v = JSON.parse(v); } catch(e){ v = null; }
+    try { v = JSON.parse(v); } catch(e){ console.warn('[Venn] parse error:', e, v); v = null; }
   }
   if(!v || !v.left_label || !v.right_label){
-    host.style.display='none'; host.innerHTML=''; return;
+    host.style.display='none'; host.innerHTML='';
+    console.log('[Venn] card sem dado venn válido — id=', card && card.id);
+    return;
   }
   var L = Array.isArray(v.left)   ? v.left   : [];
   var S = Array.isArray(v.shared) ? v.shared : [];
@@ -15338,68 +15368,80 @@ window._bmdRenderVennInline = function(card){
   if(L.length + S.length + R.length === 0){
     host.style.display='none'; host.innerHTML=''; return;
   }
+  console.log('[Venn] renderizando para card', card.id, '— L:', L.length, 'S:', S.length, 'R:', R.length);
 
-  function buildSvg(W, H){
-    // Layout: dois círculos sobrepostos, com labels acima e itens distribuídos
-    // em 3 zonas horizontais usando foreignObject (texto que quebra naturalmente).
-    var cy = Math.round(H * 0.56);
-    var r  = Math.round(H * 0.40);
-    var cx1 = Math.round(W * 0.34);
-    var cx2 = Math.round(W * 0.66);
-    var rows = Math.max(L.length, S.length, R.length, 1);
-    var itemH = 22;
-    var zoneTop = cy - r + 18;
-    // Larguras úteis
-    var lW = Math.round(W * 0.26);
-    var sW = Math.round(W * 0.20);
-    var rW = Math.round(W * 0.26);
-    function itemsHTML(items, xCenter, fillColor, bold){
-      return items.map(function(t, i){
-        var x = xCenter - (lW/2); // será reposicionado por param
-        return '';
-      }).join('');
-    }
-    function foZone(items, xCenter, width, color, bold){
-      var html = '';
+  // util: escapa text para SVG (apenas < > & que quebram XML)
+  function esc(t){ return String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+  function buildSvg(W){
+    var rows = Math.max(L.length, S.length, R.length);
+    var itemH = 20;                          // espaçamento vertical entre itens
+    var topPad = 36;                         // espaço pros labels do topo
+    var diameter = Math.min(W * 0.46, 280);  // diâmetro dos círculos
+    var r = diameter / 2;
+    var contentH = rows * itemH + topPad + 24;
+    var H = Math.max(contentH, diameter + topPad + 20);
+    var cy = topPad + (H - topPad) / 2;
+    // overlap clássico de Venn (~30% do raio)
+    var cx1 = W * 0.36;
+    var cx2 = W * 0.64;
+
+    // X centers das 3 zonas (textos)
+    var zL = cx1 - r * 0.55;
+    var zS = (cx1 + cx2) / 2;
+    var zR = cx2 + r * 0.55;
+
+    // y inicial dos itens
+    var yStart = topPad + 6;
+
+    function renderItems(items, x, color, weight, maxChars){
+      var out = '';
       items.forEach(function(t, i){
-        html += '<foreignObject x="' + (xCenter - width/2) + '" y="' + (zoneTop + i*itemH) + '" width="' + width + '" height="' + itemH + '">' +
-                '<div xmlns="http://www.w3.org/1999/xhtml" style="font:'+(bold?'700':'500')+' 11.5px/1.2 Lato, sans-serif;color:'+color+';text-align:center;padding:2px 4px;overflow:hidden;display:flex;align-items:center;justify-content:center;height:100%;letter-spacing:.01em;">' +
-                String(t).replace(/</g,'&lt;') +
-                '</div></foreignObject>';
+        var y = yStart + i * itemH;
+        var txt = esc(t);
+        // Trunca textos muito longos para não vazar (sem suporte a quebra de linha em <text> puro)
+        if(txt.length > maxChars) txt = txt.substring(0, maxChars - 1) + '…';
+        out += '<text x="' + x + '" y="' + y + '" text-anchor="middle" ' +
+               'font-family="Lato, system-ui, sans-serif" font-size="11" ' +
+               'font-weight="' + weight + '" fill="' + color + '">' + txt + '</text>';
       });
-      return html;
+      return out;
     }
 
-    // x centers das 3 zonas
-    var zL = cx1 - r/2 - 6;          // só esquerda
-    var zS = (cx1 + cx2) / 2;        // ambos (centro)
-    var zR = cx2 + r/2 + 6;          // só direita
-
-    var svg = '<svg viewBox="0 0 '+W+' '+H+'" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Diagrama de Venn comparando '+v.left_label+' e '+v.right_label+'">';
-    // Círculos
-    svg += '<circle cx="'+cx1+'" cy="'+cy+'" r="'+r+'" fill="rgba(59,127,255,0.10)" stroke="#3b7fff" stroke-width="1.4"/>';
-    svg += '<circle cx="'+cx2+'" cy="'+cy+'" r="'+r+'" fill="rgba(245,158,11,0.10)" stroke="#f59e0b" stroke-width="1.4"/>';
+    var svg = '';
+    svg += '<svg viewBox="0 0 ' + W + ' ' + H + '" xmlns="http://www.w3.org/2000/svg" ' +
+           'preserveAspectRatio="xMidYMid meet" role="img" ' +
+           'aria-label="Comparação Venn: ' + esc(v.left_label) + ' vs ' + esc(v.right_label) + '">';
+    // Círculos (preenchimento sutil, contorno definido)
+    svg += '<circle cx="' + cx1 + '" cy="' + cy + '" r="' + r + '" ' +
+           'fill="rgba(59,127,255,0.08)" stroke="#3b7fff" stroke-width="1.5"/>';
+    svg += '<circle cx="' + cx2 + '" cy="' + cy + '" r="' + r + '" ' +
+           'fill="rgba(245,158,11,0.08)" stroke="#f59e0b" stroke-width="1.5"/>';
     // Labels topo (3 colunas)
-    svg += '<text x="'+zL+'" y="22" text-anchor="middle" font-family="Lato, sans-serif" font-size="10.5" font-weight="800" letter-spacing="1.2" fill="#3b7fff">' + String(v.left_label).toUpperCase() + '</text>';
-    svg += '<text x="'+zS+'" y="22" text-anchor="middle" font-family="Lato, sans-serif" font-size="10.5" font-weight="800" letter-spacing="1.2" fill="#8b5cf6">BOTH</text>';
-    svg += '<text x="'+zR+'" y="22" text-anchor="middle" font-family="Lato, sans-serif" font-size="10.5" font-weight="800" letter-spacing="1.2" fill="#f59e0b">' + String(v.right_label).toUpperCase() + '</text>';
-    // Itens
-    svg += foZone(L, zL, lW, '#1d4ed8', false);
-    svg += foZone(S, zS, sW, '#6d28d9', true);
-    svg += foZone(R, zR, rW, '#b45309', false);
+    svg += '<text x="' + zL + '" y="20" text-anchor="middle" ' +
+           'font-family="Lato, sans-serif" font-size="10.5" font-weight="800" ' +
+           'letter-spacing="1.2" fill="#3b7fff">' + esc(v.left_label).toUpperCase() + '</text>';
+    svg += '<text x="' + zS + '" y="20" text-anchor="middle" ' +
+           'font-family="Lato, sans-serif" font-size="10.5" font-weight="800" ' +
+           'letter-spacing="1.2" fill="#8b5cf6">BOTH</text>';
+    svg += '<text x="' + zR + '" y="20" text-anchor="middle" ' +
+           'font-family="Lato, sans-serif" font-size="10.5" font-weight="800" ' +
+           'letter-spacing="1.2" fill="#f59e0b">' + esc(v.right_label).toUpperCase() + '</text>';
+    // Itens (cores próximas dos labels, mas com contraste suficiente)
+    svg += renderItems(L, zL, '#1d4ed8', '500', 24);
+    svg += renderItems(S, zS, '#6d28d9', '700', 18);
+    svg += renderItems(R, zR, '#b45309', '500', 24);
     svg += '</svg>';
     return svg;
   }
 
-  var rows = Math.max(L.length, S.length, R.length, 1);
-  var Hsmall = Math.max(170, 60 + rows * 26);
-  var svgSmall = buildSvg(640, Hsmall);
-  var svgLarge = buildSvg(820, Math.max(280, 80 + rows * 36));
+  var svgSmall = buildSvg(700);
+  var svgLarge = buildSvg(900);
 
   // Header com chip "Comparison" + botão ampliar
   host.innerHTML =
     '<div class="vi-head">' +
-      '<span class="vi-tag">◐ Comparison · ' + String(v.left_label).toUpperCase() + ' vs ' + String(v.right_label).toUpperCase() + '</span>' +
+      '<span class="vi-tag">◐ ' + esc(v.left_label).toUpperCase() + ' vs ' + esc(v.right_label).toUpperCase() + '</span>' +
       '<button class="vi-expand" type="button" onclick="document.getElementById(\'venn-inline-modal\').classList.add(\'on\')">⤢ Expand</button>' +
     '</div>' +
     svgSmall;
@@ -15416,7 +15458,8 @@ window._bmdRenderVennInline = function(card){
   var body = document.getElementById('venn-inline-modal-body');
   if(body) body.innerHTML = svgLarge;
 
-  host.style.display = 'block';
+  // Forçar exibição (alguns CSS podem sobrepor)
+  host.style.cssText = 'display:block !important; margin:10px 18px 4px;';
 };
 console.log('[BoardMD v2] loaded');
 </script>
@@ -17012,14 +17055,17 @@ window._v2ti=null;
 function v2starttimer(){
   clearInterval(window._v2ti);
   const bar=document.getElementById('bmd-timer-bar'),lbl=document.getElementById('bmd-timer-secs'),prv=document.getElementById('bmd-coins-preview');
+  const lbl2=document.getElementById('bmd-timer-secs-2'),prv2=document.getElementById('bmd-coins-preview-2');
   const st=Date.now();
   function tick(){
     const idle=typeof window._idleAccumMs==='number'?window._idleAccumMs:0;
     const ms=Math.max(0,Date.now()-st-idle);
     const s=Math.floor(ms/1000);
-    if(lbl)lbl.textContent=Math.floor(s/60)+':'+(''+(s%60)).padStart(2,'0');
+    const txt=Math.floor(s/60)+':'+(''+(s%60)).padStart(2,'0');
+    if(lbl)lbl.textContent=txt;
+    if(lbl2)lbl2.textContent=txt;
     if(bar){bar.style.width=Math.max(0,100-ms/300000*100)+'%';bar.style.background=ms<15000?'#22c55e':ms<45000?'var(--accent)':ms<120000?'var(--gold)':ms<300000?'#a855f7':'var(--text-faint)';}
-    if(prv){const[t,c]=ms<15000?['+8 coins if correct','tcp-l']:ms<45000?['+6 coins if correct','tcp-f']:ms<120000?['+5 coins if correct','tcp-s']:ms<300000?['+2 coins if correct','tcp-w']:['0 coins (idle)','tcp-i'];prv.textContent=t;prv.className=c;}
+    if(prv){const[t,c]=ms<15000?['+8 coins if correct','tcp-l']:ms<45000?['+6 coins if correct','tcp-f']:ms<120000?['+5 coins if correct','tcp-s']:ms<300000?['+2 coins if correct','tcp-w']:['0 coins (idle)','tcp-i'];prv.textContent=t;prv.className=c;if(prv2){prv2.textContent=t;prv2.className='btd-coins '+c;}}
   }
   tick();window._v2ti=setInterval(tick,400);
 }
