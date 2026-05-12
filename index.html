@@ -3924,7 +3924,7 @@ html.light #venn-inline{ background:linear-gradient(180deg, rgba(37,99,235,0.04)
 /* Modal ampliado */
 #venn-inline-modal{ display:none; position:fixed; inset:0; z-index:9999; background:rgba(0,0,0,.78); backdrop-filter:blur(6px); align-items:center; justify-content:center; padding:20px; }
 #venn-inline-modal.on{ display:flex; }
-#venn-inline-modal .vim-inner{ background:var(--surface); border:1px solid var(--border-bright); border-radius:18px; padding:24px 24px 18px; max-width:min(820px, 95vw); max-height:90vh; overflow:auto; box-shadow:0 24px 60px rgba(0,0,0,.5); }
+#venn-inline-modal .vim-inner{ background:var(--surface); border:1px solid var(--border-bright); border-radius:18px; padding:24px 24px 18px; width:min(900px, 95vw); min-width:min(700px, 90vw); max-height:90vh; overflow:auto; box-shadow:0 24px 60px rgba(0,0,0,.5); }
 #venn-inline-modal .vim-close{ float:right; background:var(--surface2); border:1px solid var(--border); border-radius:8px; padding:6px 12px; font-size:13px; cursor:pointer; color:var(--text-dim); font-family:'Lato', sans-serif; }
 #venn-inline-modal .vim-close:hover{ color:var(--text); background:var(--surface); }
 
@@ -16863,10 +16863,7 @@ console.log('[BoardMD v2] loaded');
 
 <script>
 /* ═══════════════════════════════════════════════════════════════════
-   BoardMD — Venn Inline (Classic Layout)
-   Dois círculos sobrepostos com itens DENTRO de cada zona.
-   Labels acima identificam as 3 colunas (esquerda / BOTH / direita).
-   Quebra texto em até 2 linhas. Modal "Expand" com SVG grande.
+   BoardMD — Venn Inline (Classic, v3 — wrap correto + zonas DENTRO)
    ═══════════════════════════════════════════════════════════════════ */
 window._bmdRenderVennInline = function(card){
   var host = document.getElementById('venn-inline');
@@ -16878,7 +16875,6 @@ window._bmdRenderVennInline = function(card){
   }
   if(!v || !v.left_label || !v.right_label){
     host.style.display='none'; host.innerHTML='';
-    console.log('[Venn] sem dado válido — id=', card && card.id);
     return;
   }
   var L = Array.isArray(v.left)   ? v.left   : [];
@@ -16891,86 +16887,106 @@ window._bmdRenderVennInline = function(card){
 
   function esc(t){ return String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
-  // Quebra texto em até 2 linhas dentro de maxChars (separação por palavras)
-  function wrapText(t, maxChars){
-    var words = String(t).split(/\s+/);
-    if(words.length === 1){
-      // palavra única: trunca se exceder
-      if(words[0].length > maxChars) return [words[0].substring(0, maxChars - 1) + '…'];
-      return [words[0]];
-    }
+  /* Quebra texto em N linhas (até maxLines). Greedy word-wrap.
+     Se uma palavra única for maior que maxChars, divide com hífen. */
+  function wrapText(t, maxChars, maxLines){
+    maxLines = maxLines || 3;
+    var s = String(t).trim();
+    if(!s) return [''];
+    var words = s.split(/\s+/);
     var lines = [];
     var cur = '';
+    function pushAndReset(){ if(cur){ lines.push(cur); cur=''; } }
     for(var i = 0; i < words.length; i++){
       var w = words[i];
+      // Palavra única excedendo maxChars: divide com -
+      while(w.length > maxChars){
+        pushAndReset();
+        if(lines.length >= maxLines) break;
+        lines.push(w.substring(0, maxChars - 1) + '-');
+        w = w.substring(maxChars - 1);
+      }
+      if(lines.length >= maxLines){
+        // estouramos limite de linhas — tudo o que sobra vira "…" na última
+        if(lines.length === maxLines){
+          var last = lines[maxLines - 1];
+          if(last.length + 1 < maxChars) lines[maxLines - 1] = last + '…';
+        }
+        return lines;
+      }
       if(!cur){ cur = w; continue; }
       if((cur.length + 1 + w.length) <= maxChars){
         cur += ' ' + w;
       } else {
         lines.push(cur);
         cur = w;
-        // limita a 2 linhas: se já temos 1 linha e ainda há palavras, junta resto truncando
-        if(lines.length >= 1 && i < words.length - 1){
-          var rest = words.slice(i).join(' ');
+        if(lines.length >= maxLines){
+          // resto vai pra última linha (truncada se preciso)
+          var rest = w + (i < words.length - 1 ? ' ' + words.slice(i+1).join(' ') : '');
           if(rest.length > maxChars) rest = rest.substring(0, maxChars - 1) + '…';
           lines.push(rest);
-          return lines;
+          // pop "cur" duplicado
+          if(lines[lines.length - 2] !== rest) {} // já adicionou
+          return lines.slice(0, maxLines);
         }
       }
     }
     if(cur) lines.push(cur);
-    return lines;
+    return lines.slice(0, maxLines);
   }
 
   function buildSvg(W, opts){
     opts = opts || {};
     var fontSize  = opts.fontSize  || 12;
     var labelSize = opts.labelSize || 11;
-    var lineH     = Math.round(fontSize * 1.35);
-    var itemGap   = Math.round(fontSize * 0.6);
-    var topPad    = 50;            // labels do topo
+    var lineH     = Math.round(fontSize * 1.3);
+    var itemGap   = Math.round(fontSize * 0.5);
+    var topPad    = 50;
     var bottomPad = 24;
-    var maxL = opts.maxL || 18;    // chars máximos por zona
-    var maxS = opts.maxS || 12;
+    var maxL = opts.maxL || 18;
+    var maxS = opts.maxS || 13;
     var maxR = opts.maxR || 18;
+    var maxLines = 3;
 
-    // Pré-wrap todos itens
-    var Lw = L.map(function(t){ return wrapText(t, maxL); });
-    var Sw = S.map(function(t){ return wrapText(t, maxS); });
-    var Rw = R.map(function(t){ return wrapText(t, maxR); });
+    var Lw = L.map(function(t){ return wrapText(t, maxL, maxLines); });
+    var Sw = S.map(function(t){ return wrapText(t, maxS, maxLines); });
+    var Rw = R.map(function(t){ return wrapText(t, maxR, maxLines); });
 
     function blockHeight(wrapped){
       var h = 0;
       wrapped.forEach(function(lines){ h += lines.length * lineH + itemGap; });
-      return h - itemGap; // remove o gap após último item
+      return Math.max(0, h - itemGap);
     }
     var hL = blockHeight(Lw);
     var hS = blockHeight(Sw);
     var hR = blockHeight(Rw);
-    var contentH = Math.max(hL, hS, hR, 100);
+    var contentH = Math.max(hL, hS, hR, 130);
 
-    // Círculos grandes (raio = ~80% da altura do conteúdo)
-    var rCircle = Math.max(contentH * 0.85, 140);
-    // Sobreposição: ~25% do raio (overlap clássico)
-    var overlap = rCircle * 0.45;
+    // Círculos — diâmetro um pouco maior que a altura do conteúdo
+    var rCircle = Math.max(contentH * 0.85, 150);
+    // Sobreposição clássica: ~45% do raio (interseção generosa pra textos do BOTH)
+    var overlap = rCircle * 0.55;
 
-    // Centros dos círculos
     var cy = topPad + contentH/2;
     var cx1 = W/2 - rCircle + overlap;
     var cx2 = W/2 + rCircle - overlap;
 
-    // Centros X das 3 zonas de TEXTO (não dos círculos)
-    var zL = (W - (cx2 - cx1)) / 2 - 30;     // mais à esquerda
-    var zS = W/2;                             // centro absoluto
-    var zR = W - zL;                          // simétrico
+    // Centros X dos textos: usar o "centroide" geométrico de cada zona
+    // Esquerda: ponto médio entre borda esquerda do círculo 1 e o início da interseção
+    var leftEdge   = cx1 - rCircle;
+    var intersectStart = cx2 - rCircle;
+    var intersectEnd   = cx1 + rCircle;
+    var rightEdge  = cx2 + rCircle;
+
+    var zL = (leftEdge + intersectStart) / 2;
+    var zS = W / 2;
+    var zR = (intersectEnd + rightEdge) / 2;
 
     var H = topPad + contentH + bottomPad;
 
     function renderZone(wrapped, x, color, weight, blockH){
       var out = '';
-      // Centraliza verticalmente o bloco dentro do contentH
-      var totalH = blockH;
-      var startY = topPad + (contentH - totalH) / 2 + lineH; // primeira baseline
+      var startY = topPad + (contentH - blockH) / 2 + lineH;
       var y = startY;
       wrapped.forEach(function(lines){
         lines.forEach(function(line){
@@ -16987,14 +17003,12 @@ window._bmdRenderVennInline = function(card){
     var out = '<svg viewBox="0 0 '+W+' '+H+'" xmlns="http://www.w3.org/2000/svg" ' +
               'preserveAspectRatio="xMidYMid meet" role="img" ' +
               'aria-label="Venn: '+esc(v.left_label)+' vs '+esc(v.right_label)+'">';
-
-    // Círculos atrás dos textos
+    // Círculos
     out += '<circle cx="'+cx1+'" cy="'+cy+'" r="'+rCircle+'" ' +
            'fill="rgba(59,127,255,0.12)" stroke="#3b7fff" stroke-width="1.6"/>';
     out += '<circle cx="'+cx2+'" cy="'+cy+'" r="'+rCircle+'" ' +
            'fill="rgba(245,158,11,0.12)" stroke="#f59e0b" stroke-width="1.6"/>';
-
-    // Labels do topo (3 colunas)
+    // Labels topo
     out += '<text x="'+zL+'" y="'+(topPad - 18)+'" text-anchor="middle" ' +
            'font-family="Lato, sans-serif" font-size="'+labelSize+'" font-weight="700" ' +
            'letter-spacing="1.4" fill="#3b7fff">' + esc(String(v.left_label).toUpperCase()) + '</text>';
@@ -17004,8 +17018,7 @@ window._bmdRenderVennInline = function(card){
     out += '<text x="'+zR+'" y="'+(topPad - 18)+'" text-anchor="middle" ' +
            'font-family="Lato, sans-serif" font-size="'+labelSize+'" font-weight="700" ' +
            'letter-spacing="1.4" fill="#f59e0b">' + esc(String(v.right_label).toUpperCase()) + '</text>';
-
-    // Itens nas 3 zonas
+    // Itens
     out += renderZone(Lw, zL, '#1d4ed8', '500', hL);
     out += renderZone(Sw, zS, '#6d28d9', '700', hS);
     out += renderZone(Rw, zR, '#b45309', '500', hR);
@@ -17014,10 +17027,8 @@ window._bmdRenderVennInline = function(card){
     return out;
   }
 
-  // Versão small (inline)
-  var svgSmall = buildSvg(680, { fontSize:12, labelSize:11, maxL:18, maxS:12, maxR:18 });
-  // Versão large (modal Expand)
-  var svgLarge = buildSvg(900, { fontSize:14, labelSize:13, maxL:24, maxS:16, maxR:24 });
+  var svgSmall = buildSvg(680, { fontSize:12, labelSize:11, maxL:16, maxS:12, maxR:16 });
+  var svgLarge = buildSvg(880, { fontSize:15, labelSize:13, maxL:24, maxS:18, maxR:24 });
 
   host.innerHTML =
     '<div class="vi-head">' +
@@ -17026,7 +17037,6 @@ window._bmdRenderVennInline = function(card){
     '</div>' +
     svgSmall;
 
-  // Garante o modal
   var modal = document.getElementById('venn-inline-modal');
   if(!modal){
     modal = document.createElement('div');
@@ -17035,7 +17045,7 @@ window._bmdRenderVennInline = function(card){
     modal.innerHTML =
       '<div class="vim-inner">' +
         '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">' +
-          '<div id="venn-inline-modal-title" style="font-family:Lato,sans-serif;font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--text-faint)"></div>' +
+          '<div id="venn-inline-modal-title" style="font-family:Lato,sans-serif;font-size:13px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--text-faint)"></div>' +
           '<button class="vim-close" type="button" onclick="document.getElementById(\'venn-inline-modal\').classList.remove(\'on\')">✕ Close</button>' +
         '</div>' +
         '<div id="venn-inline-modal-body" style="width:100%"></div>' +
@@ -17051,45 +17061,58 @@ window._bmdRenderVennInline = function(card){
 };
 
 /* ═══════════════════════════════════════════════════════════════════
-   BoardMD — Storm This Card
-   Reusa o fluxo nativo da busca por QID dentro do BrainStorm.
+   BoardMD — Storm This Card (v3 — vai direto pra sessão filtrada)
    ═══════════════════════════════════════════════════════════════════ */
 window.stormThisCard = function(card){
   if(!card){ card = window._currentCard; }
   if(!card || !card.qid){
-    console.warn('[Storm this card] sem card/qid disponível', card);
+    console.warn('[Storm] sem card/qid', card);
+    alert('Não foi possível abrir o Storm — card sem QID.');
     return;
   }
   var qid = String(card.qid).trim();
+  console.log('[Storm] abrindo brainstorm com qid =', qid, '| deck =', card.deck);
 
-  if(typeof window.openBrainStorm === 'function'){
-    window.openBrainStorm();
-  } else {
-    var ov = document.getElementById('bs-overlay');
-    if(!ov){ console.warn('[Storm] bs-overlay não encontrado'); return; }
-    ov.classList.add('on'); document.body.style.overflow = 'hidden';
+  // 1. Abre overlay manualmente (NÃO chama openBrainStorm porque ele mostra config)
+  var ov = document.getElementById('bs-overlay');
+  if(!ov){ console.warn('[Storm] bs-overlay não encontrado'); alert('BrainStorm overlay não encontrado'); return; }
+  ov.classList.add('on');
+  document.body.style.overflow = 'hidden';
+
+  // 2. Setup do BS state
+  if(typeof window.BS === 'undefined'){
+    console.warn('[Storm] BS não definido');
+    return;
   }
+  BS.mode = 'phrase';  // Clinical Reasoning (HY Clue → Diagnosis → Action)
+  BS.deck = 'all';     // pool unificado (inclui new_s2ck após nossa correção)
+  BS._searchFilter = qid.toLowerCase();
 
-  if(typeof window.BS !== 'undefined'){
-    BS.mode = 'phrase';
-    document.querySelectorAll('.bs-mode').forEach(function(el){
-      el.classList.toggle('on', el.dataset.mode === 'phrase');
-    });
-  }
+  // Atualiza UI dos seletores
+  document.querySelectorAll('.bs-mode').forEach(function(el){
+    el.classList.toggle('on', el.dataset.mode === 'phrase');
+  });
+  document.querySelectorAll('.bs-deck').forEach(function(el){
+    el.classList.toggle('on', el.dataset.deck === 'all');
+  });
 
+  // 3. Preenche o input de busca (visual + integração)
   var inp = document.getElementById('bs-search');
-  if(inp){
-    inp.value = qid;
-    if(typeof window.bsSearch === 'function'){ window.bsSearch(qid); }
-    else { inp.dispatchEvent(new Event('input', {bubbles:true})); }
-  } else if(typeof window.BS !== 'undefined'){
-    BS._searchFilter = qid.toLowerCase();
-  }
+  if(inp){ inp.value = qid; }
+  // 4. Dispara o feedback visual da busca (badge "X matches")
+  try { if(typeof window.bsSearch === 'function') window.bsSearch(qid); } catch(e){}
 
+  // 5. Vai DIRETO pra sessão — pula a config (depois do overlay estabilizar)
   setTimeout(function(){
-    try { if(typeof window.bsStart === 'function') window.bsStart(); }
-    catch(e){ console.warn('[Storm this card] bsStart erro:', e); }
-  }, 80);
+    try {
+      if(typeof window.bsStart === 'function'){
+        window.bsStart();
+        console.log('[Storm] bsStart chamado. BS.cards =', BS.cards && BS.cards.length);
+      } else {
+        console.warn('[Storm] bsStart não disponível');
+      }
+    } catch(e){ console.warn('[Storm] erro:', e); }
+  }, 150);
 };
 
 console.log('[BoardMD Venn + Storm] ready');
