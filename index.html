@@ -3886,6 +3886,11 @@ html.dark .hl-btn-active { border-color:#fff!important; }
 .venn-modal-inner{background:var(--surface1);border-radius:16px;padding:20px;max-width:90vw;width:600px;max-height:90vh;overflow:auto;}
 .venn-modal-close{float:right;background:none;border:none;font-size:20px;cursor:pointer;color:var(--text2);}
 
+
+/* VENN inline no Visual tab */
+#v2venn{margin-top:8px;}
+#v2venn .venn-title{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--text-faint);margin-bottom:6px;padding:0 2px;}
+
 </style>
 
 
@@ -5021,12 +5026,12 @@ html.dark .hl-btn-active { border-color:#fff!important; }
               <button class="v2t" onclick="v2tab(1,this)">Full text</button>
               </div>
             <div class="v2p on" id="v2p0">
-<div id="v2venn" style="display:none;margin-bottom:12px"></div>
               <div style="padding:12px 14px">
                 <div class="v2dots" id="v2dots"></div>
                 <div id="v2blocks"></div>
                 <button id="v2next" onclick="v2next()">Next &#8250;</button>
               </div>
+              <div id="v2venn" style="display:none;border-top:1px solid var(--border);padding:8px 14px 12px"></div>
             </div>
             <div class="v2p" id="v2p1">
               <div class="exp-section">
@@ -15126,7 +15131,7 @@ function v2stoptimer(){clearInterval(window._v2ti);}
 
 function v2tab(i,btn){
   document.querySelectorAll('.v2t').forEach((b,j)=>b.classList.toggle('on',j===i));
-  ['v2p0','v2p1','v2p-venn'].forEach(function(pid,j){var p=document.getElementById(pid);if(p)p.classList.toggle('on',j===i);});
+  [0,1].forEach(function(j){var p=document.getElementById('v2p'+j);if(p)p.classList.toggle('on',j===i);});
 }
 
 window._v2bi=0;window._v2bl=[];
@@ -15137,9 +15142,8 @@ function v2build(card){
   if(card.venn && card.venn.left_label){
     const venn=card.venn;
     const vEl=document.getElementById('v2venn');
-    const vTab=document.getElementById('v2t-venn');
-    if(vEl && vTab){
-      vTab.style.display='';
+    if(vEl){
+      {
       function makeVennSVG(venn, w, h){
         const L=venn.left||[], S=venn.shared||[], R=venn.right||[];
         const cx1=Math.round(w*0.36), cx2=Math.round(w*0.64), cy=Math.round(h*0.55), r=Math.round(h*0.42);
@@ -16855,7 +16859,7 @@ function v2stoptimer(){clearInterval(window._v2ti);}
 
 function v2tab(i,btn){
   document.querySelectorAll('.v2t').forEach((b,j)=>b.classList.toggle('on',j===i));
-  ['v2p0','v2p1','v2p-venn'].forEach(function(pid,j){var p=document.getElementById(pid);if(p)p.classList.toggle('on',j===i);});
+  [0,1].forEach(function(j){var p=document.getElementById('v2p'+j);if(p)p.classList.toggle('on',j===i);});
 }
 
 window._v2bi=0;window._v2bl=[];
@@ -16866,9 +16870,8 @@ function v2build(card){
   if(card.venn && card.venn.left_label){
     const venn=card.venn;
     const vEl=document.getElementById('v2venn');
-    const vTab=document.getElementById('v2t-venn');
-    if(vEl && vTab){
-      vTab.style.display='';
+    if(vEl){
+      {
       function wrapTxt(txt,x,y,maxCh,fill,bold){
         const words=txt.split(' ');const lines=[];let cur='';
         words.forEach(w=>{const t=cur?cur+' '+w:w;if(t.length>maxCh&&cur){lines.push(cur);cur=w;}else cur=t;});
