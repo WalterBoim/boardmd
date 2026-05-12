@@ -10099,7 +10099,7 @@ async function forceRefreshCards(){
 // ── LOAD ALL CARDS FROM SUPABASE ─────────────────────────────────────
 // ── INDEXEDDB CACHE ──────────────────────────────────────────────────
 const IDB_NAME = 'boardmd_cache';
-const IDB_VERSION = 3;
+const IDB_VERSION = 4;
 const IDB_STORE = 'cards';
 const IDB_META_KEY = 'bmd_idb_meta';
 
@@ -10151,7 +10151,7 @@ function getIDBMeta(){
 
 async function fetchAllFromSupabase(onProgress){
   const PAGE = 1000;
-  const SELECT = 'id,deck,system,topic,subject,qid,q,c,w,e,kp,phrase,brainstorm,d,img,pubmed_query,cochrane_pmid,venn,kp_cloze';
+  const SELECT = 'id,deck,system,topic,subject,qid,q,c,w,e,kp,phrase,brainstorm,d,img,pubmed_query,cochrane_pmid,venn,kp_cloze,hy';
   let total = 0;
   try {
     const cr = await _supa.from('cards').select('id', { count: 'exact', head: true });
@@ -10164,8 +10164,7 @@ async function fetchAllFromSupabase(onProgress){
   while(pageIdx < 500){
     let data, error;
     try {
-      let q = _supa.from('cards').select(SELECT).order('id').limit(PAGE);
-      if(lastId !== null) q = q.gt('id', lastId);
+      let q = _supa.from('cards').select(SELECT).order('id', {ascending: true}).range(pageIdx * PAGE, (pageIdx + 1) * PAGE - 1);
       const resp = await q;
       data = resp.data; error = resp.error;
     } catch(e){
