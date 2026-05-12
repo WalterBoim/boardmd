@@ -3818,6 +3818,21 @@ html.dark .hl-btn-active { border-color:#fff!important; }
 #bmd-timer-bar{height:3px;width:100%;transition:width .3s linear,background .5s}
 #bmd-timer-label{display:flex;align-items:center;justify-content:space-between;padding:3px 0 6px;font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-faint)}
 #bmd-coins-preview{font-size:9px;font-weight:700;padding:2px 9px;border-radius:20px}
+/* Timer discreto após as opções (substitui a barra grossa do topo) */
+.bmd-timer-discreet{
+  display:flex; align-items:center; justify-content:flex-end; gap:8px;
+  padding:8px 20px 4px;
+  font-family:'JetBrains Mono', monospace;
+  font-size:10px; color:var(--text-faint);
+  opacity:.72; transition:opacity .2s ease;
+}
+.bmd-timer-discreet:hover{ opacity:1; }
+.bmd-timer-discreet .btd-time{ font-weight:600; letter-spacing:.04em; }
+.bmd-timer-discreet .btd-sep{ opacity:.5; font-weight:300; }
+.bmd-timer-discreet .btd-coins{
+  font-size:9px; font-weight:700; padding:2px 9px; border-radius:20px;
+  letter-spacing:.02em;
+}
 .tcp-l{background:rgba(34,197,94,.12)!important;color:#22c55e!important;border:1px solid rgba(34,197,94,.2)!important}
 .tcp-f{background:rgba(59,127,255,.1)!important;color:var(--accent)!important;border:1px solid rgba(59,127,255,.2)!important}
 .tcp-s{background:rgba(232,168,54,.1)!important;color:var(--gold)!important;border:1px solid rgba(232,168,54,.2)!important}
@@ -5045,14 +5060,20 @@ html.light #venn-inline{ background:linear-gradient(180deg, rgba(37,99,235,0.04)
             </button>
           </div>
           <!-- V2 TIMER -->
-          <div id="bmd-timer-wrap"><div id="bmd-timer-bar" style="background:#22c55e"></div></div>
-          <div id="bmd-timer-label"><span id="bmd-timer-secs">0:00</span><span id="bmd-coins-preview" class="tcp-l">+8 coins if correct</span></div>
+          <div id="bmd-timer-wrap" style="display:none"><div id="bmd-timer-bar" style="background:#22c55e"></div></div>
+          <div id="bmd-timer-label" style="display:none"><span id="bmd-timer-secs">0:00</span><span id="bmd-coins-preview" class="tcp-l">+8 coins if correct</span></div>
           <div id="bmd-cols-row">
           <div id="bmd-q-col">
           <div id="bmd-q-inner">
           <div class="card-body">
             <div class="card-question hl-zone" id="c-q">Loading…</div>
             <div class="options" id="c-opts"></div>
+            <!-- Timer discreto após as opções (substitui a faixa do topo) -->
+            <div id="bmd-timer-discreet" class="bmd-timer-discreet">
+              <span class="btd-time" id="bmd-timer-secs-2">0:00</span>
+              <span class="btd-sep">·</span>
+              <span class="btd-coins tcp-l" id="bmd-coins-preview-2">+8 coins if correct</span>
+            </div>
           </div>
           <div id="resp-dist-wrap" style="display:none;padding:14px 20px 10px;border-top:1px solid var(--border);">
             <div style="font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text-faint);font-family:'JetBrains Mono',monospace;margin-bottom:10px;">Response Distribution</div>
@@ -15557,6 +15578,19 @@ function bmdSetupDrag(){
 (function(){
 'use strict';
 const BS={mode:'phrase',deck:'all',spd:3000,cards:[],cur:0,ph:0,playing:false,timer:null,clock:null,elapsed:0,flagged:new Set(),seen:new Set(),fz:'lg',fsrsActive:false};
+// CRITICO: expor BS + funções do BrainStorm no window pra que scripts externos
+// (como window.stormThisCard, em outro <script>) possam acessar.
+// Cuidado: as funções são definidas DEPOIS no mesmo script, então usamos setTimeout(0)
+// para garantir que estarão prontas quando window.X = X for executado.
+window.BS = BS;
+setTimeout(function(){
+  try {
+    if(typeof render !== 'undefined') window.render = render;
+    if(typeof bsUpdateFsrsCounter !== 'undefined') window.bsUpdateFsrsCounter = bsUpdateFsrsCounter;
+    if(typeof showDone !== 'undefined') window.bsShowDone = showDone; // showDone tem nome ambíguo (existe outro)
+    console.log('[BrainStorm] funções expostas no window');
+  } catch(e){ console.warn('[BrainStorm] erro expondo no window:', e); }
+}, 0);
 const SPDS={1:800,2:1500,3:3000,4:5000,5:8000,6:12000,7:20000};
 const SLBL={1:'0.8s',2:'1.5s',3:'3s',4:'5s',5:'8s',6:'12s',7:'20s'};
 const SWPM={1:'≈75/min',2:'≈40/min',3:'≈20/min',4:'≈12/min',5:'≈7/min',6:'≈5/min',7:'≈3/min'};
@@ -16741,14 +16775,17 @@ window._v2ti=null;
 function v2starttimer(){
   clearInterval(window._v2ti);
   const bar=document.getElementById('bmd-timer-bar'),lbl=document.getElementById('bmd-timer-secs'),prv=document.getElementById('bmd-coins-preview');
+  const lbl2=document.getElementById('bmd-timer-secs-2'),prv2=document.getElementById('bmd-coins-preview-2');
   const st=Date.now();
   function tick(){
     const idle=typeof window._idleAccumMs==='number'?window._idleAccumMs:0;
     const ms=Math.max(0,Date.now()-st-idle);
     const s=Math.floor(ms/1000);
-    if(lbl)lbl.textContent=Math.floor(s/60)+':'+(''+(s%60)).padStart(2,'0');
+    const txt=Math.floor(s/60)+':'+(''+(s%60)).padStart(2,'0');
+    if(lbl)lbl.textContent=txt;
+    if(lbl2)lbl2.textContent=txt;
     if(bar){bar.style.width=Math.max(0,100-ms/300000*100)+'%';bar.style.background=ms<15000?'#22c55e':ms<45000?'var(--accent)':ms<120000?'var(--gold)':ms<300000?'#a855f7':'var(--text-faint)';}
-    if(prv){const[t,c]=ms<15000?['+8 coins if correct','tcp-l']:ms<45000?['+6 coins if correct','tcp-f']:ms<120000?['+5 coins if correct','tcp-s']:ms<300000?['+2 coins if correct','tcp-w']:['0 coins (idle)','tcp-i'];prv.textContent=t;prv.className=c;}
+    if(prv){const[t,c]=ms<15000?['+8 coins if correct','tcp-l']:ms<45000?['+6 coins if correct','tcp-f']:ms<120000?['+5 coins if correct','tcp-s']:ms<300000?['+2 coins if correct','tcp-w']:['0 coins (idle)','tcp-i'];prv.textContent=t;prv.className=c;if(prv2){prv2.textContent=t;prv2.className='btd-coins '+c;}}
   }
   tick();window._v2ti=setInterval(tick,400);
 }
@@ -17118,22 +17155,24 @@ window.stormThisCard = function(card){
   document.body.style.overflow = 'hidden';
   console.log('[Storm v5] overlay aberto');
 
-  if(typeof window.BS === 'undefined'){
-    alert('Storm cancelado: variável BS não definida.');
+  // BS pode estar como window.BS ou só BS no escopo (depende de como foi declarado)
+  var bs = window.BS;
+  if(!bs){
+    alert('Storm cancelado: variável BS não acessível via window. Verifique inicialização.');
     return;
   }
 
   // 2. Setup BS COM O CARD DIRETO
-  BS.mode = 'phrase';
-  BS.deck = card.deck || 'all';
-  BS.cards = [card];
-  BS.cur = 0;
-  BS.ph = 0;
-  if(BS.seen && BS.seen.clear) BS.seen.clear();
-  if(BS.flagged && BS.flagged.clear) BS.flagged.clear();
-  BS.elapsed = 0;
-  BS._searchFilter = null;
-  console.log('[Storm v5] BS setado. BS.cards.length=', BS.cards.length);
+  bs.mode = 'phrase';
+  bs.deck = card.deck || 'all';
+  bs.cards = [card];
+  bs.cur = 0;
+  bs.ph = 0;
+  if(bs.seen && bs.seen.clear) bs.seen.clear();
+  if(bs.flagged && bs.flagged.clear) bs.flagged.clear();
+  bs.elapsed = 0;
+  bs._searchFilter = null;
+  console.log('[Storm v5] BS setado. bs.cards.length=', bs.cards.length);
 
   // 3. UI dos seletores (mode)
   document.querySelectorAll('.bs-mode').forEach(function(el){
@@ -17164,18 +17203,19 @@ window.stormThisCard = function(card){
   // 6. Reset timer
   var tNode = document.getElementById('bs-n-time');
   if(tNode) tNode.textContent = '0:00';
-  if(BS.clock) clearInterval(BS.clock);
-  BS.clock = setInterval(function(){
-    BS.elapsed++;
-    var m = Math.floor(BS.elapsed/60), s = BS.elapsed%60;
+  if(bs.clock) clearInterval(bs.clock);
+  bs.clock = setInterval(function(){
+    bs.elapsed++;
+    var m = Math.floor(bs.elapsed/60), s = bs.elapsed%60;
     var ti = document.getElementById('bs-n-time');
     if(ti) ti.textContent = m + ':' + (s<10?'0':'') + s;
   }, 1000);
 
   // 7. Renderiza o card
+  var renderFn = window.render || (typeof render === 'function' ? render : null);
   try {
-    if(typeof render === 'function'){
-      render();
+    if(typeof renderFn === 'function'){
+      renderFn();
       console.log('[Storm v5] render() executado ok');
     } else {
       console.warn('[Storm v5] função render() não existe!');
@@ -17186,7 +17226,7 @@ window.stormThisCard = function(card){
     alert('Storm erro no render(): ' + e.message);
   }
 
-  try { if(typeof bsUpdateFsrsCounter === 'function') bsUpdateFsrsCounter(); } catch(e){}
+  try { if(typeof window.bsUpdateFsrsCounter === 'function') window.bsUpdateFsrsCounter(); } catch(e){}
 
   // === VERIFICAÇÃO FINAL após 200ms — vê se algo reverteu ===
   setTimeout(function(){
@@ -17195,10 +17235,9 @@ window.stormThisCard = function(card){
     console.log('[Storm v5] APÓS 200ms — cfg.display=', cfgFinal && cfgFinal.style.display, '| ses.display=', sesFinal && sesFinal.style.display);
     if(cfgFinal && cfgFinal.style.display !== 'none'){
       console.warn('[Storm v5] ALGUMA COISA RE-MOSTROU O CFG! Forçando novamente.');
-      // Tentativa #2: força DE NOVO
       cfgFinal.style.display = 'none';
       if(sesFinal) sesFinal.style.display = 'block';
-      try { if(typeof render === 'function') render(); } catch(e){}
+      try { if(typeof renderFn === 'function') renderFn(); } catch(e){}
     }
   }, 200);
 };
