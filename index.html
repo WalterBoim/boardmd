@@ -15142,7 +15142,6 @@ function v2build(card){
     const venn=card.venn;
     const vEl=document.getElementById('v2venn');
     if(vEl){
-      {
       function makeVennSVG(venn, w, h){
         const L=venn.left||[], S=venn.shared||[], R=venn.right||[];
         const cx1=Math.round(w*0.36), cx2=Math.round(w*0.64), cy=Math.round(h*0.55), r=Math.round(h*0.42);
@@ -15247,7 +15246,6 @@ function v2reset(){
   var vp=document.getElementById('venn-placeholder');if(vp)vp.style.display='none';
 }
 console.log('[BoardMD v2] loaded');
-}
 </script>
 
 </body>
@@ -16868,7 +16866,6 @@ function v2build(card){
     const venn=card.venn;
     const vEl=document.getElementById('v2venn');
     if(vEl){
-      {
       function wrapTxt(txt,x,y,maxCh,fill,bold){
         const words=txt.split(' ');const lines=[];let cur='';
         words.forEach(w=>{const t=cur?cur+' '+w:w;if(t.length>maxCh&&cur){lines.push(cur);cur=w;}else cur=t;});
@@ -16965,7 +16962,6 @@ function v2reset(){
   var _wp2=document.getElementById('v2p2');if(_wp2)_wp2.style.display='none';
 }
 console.log('[BoardMD v2] loaded');
-}
 </script>
 
   }
