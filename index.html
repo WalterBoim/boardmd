@@ -3891,6 +3891,43 @@ html.dark .hl-btn-active { border-color:#fff!important; }
 #v2venn{margin-top:8px;}
 #v2venn .venn-title{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--text-faint);margin-bottom:6px;padding:0 2px;}
 
+/* ─── BoardMD Venn INLINE (após o Correct Answer) ────────────────────── */
+#venn-inline{
+  border:1px solid var(--border);
+  border-radius:12px;
+  padding:10px 12px 12px;
+  background:linear-gradient(180deg, rgba(59,127,255,0.025) 0%, transparent 100%);
+  animation: vennFadeIn .35s ease-out;
+}
+html.light #venn-inline{ background:linear-gradient(180deg, rgba(37,99,235,0.04) 0%, transparent 100%); }
+#venn-inline .vi-head{
+  display:flex; align-items:center; justify-content:space-between;
+  font-family:'JetBrains Mono', monospace;
+  font-size:9px; font-weight:700; letter-spacing:.12em; text-transform:uppercase;
+  color:var(--text-faint); margin-bottom:6px; padding:0 2px;
+}
+#venn-inline .vi-head .vi-tag{
+  color:var(--accent); opacity:.85;
+}
+#venn-inline .vi-expand{
+  background:none; border:1px solid var(--border); border-radius:6px;
+  padding:2px 8px; font-size:9px; color:var(--text-faint); cursor:pointer;
+  font-family:inherit; letter-spacing:.06em;
+  transition:all .15s ease;
+}
+#venn-inline .vi-expand:hover{ color:var(--text); border-color:var(--border-bright); }
+#venn-inline svg{ width:100%; height:auto; display:block; }
+@keyframes vennFadeIn{
+  from{ opacity:0; transform:translateY(-4px); }
+  to{ opacity:1; transform:translateY(0); }
+}
+/* Modal ampliado */
+#venn-inline-modal{ display:none; position:fixed; inset:0; z-index:9999; background:rgba(0,0,0,.78); backdrop-filter:blur(6px); align-items:center; justify-content:center; padding:20px; }
+#venn-inline-modal.on{ display:flex; }
+#venn-inline-modal .vim-inner{ background:var(--surface); border:1px solid var(--border-bright); border-radius:18px; padding:24px 24px 18px; max-width:min(820px, 95vw); max-height:90vh; overflow:auto; box-shadow:0 24px 60px rgba(0,0,0,.5); }
+#venn-inline-modal .vim-close{ float:right; background:var(--surface2); border:1px solid var(--border); border-radius:8px; padding:6px 12px; font-size:13px; cursor:pointer; color:var(--text-dim); font-family:'Lato', sans-serif; }
+#venn-inline-modal .vim-close:hover{ color:var(--text); background:var(--surface); }
+
 </style>
 
 
@@ -5014,6 +5051,8 @@ html.dark .hl-btn-active { border-color:#fff!important; }
               <div class="exp-label"><span class="exp-label-icon" style="background:rgba(34,197,94,.15);color:var(--emerald)"></span>Correct answer</div>
               <div class="exp-correct"><div class="exp-correct-inner" id="exp-ans"></div></div>
             </div>
+            <!-- BoardMD Venn (inline, aparece automaticamente quando o card tem dado venn) -->
+            <div id="venn-inline" style="display:none;margin:10px 18px 4px;" aria-hidden="true"></div>
             <div id="c-img-wrap" style="display:none" class="card-img-wrap">
               <img id="c-img" class="card-img" src="" alt=""/>
               <div class="card-img-credit">
@@ -5054,7 +5093,6 @@ html.dark .hl-btn-active { border-color:#fff!important; }
             </div>
           </div>
           <div id="key-point-wrap" style="display:none;padding:0 18px 14px;"></div>
-          <div id="venn-placeholder" style="display:none;margin:0 18px 14px;"></div>
           <div id="card-pubmed-wrap" style="display:none;"></div>
           <div id="card-cochrane-wrap" style="display:none;"></div>
           <div style="display:flex;justify-content:flex-end;padding:4px 18px 6px;">
@@ -7006,6 +7044,10 @@ function launchBidSession(){
 function revealAnswer(sel,card){
   if(revealed) return;
   revealed=true;
+
+  // BoardMD Venn inline — exibe diagrama de Venn logo após o "Correct answer"
+  // quando o card tem dado .venn estruturado. Idempotente: se nao houver dado, esconde.
+  try { if(typeof _bmdRenderVennInline === 'function') _bmdRenderVennInline(card); } catch(e){ console.warn('venn render:', e); }
 
   // ── SETOR B v6 — Time-validated scoring (anti-cheat / ranking justo) ──
   // Classifica o tempo de resposta para ajustar coins, ranking e avgTime.
@@ -15243,8 +15285,113 @@ function v2reset(){
   document.querySelectorAll('.v2t').forEach((b,i)=>b.classList.toggle('on',i===0));
   [0,1].forEach(function(j){var p=document.getElementById('v2p'+j);if(p)p.classList.toggle('on',j===0);});
   var _wp2=document.getElementById('v2p2');if(_wp2)_wp2.style.display='none';
-  var vp=document.getElementById('venn-placeholder');if(vp)vp.style.display='none';
+  // hide inline venn (será re-exibido em revealAnswer se o card tiver dados)
+  var vi=document.getElementById('venn-inline'); if(vi){ vi.style.display='none'; vi.innerHTML=''; }
 }
+
+/* ─── BoardMD Venn Inline ───────────────────────────────────────────────
+   Renderiza o diagrama de Venn dentro de #venn-inline logo após o bloco
+   "Correct answer". Chamado pelo revealAnswer(). Recebe `card` com
+   card.venn = { left_label, right_label, left:[], shared:[], right:[] }
+   (string JSON ou objeto). Se faltar dado, esconde silenciosamente.
+   ─────────────────────────────────────────────────────────────────────── */
+window._bmdRenderVennInline = function(card){
+  var host = document.getElementById('venn-inline');
+  if(!host) return;
+  if(!card){ host.style.display='none'; host.innerHTML=''; return; }
+  var v = card.venn;
+  if(typeof v === 'string'){
+    try { v = JSON.parse(v); } catch(e){ v = null; }
+  }
+  if(!v || !v.left_label || !v.right_label){
+    host.style.display='none'; host.innerHTML=''; return;
+  }
+  var L = Array.isArray(v.left)   ? v.left   : [];
+  var S = Array.isArray(v.shared) ? v.shared : [];
+  var R = Array.isArray(v.right)  ? v.right  : [];
+  if(L.length + S.length + R.length === 0){
+    host.style.display='none'; host.innerHTML=''; return;
+  }
+
+  function buildSvg(W, H){
+    // Layout: dois círculos sobrepostos, com labels acima e itens distribuídos
+    // em 3 zonas horizontais usando foreignObject (texto que quebra naturalmente).
+    var cy = Math.round(H * 0.56);
+    var r  = Math.round(H * 0.40);
+    var cx1 = Math.round(W * 0.34);
+    var cx2 = Math.round(W * 0.66);
+    var rows = Math.max(L.length, S.length, R.length, 1);
+    var itemH = 22;
+    var zoneTop = cy - r + 18;
+    // Larguras úteis
+    var lW = Math.round(W * 0.26);
+    var sW = Math.round(W * 0.20);
+    var rW = Math.round(W * 0.26);
+    function itemsHTML(items, xCenter, fillColor, bold){
+      return items.map(function(t, i){
+        var x = xCenter - (lW/2); // será reposicionado por param
+        return '';
+      }).join('');
+    }
+    function foZone(items, xCenter, width, color, bold){
+      var html = '';
+      items.forEach(function(t, i){
+        html += '<foreignObject x="' + (xCenter - width/2) + '" y="' + (zoneTop + i*itemH) + '" width="' + width + '" height="' + itemH + '">' +
+                '<div xmlns="http://www.w3.org/1999/xhtml" style="font:'+(bold?'700':'500')+' 11.5px/1.2 Lato, sans-serif;color:'+color+';text-align:center;padding:2px 4px;overflow:hidden;display:flex;align-items:center;justify-content:center;height:100%;letter-spacing:.01em;">' +
+                String(t).replace(/</g,'&lt;') +
+                '</div></foreignObject>';
+      });
+      return html;
+    }
+
+    // x centers das 3 zonas
+    var zL = cx1 - r/2 - 6;          // só esquerda
+    var zS = (cx1 + cx2) / 2;        // ambos (centro)
+    var zR = cx2 + r/2 + 6;          // só direita
+
+    var svg = '<svg viewBox="0 0 '+W+' '+H+'" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Diagrama de Venn comparando '+v.left_label+' e '+v.right_label+'">';
+    // Círculos
+    svg += '<circle cx="'+cx1+'" cy="'+cy+'" r="'+r+'" fill="rgba(59,127,255,0.10)" stroke="#3b7fff" stroke-width="1.4"/>';
+    svg += '<circle cx="'+cx2+'" cy="'+cy+'" r="'+r+'" fill="rgba(245,158,11,0.10)" stroke="#f59e0b" stroke-width="1.4"/>';
+    // Labels topo (3 colunas)
+    svg += '<text x="'+zL+'" y="22" text-anchor="middle" font-family="Lato, sans-serif" font-size="10.5" font-weight="800" letter-spacing="1.2" fill="#3b7fff">' + String(v.left_label).toUpperCase() + '</text>';
+    svg += '<text x="'+zS+'" y="22" text-anchor="middle" font-family="Lato, sans-serif" font-size="10.5" font-weight="800" letter-spacing="1.2" fill="#8b5cf6">BOTH</text>';
+    svg += '<text x="'+zR+'" y="22" text-anchor="middle" font-family="Lato, sans-serif" font-size="10.5" font-weight="800" letter-spacing="1.2" fill="#f59e0b">' + String(v.right_label).toUpperCase() + '</text>';
+    // Itens
+    svg += foZone(L, zL, lW, '#1d4ed8', false);
+    svg += foZone(S, zS, sW, '#6d28d9', true);
+    svg += foZone(R, zR, rW, '#b45309', false);
+    svg += '</svg>';
+    return svg;
+  }
+
+  var rows = Math.max(L.length, S.length, R.length, 1);
+  var Hsmall = Math.max(170, 60 + rows * 26);
+  var svgSmall = buildSvg(640, Hsmall);
+  var svgLarge = buildSvg(820, Math.max(280, 80 + rows * 36));
+
+  // Header com chip "Comparison" + botão ampliar
+  host.innerHTML =
+    '<div class="vi-head">' +
+      '<span class="vi-tag">◐ Comparison · ' + String(v.left_label).toUpperCase() + ' vs ' + String(v.right_label).toUpperCase() + '</span>' +
+      '<button class="vi-expand" type="button" onclick="document.getElementById(\'venn-inline-modal\').classList.add(\'on\')">⤢ Expand</button>' +
+    '</div>' +
+    svgSmall;
+
+  // Garante (cria se ainda nao existe) o modal global do venn ampliado
+  var modal = document.getElementById('venn-inline-modal');
+  if(!modal){
+    modal = document.createElement('div');
+    modal.id = 'venn-inline-modal';
+    modal.addEventListener('click', function(ev){ if(ev.target === modal) modal.classList.remove('on'); });
+    modal.innerHTML = '<div class="vim-inner"><button class="vim-close" type="button" onclick="document.getElementById(\'venn-inline-modal\').classList.remove(\'on\')">✕ Close</button><div id="venn-inline-modal-body" style="clear:both;margin-top:8px"></div></div>';
+    document.body.appendChild(modal);
+  }
+  var body = document.getElementById('venn-inline-modal-body');
+  if(body) body.innerHTML = svgLarge;
+
+  host.style.display = 'block';
+};
 console.log('[BoardMD v2] loaded');
 </script>
 
