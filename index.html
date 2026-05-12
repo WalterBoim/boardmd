@@ -7072,6 +7072,11 @@ function revealAnswer(sel,card){
   if(revealed) return;
   revealed=true;
 
+  // CRITICO: setar _currentCard SEMPRE (era só quando tinha Cochrane)
+  // Sem isso, "Storm this card" não recebe card e dispara alert "sem QID".
+  window._currentCard = card;
+  window._v2card = card;
+
   // BoardMD Venn inline — exibe diagrama de Venn logo após o "Correct answer"
   // quando o card tem dado .venn estruturado. Idempotente: se nao houver dado, esconde.
   try { if(typeof _bmdRenderVennInline === 'function') _bmdRenderVennInline(card); } catch(e){ console.warn('venn render:', e); }
@@ -16941,7 +16946,7 @@ window._bmdRenderVennInline = function(card){
     var labelSize = opts.labelSize || 11;
     var lineH     = Math.round(fontSize * 1.3);
     var itemGap   = Math.round(fontSize * 0.5);
-    var topPad    = 50;
+    var topPad    = 50;     // espaço pros labels acima dos círculos
     var bottomPad = 24;
     var maxL = opts.maxL || 18;
     var maxS = opts.maxS || 13;
@@ -16962,31 +16967,33 @@ window._bmdRenderVennInline = function(card){
     var hR = blockHeight(Rw);
     var contentH = Math.max(hL, hS, hR, 130);
 
-    // Círculos — diâmetro um pouco maior que a altura do conteúdo
-    var rCircle = Math.max(contentH * 0.85, 150);
-    // Sobreposição clássica: ~45% do raio (interseção generosa pra textos do BOTH)
+    // GEOMETRIA CORRETA:
+    // 1. Raio do círculo é ditado pelo conteúdo + folga
+    var verticalPad = 30; // folga em cima e embaixo do conteúdo, dentro do círculo
+    var rCircle = Math.max(contentH/2 + verticalPad, 150);
+    // 2. Sobreposição clássica
     var overlap = rCircle * 0.55;
-
-    var cy = topPad + contentH/2;
+    // 3. H = topPad (labels) + 2*rCircle (diâmetro completo) + bottomPad
+    var H = topPad + 2 * rCircle + bottomPad;
+    // 4. cy fica no centro vertical dos círculos (logo abaixo dos labels)
+    var cy = topPad + rCircle;
+    // 5. cx centrado horizontalmente, espaçados pelo overlap
     var cx1 = W/2 - rCircle + overlap;
     var cx2 = W/2 + rCircle - overlap;
 
-    // Centros X dos textos: usar o "centroide" geométrico de cada zona
-    // Esquerda: ponto médio entre borda esquerda do círculo 1 e o início da interseção
-    var leftEdge   = cx1 - rCircle;
+    // Centros X dos textos (centroide geométrico de cada zona do Venn)
+    var leftEdge       = cx1 - rCircle;
     var intersectStart = cx2 - rCircle;
     var intersectEnd   = cx1 + rCircle;
-    var rightEdge  = cx2 + rCircle;
-
+    var rightEdge      = cx2 + rCircle;
     var zL = (leftEdge + intersectStart) / 2;
     var zS = W / 2;
     var zR = (intersectEnd + rightEdge) / 2;
 
-    var H = topPad + contentH + bottomPad;
-
     function renderZone(wrapped, x, color, weight, blockH){
       var out = '';
-      var startY = topPad + (contentH - blockH) / 2 + lineH;
+      // Texto começa centralizado verticalmente nos círculos (cy)
+      var startY = cy - blockH/2 + lineH;
       var y = startY;
       wrapped.forEach(function(lines){
         lines.forEach(function(line){
@@ -17065,13 +17072,33 @@ window._bmdRenderVennInline = function(card){
    ═══════════════════════════════════════════════════════════════════ */
 window.stormThisCard = function(card){
   if(!card){ card = window._currentCard; }
-  if(!card || !card.qid){
-    console.warn('[Storm] sem card/qid', card);
-    alert('Não foi possível abrir o Storm — card sem QID.');
+  // Fallback: tenta achar card pelo state global de estudo se nada veio
+  if(!card){
+    try {
+      if(typeof getCards === 'function' && typeof idx !== 'undefined'){
+        var pool = (typeof deck !== 'undefined' && Array.isArray(deck)) ? deck : null;
+        if(pool && pool[idx]) card = pool[idx];
+      }
+    } catch(e){}
+  }
+  if(!card){
+    console.warn('[Storm] sem card');
+    alert('Não foi possível abrir o Storm — card não disponível.');
     return;
   }
-  var qid = String(card.qid).trim();
-  console.log('[Storm] abrindo brainstorm com qid =', qid, '| deck =', card.deck);
+
+  // Procura um identificador utilizável: qid > id > topic
+  var searchTerm = '';
+  if(card.qid){ searchTerm = String(card.qid).trim(); }
+  else if(card.id){ searchTerm = String(card.id).trim(); }
+  else if(card.topic){ searchTerm = String(card.topic).trim(); }
+
+  if(!searchTerm){
+    console.warn('[Storm] card sem identificador', card);
+    alert('Não foi possível abrir o Storm — card sem identificador.');
+    return;
+  }
+  console.log('[Storm] abrindo brainstorm | term=', searchTerm, '| card.id=', card.id, '| card.qid=', card.qid, '| deck=', card.deck);
 
   // 1. Abre overlay manualmente (NÃO chama openBrainStorm porque ele mostra config)
   var ov = document.getElementById('bs-overlay');
@@ -17079,16 +17106,14 @@ window.stormThisCard = function(card){
   ov.classList.add('on');
   document.body.style.overflow = 'hidden';
 
-  // 2. Setup do BS state
   if(typeof window.BS === 'undefined'){
     console.warn('[Storm] BS não definido');
     return;
   }
   BS.mode = 'phrase';  // Clinical Reasoning (HY Clue → Diagnosis → Action)
-  BS.deck = 'all';     // pool unificado (inclui new_s2ck após nossa correção)
-  BS._searchFilter = qid.toLowerCase();
+  BS.deck = 'all';     // pool unificado (inclui new_s2ck)
+  BS._searchFilter = searchTerm.toLowerCase();
 
-  // Atualiza UI dos seletores
   document.querySelectorAll('.bs-mode').forEach(function(el){
     el.classList.toggle('on', el.dataset.mode === 'phrase');
   });
@@ -17096,13 +17121,10 @@ window.stormThisCard = function(card){
     el.classList.toggle('on', el.dataset.deck === 'all');
   });
 
-  // 3. Preenche o input de busca (visual + integração)
   var inp = document.getElementById('bs-search');
-  if(inp){ inp.value = qid; }
-  // 4. Dispara o feedback visual da busca (badge "X matches")
-  try { if(typeof window.bsSearch === 'function') window.bsSearch(qid); } catch(e){}
+  if(inp){ inp.value = searchTerm; }
+  try { if(typeof window.bsSearch === 'function') window.bsSearch(searchTerm); } catch(e){}
 
-  // 5. Vai DIRETO pra sessão — pula a config (depois do overlay estabilizar)
   setTimeout(function(){
     try {
       if(typeof window.bsStart === 'function'){
