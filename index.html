@@ -4027,25 +4027,22 @@ html.light #venn-inline{ background:linear-gradient(180deg, rgba(37,99,235,0.04)
 }
 .storm-split.menu-open .ss-caret { transform: rotate(180deg); }
 
-/* Dropdown — abre para BAIXO (storm fica no fim da coluna direita) */
+/* Dropdown — position:fixed para escapar do overflow:auto da coluna direita */
 .storm-menu {
-  position: absolute;
-  top: calc(100% + 6px);
-  right: 50%;
-  transform: translateX(50%);
+  position: fixed;
   background: var(--surface);
   border: 1px solid var(--border-bright);
   border-radius: 12px;
   box-shadow: 0 8px 28px rgba(0,0,0,.18), 0 2px 6px rgba(0,0,0,.06);
   padding: 6px;
-  min-width: 240px;
-  z-index: 100;
+  min-width: 260px;
+  z-index: 9999;
   display: none;
   animation: stormMenuIn .18s cubic-bezier(.34,1.56,.64,1);
 }
 @keyframes stormMenuIn {
-  from { opacity: 0; transform: translateX(50%) translateY(-6px); }
-  to   { opacity: 1; transform: translateX(50%) translateY(0); }
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 .storm-menu.on { display: block; }
 .storm-menu-item {
@@ -12097,6 +12094,37 @@ function fetchCardPubmed(card){
   if(!container) return;
   const query = card.pubmed_query;
   if(!query) return;
+
+  // Extrair PMIDs diretamente do campo (cards novos bmd_)
+  const pmidMatches = query.match(/PMID[:\s]*(\d{7,8})/gi)||[];
+  const directPmids = pmidMatches.map(function(m){ return m.replace(/PMID[:\s]*/i,'').trim(); }).filter(Boolean);
+
+  if(directPmids.length > 0){
+    // Buscar direto pelos PMIDs — sem esearch
+    return fetch('https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=pubmed&id='+directPmids.join(',')+'&retmode=json')
+      .then(function(r){ return r.json(); })
+      .then(function(rd){
+        const uids = rd.result && rd.result.uids ? rd.result.uids : directPmids;
+        window._cardPubmedArticles = uids.map(function(uid){
+          const a = rd.result ? (rd.result[uid]||{}) : {};
+          const authors = a.authors ? a.authors.slice(0,3).map(function(x){ return x.name; }).join(', ')+(a.authors.length>3?' et al.':'') : '';
+          return { uid:uid, title:a.title||'', journal:a.source||'', year:a.pubdate?a.pubdate.substring(0,4):'', authors:authors };
+        });
+        let html = '';
+        uids.forEach(function(uid){
+          const a = rd.result ? (rd.result[uid]||{}) : {};
+          const title = (a.title||'').replace(/</g,'&lt;');
+          const journal = a.source||'';
+          const year = a.pubdate ? a.pubdate.substring(0,4) : '';
+          html += '<div onclick="openCardAbstract(\'' + uid + '\')" style="padding:11px 13px;border-bottom:1px solid var(--border);cursor:pointer;" onmouseover="this.style.background=\'rgba(79,142,247,.06)\'" onmouseout="this.style.background=\'\'"><div style="font-size:12px;color:var(--text);font-weight:500;line-height:1.4;margin-bottom:4px;">' + title + '</div><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;"><span style="font-family:JetBrains Mono,monospace;font-size:10px;color:var(--accent);opacity:.8;">' + journal + '</span><span style="font-family:JetBrains Mono,monospace;font-size:10px;color:var(--text-faint);">' + year + '</span><span style="font-family:JetBrains Mono,monospace;font-size:10px;color:var(--text-faint);background:var(--surface);border:1px solid var(--border);padding:1px 5px;border-radius:3px;margin-left:auto;">PMID ' + uid + '</span></div><div style="margin-top:4px;font-size:9px;color:var(--accent);opacity:.5;letter-spacing:.06em;">TAP TO READ ABSTRACT</div></div>';
+        });
+        html += '<div style="padding:7px 13px;font-size:10px;color:var(--text-faint);border-top:1px solid var(--border);">NCBI PubMed — National Library of Medicine</div>';
+        container.innerHTML = html;
+      })
+      .catch(function(){ container.innerHTML = '<div style="padding:10px 14px;font-size:11px;color:var(--text-faint);">Could not connect to PubMed.</div>'; });
+  }
+
+  // Fallback: busca textual (cards antigos sem PMIDs)
   fetch('https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed&term='+encodeURIComponent(query)+'&retmax=3&sort=relevance&retmode=json')
     .then(function(r){ return r.json(); })
     .then(function(sd){
@@ -12105,7 +12133,7 @@ function fetchCardPubmed(card){
         container.innerHTML = '<div style="padding:10px 14px;font-size:11px;color:var(--text-faint);">No articles found.</div>';
         return;
       }
-      return fetch('https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=pubmed&id='+ids.join(',')+' &retmode=json')
+      return fetch('https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=pubmed&id='+ids.join(',')+'&retmode=json')
         .then(function(r){ return r.json(); })
         .then(function(rd){
           const uids = rd.result && rd.result.uids ? rd.result.uids : [];
@@ -17349,24 +17377,37 @@ window.toggleStormMenu = function(ev){
   if(ev){ ev.stopPropagation(); ev.preventDefault(); }
   var split = document.getElementById('storm-split-btn');
   var menu = document.getElementById('storm-menu');
-  if(!menu || !split) return;
+  var modeBtn = split ? split.querySelector('.storm-split-mode') : null;
+  if(!menu || !split || !modeBtn) return;
   var isOpen = menu.classList.contains('on');
   if(isOpen){
     menu.classList.remove('on');
     split.classList.remove('menu-open');
-  } else {
-    menu.classList.add('on');
-    split.classList.add('menu-open');
-    window._stormUpdateUI();
-    // Fecha ao clicar fora
-    setTimeout(function(){
-      document.addEventListener('click', window._stormCloseMenuOnce, { once: true });
-    }, 0);
+    return;
   }
+  window._stormUpdateUI();
+  // Posiciona o menu (fixed) logo abaixo do botão Recall▾, alinhado à direita
+  var rect = modeBtn.getBoundingClientRect();
+  var menuW = 260;
+  var left = rect.right - menuW;
+  // Garante que não sai da tela à esquerda
+  if(left < 8) left = 8;
+  // Garante que não sai da tela à direita
+  if(left + menuW > window.innerWidth - 8) left = window.innerWidth - menuW - 8;
+  menu.style.left = left + 'px';
+  menu.style.top  = (rect.bottom + 6) + 'px';
+  menu.classList.add('on');
+  split.classList.add('menu-open');
+  // Fecha ao clicar fora (delay pra não pegar o próprio click do botão)
+  setTimeout(function(){
+    document.addEventListener('click', window._stormCloseMenuOnce, { once: true, capture: true });
+  }, 50);
 };
 
-window._stormCloseMenuOnce = function(){
+window._stormCloseMenuOnce = function(ev){
+  // Se clicou dentro do menu (em um item) — não fecha aqui (o setStormMode cuida)
   var menu = document.getElementById('storm-menu');
+  if(menu && ev && menu.contains(ev.target)) return;
   var split = document.getElementById('storm-split-btn');
   if(menu) menu.classList.remove('on');
   if(split) split.classList.remove('menu-open');
