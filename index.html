@@ -7731,7 +7731,17 @@ function revealAnswer(sel,card){
   } catch(e){ console.warn('storm-wrap move:', e); }
   // Pre-fetch PubMed abstracts in background
   if(card.pubmed_query || card.topic) setTimeout(() => prefetchPubmedAbstracts(card), 500);
-  // Auto-Lens removido — Lens agora é gerado diretamente nos cards via pipeline.
+  // Auto-Lens: carrega Compare silenciosamente
+  // SETOR B (item 2): removida a manipulacao de scrollTop que causava o
+  // movimento estranho da coluna direita ao Venn/Compare carregar.
+  // Comportamento original (problematico):
+  //   const savedScroll = ansC ? ansC.scrollTop : 0;
+  //   if(ansC) setTimeout(() => { ansC.scrollTop = savedScroll; }, 50);
+  // Agora o Compare apenas carrega; a coluna nao se move.
+  setTimeout(() => {
+    const wrap = document.getElementById('att-inline-wrap');
+    if(wrap) askAttendingInline('compare', null);
+  }, 1500);
 
   // Update FSRS intervals display — sync both nav elements
   const ivs=getIntervals(getState(card.id));
@@ -11318,28 +11328,35 @@ function injectAttendingInline(card, sel){
         </div>
         <span class="att-inline-title">BoardMD Attending</span>
       </div>
-      <span style="font-size:10px;font-family:Inter,sans-serif;color:var(--text-faint);letter-spacing:.04em;text-transform:uppercase;">Free</span>
+      <span style="font-size:10px;font-family:Inter,sans-serif;color:var(--text-faint);">Free</span>
     </div>
-    ${!wasCorrect ? `<div style="padding:10px 14px 4px;">
-      <button ${dis} onclick="askAttendingInline('wrong',this)" style="display:flex;align-items:center;justify-content:center;gap:7px;width:100%;background:rgba(244,63,94,.07);border:1.5px solid rgba(244,63,94,.25);border-radius:12px;padding:11px 14px;font-size:12px;font-weight:700;color:#f43f5e;cursor:pointer;font-family:Inter,sans-serif;transition:all .2s;letter-spacing:.01em;" onmouseover="this.style.background='rgba(244,63,94,.13)';this.style.borderColor='rgba(244,63,94,.5)'" onmouseout="this.style.background='rgba(244,63,94,.07)';this.style.borderColor='rgba(244,63,94,.25)'">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#f43f5e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+    <div class="att-inline-btns">
+      <button class="att-ibtn" ${dis} onclick="askAttendingInline('explain',this)">
+        <span class="att-ibtn-label">Explain better</span>
+      </button>
+      <button class="att-ibtn" ${dis} onclick="askAttendingInline('mcq',this)" style="background:rgba(79,142,247,.1);border-color:rgba(79,142,247,.35);">
+        <span class="att-ibtn-label" style="color:#3b7fff;font-weight:800;">More MCQs</span>
+      </button>
+      <button class="att-ibtn" ${dis} onclick="askAttendingInline('surprise',this)">
+        <span class="att-ibtn-label">Surprise me</span>
+      </button>
+    </div>
+    ${!wasCorrect ? `<div style="padding:0 14px 10px;">
+      <button ${dis} onclick="askAttendingInline('wrong',this)" style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%;background:rgba(244,63,94,.08);border:1.5px solid rgba(244,63,94,.3);border-radius:10px;padding:10px 14px;font-size:12px;font-weight:700;color:#f43f5e;cursor:pointer;font-family:Inter,sans-serif;transition:all .15s;" onmouseover="this.style.background='rgba(244,63,94,.14)'" onmouseout="this.style.background='rgba(244,63,94,.08)'">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#f43f5e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
         Why I was wrong
       </button>
     </div>` : ''}
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:${!wasCorrect ? '8px' : '12px'} 14px 8px;">
-      <button ${dis} onclick="askAttendingInline('explain',this)" style="display:flex;align-items:center;justify-content:center;gap:6px;background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:11px 10px;font-size:12px;font-weight:600;color:var(--text-dim);cursor:pointer;font-family:Inter,sans-serif;transition:all .2s;" onmouseover="this.style.background='rgba(139,92,246,.1)';this.style.borderColor='rgba(139,92,246,.4)';this.style.color='#a78bfa'" onmouseout="this.style.background='var(--surface2)';this.style.borderColor='var(--border)';this.style.color='var(--text-dim)'">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
-        Explain better
-      </button>
-      <button ${dis} onclick="askAttendingInline('mcq',this)" style="display:flex;align-items:center;justify-content:center;gap:6px;background:rgba(59,127,255,.08);border:1px solid rgba(59,127,255,.3);border-radius:12px;padding:11px 10px;font-size:12px;font-weight:700;color:#3b7fff;cursor:pointer;font-family:Inter,sans-serif;transition:all .2s;" onmouseover="this.style.background='rgba(59,127,255,.16)';this.style.borderColor='rgba(59,127,255,.55)'" onmouseout="this.style.background='rgba(59,127,255,.08)';this.style.borderColor='rgba(59,127,255,.3)'">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
-        More MCQs
+    <div style="padding:0 14px 10px;">
+      <button ${dis} onclick="askAttendingInline('compare',this)" style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%;background:#185FA5;border:none;border-radius:10px;padding:11px 14px;font-size:12px;font-weight:600;color:#fff;cursor:pointer;font-family:Inter,sans-serif;transition:background .15s;" onmouseover="this.style.background='#0c3460'" onmouseout="this.style.background='#185FA5'">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><circle cx="8" cy="12" r="6"/><circle cx="16" cy="12" r="6"/></svg>
+        <span id="att-compare-label">Compare diagnoses</span>
       </button>
     </div>
     <div style="display:flex;gap:8px;padding:0 14px 12px;align-items:center;position:relative;">
-      <input id="att-ask-input" type="text" placeholder="Ask anything about this topic…" style="flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:12px;color:var(--text);font-family:'Inter',sans-serif;font-size:13px;padding:10px 36px 10px 14px;outline:none;transition:border-color .2s;" onfocus="this.style.borderColor='rgba(139,92,246,.5)'" onblur="this.style.borderColor='var(--border)'" onkeydown="if(event.key==='Enter'){event.preventDefault();askAttendingInline('custom',null);}else if(event.key==='Escape'){this.value='';}" oninput="document.getElementById('att-ask-clear').style.display=this.value?'flex':'none'">
-      <button id="att-ask-clear" onclick="document.getElementById('att-ask-input').value='';this.style.display='none';document.getElementById('att-ask-input').focus();" style="display:none;position:absolute;right:78px;background:none;border:none;color:var(--text-faint);cursor:pointer;font-size:14px;padding:4px;line-height:1;">&#x2715;</button>
-      <button ${dis} onclick="askAttendingInline('custom',null)" style="background:linear-gradient(135deg,#6366f1,#8b5cf6);border:none;border-radius:12px;color:#fff;font-family:'Inter',sans-serif;font-size:12px;font-weight:700;padding:10px 18px;cursor:pointer;white-space:nowrap;transition:opacity .2s;flex-shrink:0;" onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">Ask</button>
+      <input id="att-ask-input" type="text" placeholder="Ask anything about this topic…" style="flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:9px;color:var(--text);font-family:'Inter',sans-serif;font-size:13px;padding:9px 32px 9px 12px;outline:none;transition:border-color .15s;" onfocus="this.style.borderColor='rgba(139,92,246,.5)'" onblur="this.style.borderColor='var(--border)'" onkeydown="if(event.key==='Enter'){event.preventDefault();askAttendingInline('custom',null);}else if(event.key==='Escape'){this.value='';}" oninput="document.getElementById('att-ask-clear').style.display=this.value?'flex':'none'">
+      <button id="att-ask-clear" onclick="document.getElementById('att-ask-input').value='';this.style.display='none';document.getElementById('att-ask-input').focus();" style="display:none;position:absolute;right:80px;background:none;border:none;color:var(--text-faint);cursor:pointer;font-size:14px;padding:4px;line-height:1;">&#x2715;</button>
+      <button ${dis} onclick="askAttendingInline('custom',null)" style="background:rgba(99,102,241,.12);border:1px solid rgba(139,92,246,.3);border-radius:9px;color:#8b5cf6;font-family:'Inter',sans-serif;font-size:12px;font-weight:700;padding:9px 16px;cursor:pointer;white-space:nowrap;transition:all .15s;flex-shrink:0;" onmouseover="this.style.background='rgba(99,102,241,.22)'" onmouseout="this.style.background='rgba(99,102,241,.12)'">Ask</button>
     </div>
     <div style="padding:0 14px 10px;font-size:11px;color:var(--text-faint);font-family:'Inter',sans-serif;line-height:1.4;">For educational purposes only. Not medical advice.</div>
     <div class="att-inline-response" id="att-inline-response"></div>`;
@@ -16231,20 +16248,31 @@ window.bsOpenAttending=function(topic,kp){
         '</div>' +
         '<span style="font-family:Inter,sans-serif;font-size:13px;font-weight:700;color:var(--text);">BoardMD Attending</span>' +
       '</div>' +
-      '<button onclick="document.getElementById(\'att-inline-wrap\').remove()" style="background:none;border:none;color:var(--text-faint);font-size:18px;cursor:pointer;line-height:1;padding:0 4px;">&times;</button>' +
+      '<button id="att-bs-close" style="background:none;border:none;color:var(--text-faint);font-size:18px;cursor:pointer;line-height:1;padding:0 4px;">&times;</button>' +
     '</div>' +
     '<div style="padding:14px;">' +
-      '<button onclick="askAttendingInline(\'explain\',this)" style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%;background:#185FA5;border:none;border-radius:10px;padding:11px 14px;font-size:13px;font-weight:700;color:#fff;cursor:pointer;font-family:Inter,sans-serif;transition:background .15s;margin-bottom:10px;" onmouseover="this.style.background=\'#0c3460\'" onmouseout="this.style.background=\'#185FA5\'">' +
-        '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/></svg>' +
+      '<button id="att-bs-explain" style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%;background:linear-gradient(135deg,#6366f1,#8b5cf6);border:none;border-radius:12px;padding:12px 14px;font-size:13px;font-weight:700;color:#fff;cursor:pointer;font-family:Inter,sans-serif;transition:opacity .2s;margin-bottom:10px;">' +
+        '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>' +
         'Explain better' +
       '</button>' +
-      '<div style="display:flex;gap:8px;align-items:center;position:relative;">' +
-        '<input id="att-ask-input" type="text" placeholder="Ask anything about this topic…" style="flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:9px;color:var(--text);font-family:Inter,sans-serif;font-size:13px;padding:10px 12px;outline:none;transition:border-color .15s;" onfocus="this.style.borderColor=\'rgba(139,92,246,.5)\'" onblur="this.style.borderColor=\'var(--border)\'" onkeydown="if(event.key===\'Enter\'){event.preventDefault();askAttendingInline(\'custom\',null);}">' +
-        '<button onclick="askAttendingInline(\'custom\',null)" style="background:rgba(99,102,241,.14);border:1px solid rgba(139,92,246,.35);border-radius:9px;color:#8b5cf6;font-family:Inter,sans-serif;font-size:12px;font-weight:700;padding:10px 16px;cursor:pointer;white-space:nowrap;transition:all .15s;" onmouseover="this.style.background=\'rgba(99,102,241,.24)\'" onmouseout="this.style.background=\'rgba(99,102,241,.14)\'">Ask</button>' +
+      '<div style="display:flex;gap:8px;align-items:center;">' +
+        '<input id="att-ask-input" type="text" placeholder="Ask anything about this topic…" style="flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:12px;color:var(--text);font-family:Inter,sans-serif;font-size:13px;padding:11px 14px;outline:none;transition:border-color .2s;">' +
+        '<button id="att-bs-ask" style="background:linear-gradient(135deg,#6366f1,#8b5cf6);border:none;border-radius:12px;color:#fff;font-family:Inter,sans-serif;font-size:12px;font-weight:700;padding:11px 18px;cursor:pointer;white-space:nowrap;flex-shrink:0;">Ask</button>' +
       '</div>' +
-      '<div style="padding:8px 0 0;font-size:10px;color:var(--text-faint);font-family:Inter,sans-serif;line-height:1.4;">For educational purposes only. Not medical advice.</div>' +
+      '<div style="padding:8px 0 0;font-size:10px;color:var(--text-faint);font-family:Inter,sans-serif;">For educational purposes only. Not medical advice.</div>' +
     '</div>' +
     '<div class="att-inline-response" id="att-inline-response"></div>';
+
+  // Listeners via JS (sem onkeydown inline — evita bugs de espaço/Enter em strings concatenadas)
+  wrap.querySelector('#att-bs-close').addEventListener('click', () => wrap.remove());
+  wrap.querySelector('#att-bs-explain').addEventListener('click', function(){ askAttendingInline('explain', this); });
+  wrap.querySelector('#att-bs-ask').addEventListener('click', () => askAttendingInline('custom', null));
+  const bsInput = wrap.querySelector('#att-ask-input');
+  bsInput.addEventListener('focus', () => { bsInput.style.borderColor = 'rgba(139,92,246,.5)'; });
+  bsInput.addEventListener('blur',  () => { bsInput.style.borderColor = 'var(--border)'; });
+  bsInput.addEventListener('keydown', (e) => {
+    if(e.key === 'Enter'){ e.preventDefault(); askAttendingInline('custom', null); }
+  });
 
   // Guarda contexto do card (askAttendingInline precisa de wrap._attCard)
   wrap._attCard = card;
