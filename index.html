@@ -3655,9 +3655,9 @@ html.light .att-ibtn{background:var(--surface2);}
 @media(max-width:600px){.att-inline-btns{grid-template-columns:repeat(2,1fr);}}
 
 /* ── HIGHLIGHT SYSTEM — cores calibradas estilo UWorld ── */
-mark.hl-yellow, .hl-yellow { background:#ffe066; color:inherit; border-radius:2px; cursor:pointer; }
-mark.hl-green,  .hl-green  { background:#86efac; color:inherit; border-radius:2px; cursor:pointer; }
-mark.hl-blue,   .hl-blue   { background:#7dd3fc; color:inherit; border-radius:2px; cursor:pointer; }
+mark.hl-yellow, .hl-yellow { background:#ffe066; color:inherit; border-radius:2px; cursor:pointer; display:inline; padding:0; margin:0; line-height:inherit; box-decoration-break:clone; -webkit-box-decoration-break:clone; }
+mark.hl-green,  .hl-green  { background:#86efac; color:inherit; border-radius:2px; cursor:pointer; display:inline; padding:0; margin:0; line-height:inherit; box-decoration-break:clone; -webkit-box-decoration-break:clone; }
+mark.hl-blue,   .hl-blue   { background:#7dd3fc; color:inherit; border-radius:2px; cursor:pointer; display:inline; padding:0; margin:0; line-height:inherit; box-decoration-break:clone; -webkit-box-decoration-break:clone; }
 html.dark mark.hl-yellow, html.dark .hl-yellow { background:none !important; color:#fde047 !important; }
 html.dark mark.hl-green,  html.dark .hl-green  { background:none !important; color:#86efac !important; }
 html.dark mark.hl-blue,   html.dark .hl-blue   { background:none !important; color:#7dd3fc !important; }
@@ -3963,12 +3963,14 @@ html.light #venn-inline{ background:linear-gradient(180deg, rgba(37,99,235,0.04)
   overflow: hidden;
   background: linear-gradient(135deg, #1e3a5f 0%, #2563eb 50%, #1d4ed8 100%);
   box-shadow: 0 2px 8px rgba(37,99,235,.18), 0 1px 2px rgba(0,0,0,.06);
-  transition: transform .15s ease, box-shadow .2s ease;
   position: relative;
   margin: 6px auto 2px;
+  /* Estabilidade visual — sem transform no hover do container pra evitar loop */
+  pointer-events: auto;
+  user-select: none;
+  -webkit-user-select: none;
 }
 .storm-split:hover {
-  transform: translateY(-1px);
   box-shadow: 0 4px 14px rgba(37,99,235,.28), 0 1px 2px rgba(0,0,0,.06);
 }
 .storm-split-main {
@@ -7708,20 +7710,32 @@ function revealAnswer(sel,card){
 
   // Storm this card: move o split-button pra DEPOIS do attending na coluna direita
   // (filosofia: aparece quando o aluno terminou de ler tudo, no flow natural)
+  // IMPORTANTE: idempotente — só move se ainda não está no lugar certo, pra não piscar.
   try {
     const stw = document.getElementById('storm-this-wrap');
     const ansCol = document.getElementById('bmd-ans-col');
     const attWrap = document.getElementById('att-inline-wrap');
     if(stw && ansCol){
-      // Re-insere o storm-wrap logo depois do attending (se attending existir)
+      // Posição desejada: imediatamente após o att-inline-wrap (se existir)
+      let needsMove = false;
       if(attWrap && attWrap.parentNode === ansCol){
-        ansCol.insertBefore(stw, attWrap.nextSibling);
+        // Deve ficar logo após attWrap
+        if(stw.previousElementSibling !== attWrap || stw.parentNode !== ansCol){
+          needsMove = true;
+        }
       } else {
-        // Fallback: insere antes do footer counter
-        const footerRef = ansCol.querySelector('.card-footer-counter')
-                       || ansCol.querySelector('#report-issue-btn')?.parentElement;
-        if(footerRef) ansCol.insertBefore(stw, footerRef);
-        else ansCol.appendChild(stw);
+        // Sem attending: deve ficar antes do footer
+        if(stw.parentNode !== ansCol) needsMove = true;
+      }
+      if(needsMove){
+        if(attWrap && attWrap.parentNode === ansCol){
+          ansCol.insertBefore(stw, attWrap.nextSibling);
+        } else {
+          const footerRef = ansCol.querySelector('.card-footer-counter')
+                         || ansCol.querySelector('#report-issue-btn')?.parentElement;
+          if(footerRef) ansCol.insertBefore(stw, footerRef);
+          else ansCol.appendChild(stw);
+        }
       }
       stw.classList.add('visible');
       stw.style.display = 'block';
@@ -11790,6 +11804,15 @@ function handleHlSelection(e){
     if(zone.contains(container)){ inZone = true; break; }
   }
   if(!inZone){ sel.removeAllRanges(); return; }
+
+  // Preserva scrollTop pra não pular layout durante highlight
+  const ansCol = document.getElementById('bmd-ans-col');
+  const qCol   = document.getElementById('bmd-q-col');
+  const studyEl = document.getElementById('study-col') || document.getElementById('study-section');
+  const savedAns = ansCol ? ansCol.scrollTop : 0;
+  const savedQ   = qCol   ? qCol.scrollTop   : 0;
+  const savedStudy = studyEl ? studyEl.scrollTop : 0;
+  const savedWin = window.scrollY;
   
   // Apply highlight mark
   try {
@@ -11810,13 +11833,23 @@ function handleHlSelection(e){
     // surroundContents fails if selection crosses elements — ignore
     sel.removeAllRanges();
   }
+
+  // Restaura scrollTop em rAF aninhado (após reflow do browser)
+  requestAnimationFrame(function(){
+    requestAnimationFrame(function(){
+      if(ansCol)  ansCol.scrollTop = savedAns;
+      if(qCol)    qCol.scrollTop = savedQ;
+      if(studyEl) studyEl.scrollTop = savedStudy;
+      if(Math.abs(window.scrollY - savedWin) > 2) window.scrollTo(0, savedWin);
+    });
+  });
 }
 
 function _saveCardHighlights(){
   const card = getCurrentCard();
   if(!card) return;
   if(!_hlData[card.id]) _hlData[card.id] = {};
-  // Save innerHTML of each zone
+  // Save innerHTML de cada zona — APENAS lê, não escreve (evita reflow/flicker)
   ['c-q','exp-txt','exp-dist'].forEach(zoneId=>{
     const el = document.getElementById(zoneId);
     if(el) _hlData[card.id][zoneId] = el.innerHTML;
@@ -14382,9 +14415,9 @@ function selectProfileStep(step) {
 
 <style>
 /* ── HIGHLIGHT SYSTEM — cores calibradas estilo UWorld ── */
-mark.hl-yellow, .hl-yellow { background:#ffe066; color:inherit; border-radius:2px; cursor:pointer; }
-mark.hl-green,  .hl-green  { background:#86efac; color:inherit; border-radius:2px; cursor:pointer; }
-mark.hl-blue,   .hl-blue   { background:#7dd3fc; color:inherit; border-radius:2px; cursor:pointer; }
+mark.hl-yellow, .hl-yellow { background:#ffe066; color:inherit; border-radius:2px; cursor:pointer; display:inline; padding:0; margin:0; line-height:inherit; box-decoration-break:clone; -webkit-box-decoration-break:clone; }
+mark.hl-green,  .hl-green  { background:#86efac; color:inherit; border-radius:2px; cursor:pointer; display:inline; padding:0; margin:0; line-height:inherit; box-decoration-break:clone; -webkit-box-decoration-break:clone; }
+mark.hl-blue,   .hl-blue   { background:#7dd3fc; color:inherit; border-radius:2px; cursor:pointer; display:inline; padding:0; margin:0; line-height:inherit; box-decoration-break:clone; -webkit-box-decoration-break:clone; }
 html.dark mark.hl-yellow, html.dark .hl-yellow { background:none !important; color:#fde047 !important; }
 html.dark mark.hl-green,  html.dark .hl-green  { background:none !important; color:#86efac !important; }
 html.dark mark.hl-blue,   html.dark .hl-blue   { background:none !important; color:#7dd3fc !important; }
