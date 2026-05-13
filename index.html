@@ -24,8 +24,7 @@ if('caches' in window){
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="BoardMD">
 <link rel="apple-touch-icon" href="/icon-192.png">
-<!-- Puter.js for Gemini AI (free tier) -->
-<script src="https://js.puter.com/v2/"></script>
+<!-- Attending AI: migrated from Puter.js to Supabase Edge Function (Gemini 2.5 Flash) on 28 Apr 2026 -->
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Lato:wght@400;500;700&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,500;0,8..60,600;1,8..60,300;1,8..60,400&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Sora:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <style id="bmd-all">
 
@@ -7732,17 +7731,7 @@ function revealAnswer(sel,card){
   } catch(e){ console.warn('storm-wrap move:', e); }
   // Pre-fetch PubMed abstracts in background
   if(card.pubmed_query || card.topic) setTimeout(() => prefetchPubmedAbstracts(card), 500);
-  // Auto-Lens: carrega Compare silenciosamente
-  // SETOR B (item 2): removida a manipulacao de scrollTop que causava o
-  // movimento estranho da coluna direita ao Venn/Compare carregar.
-  // Comportamento original (problematico):
-  //   const savedScroll = ansC ? ansC.scrollTop : 0;
-  //   if(ansC) setTimeout(() => { ansC.scrollTop = savedScroll; }, 50);
-  // Agora o Compare apenas carrega; a coluna nao se move.
-  setTimeout(() => {
-    const wrap = document.getElementById('att-inline-wrap');
-    if(wrap) askAttendingInline('compare', null);
-  }, 1500);
+  // Auto-Lens removido — Lens agora é gerado diretamente nos cards via pipeline.
 
   // Update FSRS intervals display — sync both nav elements
   const ivs=getIntervals(getState(card.id));
@@ -11329,26 +11318,28 @@ function injectAttendingInline(card, sel){
         </div>
         <span class="att-inline-title">BoardMD Attending</span>
       </div>
-      <span style="font-size:10px;font-family:Inter,sans-serif;color:var(--text-faint);">Free</span>
+      <span style="font-size:10px;font-family:Inter,sans-serif;color:var(--text-faint);letter-spacing:.04em;text-transform:uppercase;">Free</span>
     </div>
-    ${!wasCorrect ? `<div style="padding:0 14px 8px;">
-      <button ${dis} onclick="askAttendingInline('wrong',this)" style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%;background:rgba(244,63,94,.08);border:1.5px solid rgba(244,63,94,.3);border-radius:10px;padding:10px 14px;font-size:12px;font-weight:700;color:#f43f5e;cursor:pointer;font-family:Inter,sans-serif;transition:all .15s;" onmouseover="this.style.background='rgba(244,63,94,.14)'" onmouseout="this.style.background='rgba(244,63,94,.08)'">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#f43f5e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+    ${!wasCorrect ? `<div style="padding:10px 14px 4px;">
+      <button ${dis} onclick="askAttendingInline('wrong',this)" style="display:flex;align-items:center;justify-content:center;gap:7px;width:100%;background:rgba(244,63,94,.07);border:1.5px solid rgba(244,63,94,.25);border-radius:12px;padding:11px 14px;font-size:12px;font-weight:700;color:#f43f5e;cursor:pointer;font-family:Inter,sans-serif;transition:all .2s;letter-spacing:.01em;" onmouseover="this.style.background='rgba(244,63,94,.13)';this.style.borderColor='rgba(244,63,94,.5)'" onmouseout="this.style.background='rgba(244,63,94,.07)';this.style.borderColor='rgba(244,63,94,.25)'">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#f43f5e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
         Why I was wrong
       </button>
     </div>` : ''}
-    <div class="att-inline-btns" style="padding:0 14px 8px;">
-      <button class="att-ibtn" ${dis} onclick="askAttendingInline('explain',this)">
-        <span class="att-ibtn-label">Explain better</span>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:${!wasCorrect ? '8px' : '12px'} 14px 8px;">
+      <button ${dis} onclick="askAttendingInline('explain',this)" style="display:flex;align-items:center;justify-content:center;gap:6px;background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:11px 10px;font-size:12px;font-weight:600;color:var(--text-dim);cursor:pointer;font-family:Inter,sans-serif;transition:all .2s;" onmouseover="this.style.background='rgba(139,92,246,.1)';this.style.borderColor='rgba(139,92,246,.4)';this.style.color='#a78bfa'" onmouseout="this.style.background='var(--surface2)';this.style.borderColor='var(--border)';this.style.color='var(--text-dim)'">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+        Explain better
       </button>
-      <button class="att-ibtn" ${dis} onclick="askAttendingInline('mcq',this)" style="background:rgba(79,142,247,.1);border-color:rgba(79,142,247,.35);">
-        <span class="att-ibtn-label" style="color:#3b7fff;font-weight:800;">More MCQs</span>
+      <button ${dis} onclick="askAttendingInline('mcq',this)" style="display:flex;align-items:center;justify-content:center;gap:6px;background:rgba(59,127,255,.08);border:1px solid rgba(59,127,255,.3);border-radius:12px;padding:11px 10px;font-size:12px;font-weight:700;color:#3b7fff;cursor:pointer;font-family:Inter,sans-serif;transition:all .2s;" onmouseover="this.style.background='rgba(59,127,255,.16)';this.style.borderColor='rgba(59,127,255,.55)'" onmouseout="this.style.background='rgba(59,127,255,.08)';this.style.borderColor='rgba(59,127,255,.3)'">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+        More MCQs
       </button>
     </div>
     <div style="display:flex;gap:8px;padding:0 14px 12px;align-items:center;position:relative;">
-      <input id="att-ask-input" type="text" placeholder="Ask anything about this topic…" style="flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:9px;color:var(--text);font-family:'Inter',sans-serif;font-size:13px;padding:9px 32px 9px 12px;outline:none;transition:border-color .15s;" onfocus="this.style.borderColor='rgba(139,92,246,.5)'" onblur="this.style.borderColor='var(--border)'" onkeydown="if(event.key==='Enter'){event.preventDefault();askAttendingInline('custom',null);}else if(event.key==='Escape'){this.value='';}" oninput="document.getElementById('att-ask-clear').style.display=this.value?'flex':'none'">
-      <button id="att-ask-clear" onclick="document.getElementById('att-ask-input').value='';this.style.display='none';document.getElementById('att-ask-input').focus();" style="display:none;position:absolute;right:80px;background:none;border:none;color:var(--text-faint);cursor:pointer;font-size:14px;padding:4px;line-height:1;">&#x2715;</button>
-      <button ${dis} onclick="askAttendingInline('custom',null)" style="background:rgba(99,102,241,.12);border:1px solid rgba(139,92,246,.3);border-radius:9px;color:#8b5cf6;font-family:'Inter',sans-serif;font-size:12px;font-weight:700;padding:9px 16px;cursor:pointer;white-space:nowrap;transition:all .15s;flex-shrink:0;" onmouseover="this.style.background='rgba(99,102,241,.22)'" onmouseout="this.style.background='rgba(99,102,241,.12)'">Ask</button>
+      <input id="att-ask-input" type="text" placeholder="Ask anything about this topic…" style="flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:12px;color:var(--text);font-family:'Inter',sans-serif;font-size:13px;padding:10px 36px 10px 14px;outline:none;transition:border-color .2s;" onfocus="this.style.borderColor='rgba(139,92,246,.5)'" onblur="this.style.borderColor='var(--border)'" onkeydown="if(event.key==='Enter'){event.preventDefault();askAttendingInline('custom',null);}else if(event.key==='Escape'){this.value='';}" oninput="document.getElementById('att-ask-clear').style.display=this.value?'flex':'none'">
+      <button id="att-ask-clear" onclick="document.getElementById('att-ask-input').value='';this.style.display='none';document.getElementById('att-ask-input').focus();" style="display:none;position:absolute;right:78px;background:none;border:none;color:var(--text-faint);cursor:pointer;font-size:14px;padding:4px;line-height:1;">&#x2715;</button>
+      <button ${dis} onclick="askAttendingInline('custom',null)" style="background:linear-gradient(135deg,#6366f1,#8b5cf6);border:none;border-radius:12px;color:#fff;font-family:'Inter',sans-serif;font-size:12px;font-weight:700;padding:10px 18px;cursor:pointer;white-space:nowrap;transition:opacity .2s;flex-shrink:0;" onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">Ask</button>
     </div>
     <div style="padding:0 14px 10px;font-size:11px;color:var(--text-faint);font-family:'Inter',sans-serif;line-height:1.4;">For educational purposes only. Not medical advice.</div>
     <div class="att-inline-response" id="att-inline-response"></div>`;
@@ -11565,18 +11556,35 @@ EXPLANATION: ${(card.e||'').replace(/<[^>]+>/g,' ').slice(0,300)}${pubmedRefs}`;
       return null;
     };
 
-    // ── Call Puter.js (Gemini 2.0 Flash, free tier) ──
-    if(typeof puter !== 'undefined' && puter.ai){
-      try {
-        const response = await puter.ai.chat(finalPrompt, { model: 'gemini-2.0-flash' });
-        responseText = typeof response === 'string' ? response
-          : (response?.message?.content || response?.text || JSON.stringify(response));
-      } catch(apiErr){
-        console.error('Attending AI error:', apiErr);
-        responseText = '⚠️ AI Attending temporarily unavailable. Please try again in a moment.';
+    // ── Call Supabase Edge Function `attending-ai` (Gemini 2.5 Flash) ──
+    // Retry on 503 (Gemini overload) up to 3 times with exponential backoff
+    const callAttending = async (attempt = 0) => {
+      const r = await fetch(SUPA_URL + '/functions/v1/attending-ai', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + SUPA_KEY,
+          'apikey': SUPA_KEY,
+        },
+        body: JSON.stringify({ prompt: finalPrompt }),
+      });
+      if (r.ok) return r.json();
+      const errBody = await r.text();
+      const isOverload = r.status === 400 && /503|UNAVAILABLE|high demand/i.test(errBody);
+      if (isOverload && attempt < 2) {
+        await new Promise(res => setTimeout(res, 1500 * (attempt + 1)));
+        return callAttending(attempt + 1);
       }
-    } else {
-      responseText = '⚠️ AI Attending not available — check your connection and try again.';
+      throw new Error(`attending-ai ${r.status}: ${errBody.slice(0, 200)}`);
+    };
+
+    try {
+      const data = await callAttending();
+      responseText = data?.text || '';
+      if (!responseText) responseText = '⚠️ Empty response from Attending. Please try again.';
+    } catch (apiErr) {
+      console.error('Attending AI error:', apiErr);
+      responseText = '⚠️ AI Attending temporarily unavailable. Please try again in a moment.';
     }
 
     // MCQ interativo — parse JSON e renderiza com botões
