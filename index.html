@@ -8423,6 +8423,8 @@ function downloadDeck(deckId,name){
 // ── STEP SELECTOR ────────────────────────────────────────────
 
 document.addEventListener('keydown',e=>{
+  // Não intercepta teclas quando o foco está num campo de texto
+  if(e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
   if(document.getElementById('app').classList.contains('active')){
     if(['a','b','c','d'].includes(e.key.toLowerCase())&&!revealed){
       const i='abcd'.indexOf(e.key.toLowerCase());
@@ -16331,6 +16333,8 @@ window.closeBrainStorm=function(){
 };
 document.addEventListener('keydown',function(e){
   const ov=document.getElementById('bs-overlay');if(!ov||!ov.classList.contains('on'))return;
+  // Não intercepta quando foco está num campo de texto
+  if(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA')return;
   if(e.key==='Escape'){closeBrainStorm();return;}
   if(document.getElementById('bs-ses').style.display==='none')return;
   if(e.key==='ArrowRight')bsGo(1);
