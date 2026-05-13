@@ -17231,15 +17231,22 @@ window._bmdRenderVennInline = function(card){
 
   function buildSvg(W, opts){
     opts = opts || {};
-    var fontSize  = opts.fontSize  || 12;
+    var fontSize  = opts.fontSize  || 13;
     var labelSize = opts.labelSize || 11;
-    var lineH     = Math.round(fontSize * 1.3);
-    var itemGap   = Math.round(fontSize * 0.5);
-    var topPad    = 50;     // espaço pros labels acima dos círculos
-    var bottomPad = 24;
-    var maxL = opts.maxL || 18;
+    var lineH     = Math.round(fontSize * 1.35);
+    var itemGap   = Math.round(fontSize * 0.65);
+    var topPad    = 70;     // espaço pros labels acima dos círculos (maior)
+    var bottomPad = 30;
+    // GERAR LABELS: NÃO TRUNCAR — quebrar em 2 linhas se necessário
+    var leftLblLines  = wrapText(String(v.left_label).toUpperCase(),  22, 2);
+    var rightLblLines = wrapText(String(v.right_label).toUpperCase(), 22, 2);
+    var labelH = Math.max(leftLblLines.length, rightLblLines.length) * 16;
+    if(labelH > 16) topPad = 60 + labelH;
+
+    // chars máximos por zona — ajustado pra textos dentro dos círculos
+    var maxL = opts.maxL || 16;
     var maxS = opts.maxS || 13;
-    var maxR = opts.maxR || 18;
+    var maxR = opts.maxR || 16;
     var maxLines = 3;
 
     var Lw = L.map(function(t){ return wrapText(t, maxL, maxLines); });
@@ -17256,44 +17263,34 @@ window._bmdRenderVennInline = function(card){
     var hR = blockHeight(Rw);
     var contentH = Math.max(hL, hS, hR, 130);
 
-    // GEOMETRIA CORRETA:
-    // 1. Raio do círculo é ditado pelo conteúdo + folga
-    var verticalPad = 30; // folga em cima e embaixo do conteúdo, dentro do círculo
-    var rCircle = Math.max(contentH/2 + verticalPad, 150);
-    // 2. Sobreposição clássica
+    // Geometria: raio do círculo com folga generosa
+    var verticalPad = 36;
+    var rCircle = Math.max(contentH/2 + verticalPad, 170);
     var overlap = rCircle * 0.55;
-    // 3. H = topPad (labels) + 2*rCircle (diâmetro completo) + bottomPad
     var H = topPad + 2 * rCircle + bottomPad;
-    // 4. cy fica no centro vertical dos círculos (logo abaixo dos labels)
     var cy = topPad + rCircle;
-    // 5. cx centrado horizontalmente, espaçados pelo overlap
     var cx1 = W/2 - rCircle + overlap;
     var cx2 = W/2 + rCircle - overlap;
 
-    // Centros X dos textos
-    // Em vez de usar centroide geométrico (que fica perto da borda),
-    // usamos: leftEdge + 1/3 da largura da zona (puxa pra DENTRO do círculo)
+    // Centros X dos textos (centroides simétricos das 3 zonas)
     var leftEdge       = cx1 - rCircle;
     var intersectStart = cx2 - rCircle;
     var intersectEnd   = cx1 + rCircle;
     var rightEdge      = cx2 + rCircle;
-    // Zona esquerda: do leftEdge até intersectStart
     var leftZoneW  = intersectStart - leftEdge;
     var rightZoneW = rightEdge - intersectEnd;
-    // Posiciona o texto no MEIO da zona (centroide simétrico)
     var zL = leftEdge + leftZoneW / 2;
     var zS = W / 2;
     var zR = intersectEnd + rightZoneW / 2;
 
     function renderZone(wrapped, x, color, weight, blockH){
       var out = '';
-      // Texto começa centralizado verticalmente nos círculos (cy)
       var startY = cy - blockH/2 + lineH;
       var y = startY;
       wrapped.forEach(function(lines){
         lines.forEach(function(line){
           out += '<text x="'+x+'" y="'+y+'" text-anchor="middle" ' +
-                 'font-family="Lato, system-ui, sans-serif" font-size="'+fontSize+'" ' +
+                 'font-family="-apple-system, BlinkMacSystemFont, Inter, sans-serif" font-size="'+fontSize+'" ' +
                  'font-weight="'+weight+'" fill="'+color+'">' + esc(line) + '</text>';
           y += lineH;
         });
@@ -17302,39 +17299,61 @@ window._bmdRenderVennInline = function(card){
       return out;
     }
 
+    // Função pra renderizar label do topo em até 2 linhas
+    function renderTopLabel(lines, x, color){
+      var baseY = topPad - 30 - ((lines.length - 1) * 14);
+      var out = '';
+      lines.forEach(function(line, i){
+        out += '<text x="'+x+'" y="'+(baseY + i*14)+'" text-anchor="middle" ' +
+               'font-family="-apple-system, BlinkMacSystemFont, Inter, sans-serif" font-size="'+labelSize+'" font-weight="700" ' +
+               'letter-spacing="2.2" fill="'+color+'">' + esc(line) + '</text>';
+      });
+      return out;
+    }
+
+    // IDs únicos para gradientes (evita conflito entre small/large coexistindo no DOM)
+    var uid = 'venn' + Math.random().toString(36).substr(2, 8);
+
     var out = '<svg viewBox="0 0 '+W+' '+H+'" xmlns="http://www.w3.org/2000/svg" ' +
               'preserveAspectRatio="xMidYMid meet" role="img" ' +
               'aria-label="Venn: '+esc(v.left_label)+' vs '+esc(v.right_label)+'">';
-    // Círculos
-    out += '<circle cx="'+cx1+'" cy="'+cy+'" r="'+rCircle+'" ' +
-           'fill="rgba(59,127,255,0.12)" stroke="#3b7fff" stroke-width="1.6"/>';
-    out += '<circle cx="'+cx2+'" cy="'+cy+'" r="'+rCircle+'" ' +
-           'fill="rgba(245,158,11,0.12)" stroke="#f59e0b" stroke-width="1.6"/>';
-    // Labels topo — truncar se muito longos para evitar colisão com BOTH
-    function truncLabel(s, maxC){
-      var u = String(s).toUpperCase();
-      if(u.length > maxC) return u.substring(0, maxC - 1) + '…';
-      return u;
-    }
-    // Calcula chars máximos do label baseado no espaço disponível em cada lado
-    // (largura útil de cada zona - 20px de margem)
-    var labelMaxChars = Math.max(10, Math.floor((leftZoneW - 30) / 7));
-    var leftLbl  = truncLabel(v.left_label,  labelMaxChars);
-    var rightLbl = truncLabel(v.right_label, labelMaxChars);
 
-    out += '<text x="'+zL+'" y="'+(topPad - 18)+'" text-anchor="middle" ' +
-           'font-family="Lato, sans-serif" font-size="'+labelSize+'" font-weight="700" ' +
-           'letter-spacing="1.4" fill="#3b7fff">' + esc(leftLbl) + '</text>';
-    out += '<text x="'+zS+'" y="'+(topPad - 18)+'" text-anchor="middle" ' +
-           'font-family="Lato, sans-serif" font-size="'+labelSize+'" font-weight="700" ' +
-           'letter-spacing="1.4" fill="#8b5cf6">BOTH</text>';
-    out += '<text x="'+zR+'" y="'+(topPad - 18)+'" text-anchor="middle" ' +
-           'font-family="Lato, sans-serif" font-size="'+labelSize+'" font-weight="700" ' +
-           'letter-spacing="1.4" fill="#f59e0b">' + esc(rightLbl) + '</text>';
-    // Itens
-    out += renderZone(Lw, zL, '#1d4ed8', '500', hL);
-    out += renderZone(Sw, zS, '#6d28d9', '700', hS);
-    out += renderZone(Rw, zR, '#b45309', '500', hR);
+    // Defs: gradientes e shadow
+    out += '<defs>';
+    out += '<linearGradient id="'+uid+'Lf" x1="0" y1="0" x2="0" y2="1">';
+    out += '<stop offset="0%" stop-color="#dbeafe" stop-opacity="0.95"/>';
+    out += '<stop offset="100%" stop-color="#bfdbfe" stop-opacity="0.85"/>';
+    out += '</linearGradient>';
+    out += '<linearGradient id="'+uid+'Rf" x1="0" y1="0" x2="0" y2="1">';
+    out += '<stop offset="0%" stop-color="#fef3c7" stop-opacity="0.95"/>';
+    out += '<stop offset="100%" stop-color="#fde68a" stop-opacity="0.85"/>';
+    out += '</linearGradient>';
+    out += '<filter id="'+uid+'Sh" x="-10%" y="-10%" width="120%" height="120%">';
+    out += '<feGaussianBlur in="SourceGraphic" stdDeviation="6"/>';
+    out += '<feOffset dx="0" dy="2" result="offsetblur"/>';
+    out += '<feFlood flood-color="#000" flood-opacity="0.06"/>';
+    out += '<feComposite in2="offsetblur" operator="in"/>';
+    out += '<feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>';
+    out += '</filter>';
+    out += '</defs>';
+
+    // Labels topo (até 2 linhas, SEM cortar)
+    out += renderTopLabel(leftLblLines,  zL, '#2563eb');
+    out += '<text x="'+zS+'" y="'+(topPad - 30)+'" text-anchor="middle" ' +
+           'font-family="-apple-system, BlinkMacSystemFont, Inter, sans-serif" font-size="'+labelSize+'" font-weight="700" ' +
+           'letter-spacing="2.4" fill="#7c3aed">SHARED</text>';
+    out += renderTopLabel(rightLblLines, zR, '#d97706');
+
+    // Círculos com gradient + sombra suave
+    out += '<circle cx="'+cx1+'" cy="'+cy+'" r="'+rCircle+'" ' +
+           'fill="url(#'+uid+'Lf)" stroke="#3b82f6" stroke-width="2" filter="url(#'+uid+'Sh)"/>';
+    out += '<circle cx="'+cx2+'" cy="'+cy+'" r="'+rCircle+'" ' +
+           'fill="url(#'+uid+'Rf)" stroke="#f59e0b" stroke-width="2" filter="url(#'+uid+'Sh)" opacity="0.92"/>';
+
+    // Itens nas 3 zonas — cores no estilo 800/900 do design system
+    out += renderZone(Lw, zL, '#1e3a8a', '600', hL);   // azul escuro
+    out += renderZone(Sw, zS, '#5b21b6', '700', hS);   // roxo escuro (SHARED em destaque)
+    out += renderZone(Rw, zR, '#78350f', '600', hR);   // âmbar escuro
 
     out += '</svg>';
     return out;
