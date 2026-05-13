@@ -12097,6 +12097,37 @@ function fetchCardPubmed(card){
   if(!container) return;
   const query = card.pubmed_query;
   if(!query) return;
+
+  // Extrair PMIDs diretamente do campo (cards novos bmd_)
+  const pmidMatches = query.match(/PMID[:\s]*(\d{7,8})/gi)||[];
+  const directPmids = pmidMatches.map(function(m){ return m.replace(/PMID[:\s]*/i,'').trim(); }).filter(Boolean);
+
+  if(directPmids.length > 0){
+    // Buscar direto pelos PMIDs — sem esearch
+    return fetch('https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=pubmed&id='+directPmids.join(',')+'&retmode=json')
+      .then(function(r){ return r.json(); })
+      .then(function(rd){
+        const uids = rd.result && rd.result.uids ? rd.result.uids : directPmids;
+        window._cardPubmedArticles = uids.map(function(uid){
+          const a = rd.result ? (rd.result[uid]||{}) : {};
+          const authors = a.authors ? a.authors.slice(0,3).map(function(x){ return x.name; }).join(', ')+(a.authors.length>3?' et al.':'') : '';
+          return { uid:uid, title:a.title||'', journal:a.source||'', year:a.pubdate?a.pubdate.substring(0,4):'', authors:authors };
+        });
+        let html = '';
+        uids.forEach(function(uid){
+          const a = rd.result ? (rd.result[uid]||{}) : {};
+          const title = (a.title||'').replace(/</g,'&lt;');
+          const journal = a.source||'';
+          const year = a.pubdate ? a.pubdate.substring(0,4) : '';
+          html += '<div onclick="openCardAbstract(''+uid+'')" style="padding:11px 13px;border-bottom:1px solid var(--border);cursor:pointer;" onmouseover="this.style.background='rgba(79,142,247,.06)'" onmouseout="this.style.background=''"><div style="font-size:12px;color:var(--text);font-weight:500;line-height:1.4;margin-bottom:4px;">'+title+'</div><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;"><span style="font-family:JetBrains Mono,monospace;font-size:10px;color:var(--accent);opacity:.8;">'+journal+'</span><span style="font-family:JetBrains Mono,monospace;font-size:10px;color:var(--text-faint);">'+year+'</span><span style="font-family:JetBrains Mono,monospace;font-size:10px;color:var(--text-faint);background:var(--surface);border:1px solid var(--border);padding:1px 5px;border-radius:3px;margin-left:auto;">PMID '+uid+'</span></div><div style="margin-top:4px;font-size:9px;color:var(--accent);opacity:.5;letter-spacing:.06em;">TAP TO READ ABSTRACT</div></div>';
+        });
+        html += '<div style="padding:7px 13px;font-size:10px;color:var(--text-faint);border-top:1px solid var(--border);">NCBI PubMed — National Library of Medicine</div>';
+        container.innerHTML = html;
+      })
+      .catch(function(){ container.innerHTML = '<div style="padding:10px 14px;font-size:11px;color:var(--text-faint);">Could not connect to PubMed.</div>'; });
+  }
+
+  // Fallback: busca textual (cards antigos sem PMIDs)
   fetch('https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed&term='+encodeURIComponent(query)+'&retmax=3&sort=relevance&retmode=json')
     .then(function(r){ return r.json(); })
     .then(function(sd){
@@ -12105,7 +12136,7 @@ function fetchCardPubmed(card){
         container.innerHTML = '<div style="padding:10px 14px;font-size:11px;color:var(--text-faint);">No articles found.</div>';
         return;
       }
-      return fetch('https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=pubmed&id='+ids.join(',')+' &retmode=json')
+      return fetch('https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=pubmed&id='+ids.join(',')+'&retmode=json')
         .then(function(r){ return r.json(); })
         .then(function(rd){
           const uids = rd.result && rd.result.uids ? rd.result.uids : [];
