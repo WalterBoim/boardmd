@@ -6068,6 +6068,21 @@ function applyFont(){
     .key-point-line { font-size: ${sm} !important; }
     .att-response-text { font-size: ${px} !important; }
   `;
+  // FIX 2026-05-14 v3: limpa inline lock pra a nova fonte ter efeito,
+  // depois re-aplica o lock no próximo frame com os novos valores.
+  ['c-q','exp-txt','exp-dist'].forEach(zoneId => {
+    const el = document.getElementById(zoneId);
+    if(!el) return;
+    el.style.fontSize = '';
+    el.style.lineHeight = '';
+    el.style.letterSpacing = '';
+    el.style.fontFamily = '';
+    el.style.fontWeight = '';
+    el.style.wordSpacing = '';
+  });
+  requestAnimationFrame(() => {
+    try { if(typeof window._lockTypographyOnZones === 'function') window._lockTypographyOnZones(); } catch(e){}
+  });
 }
 
 // ── SESSION STATE ────────────────────────────────────────────────────
@@ -7776,6 +7791,8 @@ function revealAnswer(sel,card){
       if(_wp)_wp.style.display='none';
     }
   }
+  // FIX 2026-05-14 v3: lock tipográfico DEPOIS de popular exp-txt e exp-dist
+  try { if(typeof window._lockTypographyOnZones === 'function') setTimeout(window._lockTypographyOnZones, 30); } catch(e){}
 
   // KEY POINT — usa campo kp do Supabase
   const kpWrap = document.getElementById('key-point-wrap');
@@ -10292,7 +10309,33 @@ window.renderCard = function(){
   // Restaura highlights salvos para este card
   window._currentHlCardId = card.id;
   setTimeout(() => applyHighlightsToCard(card.id), 50);
+  // FIX 2026-05-14 v3: LOCK TIPOGRÁFICO INLINE
+  // Faz com que o .card-question (c-q), .exp-text (exp-txt) e .exp-dist
+  // tenham font-size/family/spacing FIXADOS via inline style. Inline > !important.
+  // Isso elimina qualquer chance do grifo (ou qualquer outra coisa) reduzir o texto.
+  setTimeout(() => _lockTypographyOnZones(), 80);
 };
+
+// Trava tipografia das zonas grifáveis usando inline style (prioridade máxima).
+// Pega o computed style imediatamente após o render (quando ainda está correto)
+// e re-aplica inline. Qualquer mudança posterior do cascade não consegue
+// sobrescrever inline style sem outro !important inline.
+function _lockTypographyOnZones(){
+  ['c-q','exp-txt','exp-dist'].forEach(zoneId => {
+    const el = document.getElementById(zoneId);
+    if(!el) return;
+    try {
+      const cs = getComputedStyle(el);
+      el.style.fontSize      = cs.fontSize;
+      el.style.lineHeight    = cs.lineHeight;
+      el.style.letterSpacing = cs.letterSpacing;
+      el.style.fontFamily    = cs.fontFamily;
+      el.style.fontWeight    = cs.fontWeight;
+      el.style.wordSpacing   = cs.wordSpacing;
+    } catch(e){}
+  });
+}
+window._lockTypographyOnZones = _lockTypographyOnZones;
 </script>
 <style>
 #report-modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:9999;align-items:center;justify-content:center;}
@@ -12264,53 +12307,15 @@ function handleHlSelection(e){
       const parent = this.parentNode;
       parent.replaceChild(document.createTextNode(this.textContent), this);
       parent.normalize();
+      // Re-trava tipografia também ao remover grifo
+      try { if(typeof window._lockTypographyOnZones === 'function') window._lockTypographyOnZones(); } catch(e){}
     };
-    // FIX 2026-05-14 v2: TRAVAR estilo do container ANTES de inserir o mark.
-    // Causa raiz: ao inserir <mark> via surroundContents, o navegador
-    // recalcula a render-tree e *aparentemente* algum cascade muda o
-    // font-size efetivo do .card-question (o texto fica visivelmente menor).
-    // Solução defensiva: snapshot do computed style e re-aplicar inline depois.
-    let _hlContainer = null;
-    let _snap = null;
-    try {
-      // Subir até o container "zone" (c-q, exp-txt, exp-dist, etc)
-      let n = range.startContainer;
-      while(n && n.nodeType !== 1) n = n.parentNode;
-      while(n && !['c-q','exp-txt','exp-dist'].includes(n.id || '')) {
-        n = n.parentNode;
-        if(!n || n === document.body) { n = null; break; }
-      }
-      if(n){
-        const cs = getComputedStyle(n);
-        _snap = {
-          fontSize:      cs.fontSize,
-          lineHeight:    cs.lineHeight,
-          letterSpacing: cs.letterSpacing,
-          fontFamily:    cs.fontFamily,
-          fontWeight:    cs.fontWeight,
-        };
-        _hlContainer = n;
-      }
-    } catch(snapErr){}
-
     range.surroundContents(mark);
     sel.removeAllRanges();
-
-    // Re-aplica o snapshot inline (sobrepõe qualquer cascade que tenha mudado).
-    // Faz isso 2x: agora e em rAF — cobre tanto o render síncrono quanto
-    // qualquer reflow assíncrono do browser.
-    if(_hlContainer && _snap){
-      const apply = () => {
-        _hlContainer.style.fontSize      = _snap.fontSize;
-        _hlContainer.style.lineHeight    = _snap.lineHeight;
-        _hlContainer.style.letterSpacing = _snap.letterSpacing;
-        _hlContainer.style.fontFamily    = _snap.fontFamily;
-        _hlContainer.style.fontWeight    = _snap.fontWeight;
-      };
-      apply();
-      requestAnimationFrame(apply);
-    }
-
+    // FIX 2026-05-14 v3: simples e robusto — re-aplica o lock tipográfico
+    // após inserir o mark. As zonas já têm inline font-* (locked no render),
+    // mas garantimos que ainda batem com o computed style atual.
+    try { if(typeof window._lockTypographyOnZones === 'function') window._lockTypographyOnZones(); } catch(e){}
     // Save highlights for current card
     _saveCardHighlights();
   } catch(err){
