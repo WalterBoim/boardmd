@@ -4104,15 +4104,41 @@ html.light #venn-inline{ background:linear-gradient(180deg, rgba(37,99,235,0.04)
   transform: translateX(-50%) translateY(0);
 }
 
-/* FIX 2026-05-14: <mark> nunca altera font-size/weight/family — só background.
-   Sem isso, o user-agent default fazia o texto grifado mudar de tamanho, e o
-   reflow disparava transição visual no .opt-letter (que tinha transition: all).
-   Aplica em desktop E mobile, em qualquer mark usado no app. */
+/* FIX 2026-05-14 v2: <mark> nunca altera font-size/weight/family/spacing — só background.
+   Diagnóstico: ao inserir <mark> via range.surroundContents, o texto do .card-question
+   ficava visualmente menor/mais condensado. Causas possíveis: letter-spacing herdado,
+   user-agent stylesheet de <mark>, font-feature-settings, text-rendering, ou cálculo
+   diferente de altura/inline-box ao quebrar nó de texto. Neutralizo TODOS de uma vez. */
 mark, mark.hl-yellow, mark.hl-green, mark.hl-blue, mark.hy, mark.hg, mark.hb {
   font-size: inherit !important;
   font-weight: inherit !important;
   font-family: inherit !important;
+  font-style: inherit !important;
+  font-stretch: inherit !important;
+  letter-spacing: inherit !important;
+  line-height: inherit !important;
+  word-spacing: inherit !important;
+  text-rendering: inherit !important;
+  font-feature-settings: inherit !important;
+  font-variant-ligatures: inherit !important;
   vertical-align: baseline !important;
+  display: inline !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+/* Garante que o container do enunciado mantenha SEMPRE mesma tipografia,
+   mesmo quando contém <mark> filho — usando o seletor parent:has() para
+   forçar redeclaração igual. Browsers que não suportam :has() ignoram a
+   regra sem prejuízo (cai no comportamento default já corrigido acima). */
+.card-question:has(mark),
+#c-q:has(mark),
+.exp-text:has(mark),
+.exp-dist:has(mark) {
+  font-size: var(--font-size, 16px) !important;
+  letter-spacing: -.01em !important;
+  line-height: 1.75 !important;
+  font-feature-settings: "liga" 1, "kern" 1 !important;
+  text-rendering: optimizeLegibility !important;
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
@@ -12239,8 +12265,52 @@ function handleHlSelection(e){
       parent.replaceChild(document.createTextNode(this.textContent), this);
       parent.normalize();
     };
+    // FIX 2026-05-14 v2: TRAVAR estilo do container ANTES de inserir o mark.
+    // Causa raiz: ao inserir <mark> via surroundContents, o navegador
+    // recalcula a render-tree e *aparentemente* algum cascade muda o
+    // font-size efetivo do .card-question (o texto fica visivelmente menor).
+    // Solução defensiva: snapshot do computed style e re-aplicar inline depois.
+    let _hlContainer = null;
+    let _snap = null;
+    try {
+      // Subir até o container "zone" (c-q, exp-txt, exp-dist, etc)
+      let n = range.startContainer;
+      while(n && n.nodeType !== 1) n = n.parentNode;
+      while(n && !['c-q','exp-txt','exp-dist'].includes(n.id || '')) {
+        n = n.parentNode;
+        if(!n || n === document.body) { n = null; break; }
+      }
+      if(n){
+        const cs = getComputedStyle(n);
+        _snap = {
+          fontSize:      cs.fontSize,
+          lineHeight:    cs.lineHeight,
+          letterSpacing: cs.letterSpacing,
+          fontFamily:    cs.fontFamily,
+          fontWeight:    cs.fontWeight,
+        };
+        _hlContainer = n;
+      }
+    } catch(snapErr){}
+
     range.surroundContents(mark);
     sel.removeAllRanges();
+
+    // Re-aplica o snapshot inline (sobrepõe qualquer cascade que tenha mudado).
+    // Faz isso 2x: agora e em rAF — cobre tanto o render síncrono quanto
+    // qualquer reflow assíncrono do browser.
+    if(_hlContainer && _snap){
+      const apply = () => {
+        _hlContainer.style.fontSize      = _snap.fontSize;
+        _hlContainer.style.lineHeight    = _snap.lineHeight;
+        _hlContainer.style.letterSpacing = _snap.letterSpacing;
+        _hlContainer.style.fontFamily    = _snap.fontFamily;
+        _hlContainer.style.fontWeight    = _snap.fontWeight;
+      };
+      apply();
+      requestAnimationFrame(apply);
+    }
+
     // Save highlights for current card
     _saveCardHighlights();
   } catch(err){
