@@ -4104,6 +4104,157 @@ html.light #venn-inline{ background:linear-gradient(180deg, rgba(37,99,235,0.04)
   transform: translateX(-50%) translateY(0);
 }
 
+/* ═══════════════════════════════════════════════════════════════════════
+   MOBILE FIXES (≤600px) — 2026-05-14
+   Bloco final pra ter prioridade. NÃO afeta desktop (≥601px).
+   Objetivo:
+   1. Eliminar scroll horizontal — nada deve estourar a largura da tela.
+   2. Estabilizar header BrainStorm (A- Large A+ Settings X em 1 linha).
+   3. Estabilizar linha "seen/flagged/time" (não pode quebrar feio).
+   4. Card de estudo (pergunta + resposta) ocupa 100% da viewport.
+   5. FSRS buttons full-width (nada de max-width:430px no mobile).
+   ═══════════════════════════════════════════════════════════════════════ */
+@media (max-width: 600px) {
+
+  /* ── 1. ANTI scroll horizontal — global ────────────────────────────── */
+  html, body { max-width: 100vw !important; overflow-x: hidden !important; }
+  #app, #app.active, .deck-home, #card-el, .study-inner,
+  #bmd-cols-row, #bmd-q-col, #bmd-ans-col, #bmd-q-inner {
+    max-width: 100% !important;
+    overflow-x: hidden !important;
+  }
+  /* Qualquer URL/PMID/string longa precisa quebrar */
+  .exp-text, .exp-dist, .card-question, .opt-btn,
+  .key-point-line, .kp-text, .att-response-text,
+  #c-exp, #exp-txt, .dist-item, #c-q {
+    word-break: break-word !important;
+    overflow-wrap: anywhere !important;
+    max-width: 100% !important;
+  }
+  /* Imagens/SVGs nunca estouram a coluna */
+  #card-el img, #bmd-ans-col img, .card-img-wrap img,
+  #card-el svg.full, .pubmed-card, .pubmed-ref {
+    max-width: 100% !important;
+    height: auto !important;
+  }
+
+  /* ── 2. FSRS bar full-width no mobile ──────────────────────────────── */
+  .fsrs-bar {
+    max-width: 100% !important;
+    left: 0 !important;
+    right: 0 !important;
+    margin: 0 !important;
+    padding: 8px 10px calc(8px + env(safe-area-inset-bottom)) !important;
+  }
+  /* Storm split button — não pode ficar enorme. */
+  #storm-this-wrap { padding: 4px 8px !important; }
+  .storm-split { max-width: 100% !important; width: auto !important; }
+  .storm-split-main { padding: 8px 12px !important; font-size: 12px !important; }
+  .storm-split-mode { padding: 8px 10px !important; font-size: 11px !important; }
+  /* Dropdown menu — não pode ficar atrás da bottom-nav */
+  .storm-menu {
+    z-index: 2000 !important;
+    min-width: 220px !important;
+    max-width: calc(100vw - 24px) !important;
+  }
+
+  /* ── 3. BrainStorm header (A- Large A+ Settings X) — 1 linha ───────── */
+  .bs-h {
+    padding: 10px 12px !important;
+    gap: 6px !important;
+    flex-wrap: nowrap !important;
+  }
+  .bs-t { font-size: 18px !important; gap: 8px !important; min-width: 0 !important; flex-shrink: 1 !important; }
+  .bs-t svg { width: 28px !important; height: 28px !important; }
+  .bs-hr { gap: 4px !important; flex-shrink: 0 !important; }
+  /* Font size widget compacto */
+  .bs-fz { padding: 2px !important; gap: 2px !important; }
+  .bs-fz button { width: 28px !important; height: 28px !important; font-size: 12px !important; }
+  .bs-fz span { font-size: 10px !important; min-width: 36px !important; padding: 0 4px !important; }
+  /* Esconder o texto "Settings" — manter só o ícone de engrenagem */
+  .bs-ib-cfg {
+    width: 32px !important; height: 32px !important;
+    padding: 0 !important; gap: 0 !important;
+    font-size: 0 !important;
+  }
+  .bs-ib-cfg svg { width: 14px !important; height: 14px !important; }
+  /* Close X compacto */
+  .bs-ib { width: 32px !important; height: 32px !important; font-size: 14px !important; }
+
+  /* ── 4. Stats line (seen/flagged/time/total) — não pode encavalar ──── */
+  .bs-stats {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    justify-content: center !important;
+    gap: 6px 14px !important;
+    padding: 10px 8px 4px !important;
+    font-size: 11px !important;
+    line-height: 1.4 !important;
+    text-align: center !important;
+  }
+  /* Cada par "label + valor" agrupado, sem quebra interna */
+  .bs-stats b {
+    display: inline-block !important;
+    margin: 0 2px !important;
+    white-space: nowrap !important;
+  }
+  /* Separadores (·) somem em telas estreitas */
+  .bs-stats { font-variant-numeric: tabular-nums; }
+
+  /* ── 5. Card de estudo — área de resposta encavalada ──────────────── */
+  /* Pergunta e resposta empilhadas, sem padding/margin extras que estouram */
+  #bmd-cols-row { display: block !important; width: 100% !important; padding: 0 !important; }
+  #bmd-q-col, #bmd-ans-col {
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 0 !important;
+    border-right: none !important;
+  }
+  #bmd-q-inner { padding: 14px 14px !important; }
+  #bmd-ans-col #c-exp { padding: 14px !important; }
+  #bmd-ans-col .card-img-wrap { margin: 0 14px 12px !important; }
+  #bmd-ans-col #key-point-wrap { padding: 0 14px 12px !important; }
+  #bmd-ans-col #card-pubmed-wrap { padding: 0 14px !important; }
+  #bmd-ans-col #att-inline-wrap {
+    margin: 0 !important;
+    border-radius: 0 !important;
+    border-left: none !important;
+    border-right: none !important;
+    max-width: 100% !important;
+  }
+
+  /* ── 6. Bottom-nav — garantir z-index e espaço seguro ──────────────── */
+  .bmd-bottom-nav {
+    padding-bottom: calc(8px + env(safe-area-inset-bottom)) !important;
+    z-index: 100 !important;
+  }
+  /* Conteúdo acima da nav não pode ser coberto */
+  #card-el { padding-bottom: 90px !important; }
+
+  /* ── 7. BS body / search chips — sem overflow ──────────────────────── */
+  .bs-body { padding: 14px !important; max-width: 100% !important; overflow-x: hidden !important; }
+  .bs-int-chips { gap: 6px !important; }
+  .bs-chip { padding: 4px 10px !important; font-size: 11px !important; }
+  .bs-modes { grid-template-columns: 1fr 1fr !important; gap: 8px !important; }
+  .bs-mode { padding: 12px 14px !important; }
+  .bs-mode-n { font-size: 13px !important; }
+  .bs-mode-d { font-size: 11px !important; }
+  .bs-decks { gap: 6px !important; }
+  .bs-deck { padding: 7px 12px !important; font-size: 12px !important; }
+  .bs-cta { padding: 14px !important; font-size: 14px !important; }
+
+  /* ── 8. Ask Attending textarea — não pode estourar ─────────────────── */
+  #att-ask-input { max-width: 100% !important; box-sizing: border-box !important; }
+
+  /* ── 9. BrainStorm Ctrl (Back/Flag/Next) — espaçamento estável ────── */
+  .bs-ctrl {
+    padding: 10px 12px calc(10px + env(safe-area-inset-bottom)) 12px !important;
+    gap: 6px !important;
+  }
+  .bs-btn { padding: 9px 14px !important; font-size: 12px !important; }
+}
+
 </style>
 
 
