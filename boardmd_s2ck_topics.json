@@ -1,0 +1,682 @@
+[
+  {
+    "bmd_id": "BMD-S2-0001",
+    "system": "Cardiovascular",
+    "topic": "ACS / NSTEMI / STEMI"
+  },
+  {
+    "bmd_id": "BMD-S2-0002",
+    "system": "Cardiovascular",
+    "topic": "Heart Failure \u2014 Acute & Chronic"
+  },
+  {
+    "bmd_id": "BMD-S2-0003",
+    "system": "Cardiovascular",
+    "topic": "Atrial Fibrillation \u2014 Management"
+  },
+  {
+    "bmd_id": "BMD-S2-0004",
+    "system": "Cardiovascular",
+    "topic": "Hypertensive Emergency"
+  },
+  {
+    "bmd_id": "BMD-S2-0005",
+    "system": "Cardiovascular",
+    "topic": "Aortic Dissection"
+  },
+  {
+    "bmd_id": "BMD-S2-0006",
+    "system": "Cardiovascular",
+    "topic": "Valvular Disease \u2014 Aortic Stenosis"
+  },
+  {
+    "bmd_id": "BMD-S2-0007",
+    "system": "Cardiovascular",
+    "topic": "Valvular Disease \u2014 Mitral Regurgitation"
+  },
+  {
+    "bmd_id": "BMD-S2-0008",
+    "system": "Cardiovascular",
+    "topic": "Endocarditis"
+  },
+  {
+    "bmd_id": "BMD-S2-0009",
+    "system": "Cardiovascular",
+    "topic": "Pericarditis / Cardiac Tamponade"
+  },
+  {
+    "bmd_id": "BMD-S2-0010",
+    "system": "Cardiovascular",
+    "topic": "DVT / Pulmonary Embolism"
+  },
+  {
+    "bmd_id": "BMD-S2-0011",
+    "system": "Cardiovascular",
+    "topic": "Peripheral Artery Disease"
+  },
+  {
+    "bmd_id": "BMD-S2-0012",
+    "system": "Cardiovascular",
+    "topic": "Syncope \u2014 Differential Diagnosis"
+  },
+  {
+    "bmd_id": "BMD-S2-0013",
+    "system": "Respiratory",
+    "topic": "Community-Acquired Pneumonia"
+  },
+  {
+    "bmd_id": "BMD-S2-0014",
+    "system": "Respiratory",
+    "topic": "COPD Exacerbation"
+  },
+  {
+    "bmd_id": "BMD-S2-0015",
+    "system": "Respiratory",
+    "topic": "Asthma \u2014 Acute Management"
+  },
+  {
+    "bmd_id": "BMD-S2-0016",
+    "system": "Respiratory",
+    "topic": "Lung Cancer \u2014 Diagnosis & Staging"
+  },
+  {
+    "bmd_id": "BMD-S2-0017",
+    "system": "Respiratory",
+    "topic": "Pleural Effusion \u2014 Workup"
+  },
+  {
+    "bmd_id": "BMD-S2-0018",
+    "system": "Respiratory",
+    "topic": "Pneumothorax"
+  },
+  {
+    "bmd_id": "BMD-S2-0019",
+    "system": "Respiratory",
+    "topic": "Interstitial Lung Disease"
+  },
+  {
+    "bmd_id": "BMD-S2-0020",
+    "system": "Respiratory",
+    "topic": "Sleep Apnea"
+  },
+  {
+    "bmd_id": "BMD-S2-0021",
+    "system": "Respiratory",
+    "topic": "Hemoptysis \u2014 Differential"
+  },
+  {
+    "bmd_id": "BMD-S2-0022",
+    "system": "Respiratory",
+    "topic": "Tuberculosis"
+  },
+  {
+    "bmd_id": "BMD-S2-0023",
+    "system": "Gastrointestinal",
+    "topic": "Acute Abdomen \u2014 Appendicitis"
+  },
+  {
+    "bmd_id": "BMD-S2-0024",
+    "system": "Gastrointestinal",
+    "topic": "GI Bleeding \u2014 Upper vs Lower"
+  },
+  {
+    "bmd_id": "BMD-S2-0025",
+    "system": "Gastrointestinal",
+    "topic": "Peptic Ulcer Disease & H. pylori"
+  },
+  {
+    "bmd_id": "BMD-S2-0026",
+    "system": "Gastrointestinal",
+    "topic": "Inflammatory Bowel Disease"
+  },
+  {
+    "bmd_id": "BMD-S2-0027",
+    "system": "Gastrointestinal",
+    "topic": "Pancreatitis \u2014 Acute"
+  },
+  {
+    "bmd_id": "BMD-S2-0028",
+    "system": "Gastrointestinal",
+    "topic": "Liver Disease \u2014 Cirrhosis Complications"
+  },
+  {
+    "bmd_id": "BMD-S2-0029",
+    "system": "Gastrointestinal",
+    "topic": "Colorectal Cancer \u2014 Screening"
+  },
+  {
+    "bmd_id": "BMD-S2-0030",
+    "system": "Gastrointestinal",
+    "topic": "Cholecystitis / Choledocholithiasis"
+  },
+  {
+    "bmd_id": "BMD-S2-0031",
+    "system": "Gastrointestinal",
+    "topic": "Bowel Obstruction"
+  },
+  {
+    "bmd_id": "BMD-S2-0032",
+    "system": "Gastrointestinal",
+    "topic": "Celiac Disease"
+  },
+  {
+    "bmd_id": "BMD-S2-0033",
+    "system": "Gastrointestinal",
+    "topic": "Hepatitis B & C Management"
+  },
+  {
+    "bmd_id": "BMD-S2-0034",
+    "system": "Renal & Urinary",
+    "topic": "AKI \u2014 Prerenal vs Intrinsic vs Postrenal"
+  },
+  {
+    "bmd_id": "BMD-S2-0035",
+    "system": "Renal & Urinary",
+    "topic": "CKD \u2014 Management & Complications"
+  },
+  {
+    "bmd_id": "BMD-S2-0036",
+    "system": "Renal & Urinary",
+    "topic": "Nephrotic vs Nephritic Syndrome"
+  },
+  {
+    "bmd_id": "BMD-S2-0037",
+    "system": "Renal & Urinary",
+    "topic": "Urinary Tract Infection \u2014 Complicated"
+  },
+  {
+    "bmd_id": "BMD-S2-0038",
+    "system": "Renal & Urinary",
+    "topic": "Acid-Base Disorders"
+  },
+  {
+    "bmd_id": "BMD-S2-0039",
+    "system": "Renal & Urinary",
+    "topic": "Electrolyte Disorders \u2014 Hyponatremia"
+  },
+  {
+    "bmd_id": "BMD-S2-0040",
+    "system": "Renal & Urinary",
+    "topic": "Electrolyte Disorders \u2014 Hyperkalemia"
+  },
+  {
+    "bmd_id": "BMD-S2-0041",
+    "system": "Renal & Urinary",
+    "topic": "Renal Cell Carcinoma"
+  },
+  {
+    "bmd_id": "BMD-S2-0042",
+    "system": "Renal & Urinary",
+    "topic": "Bladder Cancer"
+  },
+  {
+    "bmd_id": "BMD-S2-0043",
+    "system": "Nervous System",
+    "topic": "Ischemic Stroke \u2014 tPA Criteria"
+  },
+  {
+    "bmd_id": "BMD-S2-0044",
+    "system": "Nervous System",
+    "topic": "Hemorrhagic Stroke \u2014 Management"
+  },
+  {
+    "bmd_id": "BMD-S2-0045",
+    "system": "Nervous System",
+    "topic": "Seizure \u2014 First vs Recurrent"
+  },
+  {
+    "bmd_id": "BMD-S2-0046",
+    "system": "Nervous System",
+    "topic": "Meningitis \u2014 Bacterial"
+  },
+  {
+    "bmd_id": "BMD-S2-0047",
+    "system": "Nervous System",
+    "topic": "Headache \u2014 Dangerous vs Benign"
+  },
+  {
+    "bmd_id": "BMD-S2-0048",
+    "system": "Nervous System",
+    "topic": "Multiple Sclerosis \u2014 Relapsing Remitting"
+  },
+  {
+    "bmd_id": "BMD-S2-0049",
+    "system": "Nervous System",
+    "topic": "Parkinson Disease \u2014 Management"
+  },
+  {
+    "bmd_id": "BMD-S2-0050",
+    "system": "Nervous System",
+    "topic": "Dementia \u2014 Differential Diagnosis"
+  },
+  {
+    "bmd_id": "BMD-S2-0051",
+    "system": "Nervous System",
+    "topic": "Peripheral Neuropathy"
+  },
+  {
+    "bmd_id": "BMD-S2-0052",
+    "system": "Nervous System",
+    "topic": "Spinal Cord Compression \u2014 Emergency"
+  },
+  {
+    "bmd_id": "BMD-S2-0053",
+    "system": "Nervous System",
+    "topic": "Brain Tumor \u2014 Presentation"
+  },
+  {
+    "bmd_id": "BMD-S2-0054",
+    "system": "Behavioral Health",
+    "topic": "Major Depression \u2014 Diagnosis & Treatment"
+  },
+  {
+    "bmd_id": "BMD-S2-0055",
+    "system": "Behavioral Health",
+    "topic": "Bipolar Disorder \u2014 Management"
+  },
+  {
+    "bmd_id": "BMD-S2-0056",
+    "system": "Behavioral Health",
+    "topic": "Schizophrenia \u2014 Antipsychotics"
+  },
+  {
+    "bmd_id": "BMD-S2-0057",
+    "system": "Behavioral Health",
+    "topic": "Anxiety Disorders"
+  },
+  {
+    "bmd_id": "BMD-S2-0058",
+    "system": "Behavioral Health",
+    "topic": "Alcohol Withdrawal \u2014 Management"
+  },
+  {
+    "bmd_id": "BMD-S2-0059",
+    "system": "Behavioral Health",
+    "topic": "Opioid Use Disorder \u2014 MAT"
+  },
+  {
+    "bmd_id": "BMD-S2-0060",
+    "system": "Behavioral Health",
+    "topic": "Eating Disorders"
+  },
+  {
+    "bmd_id": "BMD-S2-0061",
+    "system": "Behavioral Health",
+    "topic": "Suicide Risk Assessment"
+  },
+  {
+    "bmd_id": "BMD-S2-0062",
+    "system": "Behavioral Health",
+    "topic": "PTSD \u2014 Diagnosis & Treatment"
+  },
+  {
+    "bmd_id": "BMD-S2-0063",
+    "system": "Behavioral Health",
+    "topic": "Delirium vs Dementia vs Depression"
+  },
+  {
+    "bmd_id": "BMD-S2-0064",
+    "system": "Behavioral Health",
+    "topic": "ADHD \u2014 Diagnosis & Treatment"
+  },
+  {
+    "bmd_id": "BMD-S2-0065",
+    "system": "Musculoskeletal & Skin",
+    "topic": "Septic Arthritis"
+  },
+  {
+    "bmd_id": "BMD-S2-0066",
+    "system": "Musculoskeletal & Skin",
+    "topic": "Rheumatoid Arthritis \u2014 Management"
+  },
+  {
+    "bmd_id": "BMD-S2-0067",
+    "system": "Musculoskeletal & Skin",
+    "topic": "SLE \u2014 Diagnosis & Complications"
+  },
+  {
+    "bmd_id": "BMD-S2-0068",
+    "system": "Musculoskeletal & Skin",
+    "topic": "Gout \u2014 Acute & Prophylaxis"
+  },
+  {
+    "bmd_id": "BMD-S2-0069",
+    "system": "Musculoskeletal & Skin",
+    "topic": "Osteoporosis \u2014 Screening & Treatment"
+  },
+  {
+    "bmd_id": "BMD-S2-0070",
+    "system": "Musculoskeletal & Skin",
+    "topic": "Hip Fracture & Vertebral Compression"
+  },
+  {
+    "bmd_id": "BMD-S2-0071",
+    "system": "Musculoskeletal & Skin",
+    "topic": "Back Pain \u2014 Red Flags / Cauda Equina"
+  },
+  {
+    "bmd_id": "BMD-S2-0072",
+    "system": "Musculoskeletal & Skin",
+    "topic": "Melanoma \u2014 ABCDE Criteria"
+  },
+  {
+    "bmd_id": "BMD-S2-0073",
+    "system": "Musculoskeletal & Skin",
+    "topic": "Cellulitis vs Necrotizing Fasciitis"
+  },
+  {
+    "bmd_id": "BMD-S2-0074",
+    "system": "Musculoskeletal & Skin",
+    "topic": "Burns \u2014 Classification & Management"
+  },
+  {
+    "bmd_id": "BMD-S2-0075",
+    "system": "Musculoskeletal & Skin",
+    "topic": "Giant Cell Arteritis / PMR"
+  },
+  {
+    "bmd_id": "BMD-S2-0076",
+    "system": "Musculoskeletal & Skin",
+    "topic": "Pseudogout vs Gout"
+  },
+  {
+    "bmd_id": "BMD-S2-0077",
+    "system": "Endocrine",
+    "topic": "DM2 \u2014 Pharmacotherapy Algorithm"
+  },
+  {
+    "bmd_id": "BMD-S2-0078",
+    "system": "Endocrine",
+    "topic": "DKA vs HHS \u2014 Management"
+  },
+  {
+    "bmd_id": "BMD-S2-0079",
+    "system": "Endocrine",
+    "topic": "Hypothyroidism \u2014 Diagnosis & Treatment"
+  },
+  {
+    "bmd_id": "BMD-S2-0080",
+    "system": "Endocrine",
+    "topic": "Thyroid Cancer \u2014 Workup & Management"
+  },
+  {
+    "bmd_id": "BMD-S2-0081",
+    "system": "Endocrine",
+    "topic": "Adrenal Insufficiency"
+  },
+  {
+    "bmd_id": "BMD-S2-0082",
+    "system": "Endocrine",
+    "topic": "Cushing Syndrome"
+  },
+  {
+    "bmd_id": "BMD-S2-0083",
+    "system": "Endocrine",
+    "topic": "Pheochromocytoma"
+  },
+  {
+    "bmd_id": "BMD-S2-0084",
+    "system": "Endocrine",
+    "topic": "Hypercalcemia \u2014 Differential"
+  },
+  {
+    "bmd_id": "BMD-S2-0085",
+    "system": "Pregnancy & OB",
+    "topic": "Preeclampsia / Eclampsia"
+  },
+  {
+    "bmd_id": "BMD-S2-0086",
+    "system": "Pregnancy & OB",
+    "topic": "Ectopic Pregnancy"
+  },
+  {
+    "bmd_id": "BMD-S2-0087",
+    "system": "Pregnancy & OB",
+    "topic": "Placenta Previa vs Abruption"
+  },
+  {
+    "bmd_id": "BMD-S2-0088",
+    "system": "Pregnancy & OB",
+    "topic": "Gestational Diabetes"
+  },
+  {
+    "bmd_id": "BMD-S2-0089",
+    "system": "Pregnancy & OB",
+    "topic": "Postpartum Hemorrhage"
+  },
+  {
+    "bmd_id": "BMD-S2-0090",
+    "system": "Pregnancy & OB",
+    "topic": "Preterm Labor \u2014 Management"
+  },
+  {
+    "bmd_id": "BMD-S2-0091",
+    "system": "Pregnancy & OB",
+    "topic": "PROM vs PPROM"
+  },
+  {
+    "bmd_id": "BMD-S2-0092",
+    "system": "Pregnancy & OB",
+    "topic": "Shoulder Dystocia"
+  },
+  {
+    "bmd_id": "BMD-S2-0093",
+    "system": "Female Reproductive",
+    "topic": "Cervical Cancer \u2014 Screening & Colposcopy"
+  },
+  {
+    "bmd_id": "BMD-S2-0094",
+    "system": "Female Reproductive",
+    "topic": "Ovarian Cancer \u2014 Diagnosis"
+  },
+  {
+    "bmd_id": "BMD-S2-0095",
+    "system": "Female Reproductive",
+    "topic": "Endometriosis vs Adenomyosis"
+  },
+  {
+    "bmd_id": "BMD-S2-0096",
+    "system": "Female Reproductive",
+    "topic": "PCOS \u2014 Diagnosis & Management"
+  },
+  {
+    "bmd_id": "BMD-S2-0097",
+    "system": "Female Reproductive",
+    "topic": "Menopause \u2014 HRT Indications"
+  },
+  {
+    "bmd_id": "BMD-S2-0098",
+    "system": "Female Reproductive",
+    "topic": "Pelvic Inflammatory Disease"
+  },
+  {
+    "bmd_id": "BMD-S2-0099",
+    "system": "Blood & Lymphoreticular",
+    "topic": "Anemia \u2014 Iron Deficiency vs B12/Folate"
+  },
+  {
+    "bmd_id": "BMD-S2-0100",
+    "system": "Blood & Lymphoreticular",
+    "topic": "Sickle Cell Disease \u2014 Crisis Management"
+  },
+  {
+    "bmd_id": "BMD-S2-0101",
+    "system": "Blood & Lymphoreticular",
+    "topic": "Acute Leukemia \u2014 AML/ALL Presentation"
+  },
+  {
+    "bmd_id": "BMD-S2-0102",
+    "system": "Blood & Lymphoreticular",
+    "topic": "Hodgkin vs Non-Hodgkin Lymphoma"
+  },
+  {
+    "bmd_id": "BMD-S2-0103",
+    "system": "Blood & Lymphoreticular",
+    "topic": "DIC vs TTP vs HUS"
+  },
+  {
+    "bmd_id": "BMD-S2-0104",
+    "system": "Blood & Lymphoreticular",
+    "topic": "ITP vs HIT \u2014 Thrombocytopenia"
+  },
+  {
+    "bmd_id": "BMD-S2-0105",
+    "system": "Immune System",
+    "topic": "HIV \u2014 Opportunistic Infections by CD4"
+  },
+  {
+    "bmd_id": "BMD-S2-0106",
+    "system": "Immune System",
+    "topic": "HIV \u2014 ART Initiation & Monitoring"
+  },
+  {
+    "bmd_id": "BMD-S2-0107",
+    "system": "Immune System",
+    "topic": "Transplant Rejection Types"
+  },
+  {
+    "bmd_id": "BMD-S2-0108",
+    "system": "Immune System",
+    "topic": "Hypersensitivity Reactions Types I-IV"
+  },
+  {
+    "bmd_id": "BMD-S2-0109",
+    "system": "Immune System",
+    "topic": "Anaphylaxis \u2014 Management"
+  },
+  {
+    "bmd_id": "BMD-S2-0110",
+    "system": "Human Development",
+    "topic": "Pediatric Vaccinations Schedule"
+  },
+  {
+    "bmd_id": "BMD-S2-0111",
+    "system": "Human Development",
+    "topic": "Failure to Thrive"
+  },
+  {
+    "bmd_id": "BMD-S2-0112",
+    "system": "Human Development",
+    "topic": "Child Abuse \u2014 Recognition & Reporting"
+  },
+  {
+    "bmd_id": "BMD-S2-0113",
+    "system": "Human Development",
+    "topic": "Developmental Milestones"
+  },
+  {
+    "bmd_id": "BMD-S2-0114",
+    "system": "Human Development",
+    "topic": "Adolescent Confidentiality"
+  },
+  {
+    "bmd_id": "BMD-S2-0115",
+    "system": "Multisystem",
+    "topic": "Sepsis \u2014 Diagnosis & Bundles"
+  },
+  {
+    "bmd_id": "BMD-S2-0116",
+    "system": "Multisystem",
+    "topic": "Shock \u2014 Differential & Management"
+  },
+  {
+    "bmd_id": "BMD-S2-0117",
+    "system": "Multisystem",
+    "topic": "Fever of Unknown Origin"
+  },
+  {
+    "bmd_id": "BMD-S2-0118",
+    "system": "Multisystem",
+    "topic": "Cancer Screening Guidelines"
+  },
+  {
+    "bmd_id": "BMD-S2-0119",
+    "system": "Multisystem",
+    "topic": "Nutrition \u2014 TPN & Enteral Indications"
+  },
+  {
+    "bmd_id": "BMD-S2-0120",
+    "system": "Biostatistics",
+    "topic": "Sensitivity vs Specificity vs PPV/NPV"
+  },
+  {
+    "bmd_id": "BMD-S2-0121",
+    "system": "Biostatistics",
+    "topic": "Screening Test Design & NNT"
+  },
+  {
+    "bmd_id": "BMD-S2-0122",
+    "system": "Biostatistics",
+    "topic": "Absolute vs Relative Risk Reduction"
+  },
+  {
+    "bmd_id": "BMD-S2-0123",
+    "system": "Biostatistics",
+    "topic": "Bias Types in Clinical Studies"
+  },
+  {
+    "bmd_id": "BMD-S2-0124",
+    "system": "Biostatistics",
+    "topic": "Study Design Selection"
+  },
+  {
+    "bmd_id": "BMD-S2-0125",
+    "system": "Social Sciences & Ethics",
+    "topic": "Informed Consent \u2014 Requirements & Exceptions"
+  },
+  {
+    "bmd_id": "BMD-S2-0126",
+    "system": "Social Sciences & Ethics",
+    "topic": "Capacity vs Competency Assessment"
+  },
+  {
+    "bmd_id": "BMD-S2-0127",
+    "system": "Social Sciences & Ethics",
+    "topic": "Advance Directives & DNR Orders"
+  },
+  {
+    "bmd_id": "BMD-S2-0128",
+    "system": "Social Sciences & Ethics",
+    "topic": "Confidentiality & HIPAA Exceptions"
+  },
+  {
+    "bmd_id": "BMD-S2-0129",
+    "system": "Social Sciences & Ethics",
+    "topic": "Mandatory Reporting \u2014 Child & Elder Abuse"
+  },
+  {
+    "bmd_id": "BMD-S2-0130",
+    "system": "Social Sciences & Ethics",
+    "topic": "End of Life \u2014 Palliative vs Hospice"
+  },
+  {
+    "bmd_id": "BMD-S2-0131",
+    "system": "Social Sciences & Ethics",
+    "topic": "Resource Allocation & Justice Principles"
+  },
+  {
+    "bmd_id": "BMD-S2-0132",
+    "system": "Social Sciences & Ethics",
+    "topic": "Physician Impairment \u2014 Obligations"
+  },
+  {
+    "bmd_id": "BMD-S2-0133",
+    "system": "Social Sciences & Ethics",
+    "topic": "Cultural Competence"
+  },
+  {
+    "bmd_id": "BMD-S2-0134",
+    "system": "Social Sciences & Ethics",
+    "topic": "Surrogate Decision Making"
+  },
+  {
+    "bmd_id": "BMD-S2-0135",
+    "system": "Social Sciences & Ethics",
+    "topic": "Medical Errors \u2014 Disclosure Obligation"
+  },
+  {
+    "bmd_id": "BMD-S2-0136",
+    "system": "Social Sciences & Ethics",
+    "topic": "Domestic Violence \u2014 Screening & Reporting"
+  }
+]

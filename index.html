@@ -5300,6 +5300,13 @@ html.light #venn-inline{ background:linear-gradient(180deg, rgba(37,99,235,0.04)
                 <span class="ss-caret">▾</span>
               </button>
               <div class="storm-menu" id="storm-menu">
+                <button class="storm-menu-item" type="button" data-mode="all" onclick="setStormMode('all', event)">
+                  <span class="smi-text">
+                    <span class="smi-title">All Modes</span>
+                    <span class="smi-sub">Active → Reasoning → Key Points</span>
+                  </span>
+                  <span class="smi-check">✓</span>
+                </button>
                 <button class="storm-menu-item" type="button" data-mode="active" onclick="setStormMode('active', event)">
                   <span class="smi-text">
                     <span class="smi-title">Active Recall</span>
@@ -11350,10 +11357,10 @@ function injectAttendingInline(card, sel){
         More MCQs
       </button>
     </div>
-    <div style="display:flex;gap:8px;padding:0 14px 12px;align-items:center;position:relative;">
-      <input id="att-ask-input" type="text" placeholder="Ask anything about this topic…" style="flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:12px;color:var(--text);font-family:'Inter',sans-serif;font-size:13px;padding:10px 36px 10px 14px;outline:none;transition:border-color .2s;" oninput="document.getElementById('att-ask-clear').style.display=this.value?'flex':'none'">
-      <button id="att-ask-clear" style="display:none;position:absolute;right:78px;background:none;border:none;color:var(--text-faint);cursor:pointer;font-size:14px;padding:4px;line-height:1;">&#x2715;</button>
-      <button id="att-ask-btn" ${dis} style="background:linear-gradient(135deg,#6366f1,#8b5cf6);border:none;border-radius:12px;color:#fff;font-family:'Inter',sans-serif;font-size:12px;font-weight:700;padding:10px 18px;cursor:pointer;white-space:nowrap;transition:opacity .2s;flex-shrink:0;" onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">Ask</button>
+    <div style="display:flex;gap:8px;padding:0 14px 12px;align-items:flex-end;position:relative;">
+      <textarea id="att-ask-input" rows="1" placeholder="Ask anything about this topic…" style="flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:12px;color:var(--text);font-family:'Inter',sans-serif;font-size:13px;line-height:1.5;padding:10px 36px 10px 14px;outline:none;transition:border-color .2s;resize:none;overflow-y:hidden;min-height:40px;max-height:200px;" oninput="document.getElementById('att-ask-clear').style.display=this.value?'flex':'none';this.style.height='auto';this.style.height=Math.min(this.scrollHeight,200)+'px';this.style.overflowY=this.scrollHeight>200?'auto':'hidden';"></textarea>
+      <button id="att-ask-clear" style="display:none;position:absolute;right:78px;top:10px;background:none;border:none;color:var(--text-faint);cursor:pointer;font-size:14px;padding:4px;line-height:1;">&#x2715;</button>
+      <button id="att-ask-btn" ${dis} style="background:linear-gradient(135deg,#6366f1,#8b5cf6);border:none;border-radius:12px;color:#fff;font-family:'Inter',sans-serif;font-size:12px;font-weight:700;padding:10px 18px;cursor:pointer;white-space:nowrap;transition:opacity .2s;flex-shrink:0;align-self:flex-end;" onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">Ask</button>
     </div>
     <div style="padding:0 14px 10px;font-size:11px;color:var(--text-faint);font-family:'Inter',sans-serif;line-height:1.4;">For educational purposes only. Not medical advice.</div>
     <div class="att-inline-response" id="att-inline-response"></div>`;
@@ -11365,10 +11372,16 @@ function injectAttendingInline(card, sel){
   attInput.addEventListener('focus', () => { attInput.style.borderColor = 'rgba(139,92,246,.5)'; });
   attInput.addEventListener('blur',  () => { attInput.style.borderColor = 'var(--border)'; });
   attInput.addEventListener('keydown', (e) => {
-    if(e.key === 'Enter'){ e.preventDefault(); askAttendingInline('custom', null); }
-    if(e.key === 'Escape'){ attInput.value = ''; attClear.style.display = 'none'; }
+    // Enter envia; Shift+Enter quebra linha (estilo ChatGPT)
+    if(e.key === 'Enter' && !e.shiftKey){ e.preventDefault(); askAttendingInline('custom', null); }
+    if(e.key === 'Escape'){ attInput.value = ''; attClear.style.display = 'none'; attInput.style.height='40px'; }
   });
-  attClear.addEventListener('click', () => { attInput.value = ''; attClear.style.display = 'none'; attInput.focus(); });
+  attClear.addEventListener('click', () => {
+    attInput.value = '';
+    attClear.style.display = 'none';
+    attInput.style.height = '40px';
+    attInput.focus();
+  });
   attAskBtn.addEventListener('click', () => askAttendingInline('custom', null));
 
   // Injeta no #bmd-ans-col (funciona tanto mobile quanto desktop)
@@ -11500,11 +11513,21 @@ async function askAttendingInline(type, btnEl){
   // scroll removido — aluno precisa ler a explicação primeiro
 
   // Contexto do card
+  // opts: lista com letra (A. B. C.) — usada nos prompts onde a letra ainda faz sentido
   const opts = (card.w||[]).map((o,i) => String.fromCharCode(65+i) + '. ' + o).join('\n');
+  // optsNoLetter: lista SEM letra — usada no "Why I Was Wrong" porque a randomização
+  // faz a letra que o aluno viu na tela não bater com a do array original.
+  const optsNoLetter = (card.w||[]).map(o => '• ' + o).join('\n');
   const chosenIdx = window.lastChosenIdx;
   const userChoice = chosenIdx !== undefined
     ? String.fromCharCode(65+chosenIdx) + '. ' + (card.w||[])[chosenIdx]
     : 'Not recorded';
+  // userChoiceText: só o texto da alternativa marcada (sem "A.", "B." etc).
+  // Necessário porque o aluno vê as alternativas em ordem randomizada,
+  // então mencionar "A" ou "B" na explicação confunde.
+  const userChoiceText = chosenIdx !== undefined
+    ? (card.w||[])[chosenIdx]
+    : 'not recorded';
   const wasCorrect = chosenIdx !== undefined && (card.w||[])[chosenIdx] === card.c;
 
   // Build real pubmed references with abstracts from cache
@@ -11533,7 +11556,44 @@ EXPLANATION: ${(card.e||'').replace(/<[^>]+>/g,' ').slice(0,300)}${pubmedRefs}`;
     surprise: `You are a brilliant attending. Give ONE unforgettable clinical pearl about:\n\n${ctx}\n\nSomething NOT in the explanation — a real-world connection, classic trick, or board trap that sticks in memory. Be vivid and direct. 2 paragraphs max.\n\nIf REFERENCES are provided above, cite them inline using superscript numbers ¹ ² ³ — only cite references that actually exist in the list. Do NOT invent references. If no references are provided, write without citations.\n\nAt the very end, write:\nPUBMED_QUERY: [6-8 specific medical terms for PubMed search relevant to this topic]`,
     custom: `You are a brilliant attending physician. The student has a question about this USMLE topic:\n\n${ctx}\n\nStudent question: "${document.getElementById('att-ask-input')?.value||''}"\n\nAnswer clearly and clinically in 2-3 paragraphs. Focus on what's relevant for USMLE boards.\n\nFinally, on a new line, write exactly: PUBMED_QUERY: [6-8 specific medical terms for PubMed search relevant to this answer]`,
     compare: `You are a brilliant USMLE attending. The student just answered this question:\n\n${ctx}\n\nIdentify the correct diagnosis AND the single most commonly confused alternative (main distractor).\n\nReturn ONLY valid JSON, no markdown:\n{"left_label":"[correct dx name]","right_label":"[distractor name]","left":["exclusive feature 1","exclusive feature 2","exclusive feature 3","exclusive feature 4"],"shared":["shared feature 1","shared feature 2","shared feature 3"],"right":["exclusive feature 1","exclusive feature 2","exclusive feature 3","exclusive feature 4"],"pubmed_query":"[6-8 terms comparing these two diagnoses]"}`,
-    wrong: `You are a USMLE attending physician — board examiner and clinical preceptor — speaking directly to a student who just got this question wrong. Your tone: confident, clinical, warm, never condescending. Like a great preceptor pulling the student aside on rounds.\n\n${ctx}\n\nThe student picked "${userChoice}". The correct answer is "${card.c}".\n\nWrite EXACTLY this structure (use these exact headers in caps, no other formatting/no markdown):\n\nWHY YOU PICKED ${userChoice}\nIn 1-2 sentences, explain in second person ("you") the specific clinical reasoning that led you to "${userChoice}". Be direct about the cognitive shortcut — the one finding or association that pulled you toward this answer. NO hedging words ("may have", "might be", "could have"). State it directly.\n\nWHY ${userChoice} IS WRONG\nIn 2-3 sentences, explain the single clinical/pathophysiologic reason "${userChoice}" cannot be correct in THIS vignette. Cite the specific finding, lab value, history element, or mechanism from the question that rules it out. Be precise.\n\nWHY ${card.c} IS RIGHT\nIn 2-3 sentences, explain the pathognomonic finding or pathophysiologic chain that makes "${card.c}" the answer. Connect it directly to specifics of the case.\n\nUSMLE BOARD TIP\nOne sentence on how Step 1/Step 2 CK tests this exact distinction. Mention the classic vignette element the boards use as the discriminator (e.g., "USMLE flags this with [specific finding]" or "Boards confuse students by adding [distractor element]"). Make it actionable for next time.\n\nCRITICAL RULES:\n- Speak in second person ("you picked", "you were drawn to") — NEVER "the student"\n- Reference the actual options by name (you have them in OPTIONS above) — NEVER invent option text\n- Never say "Not recorded" or any placeholder — use real option text\n- No "THE TRAP" / "LOCK IT IN" labels — just the 4 headers above\n- Total length: 130-180 words\n- Confident, declarative sentences. No hedging.\n\nIf REFERENCES are provided above, cite them inline using superscript ¹ ² ³. Never invent references.\n\nAt the very end, write:\nPUBMED_QUERY: [6-8 specific medical terms for PubMed search relevant to distinguishing ${card.c} from ${userChoice}]`,
+    wrong: `You are a USMLE attending physician — board examiner and clinical preceptor — speaking directly to a student who just got this question wrong. Your tone: confident, clinical, warm, never condescending. Like a great preceptor pulling the student aside on rounds.
+
+QUESTION: ${card.q}
+OPTIONS (presented to the student in RANDOMIZED order, so DO NOT refer to letters A/B/C/D — only refer to options by their clinical content):
+${optsNoLetter}
+CORRECT ANSWER: ${card.c}
+STUDENT SELECTED: "${userChoiceText}" (INCORRECT ✗)
+TOPIC: ${card.topic||''} | SYSTEM: ${card.system||''}
+EXPLANATION: ${(card.e||'').replace(/<[^>]+>/g,' ').slice(0,300)}${pubmedRefs}
+
+The student picked "${userChoiceText}". The correct answer is "${card.c}".
+
+Write EXACTLY this structure (use these exact headers in caps, no other formatting/no markdown):
+
+WHY YOU PICKED THIS
+In 1-2 sentences, explain in second person ("you") the specific clinical reasoning that led you to choose "${userChoiceText}". Be direct about the cognitive shortcut — the one finding or association that pulled you toward this answer. NO hedging words ("may have", "might be", "could have"). State it directly. Refer to the chosen option by its clinical name "${userChoiceText}" — NEVER as "option A/B/C/D" or any letter.
+
+WHY THIS IS WRONG
+In 2-3 sentences, explain the single clinical/pathophysiologic reason "${userChoiceText}" cannot be correct in THIS vignette. Cite the specific finding, lab value, history element, or mechanism from the question that rules it out. Be precise.
+
+WHY "${card.c}" IS RIGHT
+In 2-3 sentences, explain the pathognomonic finding or pathophysiologic chain that makes "${card.c}" the answer. Connect it directly to specifics of the case.
+
+USMLE BOARD TIP
+One sentence on how Step 1/Step 2 CK tests this exact distinction. Mention the classic vignette element the boards use as the discriminator (e.g., "USMLE flags this with [specific finding]" or "Boards confuse students by adding [distractor element]"). Make it actionable for next time.
+
+CRITICAL RULES:
+- Speak in second person ("you picked", "you were drawn to") — NEVER "the student"
+- Refer to options ONLY by their clinical content/name (e.g., "switching to valsartan-sacubitril", "adding ivabradine") — NEVER by letter (A, B, C, D) because options are randomized on screen
+- Never say "Not recorded" or any placeholder — use real option text
+- No "THE TRAP" / "LOCK IT IN" labels — just the 4 headers above
+- Total length: 130-180 words
+- Confident, declarative sentences. No hedging.
+
+If REFERENCES are provided above, cite them inline using superscript ¹ ² ³. Never invent references.
+
+At the very end, write:
+PUBMED_QUERY: [6-8 specific medical terms for PubMed search relevant to distinguishing ${card.c} from ${userChoiceText}]`,
     translate: `Translate the following medical flashcard content to Brazilian Portuguese. Keep medical terms accurate. Return ONLY the translation in this exact format:\n\nQUESTÃO: [translated question]\nA. [option] B. [option] C. [option] D. [option]\nRESPOSTA CORRETA: [translated answer]\nEXPLICAÇÃO: [translated explanation]\nPONTO-CHAVE: [translated key point]\n\nContent to translate:\nQUESTION: ${card.q}\nOPTIONS: ${(card.w||[]).map((o,i)=>String.fromCharCode(65+i)+'. '+o).join(' ')}\nCORRECT ANSWER: ${card.c}\nEXPLANATION: ${(card.e||'').replace(/<[^>]+>/g,' ').slice(0,500)}\nKEY POINT: ${(card.kp||'')}`,
   };
 
@@ -16058,7 +16118,36 @@ function advance(){
   const phs=PHS[BS.mode]||PHS.flash;
   if(BS.ph<phs.length-1){BS.ph++;render();}
   else if(BS.cur<BS.cards.length-1){BS.cur++;BS.ph=0;render();}
-  else{stopPlay();showDone();}
+  else{
+    // Fim das fases do modo atual.
+    // Se estamos no modo "All", troca para o próximo modo da sequência.
+    if(BS._allActive && BS._allQueue && BS._allQueue.length){
+      const nextMode = BS._allQueue.shift();
+      BS.mode = nextMode;
+      BS.cur = 0;
+      BS.ph = 0;
+      // Atualiza UI dos seletores (caso a tela mostre)
+      document.querySelectorAll('.bs-mode').forEach(function(el){
+        el.classList.toggle('on', el.dataset.mode === nextMode);
+      });
+      // Toast suave para o aluno saber o que mudou
+      try {
+        if(typeof window._stormToast === 'function'){
+          const lbl = nextMode === 'phrase' ? 'Clinical Reasoning'
+                    : nextMode === 'kp'     ? 'Key Points'
+                    :                          'Active Recall';
+          window._stormToast('Next: ' + lbl);
+        }
+      } catch(e){}
+      render();
+      return;
+    }
+    // Caso contrário, termina de fato
+    BS._allActive = false;
+    BS._allQueue = null;
+    stopPlay();
+    showDone();
+  }
 }
 
 function showDone(){
@@ -16298,9 +16387,9 @@ window.bsOpenAttending=function(topic,kp){
         '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>' +
         'Explain better' +
       '</button>' +
-      '<div style="display:flex;gap:8px;align-items:center;">' +
-        '<input id="att-ask-input" type="text" placeholder="Ask anything about this topic…" style="flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:12px;color:var(--text);font-family:Inter,sans-serif;font-size:13px;padding:11px 14px;outline:none;transition:border-color .2s;">' +
-        '<button id="att-bs-ask" style="background:linear-gradient(135deg,#6366f1,#8b5cf6);border:none;border-radius:12px;color:#fff;font-family:Inter,sans-serif;font-size:12px;font-weight:700;padding:11px 18px;cursor:pointer;white-space:nowrap;flex-shrink:0;">Ask</button>' +
+      '<div style="display:flex;gap:8px;align-items:flex-end;">' +
+        '<textarea id="att-ask-input" rows="1" placeholder="Ask anything about this topic…" style="flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:12px;color:var(--text);font-family:Inter,sans-serif;font-size:13px;line-height:1.5;padding:11px 14px;outline:none;transition:border-color .2s;resize:none;overflow-y:hidden;min-height:42px;max-height:200px;"></textarea>' +
+        '<button id="att-bs-ask" style="background:linear-gradient(135deg,#6366f1,#8b5cf6);border:none;border-radius:12px;color:#fff;font-family:Inter,sans-serif;font-size:12px;font-weight:700;padding:11px 18px;cursor:pointer;white-space:nowrap;flex-shrink:0;align-self:flex-end;">Ask</button>' +
       '</div>' +
       '<div style="padding:8px 0 0;font-size:10px;color:var(--text-faint);font-family:Inter,sans-serif;">For educational purposes only. Not medical advice.</div>' +
     '</div>' +
@@ -16313,8 +16402,14 @@ window.bsOpenAttending=function(topic,kp){
   const bsInput = wrap.querySelector('#att-ask-input');
   bsInput.addEventListener('focus', () => { bsInput.style.borderColor = 'rgba(139,92,246,.5)'; });
   bsInput.addEventListener('blur',  () => { bsInput.style.borderColor = 'var(--border)'; });
+  bsInput.addEventListener('input', () => {
+    bsInput.style.height = 'auto';
+    bsInput.style.height = Math.min(bsInput.scrollHeight, 200) + 'px';
+    bsInput.style.overflowY = bsInput.scrollHeight > 200 ? 'auto' : 'hidden';
+  });
   bsInput.addEventListener('keydown', (e) => {
-    if(e.key === 'Enter'){ e.preventDefault(); askAttendingInline('custom', null); }
+    // Enter envia; Shift+Enter quebra linha
+    if(e.key === 'Enter' && !e.shiftKey){ e.preventDefault(); askAttendingInline('custom', null); }
   });
 
   // Guarda contexto do card (askAttendingInline precisa de wrap._attCard)
@@ -16389,6 +16484,8 @@ function bsUpdateDeckCounters(){
 }
 window.closeBrainStorm=function(){
   stopPlay();clearInterval(BS.clock);BS.clock=null;
+  // Limpa estado da sequência "All Modes"
+  BS._allActive=false; BS._allQueue=null; BS._allCard=null;
   const ov=document.getElementById('bs-overlay');if(ov)ov.classList.remove('on');
   document.body.style.overflow='';
 };
@@ -17405,16 +17502,20 @@ window._bmdRenderVennInline = function(card){
 window._stormGetMode = function(){
   try {
     var saved = localStorage.getItem('bmd_storm_mode');
-    if(saved && ['active','phrase','kp'].indexOf(saved) >= 0) return saved;
+    if(saved && ['all','active','phrase','kp'].indexOf(saved) >= 0) return saved;
   } catch(e){}
   return 'active'; // default = Active Recall
 };
 
 window._stormGetModeLabel = function(m){
-  return m === 'phrase' ? 'Reasoning' :
+  return m === 'all'    ? 'All'        :
+         m === 'phrase' ? 'Reasoning'  :
          m === 'kp'     ? 'Key Points' :
                           'Recall';
 };
+
+// Sequência do modo "All": Active Recall → Clinical Reasoning → Key Points
+window._STORM_ALL_SEQ = ['active','phrase','kp'];
 
 window._stormUpdateUI = function(){
   var mode = window._stormGetMode();
@@ -17467,7 +17568,7 @@ window._stormCloseMenuOnce = function(ev){
 
 window.setStormMode = function(mode, ev){
   if(ev){ ev.stopPropagation(); ev.preventDefault(); }
-  if(['active','phrase','kp'].indexOf(mode) < 0) return;
+  if(['all','active','phrase','kp'].indexOf(mode) < 0) return;
   try { localStorage.setItem('bmd_storm_mode', mode); } catch(e){}
   window._stormUpdateUI();
   // Fecha menu
@@ -17476,7 +17577,7 @@ window.setStormMode = function(mode, ev){
   if(menu) menu.classList.remove('on');
   if(split) split.classList.remove('menu-open');
   // Toast de feedback
-  var modeNames = { active:'Active Recall', phrase:'Clinical Reasoning', kp:'Key Points' };
+  var modeNames = { all:'All Modes', active:'Active Recall', phrase:'Clinical Reasoning', kp:'Key Points' };
   window._stormToast((modeNames[mode] || mode) + ' set as default');
   // Inicia storm com o novo modo
   window.stormThisCard(window._currentCard, mode);
@@ -17525,8 +17626,22 @@ window.stormThisCard = function(card, forceMode){
     return;
   }
 
+  // ── Modo "All": fila de modos para rodar em sequência ──
+  // active → phrase → kp; advance() vai consumir essa fila ao terminar cada modo
+  if(mode === 'all'){
+    bs._allQueue = window._STORM_ALL_SEQ.slice();   // ['active','phrase','kp']
+    bs._allActive = true;
+    bs._allCard = card;                              // guarda o card para reusar
+    var firstMode = bs._allQueue.shift();
+    bs.mode = firstMode;
+  } else {
+    bs._allQueue = null;
+    bs._allActive = false;
+    bs._allCard = null;
+    bs.mode = mode;
+  }
+
   // Setup BS com o modo escolhido e o card direto
-  bs.mode = mode;
   bs.deck = card.deck || 'all';
   bs.cards = [card];
   bs.cur = 0;
@@ -17537,8 +17652,9 @@ window.stormThisCard = function(card, forceMode){
   bs._searchFilter = null;
 
   // UI dos seletores de mode (dentro do BrainStorm)
+  // Em "All", bs.mode já foi setado para o PRIMEIRO modo da fila (active)
   document.querySelectorAll('.bs-mode').forEach(function(el){
-    el.classList.toggle('on', el.dataset.mode === mode);
+    el.classList.toggle('on', el.dataset.mode === bs.mode);
   });
 
   // Limpa input de busca

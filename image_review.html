@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BoardMD — Image Review</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', sans-serif; background: #0a0e15; color: #e2e8f0; min-height: 100vh; }
+  
+  .header { background: #111827; border-bottom: 1px solid #1e293b; padding: 16px 24px; display: flex; align-items: center; justify-content: space-between; }
+  .header h1 { font-size: 18px; font-weight: 700; color: #fff; }
+  .header h1 span { color: #3b82f6; }
+  .progress-bar { height: 4px; background: #1e293b; }
+  .progress-fill { height: 4px; background: #3b82f6; transition: width .3s; }
+  
+  .stats { display: flex; gap: 20px; font-size: 12px; color: #64748b; }
+  .stats span { color: #94a3b8; font-weight: 600; }
+  
+  .container { max-width: 900px; margin: 0 auto; padding: 32px 24px; }
+  
+  .card { background: #111827; border: 1px solid #1e293b; border-radius: 16px; overflow: hidden; margin-bottom: 24px; }
+  
+  .card-meta { padding: 16px 20px; border-bottom: 1px solid #1e293b; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+  .badge { font-size: 10px; font-weight: 700; padding: 3px 10px; border-radius: 20px; letter-spacing: .06em; }
+  .badge-system { background: rgba(59,130,246,.15); color: #3b82f6; }
+  .badge-topic { background: rgba(16,185,129,.1); color: #10b981; }
+  .badge-qid { background: rgba(99,102,241,.1); color: #818cf8; font-family: monospace; }
+  
+  .card-body { display: grid; grid-template-columns: 1fr 1fr; gap: 0; }
+  
+  .kp-section { padding: 20px; border-right: 1px solid #1e293b; }
+  .kp-label { font-size: 9px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: #475569; margin-bottom: 10px; }
+  .kp-text { font-size: 14px; line-height: 1.6; color: #e2e8f0; }
+  
+  .img-section { padding: 20px; display: flex; flex-direction: column; gap: 12px; }
+  .img-wrap { background: #0f172a; border-radius: 10px; overflow: hidden; aspect-ratio: 4/3; display: flex; align-items: center; justify-content: center; }
+  .img-wrap img { max-width: 100%; max-height: 100%; object-fit: contain; }
+  .img-wrap.loading { color: #475569; font-size: 12px; }
+  .img-meta { font-size: 10px; color: #475569; line-height: 1.5; }
+  .img-meta a { color: #3b82f6; text-decoration: none; }
+  .license-badge { display: inline-block; background: rgba(16,185,129,.1); color: #10b981; font-size: 9px; font-weight: 700; padding: 2px 6px; border-radius: 4px; margin-left: 6px; }
+  
+  .actions { padding: 16px 20px; border-top: 1px solid #1e293b; display: flex; gap: 10px; justify-content: flex-end; }
+  .btn { padding: 9px 20px; border-radius: 8px; border: none; font-size: 13px; font-weight: 700; cursor: pointer; font-family: inherit; transition: all .15s; }
+  .btn-approve { background: #10b981; color: #fff; }
+  .btn-approve:hover { background: #059669; }
+  .btn-reject { background: #1e293b; color: #94a3b8; border: 1px solid #334155; }
+  .btn-reject:hover { background: #334155; color: #e2e8f0; }
+  .btn-skip { background: transparent; color: #475569; border: 1px solid #1e293b; }
+  .btn-skip:hover { color: #64748b; }
+  
+  .counter { text-align: center; padding: 20px; color: #475569; font-size: 13px; }
+  .done-screen { text-align: center; padding: 80px 24px; }
+  .done-screen h2 { font-size: 24px; margin-bottom: 12px; }
+  .done-screen p { color: #64748b; }
+  
+  .upload-section { background: #111827; border: 1px solid #1e293b; border-radius: 12px; padding: 24px; text-align: center; }
+  .upload-section h3 { margin-bottom: 8px; font-size: 15px; }
+  .upload-section p { color: #64748b; font-size: 13px; margin-bottom: 16px; }
+  .file-input { display: none; }
+  .btn-upload { background: #3b82f6; color: #fff; padding: 10px 24px; border-radius: 8px; border: none; font-size: 13px; font-weight: 700; cursor: pointer; }
+  
+  .supabase-section { background: #111827; border: 1px solid #1e293b; border-radius: 12px; padding: 20px; margin-bottom: 24px; }
+  .supabase-section h3 { font-size: 14px; margin-bottom: 12px; color: #94a3b8; }
+  .input-row { display: flex; gap: 10px; }
+  .input-row input { flex: 1; background: #0f172a; border: 1px solid #1e293b; border-radius: 8px; padding: 9px 14px; font-size: 13px; color: #e2e8f0; font-family: monospace; }
+  .input-row input:focus { outline: none; border-color: #3b82f6; }
+  
+  #toast { position: fixed; bottom: 24px; right: 24px; background: #10b981; color: #fff; padding: 10px 18px; border-radius: 8px; font-size: 13px; font-weight: 600; display: none; z-index: 999; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Board<span>MD</span> — Image Review</h1>
+  <div class="stats">
+    <div>Approved: <span id="stat-approved">0</span></div>
+    <div>Rejected: <span id="stat-rejected">0</span></div>
+    <div>Skipped: <span id="stat-skipped">0</span></div>
+    <div>Remaining: <span id="stat-remaining">0</span></div>
+  </div>
+</div>
+<div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+
+<div class="container">
+  
+  <!-- Configuração Supabase -->
+  <div class="supabase-section" id="supabase-config">
+    <h3>Supabase Service Role Key</h3>
+    <div class="input-row">
+      <input type="password" id="supa-key" placeholder="eyJhbGci..." />
+      <button class="btn btn-approve" onclick="saveSupaKey()">Save</button>
+    </div>
+  </div>
+
+  <!-- Upload do arquivo de candidatos -->
+  <div class="upload-section" id="upload-section">
+    <h3>Load Image Candidates</h3>
+    <p>Upload the <code>image_candidates.json</code> file generated by the Python script</p>
+    <button class="btn-upload" onclick="document.getElementById('file-input').click()">Choose File</button>
+    <input type="file" id="file-input" class="file-input" accept=".json" onchange="loadFile(event)" />
+  </div>
+
+  <!-- Card de revisão -->
+  <div id="review-container" style="display:none">
+    <div class="card" id="review-card">
+      <div class="card-meta">
+        <span class="badge badge-system" id="r-system"></span>
+        <span class="badge badge-topic" id="r-topic"></span>
+        <span class="badge badge-qid" id="r-qid"></span>
+      </div>
+      <div class="card-body">
+        <div class="kp-section">
+          <div class="kp-label">Key Point</div>
+          <div class="kp-text" id="r-kp"></div>
+        </div>
+        <div class="img-section">
+          <div class="img-wrap" id="r-img-wrap">
+            <img id="r-img" src="" alt="" onerror="this.parentElement.innerHTML='<span>Image not available</span>'" />
+          </div>
+          <div class="img-meta" id="r-img-meta"></div>
+          <button class="btn btn-reject" onclick="findAlternative()" id="btn-alt" style="font-size:11px;padding:6px 12px">Try another image</button>
+        </div>
+      </div>
+      <div class="actions">
+        <button class="btn btn-skip" onclick="skipCard()">Skip</button>
+        <button class="btn btn-reject" onclick="rejectCard()">Reject</button>
+        <button class="btn btn-approve" onclick="approveCard()">Approve & Save</button>
+      </div>
+    </div>
+    <div class="counter" id="counter"></div>
+  </div>
+
+  <div id="done-screen" style="display:none" class="done-screen">
+    <h2>Review Complete</h2>
+    <p id="done-stats"></p>
+  </div>
+
+</div>
+
+<div id="toast"></div>
+
+<script>
+const SUPABASE_URL = 'https://hwdcgbcnphkmxaasties.supabase.co';
+let supaKey = localStorage.getItem('bmd_supa_key') || '';
+let candidates = [];
+let currentIdx = 0;
+let currentAltIdx = 0;
+let stats = { approved: 0, rejected: 0, skipped: 0 };
+
+// Restore Supabase key
+if (supaKey) {
+  document.getElementById('supa-key').value = supaKey;
+  document.getElementById('supabase-config').style.display = 'none';
+}
+
+function saveSupaKey() {
+  supaKey = document.getElementById('supa-key').value.trim();
+  localStorage.setItem('bmd_supa_key', supaKey);
+  document.getElementById('supabase-config').style.display = 'none';
+  toast('Supabase key saved');
+}
+
+function loadFile(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      candidates = JSON.parse(e.target.result);
+      document.getElementById('upload-section').style.display = 'none';
+      document.getElementById('review-container').style.display = '';
+      updateStats();
+      showCard(0);
+    } catch(err) {
+      alert('Error parsing JSON: ' + err.message);
+    }
+  };
+  reader.readAsText(file);
+}
+
+function showCard(idx) {
+  if (idx >= candidates.length) {
+    showDone();
+    return;
+  }
+  
+  currentIdx = idx;
+  currentAltIdx = 0;
+  const c = candidates[idx];
+  
+  document.getElementById('r-system').textContent = c.system || '';
+  document.getElementById('r-topic').textContent = c.topic || '';
+  document.getElementById('r-qid').textContent = c.qid || '';
+  document.getElementById('r-kp').textContent = c.kp || '';
+  
+  showImage(c, 0);
+  
+  document.getElementById('counter').textContent = 
+    `Card ${idx + 1} of ${candidates.length}`;
+  
+  // Progress bar
+  const pct = (idx / candidates.length) * 100;
+  document.getElementById('progress-fill').style.width = pct + '%';
+  updateStats();
+}
+
+function showImage(card, altIdx) {
+  const imgs = card.images || [];
+  if (!imgs.length || altIdx >= imgs.length) {
+    document.getElementById('r-img-wrap').innerHTML = '<span style="color:#475569;font-size:12px">No image found</span>';
+    document.getElementById('r-img-meta').innerHTML = '';
+    document.getElementById('btn-alt').style.display = 'none';
+    return;
+  }
+  
+  const img = imgs[altIdx];
+  document.getElementById('r-img').src = img.url;
+  document.getElementById('r-img-meta').innerHTML = 
+    `<a href="${img.page_url || img.url}" target="_blank">${img.filename || ''}</a>
+     <span class="license-badge">${img.license || ''}</span>
+     ${img.artist ? '<br>Credit: ' + img.artist.replace(/<[^>]+>/g,'') : ''}`;
+  
+  // Show/hide alt button
+  document.getElementById('btn-alt').style.display = imgs.length > altIdx + 1 ? '' : 'none';
+}
+
+function findAlternative() {
+  currentAltIdx++;
+  showImage(candidates[currentIdx], currentAltIdx);
+}
+
+async function approveCard() {
+  const c = candidates[currentIdx];
+  const imgs = c.images || [];
+  if (!imgs.length || currentAltIdx >= imgs.length) {
+    skipCard();
+    return;
+  }
+  
+  const img = imgs[currentAltIdx];
+  const imgData = JSON.stringify({
+    url: img.url,
+    license: img.license,
+    artist: img.artist ? img.artist.replace(/<[^>]+>/g,'') : '',
+    source: 'Wikimedia Commons',
+    filename: img.filename,
+  });
+  
+  // Save to Supabase
+  try {
+    const r = await fetch(
+      `${SUPABASE_URL}/rest/v1/cards?qid=eq.${encodeURIComponent(c.qid)}`,
+      {
+        method: 'PATCH',
+        headers: {
+          'apikey': supaKey,
+          'Authorization': 'Bearer ' + supaKey,
+          'Content-Type': 'application/json',
+          'Prefer': 'return=minimal',
+        },
+        body: JSON.stringify({ img: imgData }),
+      }
+    );
+    
+    if (r.ok) {
+      stats.approved++;
+      toast('Approved and saved to Supabase');
+    } else {
+      toast('Error saving: ' + r.status, true);
+    }
+  } catch(e) {
+    toast('Network error: ' + e.message, true);
+  }
+  
+  nextCard();
+}
+
+function rejectCard() {
+  stats.rejected++;
+  nextCard();
+}
+
+function skipCard() {
+  stats.skipped++;
+  nextCard();
+}
+
+function nextCard() {
+  updateStats();
+  showCard(currentIdx + 1);
+}
+
+function updateStats() {
+  document.getElementById('stat-approved').textContent = stats.approved;
+  document.getElementById('stat-rejected').textContent = stats.rejected;
+  document.getElementById('stat-skipped').textContent = stats.skipped;
+  document.getElementById('stat-remaining').textContent = Math.max(0, candidates.length - currentIdx - 1);
+}
+
+function showDone() {
+  document.getElementById('review-container').style.display = 'none';
+  document.getElementById('done-screen').style.display = '';
+  document.getElementById('progress-fill').style.width = '100%';
+  document.getElementById('done-stats').textContent = 
+    `Approved: ${stats.approved} | Rejected: ${stats.rejected} | Skipped: ${stats.skipped}`;
+}
+
+function toast(msg, isError) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.background = isError ? '#ef4444' : '#10b981';
+  t.style.display = 'block';
+  setTimeout(() => t.style.display = 'none', 2500);
+}
+</script>
+</body>
+</html>
