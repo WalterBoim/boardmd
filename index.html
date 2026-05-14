@@ -291,7 +291,7 @@ html.light .anki-due{color:#16a34a;}
 .opt-btn.eliminated .opt-elim{opacity:1;background:rgba(59,127,255,.1);border-color:var(--accent);color:var(--accent);}
 /* After answer revealed — hide elim button */
 .opt-btn:disabled .opt-elim{display:none;}
-.opt-letter{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;width:22px;height:22px;min-width:22px;display:flex;align-items:center;justify-content:center;border-radius:5px;background:var(--border);color:var(--text-faint);transition:all .15s;margin-top:2px;flex-shrink:0;}
+.opt-letter{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;width:22px;height:22px;min-width:22px;display:flex;align-items:center;justify-content:center;border-radius:5px;background:var(--border);color:var(--text-faint);transition:background-color .15s,color .15s,border-color .15s;margin-top:2px;flex-shrink:0;}
 .opt-btn.correct .opt-letter{background:transparent!important;color:inherit!important;}
 .opt-btn.show-correct .opt-letter{background:transparent!important;color:inherit!important;}
 .opt-btn.wrong .opt-letter{background:transparent!important;color:inherit!important;}
@@ -1402,7 +1402,7 @@ mark.hb{background:rgba(79,142,247,.28);border-bottom:2px solid rgba(40,100,220,
 }
 .option.correct .opt-letter{background:var(--green);color:#fff}
 .option.wrong   .opt-letter{background:var(--red);  color:#fff}
-.opt-text{font-size:calc(var(--fs) - 1px);font-weight:500;color:var(--text);flex:1;line-height:1.4;transition:font-size .2s}
+.opt-text{font-size:calc(var(--fs) - 1px);font-weight:500;color:var(--text);flex:1;line-height:1.4;}
 .option.dimmed .opt-text{color:var(--muted)}
 .opt-pct{font-size:12px;font-weight:700;color:var(--muted);font-family:'JetBrains Mono',monospace;min-width:32px;text-align:right;display:none}
 .opt-bar{position:absolute;bottom:0;left:0;height:2px;background:var(--muted);opacity:.2;transition:width .6s ease;display:none;border-radius:1px}
@@ -4102,6 +4102,17 @@ html.light #venn-inline{ background:linear-gradient(180deg, rgba(37,99,235,0.04)
 .storm-toast.on {
   opacity: 1;
   transform: translateX(-50%) translateY(0);
+}
+
+/* FIX 2026-05-14: <mark> nunca altera font-size/weight/family — só background.
+   Sem isso, o user-agent default fazia o texto grifado mudar de tamanho, e o
+   reflow disparava transição visual no .opt-letter (que tinha transition: all).
+   Aplica em desktop E mobile, em qualquer mark usado no app. */
+mark, mark.hl-yellow, mark.hl-green, mark.hl-blue, mark.hy, mark.hg, mark.hb {
+  font-size: inherit !important;
+  font-weight: inherit !important;
+  font-family: inherit !important;
+  vertical-align: baseline !important;
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
@@ -6845,6 +6856,11 @@ function shuffleOpts(card){
 // ── RENDER CARD ───────────────────────────────────────────────────────
 function renderCard(){
   revealed=false;
+  // FIX 2026-05-14: limpar registro da alternativa escolhida ao trocar de card
+  // Senão o Attending do card N+1 acha que o aluno escolheu a alt do card N.
+  window.lastChosenIdx = undefined;
+  window.lastChosenText = undefined;
+  window.lastChosenCorrect = undefined;
   _cardStartTime = Date.now(); // track response time
   window._cardStartTime = _cardStartTime; // SETOR B v3: mirror to window for cross-script access
   // Esconder botão Storm this card até a resposta ser revelada
@@ -11534,6 +11550,8 @@ function injectAttendingInline(card, sel){
     attInput.focus();
   });
   attAskBtn.addEventListener('click', () => askAttendingInline('custom', null));
+  // FIX 2026-05-14: anexar autocomplete com histórico das perguntas anteriores
+  try { _askAttachSuggestions(attInput); } catch(e){ console.warn('ask suggest:', e); }
 
   // Injeta no #bmd-ans-col (funciona tanto mobile quanto desktop)
   const ansCol = document.getElementById('bmd-ans-col');
@@ -11629,6 +11647,117 @@ function renderLens(data, container){
   drawZone(function(){ctx.beginPath();ctx.arc(cx2,cy,r,0,Math.PI*2);ctx.clip();},lR,xRight,170);
 }
 
+// ── Ask Attending: histórico de perguntas (autocomplete estilo Google) ──
+// Salva últimas 30 perguntas no localStorage. Quando o aluno foca/digita
+// no input, mostra dropdown com sugestões filtradas pelo prefixo.
+const ASK_HISTORY_KEY = 'bmd_ask_history';
+const ASK_HISTORY_MAX = 30;
+
+function _askGetHistory(){
+  try {
+    const raw = localStorage.getItem(ASK_HISTORY_KEY);
+    if(!raw) return [];
+    const arr = JSON.parse(raw);
+    return Array.isArray(arr) ? arr : [];
+  } catch(e){ return []; }
+}
+function _askSaveHistory(q){
+  if(!q || typeof q !== 'string') return;
+  const clean = q.trim();
+  if(clean.length < 3) return;  // ignora perguntas triviais
+  if(clean.length > 500) return; // ignora textos absurdamente longos
+  try {
+    let hist = _askGetHistory();
+    // Remove duplicata exata (case-insensitive) — vai pro topo
+    hist = hist.filter(h => h.toLowerCase() !== clean.toLowerCase());
+    hist.unshift(clean);
+    if(hist.length > ASK_HISTORY_MAX) hist = hist.slice(0, ASK_HISTORY_MAX);
+    localStorage.setItem(ASK_HISTORY_KEY, JSON.stringify(hist));
+  } catch(e){}
+}
+function _askFilterHistory(prefix){
+  const hist = _askGetHistory();
+  if(!prefix || !prefix.trim()) return hist.slice(0, 8); // foco vazio = top 8
+  const p = prefix.trim().toLowerCase();
+  return hist.filter(h => h.toLowerCase().includes(p)).slice(0, 8);
+}
+
+// Anexa o dropdown de sugestões a um <textarea> (ou input) de Ask.
+// Funciona tanto no card principal (#att-ask-input) quanto no BS.
+function _askAttachSuggestions(inputEl){
+  if(!inputEl || inputEl._askSuggBound) return;
+  inputEl._askSuggBound = true;
+
+  // Cria o container de sugestões (uma única vez, posicionado ao lado do input)
+  const drop = document.createElement('div');
+  drop.className = 'ask-suggest-drop';
+  drop.style.cssText =
+    'position:absolute;display:none;background:var(--surface);' +
+    'border:1px solid var(--border-bright);border-radius:10px;' +
+    'box-shadow:0 8px 24px rgba(0,0,0,.18);' +
+    'max-height:280px;overflow-y:auto;z-index:9999;' +
+    'min-width:240px;font-family:Inter,sans-serif;font-size:13px;';
+  document.body.appendChild(drop);
+
+  let activeIdx = -1;
+  let items = [];
+
+  function position(){
+    const r = inputEl.getBoundingClientRect();
+    drop.style.left  = r.left + 'px';
+    drop.style.top   = (r.bottom + 4 + window.scrollY) + 'px';
+    drop.style.width = r.width + 'px';
+  }
+
+  function render(prefix){
+    items = _askFilterHistory(prefix);
+    if(!items.length){ hide(); return; }
+    activeIdx = -1;
+    drop.innerHTML = items.map((q, i) =>
+      '<div class="ask-sugg-item" data-i="' + i + '" ' +
+      'style="padding:9px 12px;cursor:pointer;color:var(--text);' +
+      'border-bottom:1px solid var(--border);white-space:nowrap;' +
+      'overflow:hidden;text-overflow:ellipsis;">' +
+      '<span style="color:var(--text-faint);margin-right:6px;font-size:11px;">↻</span>' +
+      q.replace(/</g,'&lt;') +
+      '</div>'
+    ).join('');
+    position();
+    drop.style.display = 'block';
+    // Bind clicks
+    drop.querySelectorAll('.ask-sugg-item').forEach(it => {
+      it.addEventListener('mouseenter', () => {
+        drop.querySelectorAll('.ask-sugg-item').forEach(x => x.style.background = '');
+        it.style.background = 'var(--surface2)';
+      });
+      it.addEventListener('mousedown', (e) => {
+        // mousedown em vez de click — senão o blur do input fecha antes
+        e.preventDefault();
+        const i = parseInt(it.dataset.i, 10);
+        inputEl.value = items[i];
+        hide();
+        // dispara input pra autoexpand re-render
+        inputEl.dispatchEvent(new Event('input', { bubbles: true }));
+        inputEl.focus();
+      });
+    });
+  }
+  function hide(){ drop.style.display = 'none'; }
+
+  inputEl.addEventListener('focus', () => render(inputEl.value));
+  inputEl.addEventListener('input', () => render(inputEl.value));
+  inputEl.addEventListener('blur',  () => setTimeout(hide, 120));
+  // Reposicionar quando rola
+  window.addEventListener('scroll', () => { if(drop.style.display === 'block') position(); }, true);
+  window.addEventListener('resize', () => { if(drop.style.display === 'block') position(); });
+  // Esc fecha
+  inputEl.addEventListener('keydown', (e) => {
+    if(e.key === 'Escape') hide();
+  });
+}
+window._askAttachSuggestions = _askAttachSuggestions;
+window._askSaveHistory = _askSaveHistory;
+
 async function askAttendingInline(type, btnEl){
   const wrap = document.getElementById('att-inline-wrap');
   if(!wrap) return;
@@ -11636,6 +11765,14 @@ async function askAttendingInline(type, btnEl){
   const card = wrap._attCard;
   const sel  = wrap._attSel;
   if(!card){ showToast('No card loaded.'); return; }
+
+  // FIX 2026-05-14: salvar a pergunta no histórico ANTES de enviar
+  // (mesmo se falhar depois, o aluno tem o autocomplete na próxima)
+  if(type === 'custom'){
+    const _inp = document.getElementById('att-ask-input');
+    const _q = (_inp && _inp.value) ? _inp.value.trim() : '';
+    if(_q) _askSaveHistory(_q);
+  }
 
   const isPro = !!window._supaUser;
   const uses   = getAttUses();
@@ -11669,17 +11806,30 @@ async function askAttendingInline(type, btnEl){
   // optsNoLetter: lista SEM letra — usada no "Why I Was Wrong" porque a randomização
   // faz a letra que o aluno viu na tela não bater com a do array original.
   const optsNoLetter = (card.w||[]).map(o => '• ' + o).join('\n');
+  // FIX 2026-05-14: a fonte de verdade é o TEXTO da alternativa clicada
+  // (window.lastChosenText), não o índice. shuffleOpts() embaralha as
+  // alternativas, então o índice na tela ≠ índice em card.w, e usar
+  // card.w[lastChosenIdx] retornava uma alternativa errada — fazendo o
+  // Attending explicar um erro que o aluno NÃO cometeu.
+  const lastText = window.lastChosenText;
   const chosenIdx = window.lastChosenIdx;
-  const userChoice = chosenIdx !== undefined
-    ? String.fromCharCode(65+chosenIdx) + '. ' + (card.w||[])[chosenIdx]
-    : 'Not recorded';
-  // userChoiceText: só o texto da alternativa marcada (sem "A.", "B." etc).
-  // Necessário porque o aluno vê as alternativas em ordem randomizada,
-  // então mencionar "A" ou "B" na explicação confunde.
-  const userChoiceText = chosenIdx !== undefined
-    ? (card.w||[])[chosenIdx]
-    : 'not recorded';
-  const wasCorrect = chosenIdx !== undefined && (card.w||[])[chosenIdx] === card.c;
+  // userChoiceText: o que de fato foi clicado, como string clínica.
+  let userChoiceText = 'not recorded';
+  if(typeof lastText === 'string' && lastText.length){
+    userChoiceText = lastText;
+  } else if(chosenIdx !== undefined){
+    // Fallback (legado): tenta pegar pelo índice se por algum motivo o texto
+    // não foi salvo. Continua impreciso mas é melhor que "not recorded".
+    userChoiceText = (card.w||[])[chosenIdx] || 'not recorded';
+  }
+  // userChoice (legado, com letra) — mantido só pra prompts antigos que ainda usam.
+  const userChoice = userChoiceText === 'not recorded'
+    ? 'Not recorded'
+    : userChoiceText;
+  // Acerto/erro: prioriza a flag salva no clique; senão compara o texto com card.c.
+  const wasCorrect = (typeof window.lastChosenCorrect === 'boolean')
+    ? window.lastChosenCorrect
+    : (userChoiceText !== 'not recorded' && userChoiceText === card.c);
 
   // Build real pubmed references with abstracts from cache
   const _pubCache = window._pubmedCache && window._pubmedCache[card.id];
@@ -11918,23 +12068,74 @@ function saveHlData(){
 loadHlData();
 
 function setHlColor(color){
-  // Update swatch visual
-  const map = {yellow:'sw-y', green:'sw-g', blue:'sw-b'};
-  Object.entries(map).forEach(([c, id]) => {
-    const el = document.getElementById(id);
-    if(el) el.style.transform = (c === color && _hlColor !== color) ? 'scale(1.2)' : 'scale(1)';
-    if(el) el.style.borderColor = (c === color && _hlColor !== color) ? 'var(--accent)' : 'transparent';
-  });
+  // Toggle: clicar na cor ativa desliga
   if(_hlColor === color){
     _hlColor = null;
   } else {
     _hlColor = color;
   }
-  // Update button states
+  _renderHlSwatches();
+  // Update toolbar buttons states (#hl-btn-yellow etc — caso existam)
   ['yellow','green','blue'].forEach(c=>{
     const btn = document.getElementById('hl-btn-'+c);
     if(btn) btn.classList.toggle('active', _hlColor===c);
   });
+}
+
+// Renderiza as bolinhas de cor no header. Comportamento:
+// - Nenhuma cor ativa: 3 bolinhas (yellow/green/blue) visíveis.
+// - Cor X ativa: SÓ a bolinha X visível + um "✕" discreto pra desligar
+//   (clicar na própria bolinha X também desliga; clicar no ✕ é mais óbvio).
+function _renderHlSwatches(){
+  const wrap = document.getElementById('hl-swatches-wrap');
+  if(!wrap) return;
+  const map = {yellow:'sw-y', green:'sw-g', blue:'sw-b'};
+  Object.entries(map).forEach(([c, id]) => {
+    const el = document.getElementById(id);
+    if(!el) return;
+    if(_hlColor && c !== _hlColor){
+      // Outras cores escondidas quando há uma ativa
+      el.style.display = 'none';
+      el.classList.remove('sel');
+    } else {
+      el.style.display = '';
+      // Bolinha ativa fica destacada
+      if(c === _hlColor){
+        el.classList.add('sel');
+        el.style.transform = 'scale(1.15)';
+        el.style.borderColor = 'var(--accent)';
+        el.style.boxShadow = '0 0 0 2px rgba(59,127,255,.25)';
+      } else {
+        el.classList.remove('sel');
+        el.style.transform = '';
+        el.style.borderColor = '';
+        el.style.boxShadow = '';
+      }
+    }
+  });
+  // Botão "✕" pra desligar a cor ativa
+  let xBtn = document.getElementById('hl-swatch-off');
+  if(_hlColor){
+    if(!xBtn){
+      xBtn = document.createElement('button');
+      xBtn.id = 'hl-swatch-off';
+      xBtn.type = 'button';
+      xBtn.title = 'Turn off highlight';
+      xBtn.textContent = '✕';
+      xBtn.style.cssText =
+        'background:none;border:1px solid var(--border);border-radius:50%;' +
+        'width:18px;height:18px;display:flex;align-items:center;justify-content:center;' +
+        'font-size:9px;font-weight:700;color:var(--text-faint);cursor:pointer;' +
+        'margin-left:2px;padding:0;line-height:1;flex-shrink:0;transition:all .15s;';
+      xBtn.onmouseover = function(){ this.style.borderColor='var(--rose,#f43f5e)'; this.style.color='var(--rose,#f43f5e)'; };
+      xBtn.onmouseout  = function(){ this.style.borderColor='var(--border)'; this.style.color='var(--text-faint)'; };
+      xBtn.onclick = function(){ _hlColor = null; _renderHlSwatches(); };
+      wrap.appendChild(xBtn);
+    }
+    xBtn.style.display = '';
+  } else if(xBtn){
+    xBtn.style.display = 'none';
+  }
 }
 
 function eraseAllHighlights(){
@@ -11948,6 +12149,8 @@ function eraseAllHighlights(){
     const btn = document.getElementById('hl-btn-'+c);
     if(btn) btn.classList.remove('active');
   });
+  // Restaura as 3 bolinhas (esconde X)
+  try { _renderHlSwatches(); } catch(e){}
 }
 
 function getCurrentCard(){
@@ -12089,8 +12292,10 @@ function applyHighlightsToCard(cardId){
   });
 }
 
-// Rastreia qual opção o aluno escolheu
+// Rastreia qual opção o aluno escolheu (texto é fonte de verdade — índice quebra com shuffle)
 window.lastChosenIdx = undefined;
+window.lastChosenText = undefined;
+window.lastChosenCorrect = undefined;
 
 function renderInteractiveMCQs(questions, container){
   let html = '<div style="display:flex;flex-direction:column;gap:16px;padding:4px 0 8px;">';
@@ -12455,6 +12660,16 @@ document.addEventListener('click', function(e){
   if(btn && !btn.disabled){
     const opts = Array.from(document.querySelectorAll('.opt-btn'));
     window.lastChosenIdx = opts.indexOf(btn);
+    // FIX 2026-05-14: salvar o TEXTO da alternativa clicada (não o índice).
+    // O índice na tela ≠ índice em card.w (porque shuffleOpts embaralha),
+    // então usar card.w[idx] retornava a alternativa errada.
+    // O texto é a fonte de verdade — funciona com qualquer ordem.
+    try {
+      window.lastChosenText = (btn.dataset && btn.dataset.text)
+        ? btn.dataset.text
+        : (btn.querySelector('.opt-text')?.textContent || '').trim();
+      window.lastChosenCorrect = btn.dataset && btn.dataset.correct === '1';
+    } catch(err){ window.lastChosenText = null; }
   }
 });
 
@@ -15821,7 +16036,7 @@ function bmdSetupDrag(){
 /* ── BrainStorm FSRS counters on deck cards ── */
 .bs-deck-wrap{position:relative;display:inline-flex;flex-direction:column;align-items:center}
 .bs-deck-cnt{font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:700;margin-top:2px;display:flex;gap:4px}
-.bs-deck-cnt .bdc-n{color:#3b82f6}.bs-deck-cnt .bdc-d{color:#22c55e}
+.bs-deck-cnt .bdc-n{color:#3b82f6}.bs-deck-cnt .bdc-l{color:#f59e0b}.bs-deck-cnt .bdc-d{color:#22c55e}
 .bs-deck-cnt .bdc-sep{color:var(--text-faint);font-weight:400}
 .bs-deck-sub{display:block;font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:700;margin-top:2px;opacity:.7}
 
@@ -16059,6 +16274,11 @@ function bmdSetupDrag(){
         <span style="color:#3b82f6" id="bs-fsrs-new">0</span><span style="color:var(--text-faint);font-weight:400">+</span><span style="color:#f59e0b" id="bs-fsrs-lrn">0</span><span style="color:var(--text-faint);font-weight:400">+</span><span style="color:#22c55e" id="bs-fsrs-due">0</span>
       </span>
     </div>
+    <!-- FIX 2026-05-14: indicador do deck do card atual (mostra qual está aberto) -->
+    <div id="bs-cur-deck" style="display:none;text-align:center;padding:4px 0 8px;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.05em;text-transform:uppercase;">
+      <span style="color:var(--text-faint);">from</span>
+      <span id="bs-cur-deck-name" style="color:var(--accent);font-weight:700;border-bottom:2px solid var(--accent);padding:0 4px 2px;margin-left:6px;"></span>
+    </div>
   </div>
 
   <div class="bs-ctrl" id="bs-ctrl" style="display:none">
@@ -16163,7 +16383,8 @@ function bsUpdateChipCounts(){
     Object.entries(chips).forEach(([elId, deckIds]) => {
       const el = document.getElementById(elId);
       if(!el) return;
-      let nw=0, due=0;
+      // Formato Anki: new + lrn + due (3 números coloridos separados por "+")
+      let nw=0, lrn=0, rev=0;
       deckIds.forEach(id => {
         const cards = (window.DECKS||{})[id]||[];
         if(!cards.length) return;
@@ -16175,24 +16396,73 @@ function bsUpdateChipCounts(){
         cards.forEach(card => {
           const s = getState(card.id);
           if(s.state===ST_NEW && cnt<newLeft){ nw++; cnt++; }
-          else if((s.state===ST_LRN||s.state===ST_RLN)&&s.due<=now+1200000) due++;
-          else if(s.state===ST_REV&&s.due<=now+86400000) due++;
+          else if((s.state===ST_LRN||s.state===ST_RLN)&&s.due<=now+1200000) lrn++;
+          else if(s.state===ST_REV&&s.due<=now+86400000) rev++;
         });
       });
-      // Renderiza no chip
-      if(nw===0 && due===0){
+      // Renderiza no chip — sempre o trio "new+lrn+due", igual aos outros chips
+      if(nw===0 && lrn===0 && rev===0){
         el.innerHTML = '';
       } else {
-        let html = '';
-        if(nw>0)  html += '<span class="bdc-n">' + nw + ' new</span>';
-        if(nw>0 && due>0) html += '<span class="bdc-sep"> · </span>';
-        if(due>0) html += '<span class="bdc-d">' + due + ' due</span>';
-        el.innerHTML = html;
+        el.innerHTML =
+          '<span class="bdc-n">' + nw + '</span>' +
+          '<span class="bdc-sep">+</span>' +
+          '<span class="bdc-l">' + lrn + '</span>' +
+          '<span class="bdc-sep">+</span>' +
+          '<span class="bdc-d">' + rev + '</span>';
       }
     });
   } catch(e) { console.warn('bsUpdateChipCounts', e); }
 }
 window.bsUpdateChipCounts = bsUpdateChipCounts;
+
+// ── Indicador "from <DECK>" abaixo da bs-stats ──
+// Mostra qual deck o card atual veio. Útil principalmente em "Step 2 Complete"
+// (que é a união de boardmd_s2 + core + new_s2ck).
+const _BS_DECK_LABELS = {
+  'boardmd_s1':'BoardMD S1',
+  'boardmd_s2':'BoardMD S2 CK',
+  'core':'Core S2',
+  's1_core':'Core S1',
+  'new_s2ck':'New S2 CK',
+  's1':'Rapid Review S1',
+  's2':'Rapid Review S2',
+  'hy1':'HY S1',
+  'fa_s1':'Clinical Patterns',
+  'arrows':'Trends & Arrows',
+  'ethics':'Ethics',
+  'fa_step1':'Foundations',
+  'daily_review':'Daily Review',
+};
+const _BS_DECK_COLORS = {
+  'boardmd_s1':'#3b7fff','boardmd_s2':'#3b7fff','core':'#4f8ef7','s1_core':'#4f8ef7',
+  'new_s2ck':'#10b981','daily_review':'#0ea5e9','ethics':'#a855f7',
+};
+function _bsUpdateCurDeck(card){
+  const wrap = document.getElementById('bs-cur-deck');
+  const nameEl = document.getElementById('bs-cur-deck-name');
+  if(!wrap || !nameEl || !card) return;
+  // Descobre o deck olhando em qual window.DECKS[id] o card existe.
+  // Quando bs.deck != 'all', já temos a info — mas verifica de qualquer jeito
+  // por segurança (Step 2 Complete pode misturar 3 decks).
+  let foundId = null;
+  const decksObj = window.DECKS || {};
+  for(const id of Object.keys(decksObj)){
+    const arr = decksObj[id] || [];
+    if(arr.some(c => c.id === card.id)){ foundId = id; break; }
+  }
+  if(!foundId){
+    wrap.style.display = 'none';
+    return;
+  }
+  const label = _BS_DECK_LABELS[foundId] || foundId;
+  const color = _BS_DECK_COLORS[foundId]  || 'var(--accent)';
+  nameEl.textContent = label;
+  nameEl.style.color = color;
+  nameEl.style.borderBottomColor = color;
+  wrap.style.display = '';
+}
+window._bsUpdateCurDeck = _bsUpdateCurDeck;
 
 window.bsSpd=function(v){
   BS.spd=SPDS[v]||3000;
@@ -16272,6 +16542,8 @@ function render(){
   if(!BS.cards.length){el.innerHTML='<div class="bs-empty"><h3>No cards available</h3><p>Try another mode or deck</p></div>';return;}
   if(BS.cur>=BS.cards.length){showDone();return;}
   const card=BS.cards[BS.cur];
+  // FIX 2026-05-14: indicador do deck do card atual (faixa colorida abaixo de stats)
+  try { _bsUpdateCurDeck(card); } catch(e){}
   const phs=PHS[BS.mode]||PHS.flash;
   const ph=phs[BS.ph]||phs[0];
   BS.seen.add(card.id);
@@ -16576,6 +16848,30 @@ function bsUpdateFsrsCounter(){
     if(newEl) newEl.textContent=nw;
     if(lrnEl) lrnEl.textContent=lrn;
     if(dueEl) dueEl.textContent=due;
+
+    // FIX 2026-05-14: sublinhar o número correspondente ao TIPO do card ATUAL
+    // (estilo Anki). Ex: se o card atual é "learning", o número amarelo fica
+    // sublinhado — o aluno sabe na hora qual classe esse card pertence.
+    var curCard = cards[BS.cur];
+    var curType = null; // 'new' | 'lrn' | 'due'
+    if(curCard){
+      var cs = fs[curCard.id];
+      if(!cs || cs.state===0)             curType = 'new';
+      else if(cs.state===1 || cs.state===3) curType = 'lrn';
+      else if(cs.state===2)                curType = 'due';
+    }
+    // Reset visual em todos os 3
+    [['bs-fsrs-new','new','#3b82f6'],
+     ['bs-fsrs-lrn','lrn','#f59e0b'],
+     ['bs-fsrs-due','due','#22c55e']].forEach(function(t){
+      var el = document.getElementById(t[0]);
+      if(!el) return;
+      var on = (curType === t[1]);
+      el.style.borderBottom = on ? ('2px solid ' + t[2]) : '';
+      el.style.fontWeight   = on ? '800' : '700';
+      el.style.padding      = on ? '0 2px 1px' : '';
+      el.style.transition   = 'border-bottom .2s, font-weight .2s';
+    });
   }catch(e){}
 }
 
@@ -16662,6 +16958,8 @@ window.bsOpenAttending=function(topic,kp){
     // Enter envia; Shift+Enter quebra linha
     if(e.key === 'Enter' && !e.shiftKey){ e.preventDefault(); askAttendingInline('custom', null); }
   });
+  // FIX 2026-05-14: histórico de perguntas (autocomplete)
+  try { _askAttachSuggestions(bsInput); } catch(e){ console.warn('ask suggest BS:', e); }
 
   // Guarda contexto do card (askAttendingInline precisa de wrap._attCard)
   wrap._attCard = card;
