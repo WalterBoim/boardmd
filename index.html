@@ -12923,7 +12923,9 @@ function bmdDashSync() {
       if(rev>0) html += `<span class="badge badge-due">${rev} due</span>`;
       el.innerHTML = html;
     });
-    // Deck stats: total cards + accuracy
+    // Deck stats: total cards apenas (new/lrn/due já aparecem nos balões à direita)
+    // FIX 2026-05-14: simplificado a pedido do Walter — antes mostrava
+    // "4.496 cards · 4483 + 1" o que duplicava info dos badges.
     const statDecks = ['boardmd_s1','s1_core','boardmd_s2','core','new_s2ck','daily_review','s1','s2','hy1','fa_s1','arrows','ethics','fa_step1','shelf_em','shelf_surgery','shelf_obgyn','shelf_im','shelf_fm','shelf_peds','shelf_psych','shelf_neuro'];
     statDecks.forEach(id => {
       const el = document.getElementById('stats-' + id);
@@ -12932,28 +12934,7 @@ function bmdDashSync() {
       if(!cards.length) return;
       const total = cards.length;
       if(!total) return;
-      // Count new/lrn/due same way as badges
-      const today2 = dayStamp();
-      try { const f=JSON.parse(localStorage.getItem(TODAY_KEY)||'{}'); if(f[id]&&f[id].date===today2) todayData[id]=f[id]; } catch(e){}
-      const newSeen2 = todayData[id]?.newSeen||0;
-      const newLeft2 = Math.max(0, c.newPerDay - newSeen2);
-      let nw2=0, lrn2=0, rev2=0, cnt2=0;
-      cards.forEach(card => {
-        const s = getState(card.id);
-        if(s.state===ST_NEW && cnt2<newLeft2){ nw2++; cnt2++; }
-        else if((s.state===ST_LRN||s.state===ST_RLN)&&s.due<=now+1200000) lrn2++;
-        else if(s.state===ST_REV&&s.due<=now+86400000) rev2++;
-      });
-      let html = '<span class="ds-total">' + total.toLocaleString() + ' cards</span>';
-      if(nw2>0||lrn2>0||rev2>0){
-        html += '<span class="ds-div">·</span>';
-        if(nw2>0)  html += '<span class="ds-new">' + nw2 + '</span>';
-        if(nw2>0 && (lrn2>0||rev2>0)) html += '<span class="ds-label">+</span>';
-        if(lrn2>0) html += '<span class="ds-lrn">' + lrn2 + '</span>';
-        if(lrn2>0 && rev2>0) html += '<span class="ds-label">+</span>';
-        if(rev2>0) html += '<span class="ds-due">' + rev2 + '</span>';
-      }
-      el.innerHTML = html;
+      el.innerHTML = '<span class="ds-total">' + total.toLocaleString() + ' cards</span>';
     });
     // coins
     const cv = document.getElementById('coin-val');
@@ -16109,6 +16090,19 @@ function bmdSetupDrag(){
 .bs-deck-cnt .bdc-n{color:#3b82f6}.bs-deck-cnt .bdc-l{color:#f59e0b}.bs-deck-cnt .bdc-d{color:#22c55e}
 .bs-deck-cnt .bdc-sep{color:var(--text-faint);font-weight:400}
 .bs-deck-sub{display:block;font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:700;margin-top:2px;opacity:.7}
+/* FIX 2026-05-14: cores dos contadores no <span class="bs-deck-sub"> também
+   (todos os chips do BS usam .bs-deck-sub, não .bs-deck-cnt). E forçar a cor
+   mesmo quando o chip está selecionado (.bs-deck.on tem color:#fff que
+   estava sobrescrevendo as cores dos filhos via herança). */
+.bs-deck-sub .bdc-n{color:#3b82f6 !important}
+.bs-deck-sub .bdc-l{color:#f59e0b !important}
+.bs-deck-sub .bdc-d{color:#22c55e !important}
+.bs-deck-sub .bdc-sep{color:var(--text-faint) !important;font-weight:400}
+.bs-deck.on .bs-deck-sub{opacity:1}
+.bs-deck.on .bs-deck-sub .bdc-n{color:#93c5fd !important}
+.bs-deck.on .bs-deck-sub .bdc-l{color:#fcd34d !important}
+.bs-deck.on .bs-deck-sub .bdc-d{color:#86efac !important}
+.bs-deck.on .bs-deck-sub .bdc-sep{color:rgba(255,255,255,.5) !important}
 
 .bs-cr-occlude{
   position:relative;cursor:pointer;
