@@ -7113,23 +7113,19 @@ function renderCard(){
   // QID badge
   const qEl=document.getElementById('c-qid');
   if(qEl){
-    // Only show QID if it's a real numeric UWorld QID (not internal like "hy_1")
-    const isRealQid = card.qid && /^\d+$/.test(String(card.qid));
-    if(isRealQid){
-      qEl.textContent='QID '+card.qid;
+    // FIX 2026-05-14: formatação enxuta — só o número/ID curto, sem prefixo "QID ".
+    // Mantém o card.qid completo no banco (pra busca/debug/sync), só muda APRESENTAÇÃO.
+    const _disp = _displayQid(card);
+    if(_disp){
+      qEl.textContent = _disp.label;
       qEl.style.display='';
-      qEl.style.background='rgba(59,127,255,.1)';
-      qEl.style.color='var(--accent)';
-    } else if(card.deck==='boardmd_s1'||card.deck==='boardmd_s2'){
-      // Extract BID from card id (e.g. boardmd_s1_1234 → BID 1234)
-      const bidNum = (card.id||'').replace(/^boardmd_s[12]_/,'');
-      if(bidNum){
-        qEl.textContent='BID '+bidNum;
-        qEl.style.display='';
-        qEl.style.background='rgba(139,92,246,.12)';
-        qEl.style.color='#8b5cf6';
-      } else { qEl.style.display='none'; }
-    } else { qEl.style.display='none'; }
+      qEl.style.background = _disp.bg;
+      qEl.style.color = _disp.color;
+      // Tooltip mostra o ID completo (útil pra debug e copiar)
+      qEl.title = _disp.full;
+    } else {
+      qEl.style.display='none';
+    }
   }
 
   // Deck name badge (canto direito do card)
@@ -10315,6 +10311,66 @@ window.renderCard = function(){
   // Isso elimina qualquer chance do grifo (ou qualquer outra coisa) reduzir o texto.
   setTimeout(() => _lockTypographyOnZones(), 80);
 };
+
+// ── QID display centralizado ────────────────────────────────────────
+// O `card.qid` no banco pode vir em vários formatos:
+//   - "12345"           → UWorld QID puro (numérico)
+//   - "BMD-S2-3396"     → BoardMD S2 CK (novo deck)
+//   - "BMD-S1-1234"     → BoardMD S1
+//   - "hy_1", "eth_42"  → IDs internos legados
+//   - undefined/vazio   → fallback usa últimos dígitos de card.id
+//
+// Decisão de UX (2026-05-14): NÃO mostrar prefixo "QID " no label visível
+// — fica visualmente mais limpo (estilo UWorld que mostra só "Q.12345").
+// O ID COMPLETO é mantido no tooltip pra copiar/buscar/feedback.
+function _displayQid(card){
+  if(!card) return null;
+  const raw = String(card.qid || '').trim();
+  // UWorld numérico puro
+  if(raw && /^\d+$/.test(raw)){
+    return {
+      label: raw,
+      full: raw,
+      bg:    'rgba(59,127,255,.1)',
+      color: 'var(--accent)',
+    };
+  }
+  // BoardMD format: "BMD-S2-3396" → "S2-3396" (badge do deck já mostra "BoardMD")
+  const mBmd = raw.match(/^BMD-(S[12])-(.+)$/i);
+  if(mBmd){
+    return {
+      label: mBmd[1].toUpperCase() + '-' + mBmd[2],
+      full:  raw,
+      bg:    'rgba(139,92,246,.12)',
+      color: '#8b5cf6',
+    };
+  }
+  // BoardMD S1/S2 sem qid: extrai do card.id (ex: boardmd_s2_1234 → "S2-1234")
+  if(card.deck === 'boardmd_s1' || card.deck === 'boardmd_s2'){
+    const bidNum = (card.id || '').replace(/^boardmd_(s[12])_/i, '');
+    if(bidNum && bidNum !== card.id){
+      const step = card.deck === 'boardmd_s2' ? 'S2' : 'S1';
+      return {
+        label: step + '-' + bidNum,
+        full:  card.id,
+        bg:    'rgba(139,92,246,.12)',
+        color: '#8b5cf6',
+      };
+    }
+  }
+  // Decks "originais" do BoardMD com qid string não-BMD (ex: new_s2ck)
+  if(raw && raw.length > 0 && raw.length < 30){
+    return {
+      label: raw,
+      full:  raw,
+      bg:    'rgba(16,185,129,.1)',
+      color: '#10b981',
+    };
+  }
+  // Sem qid → não mostra (evita ruído visual)
+  return null;
+}
+window._displayQid = _displayQid;
 
 // Trava tipografia das zonas grifáveis usando inline style (prioridade máxima).
 // Pega o computed style imediatamente após o render (quando ainda está correto)
@@ -16630,7 +16686,14 @@ function render(){
   renderDots();
   const topic=(card.topic||card.subject||'Card').toUpperCase();
   const dk=DKL[card.deck]||(card.deck||'').toUpperCase();
-  const qid=card.qid?'QID '+card.qid:'#'+(card.id||'').toString().slice(-5);
+  // FIX 2026-05-14: usa _displayQid pra apresentação enxuta (sem prefixo "QID ")
+  let qid;
+  try {
+    const _d = window._displayQid ? window._displayQid(card) : null;
+    qid = _d ? _d.label : ('#' + (card.id||'').toString().slice(-5));
+  } catch(e) {
+    qid = card.qid ? String(card.qid) : ('#' + (card.id||'').toString().slice(-5));
+  }
   let h='<div class="bs-ch"><span class="bs-ct">'+topic+'</span><div class="bs-cm"><span class="bs-db">'+dk+'</span><span class="bs-qi">'+qid+'</span></div></div>';
   if(ph==='vignette'){
     h+='<div class="bs-sl">Vignette</div><div class="bs-vg">'+hlVignette(card.q||'',card.phrase||'')+'</div>';
