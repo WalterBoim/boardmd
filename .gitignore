@@ -142,3 +142,4 @@ rewrite_*_progress.json
 
 # Backups locais antes de edições manuais
 index.html.backup-*
+setkey.sh

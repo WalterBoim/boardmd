@@ -16019,6 +16019,10 @@ function renderDots(){
 
 function render(){
   const el=document.getElementById('bs-cb');if(!el)return;
+  // FIX: remove painel BoardMD Attending órfão ao trocar de card / fase
+  // (antes ele ficava preso na página quando o aluno avançava)
+  const _staleAtt = document.getElementById('att-inline-wrap');
+  if(_staleAtt) _staleAtt.remove();
   if(!BS.cards.length){el.innerHTML='<div class="bs-empty"><h3>No cards available</h3><p>Try another mode or deck</p></div>';return;}
   if(BS.cur>=BS.cards.length){showDone();return;}
   const card=BS.cards[BS.cur];
