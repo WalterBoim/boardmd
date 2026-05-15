@@ -8741,6 +8741,43 @@ function launchQidSession(){
   renderCard();updateStats();
 }
 
+// ── Helper: abre Study com um único card (usado pelo BrainStorm → vignette) ──
+// CRÍTICO: precisa estar no MESMO escopo top-level onde `deck`/`idx`/etc são
+// declarados com `let`, senão atribuir via `window.deck=…` não afeta a variável
+// que `renderCard()` lê e cai no "Session complete · 0 cards".
+function _bmdOpenSingleCardSession(card){
+  if(!card){ alert('No card to open.'); return; }
+  currentDeck = '_bs_vignette';
+  deck = [card];
+  againQueue = [];
+  idx = 0;
+  revealed = false;
+  sessionRatings = {};
+  const appEl = document.getElementById('app');
+  if(appEl) appEl.classList.add('active');
+  const landing = document.getElementById('landing');
+  if(landing) landing.style.display = 'none';
+  if(typeof hideDeckHome === 'function') hideDeckHome();
+  if(typeof ensureStudyUI === 'function') ensureStudyUI();
+  // Limpa qualquer overlay residual de "Session complete" de uma sessão anterior
+  try { if(typeof _bmdCloseSessionOverlay === 'function') _bmdCloseSessionOverlay(); } catch(e){}
+  if(typeof renderCard === 'function') renderCard();
+  if(typeof updateStats === 'function') updateStats();
+}
+try { window._bmdOpenSingleCardSession = _bmdOpenSingleCardSession; } catch(e){}
+
+// Helper de restauração também precisa de acesso top-level
+function _bmdRestoreSessionFromSnap(snap){
+  if(!snap) return;
+  if(snap.deckSnap !== null && snap.deckSnap !== undefined)         deck = snap.deckSnap;
+  if(snap.idxSnap !== null && snap.idxSnap !== undefined)           idx = snap.idxSnap;
+  if(snap.againSnap !== null && snap.againSnap !== undefined)       againQueue = snap.againSnap;
+  if(snap.currentDeckSnap !== null && snap.currentDeckSnap !== undefined) currentDeck = snap.currentDeckSnap;
+  if(snap.revealedSnap !== null && snap.revealedSnap !== undefined) revealed = snap.revealedSnap;
+  if(snap.sessionRatingsSnap)                                       sessionRatings = snap.sessionRatingsSnap;
+}
+try { window._bmdRestoreSessionFromSnap = _bmdRestoreSessionFromSnap; } catch(e){}
+
 // ── DOWNLOAD CSV ──────────────────────────────────────────────────────
 function downloadDeck(deckId,name){
   const cards=DECKS[deckId]||[];
@@ -16688,9 +16725,6 @@ function bmdSetupDrag(){
 .bs-btn.pr{background:var(--accent);border-color:var(--accent);color:#fff;box-shadow:0 2px 12px rgba(59,127,255,.3)}
 .bs-btn.fl{color:var(--gold)}
 .bs-btn.fl.on{background:var(--gold-dim);border-color:var(--gold)}
-/* ── Open vignette button (BS → Card flashcard) ────────────────────── */
-.bs-btn.bs-open-vig-btn{color:var(--accent);border-color:rgba(59,127,255,.35);background:rgba(59,127,255,.06)}
-.bs-btn.bs-open-vig-btn:hover{background:rgba(59,127,255,.14);border-color:var(--accent)}
 /* ── Return-to-BrainStorm banner (visible in Study after bsOpenVignette) ── */
 #bmd-bs-return-banner{
   position:sticky;top:0;z-index:90;
@@ -17026,16 +17060,24 @@ function bmdSetupDrag(){
       </span>
     </div>
     <!-- FIX 2026-05-14: indicador do deck do card atual (mostra qual está aberto) -->
+    <!-- 2026-05-15: chip agora é clicável para abrir o vignette completo do card (atalho V) -->
     <div id="bs-cur-deck" style="display:none;text-align:center;padding:4px 0 8px;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.05em;text-transform:uppercase;">
       <span style="color:var(--text-faint);">from</span>
-      <span id="bs-cur-deck-name" style="color:var(--accent);font-weight:700;border-bottom:2px solid var(--accent);padding:0 4px 2px;margin-left:6px;"></span>
+      <button type="button" id="bs-cur-deck-btn"
+              onclick="bsOpenVignette()"
+              title="Open the full vignette/flashcard for this card (V)"
+              style="background:none;border:none;padding:0;margin-left:6px;font-family:inherit;font-size:inherit;letter-spacing:inherit;text-transform:inherit;cursor:pointer;color:var(--accent);font-weight:700;border-bottom:2px solid var(--accent);line-height:1.4;display:inline-flex;align-items:center;gap:5px;transition:opacity .15s"
+              onmouseover="this.style.opacity='.75'"
+              onmouseout="this.style.opacity='1'">
+        <span id="bs-cur-deck-name"></span>
+        <svg viewBox="0 0 16 16" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="opacity:.7"><path d="M5 3l5 5-5 5"/></svg>
+      </button>
     </div>
   </div>
 
   <div class="bs-ctrl" id="bs-ctrl" style="display:none">
     <button class="bs-btn" onclick="bsGo(-1)">← Back</button>
     <button class="bs-btn fl" id="bs-flag-btn" onclick="bsDoFlag()">⚑ Flag</button>
-    <button class="bs-btn bs-open-vig-btn" id="bs-open-vig-btn" onclick="bsOpenVignette()" title="Open the full vignette / flashcard for this item (V)">📋 Open vignette →</button>
     <button class="bs-btn pr" onclick="bsGo(1)">Next →</button>
   </div>
 </div>
@@ -17212,6 +17254,12 @@ function _bsUpdateCurDeck(card){
   nameEl.textContent = label;
   nameEl.style.color = color;
   nameEl.style.borderBottomColor = color;
+  // 2026-05-15: também aplica cor no botão wrapper (border-bottom mora nele agora)
+  const btn = document.getElementById('bs-cur-deck-btn');
+  if(btn){
+    btn.style.color = color;
+    btn.style.borderBottomColor = color;
+  }
   wrap.style.display = '';
 }
 window._bsUpdateCurDeck = _bsUpdateCurDeck;
@@ -17819,40 +17867,38 @@ window.bsOpenVignette = function(){
   // Snapshot do contexto Study atual (pra restaurar ao voltar)
   _bmdBsSuspended = {
     card: card,
-    bsScrollY: (document.getElementById('bs-overlay')||{}).scrollTop || 0,
     bodyOverflow: document.body.style.overflow,
-    // estado Study
-    deckSnap: (typeof window.deck !== 'undefined') ? window.deck : null,
-    idxSnap: (typeof window.idx !== 'undefined') ? window.idx : 0,
-    againSnap: (typeof window.againQueue !== 'undefined') ? window.againQueue : null,
-    currentDeckSnap: (typeof window.currentDeck !== 'undefined') ? window.currentDeck : null,
-    revealedSnap: (typeof window.revealed !== 'undefined') ? window.revealed : false,
+    // estado Study — capturado de variáveis top-level expostas como propriedades
+    // do window pelos códigos que rodam no escopo global; se algum estiver
+    // undefined, ignoramos no restore.
+    deckSnap:           (typeof window.deck !== 'undefined') ? window.deck : null,
+    idxSnap:            (typeof window.idx !== 'undefined') ? window.idx : 0,
+    againSnap:          (typeof window.againQueue !== 'undefined') ? window.againQueue : null,
+    currentDeckSnap:    (typeof window.currentDeck !== 'undefined') ? window.currentDeck : null,
+    revealedSnap:       (typeof window.revealed !== 'undefined') ? window.revealed : false,
     sessionRatingsSnap: (typeof window.sessionRatings !== 'undefined') ? window.sessionRatings : {},
   };
 
   // Pausa o BS: stopa timers mas NÃO limpa BS.cards/BS.cur (preserva sessão)
   try { stopPlay(); } catch(e){}
-  try { if(BS.clock){ clearInterval(BS.clock); /* timer "tempo decorrido" zera ao retomar */ } } catch(e){}
+  try { if(BS.clock){ clearInterval(BS.clock); } } catch(e){}
 
   // Esconde overlay BS (sem remover state)
   const ov = document.getElementById('bs-overlay');
   if(ov) ov.classList.remove('on');
   document.body.style.overflow = '';
 
-  // Monta sessão de um card só (mesma técnica do qidSession)
+  // Monta sessão de um card só usando helper top-level (CRÍTICO: as variáveis
+  // `deck`, `idx`, etc. são `let` no escopo global e NÃO são propriedades do
+  // window. Por isso precisamos chamar uma função declarada no mesmo escopo
+  // top-level — atribuir via window.deck=… aqui não afetaria a variável real
+  // que renderCard() lê e cairia em "Session complete · 0 cards").
+  if(typeof window._bmdOpenSingleCardSession !== 'function'){
+    alert('Internal error: _bmdOpenSingleCardSession not available.');
+    return;
+  }
   try {
-    window.currentDeck = '_bs_vignette';
-    window.deck = [card];
-    window.againQueue = [];
-    window.idx = 0;
-    window.revealed = false;
-    window.sessionRatings = {};
-    const appEl = document.getElementById('app');
-    if(appEl) appEl.classList.add('active');
-    const landing = document.getElementById('landing');
-    if(landing) landing.style.display = 'none';
-    if(typeof window.hideDeckHome === 'function') window.hideDeckHome();
-    if(typeof window.ensureStudyUI === 'function') window.ensureStudyUI();
+    window._bmdOpenSingleCardSession(card);
   } catch(e){
     console.error('[bsOpenVignette] erro montando sessão:', e);
     alert('Could not open vignette: ' + (e.message||e));
@@ -17861,12 +17907,6 @@ window.bsOpenVignette = function(){
 
   // Mostra banner sticky com "Back to BrainStorm"
   showReturnBanner(card);
-
-  // Renderiza o card
-  try {
-    if(typeof window.renderCard === 'function') window.renderCard();
-    if(typeof window.updateStats === 'function') window.updateStats();
-  } catch(e){ console.error('[bsOpenVignette] renderCard error:', e); }
 
   console.log('[bsOpenVignette] vignette aberto para card', card.id, '— BS suspenso');
 };
@@ -17883,15 +17923,12 @@ window.bsResumeFromVignette = function(){
   // Esconde banner
   hideReturnBanner();
 
-  // Restaura Study state (não obrigatório se vai voltar pro overlay,
-  // mas evita lixo caso o user feche o BS depois)
+  // Restaura Study state via helper top-level (mesmo motivo do scope: precisa
+  // mexer nas `let` reais, não em window.deck).
   try {
-    if(snap.deckSnap !== null)         window.deck = snap.deckSnap;
-    if(snap.idxSnap !== null)          window.idx = snap.idxSnap;
-    if(snap.againSnap !== null)        window.againQueue = snap.againSnap;
-    if(snap.currentDeckSnap !== null)  window.currentDeck = snap.currentDeckSnap;
-    if(snap.revealedSnap !== null)     window.revealed = snap.revealedSnap;
-    if(snap.sessionRatingsSnap)        window.sessionRatings = snap.sessionRatingsSnap;
+    if(typeof window._bmdRestoreSessionFromSnap === 'function'){
+      window._bmdRestoreSessionFromSnap(snap);
+    }
   } catch(e){ console.warn('[bsResumeFromVignette] erro restaurando state:', e); }
 
   // Reabre overlay BS (state foi preservado: BS.cards, BS.cur, BS.mode etc)
@@ -17899,7 +17936,7 @@ window.bsResumeFromVignette = function(){
   if(ov) ov.classList.add('on');
   document.body.style.overflow = 'hidden';
 
-  // Reinicia timer "tempo decorrido" da seção BS (cronômetro do canto)
+  // Reinicia timer "tempo decorrido" da seção BS
   if(BS.clock) clearInterval(BS.clock);
   BS.clock = setInterval(function(){
     BS.elapsed++;
