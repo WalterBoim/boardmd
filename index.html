@@ -12366,12 +12366,90 @@ function handleHlSelection(e){
       // Re-trava tipografia também ao remover grifo
       try { if(typeof window._lockTypographyOnZones === 'function') window._lockTypographyOnZones(); } catch(e){}
     };
+
+    // ════════ DIAGNÓSTICO AO VIVO (2026-05-14 v4) ════════
+    // Capturamos o estado COMPLETO do .card-question ANTES de inserir o <mark>.
+    // Se algo mudar depois, imprimimos a diff no console pra você me mandar.
+    const _diagEl = document.getElementById('c-q') || document.querySelector('.card-question');
+    let _before = null;
+    if(_diagEl){
+      const cs = getComputedStyle(_diagEl);
+      const rect = _diagEl.getBoundingClientRect();
+      _before = {
+        fontSize:        cs.fontSize,
+        lineHeight:      cs.lineHeight,
+        letterSpacing:   cs.letterSpacing,
+        wordSpacing:     cs.wordSpacing,
+        fontFamily:      cs.fontFamily,
+        fontWeight:      cs.fontWeight,
+        fontStyle:       cs.fontStyle,
+        fontStretch:     cs.fontStretch,
+        textRendering:   cs.textRendering,
+        fontFeatures:    cs.fontFeatureSettings,
+        fontVariant:     cs.fontVariantLigatures,
+        padding:         cs.padding,
+        width:           rect.width.toFixed(2),
+        height:          rect.height.toFixed(2),
+      };
+    }
+
     range.surroundContents(mark);
     sel.removeAllRanges();
-    // FIX 2026-05-14 v3: simples e robusto — re-aplica o lock tipográfico
-    // após inserir o mark. As zonas já têm inline font-* (locked no render),
-    // mas garantimos que ainda batem com o computed style atual.
-    try { if(typeof window._lockTypographyOnZones === 'function') window._lockTypographyOnZones(); } catch(e){}
+
+    // ─── LOCK NUCLEAR: aplica em 5 momentos diferentes pra cobrir qualquer reflow ───
+    const _doLock = () => {
+      try { if(typeof window._lockTypographyOnZones === 'function') window._lockTypographyOnZones(); } catch(e){}
+    };
+    _doLock();                                          // síncrono
+    requestAnimationFrame(_doLock);                     // próximo frame
+    requestAnimationFrame(() => requestAnimationFrame(_doLock)); // 2 frames
+    setTimeout(_doLock, 50);                            // 50ms (cobre fonts loading)
+    setTimeout(_doLock, 200);                           // 200ms (cobre reflows tardios)
+
+    // Compara ANTES vs DEPOIS após reflow + lock (200ms)
+    if(_diagEl && _before){
+      setTimeout(() => {
+        const cs2 = getComputedStyle(_diagEl);
+        const rect2 = _diagEl.getBoundingClientRect();
+        const _after = {
+          fontSize:        cs2.fontSize,
+          lineHeight:      cs2.lineHeight,
+          letterSpacing:   cs2.letterSpacing,
+          wordSpacing:     cs2.wordSpacing,
+          fontFamily:      cs2.fontFamily,
+          fontWeight:      cs2.fontWeight,
+          fontStyle:       cs2.fontStyle,
+          fontStretch:     cs2.fontStretch,
+          textRendering:   cs2.textRendering,
+          fontFeatures:    cs2.fontFeatureSettings,
+          fontVariant:     cs2.fontVariantLigatures,
+          padding:         cs2.padding,
+          width:           rect2.width.toFixed(2),
+          height:          rect2.height.toFixed(2),
+        };
+        const diffs = [];
+        Object.keys(_before).forEach(k => {
+          if(_before[k] !== _after[k]) diffs.push({prop: k, before: _before[k], after: _after[k]});
+        });
+        if(diffs.length){
+          console.warn('🔴 [HL DIAG] .card-question MUDOU após grifar:');
+          console.table(diffs);
+          // Tenta corrigir as propriedades que mudaram, forçando inline
+          diffs.forEach(d => {
+            try {
+              if(d.prop in _diagEl.style){
+                _diagEl.style[d.prop] = _before[d.prop];
+              }
+            } catch(e){}
+          });
+          console.warn('🟢 [HL DIAG] forçado inline. Se ainda mudou, é layout/transform/zoom externo.');
+        } else {
+          console.log('✅ [HL DIAG] .card-question NÃO mudou após grifar (computed style estável).');
+        }
+      }, 250);
+    }
+    // ════════ FIM DIAGNÓSTICO ════════
+
     // Save highlights for current card
     _saveCardHighlights();
   } catch(err){
