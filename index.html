@@ -16688,6 +16688,33 @@ function bmdSetupDrag(){
 .bs-btn.pr{background:var(--accent);border-color:var(--accent);color:#fff;box-shadow:0 2px 12px rgba(59,127,255,.3)}
 .bs-btn.fl{color:var(--gold)}
 .bs-btn.fl.on{background:var(--gold-dim);border-color:var(--gold)}
+/* ── Open vignette button (BS → Card flashcard) ────────────────────── */
+.bs-btn.bs-open-vig-btn{color:var(--accent);border-color:rgba(59,127,255,.35);background:rgba(59,127,255,.06)}
+.bs-btn.bs-open-vig-btn:hover{background:rgba(59,127,255,.14);border-color:var(--accent)}
+/* ── Return-to-BrainStorm banner (visible in Study after bsOpenVignette) ── */
+#bmd-bs-return-banner{
+  position:sticky;top:0;z-index:90;
+  display:none;align-items:center;justify-content:space-between;gap:14px;
+  background:linear-gradient(90deg, rgba(59,127,255,.10), rgba(59,127,255,.04));
+  border-bottom:1px solid rgba(59,127,255,.25);
+  padding:10px 18px;font-family:'Lato',sans-serif;font-size:13px;color:var(--text);
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+}
+#bmd-bs-return-banner.on{display:flex}
+#bmd-bs-return-banner .bs-rb-info{display:flex;align-items:center;gap:10px;flex:1;min-width:0}
+#bmd-bs-return-banner .bs-rb-info .bs-rb-icon{font-size:16px;flex-shrink:0}
+#bmd-bs-return-banner .bs-rb-info .bs-rb-label{font-weight:600;color:var(--text)}
+#bmd-bs-return-banner .bs-rb-info .bs-rb-sub{color:var(--text-dim);font-size:12px;font-weight:400;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#bmd-bs-return-banner .bs-rb-btn{
+  background:var(--accent);color:#fff;border:none;border-radius:9px;
+  padding:7px 14px;font-family:inherit;font-size:12px;font-weight:700;
+  cursor:pointer;flex-shrink:0;transition:all .15s;
+}
+#bmd-bs-return-banner .bs-rb-btn:hover{filter:brightness(1.08)}
+@media (max-width:700px){
+  #bmd-bs-return-banner{padding:8px 12px;font-size:12px}
+  #bmd-bs-return-banner .bs-rb-info .bs-rb-sub{display:none}
+}
 .bs-spd2{display:flex;align-items:center;gap:8px;padding:9px 14px;border-radius:10px;background:var(--surface);border:1px solid var(--border);font-size:12px;color:var(--text-dim)}
 .bs-spd2 input{width:100px}
 .bs-spd2 b{color:var(--text)}
@@ -17008,6 +17035,7 @@ function bmdSetupDrag(){
   <div class="bs-ctrl" id="bs-ctrl" style="display:none">
     <button class="bs-btn" onclick="bsGo(-1)">← Back</button>
     <button class="bs-btn fl" id="bs-flag-btn" onclick="bsDoFlag()">⚑ Flag</button>
+    <button class="bs-btn bs-open-vig-btn" id="bs-open-vig-btn" onclick="bsOpenVignette()" title="Open the full vignette / flashcard for this item (V)">📋 Open vignette →</button>
     <button class="bs-btn pr" onclick="bsGo(1)">Next →</button>
   </div>
 </div>
@@ -17766,9 +17794,160 @@ window.closeBrainStorm=function(){
   stopPlay();clearInterval(BS.clock);BS.clock=null;
   // Limpa estado da sequência "All Modes"
   BS._allActive=false; BS._allQueue=null; BS._allCard=null;
+  // Limpa também snapshot do "vignette suspenso" caso exista
+  _bmdBsSuspended = null;
+  hideReturnBanner();
   const ov=document.getElementById('bs-overlay');if(ov)ov.classList.remove('on');
   document.body.style.overflow='';
 };
+
+// ─────────────────────────────────────────────────────────────────────
+// BS → Vignette (inverso de stormThisCard): suspende a sessão BS atual
+// e abre o card/vignette completo em modo Study. Botão "Back to BrainStorm"
+// aparece no topo do Study e devolve o usuário pra sessão BS preservada.
+// ─────────────────────────────────────────────────────────────────────
+let _bmdBsSuspended = null;  // snapshot do estado pra restaurar
+
+window.bsOpenVignette = function(){
+  // Pega card atual do BS
+  const card = (BS && BS.cards && BS.cards[BS.cur]) || null;
+  if(!card){
+    alert('No card loaded in BrainStorm to open.');
+    return;
+  }
+
+  // Snapshot do contexto Study atual (pra restaurar ao voltar)
+  _bmdBsSuspended = {
+    card: card,
+    bsScrollY: (document.getElementById('bs-overlay')||{}).scrollTop || 0,
+    bodyOverflow: document.body.style.overflow,
+    // estado Study
+    deckSnap: (typeof window.deck !== 'undefined') ? window.deck : null,
+    idxSnap: (typeof window.idx !== 'undefined') ? window.idx : 0,
+    againSnap: (typeof window.againQueue !== 'undefined') ? window.againQueue : null,
+    currentDeckSnap: (typeof window.currentDeck !== 'undefined') ? window.currentDeck : null,
+    revealedSnap: (typeof window.revealed !== 'undefined') ? window.revealed : false,
+    sessionRatingsSnap: (typeof window.sessionRatings !== 'undefined') ? window.sessionRatings : {},
+  };
+
+  // Pausa o BS: stopa timers mas NÃO limpa BS.cards/BS.cur (preserva sessão)
+  try { stopPlay(); } catch(e){}
+  try { if(BS.clock){ clearInterval(BS.clock); /* timer "tempo decorrido" zera ao retomar */ } } catch(e){}
+
+  // Esconde overlay BS (sem remover state)
+  const ov = document.getElementById('bs-overlay');
+  if(ov) ov.classList.remove('on');
+  document.body.style.overflow = '';
+
+  // Monta sessão de um card só (mesma técnica do qidSession)
+  try {
+    window.currentDeck = '_bs_vignette';
+    window.deck = [card];
+    window.againQueue = [];
+    window.idx = 0;
+    window.revealed = false;
+    window.sessionRatings = {};
+    const appEl = document.getElementById('app');
+    if(appEl) appEl.classList.add('active');
+    const landing = document.getElementById('landing');
+    if(landing) landing.style.display = 'none';
+    if(typeof window.hideDeckHome === 'function') window.hideDeckHome();
+    if(typeof window.ensureStudyUI === 'function') window.ensureStudyUI();
+  } catch(e){
+    console.error('[bsOpenVignette] erro montando sessão:', e);
+    alert('Could not open vignette: ' + (e.message||e));
+    return;
+  }
+
+  // Mostra banner sticky com "Back to BrainStorm"
+  showReturnBanner(card);
+
+  // Renderiza o card
+  try {
+    if(typeof window.renderCard === 'function') window.renderCard();
+    if(typeof window.updateStats === 'function') window.updateStats();
+  } catch(e){ console.error('[bsOpenVignette] renderCard error:', e); }
+
+  console.log('[bsOpenVignette] vignette aberto para card', card.id, '— BS suspenso');
+};
+
+window.bsResumeFromVignette = function(){
+  if(!_bmdBsSuspended){
+    console.warn('[bsResumeFromVignette] nada para retomar');
+    hideReturnBanner();
+    return;
+  }
+  const snap = _bmdBsSuspended;
+  _bmdBsSuspended = null;
+
+  // Esconde banner
+  hideReturnBanner();
+
+  // Restaura Study state (não obrigatório se vai voltar pro overlay,
+  // mas evita lixo caso o user feche o BS depois)
+  try {
+    if(snap.deckSnap !== null)         window.deck = snap.deckSnap;
+    if(snap.idxSnap !== null)          window.idx = snap.idxSnap;
+    if(snap.againSnap !== null)        window.againQueue = snap.againSnap;
+    if(snap.currentDeckSnap !== null)  window.currentDeck = snap.currentDeckSnap;
+    if(snap.revealedSnap !== null)     window.revealed = snap.revealedSnap;
+    if(snap.sessionRatingsSnap)        window.sessionRatings = snap.sessionRatingsSnap;
+  } catch(e){ console.warn('[bsResumeFromVignette] erro restaurando state:', e); }
+
+  // Reabre overlay BS (state foi preservado: BS.cards, BS.cur, BS.mode etc)
+  const ov = document.getElementById('bs-overlay');
+  if(ov) ov.classList.add('on');
+  document.body.style.overflow = 'hidden';
+
+  // Reinicia timer "tempo decorrido" da seção BS (cronômetro do canto)
+  if(BS.clock) clearInterval(BS.clock);
+  BS.clock = setInterval(function(){
+    BS.elapsed++;
+    var m = Math.floor(BS.elapsed/60), s = BS.elapsed%60;
+    var ti = document.getElementById('bs-n-time');
+    if(ti) ti.textContent = m + ':' + (s<10?'0':'') + s;
+  }, 1000);
+
+  // Re-render do card BS (state já está intacto)
+  try {
+    const renderFn = window.render || (typeof render === 'function' ? render : null);
+    if(typeof renderFn === 'function') renderFn();
+  } catch(e){ console.warn('[bsResumeFromVignette] re-render falhou:', e); }
+
+  console.log('[bsResumeFromVignette] BrainStorm retomado');
+};
+
+function showReturnBanner(card){
+  let banner = document.getElementById('bmd-bs-return-banner');
+  if(!banner){
+    banner = document.createElement('div');
+    banner.id = 'bmd-bs-return-banner';
+    // insere no topo do #app
+    const appEl = document.getElementById('app') || document.body;
+    appEl.insertBefore(banner, appEl.firstChild);
+  }
+  const topic = (card.topic || card.system || 'Card');
+  const qid = card.qid || card.id || '';
+  banner.innerHTML =
+    '<div class="bs-rb-info">' +
+      '<span class="bs-rb-icon">⚡</span>' +
+      '<span class="bs-rb-label">From BrainStorm</span>' +
+      '<span class="bs-rb-sub">' + escapeHtml(topic) + (qid ? ' · ' + escapeHtml(qid) : '') + '</span>' +
+    '</div>' +
+    '<button class="bs-rb-btn" onclick="bsResumeFromVignette()">← Back to BrainStorm</button>';
+  banner.classList.add('on');
+}
+function hideReturnBanner(){
+  const banner = document.getElementById('bmd-bs-return-banner');
+  if(banner){ banner.classList.remove('on'); }
+}
+function escapeHtml(s){
+  return String(s||'').replace(/[&<>"']/g, function(c){
+    return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c];
+  });
+}
+window._bmdHasSuspendedBS = function(){ return _bmdBsSuspended != null; };
+
 document.addEventListener('keydown',function(e){
   const ov=document.getElementById('bs-overlay');if(!ov||!ov.classList.contains('on'))return;
   // Não intercepta quando foco está num campo de texto
@@ -17779,6 +17958,21 @@ document.addEventListener('keydown',function(e){
   if(e.key==='ArrowLeft')bsGo(-1);
   if(e.key===' '){e.preventDefault();bsTogglePlay();}
   if(e.key==='f'||e.key==='F')bsDoFlag();
+  if(e.key==='v'||e.key==='V'){e.preventDefault();window.bsOpenVignette();}
+});
+
+// Atalho global: quando suspenso e Study aberto, ESC retoma o BS
+document.addEventListener('keydown',function(e){
+  if(e.key!=='Escape') return;
+  if(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA') return;
+  if(!_bmdBsSuspended) return;
+  const bsOv = document.getElementById('bs-overlay');
+  if(bsOv && bsOv.classList.contains('on')) return; // BS já visível, não interfere
+  // Não interferir se há outros modais abertos
+  const editorOv = document.getElementById('card-editor-overlay');
+  if(editorOv && editorOv.style.display && editorOv.style.display !== 'none') return;
+  e.preventDefault();
+  window.bsResumeFromVignette();
 });
 
 function renderClinicalReasoning(card, el) {
