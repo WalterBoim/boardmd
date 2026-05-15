@@ -4104,7 +4104,39 @@ html.light #venn-inline{ background:linear-gradient(180deg, rgba(37,99,235,0.04)
   transform: translateX(-50%) translateY(0);
 }
 
-/* FIX 2026-05-14 v2: <mark> nunca altera font-size/weight/family/spacing — só background.
+/* FIX 2026-05-15 v6: highlight via <span> em vez de <mark>.
+   <mark> tem user-agent stylesheet que dispara reflow tipográfico (texto encurta
+   ao grifar). <span> é elemento neutro, sem styles default — não muda nada do
+   layout do texto ao redor. Mesmas cores que mark.hl-* pra compatibilidade. */
+span.hl, span.hl-yellow, span.hl-green, span.hl-blue {
+  border-radius: 2px;
+  cursor: pointer;
+  display: inline;
+  padding: 0;
+  margin: 0;
+  /* CRITICAL: zerar TODOS os estilos que poderiam disparar reflow tipográfico */
+  font-size: inherit !important;
+  font-family: inherit !important;
+  font-weight: inherit !important;
+  font-style: inherit !important;
+  letter-spacing: inherit !important;
+  line-height: inherit !important;
+  word-spacing: inherit !important;
+  text-rendering: inherit !important;
+  font-feature-settings: inherit !important;
+  font-variant-ligatures: inherit !important;
+  vertical-align: baseline !important;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+span.hl-yellow { background: #ffe066; }
+span.hl-green  { background: #86efac; }
+span.hl-blue   { background: #7dd3fc; }
+html.dark span.hl-yellow { background: none !important; color: #fde047 !important; }
+html.dark span.hl-green  { background: none !important; color: #86efac !important; }
+html.dark span.hl-blue   { background: none !important; color: #7dd3fc !important; }
+
+/* FIX 2026-05-15 v6: <mark> nunca altera font-size/weight/family/spacing — só background.
    Diagnóstico: ao inserir <mark> via range.surroundContents, o texto do .card-question
    ficava visualmente menor/mais condensado. Causas possíveis: letter-spacing herdado,
    user-agent stylesheet de <mark>, font-feature-settings, text-rendering, ou cálculo
@@ -12500,7 +12532,7 @@ function applyHighlights(cardId){
     const el = document.getElementById(zoneId);
     if(!el) return;
     // Remove existing marks
-    el.querySelectorAll('mark.hl-yellow,mark.hl-green,mark.hl-blue').forEach(m=>{
+    el.querySelectorAll('mark.hl-yellow,mark.hl-green,mark.hl-blue,span.hl-yellow,span.hl-green,span.hl-blue').forEach(m=>{
       const parent = m.parentNode;
       parent.replaceChild(document.createTextNode(m.textContent), m);
       parent.normalize();
@@ -12510,7 +12542,7 @@ function applyHighlights(cardId){
   ['c-q'].forEach(zoneId=>{
     const el = document.getElementById(zoneId);
     if(!el) return;
-    el.querySelectorAll('mark.hl-yellow,mark.hl-green,mark.hl-blue').forEach(m=>{
+    el.querySelectorAll('mark.hl-yellow,mark.hl-green,mark.hl-blue,span.hl-yellow,span.hl-green,span.hl-blue').forEach(m=>{
       const parent = m.parentNode;
       parent.replaceChild(document.createTextNode(m.textContent), m);
       parent.normalize();
@@ -12523,7 +12555,7 @@ function clearQHighlights(){
   ['c-q','c-opts'].forEach(zoneId=>{
     const el = document.getElementById(zoneId);
     if(!el) return;
-    el.querySelectorAll('mark.hl-yellow,mark.hl-green,mark.hl-blue').forEach(m=>{
+    el.querySelectorAll('mark.hl-yellow,mark.hl-green,mark.hl-blue,span.hl-yellow,span.hl-green,span.hl-blue').forEach(m=>{
       const parent = m.parentNode;
       parent.replaceChild(document.createTextNode(m.textContent), m);
       parent.normalize();
@@ -12564,8 +12596,15 @@ function handleHlSelection(e){
   
   // Apply highlight mark
   try {
-    const mark = document.createElement('mark');
-    mark.className = 'hl-'+_hlColor;
+    // FIX 2026-05-15 v6: usar <span> em vez de <mark>.
+    // <mark> tem user-agent stylesheet do navegador (background:yellow padrão +
+    // font-feature-settings interno) que dispara reflow estranho fazendo o texto
+    // ao redor ficar mais compacto. <span> é elemento "neutro" sem estilo default,
+    // então inserir um <span> no meio do texto NÃO muda o cálculo tipográfico.
+    const mark = document.createElement('span');
+    mark.className = 'hl hl-'+_hlColor;
+    // Marca pra distinção visual e para os seletores antigos continuarem funcionando
+    mark.dataset.hl = _hlColor;
     mark.onclick = function(ev){
       ev.stopPropagation();
       // Click on highlight removes it
@@ -12696,7 +12735,7 @@ function applyHighlightsToCard(cardId){
     if(!el) return;
     el.innerHTML = saved[zoneId];
     // Re-attach click handlers to marks
-    el.querySelectorAll('mark.hl-yellow,mark.hl-green,mark.hl-blue').forEach(m=>{
+    el.querySelectorAll('mark.hl-yellow,mark.hl-green,mark.hl-blue,span.hl-yellow,span.hl-green,span.hl-blue').forEach(m=>{
       m.onclick = function(ev){
         ev.stopPropagation();
         const parent = this.parentNode;
