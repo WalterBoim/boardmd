@@ -3658,9 +3658,10 @@ html.light .att-ibtn{background:var(--surface2);}
 mark.hl-yellow, .hl-yellow { background:#ffe066; color:inherit; border-radius:2px; cursor:pointer; display:inline; padding:0; margin:0; line-height:inherit; box-decoration-break:clone; -webkit-box-decoration-break:clone; }
 mark.hl-green,  .hl-green  { background:#86efac; color:inherit; border-radius:2px; cursor:pointer; display:inline; padding:0; margin:0; line-height:inherit; box-decoration-break:clone; -webkit-box-decoration-break:clone; }
 mark.hl-blue,   .hl-blue   { background:#7dd3fc; color:inherit; border-radius:2px; cursor:pointer; display:inline; padding:0; margin:0; line-height:inherit; box-decoration-break:clone; -webkit-box-decoration-break:clone; }
-html:not(.light) mark.hl-yellow, html:not(.light) .hl-yellow { background:none !important; color:#fde047 !important; }
-html:not(.light) mark.hl-green,  html:not(.light) .hl-green  { background:none !important; color:#86efac !important; }
-html:not(.light) mark.hl-blue,   html:not(.light) .hl-blue   { background:none !important; color:#7dd3fc !important; }
+/* FIX 2026-05-15: dark mode estilo UWorld — fundo colorido sólido + texto preto */
+html:not(.light) mark.hl-yellow, html:not(.light) span.hl-yellow, html:not(.light) .hl-yellow { background:#ffe066 !important; color:#000 !important; }
+html:not(.light) mark.hl-green,  html:not(.light) span.hl-green,  html:not(.light) .hl-green  { background:#86efac !important; color:#000 !important; }
+html:not(.light) mark.hl-blue,   html:not(.light) span.hl-blue,   html:not(.light) .hl-blue   { background:#7dd3fc !important; color:#000 !important; }
 .hl-btn-active { border-color:#374151!important; box-shadow:0 0 0 2px rgba(0,0,0,.3); transform:scale(1.15); }
 html:not(.light) .hl-btn-active { border-color:#fff!important; }
 
@@ -4132,9 +4133,7 @@ span.hl, span.hl-yellow, span.hl-green, span.hl-blue {
 span.hl-yellow { background: #ffe066; }
 span.hl-green  { background: #86efac; }
 span.hl-blue   { background: #7dd3fc; }
-html:not(.light) span.hl-yellow { background: none !important; color: #fde047 !important; }
-html:not(.light) span.hl-green  { background: none !important; color: #86efac !important; }
-html:not(.light) span.hl-blue   { background: none !important; color: #7dd3fc !important; }
+/* (já coberto pelo bloco acima — espaço reservado p/ não quebrar contagem de linhas) */
 
 /* FIX 2026-05-15 v6: <mark> nunca altera font-size/weight/family/spacing — só background.
    Diagnóstico: ao inserir <mark> via range.surroundContents, o texto do .card-question
@@ -10243,7 +10242,7 @@ async function deleteCurrentCard(){
     }
 
     closeCardEditor();
-    showToast(serverDeleted ? 'Card deletado ✓' : 'Card escondido localmente (servidor não autorizou)');
+    showToast(serverDeleted ? 'Card deleted ✓' : 'Card hidden locally (server did not authorize)');
 
     // Avança pro próximo card
     if(typeof idx !== 'undefined' && Array.isArray(deck)){
@@ -10260,7 +10259,7 @@ async function deleteCurrentCard(){
     try { if(typeof bsUpdateChipCounts === 'function') bsUpdateChipCounts(); } catch(e){}
   } catch(e) {
     console.error('[BMD delete] exceção pós-servidor:', e);
-    alert('Erro ao limpar card local: ' + (e.message || e));
+    alert('Error clearing card locally: ' + (e.message || e));
   }
 }
 
@@ -10320,7 +10319,7 @@ function saveCardEdit(){
     const token = sess?.session?.access_token;
     if(!token){
       console.warn('BoardMD: not logged in — edit saved only locally');
-      showToast('Edição salva localmente. Faça login admin para salvar no servidor.');
+      showToast('Edit saved locally. Sign in as admin to save to server.');
       return;
     }
     try {
@@ -10340,9 +10339,9 @@ function saveCardEdit(){
         // Verificação: se retornou array vazio, NADA foi atualizado (RLS bloqueou ou id errado)
         if(Array.isArray(respJson) && respJson.length === 0){
           console.error('BoardMD: Supabase retornou 0 registros — RLS bloqueou ou ID não existe.');
-          showToast('⚠ Salvo localmente, mas servidor não confirmou (RLS / permissão).');
+          showToast('⚠ Saved locally, but server did not confirm (RLS / permission).');
         } else {
-          showToast('Card salvo no Supabase ✓');
+          showToast('Card saved to Supabase ✓');
         }
         // Invalida cache IndexedDB
         try{
@@ -10359,14 +10358,14 @@ function saveCardEdit(){
         const t = await r.text();
         console.error('BoardMD: Supabase error', r.status, t);
         if(r.status === 401 || r.status === 403){
-          showToast('Sem permissão. Você não é admin.');
+          showToast('No permission. You are not admin.');
         } else {
-          showToast('Erro ao salvar: ' + r.status);
+          showToast('Save failed: ' + r.status);
         }
       }
     } catch(e){
       console.error('BoardMD: Supabase fetch error', e);
-      showToast('Erro de rede ao salvar.');
+      showToast('Network error while saving.');
     }
   })();
 
@@ -10386,7 +10385,7 @@ async function setCardImage(){
   if(!url){ alert('Paste an image URL first.'); return; }
   const { data: sess } = await _supa.auth.getSession();
   const token = sess?.session?.access_token;
-  if(!token){ showToast('Faça login admin para salvar imagens.'); return; }
+  if(!token){ showToast('Sign in as admin to save images.'); return; }
   const imgObj = {url:url, alt:_editingCard.c||'', credit:'Manual', license:'CC BY-SA', source:'Manual'};
   const r = await fetch(SUPA_URL+'/rest/v1/cards?id=eq.'+_editingCard.id, {
     method:'PATCH',
@@ -10408,7 +10407,7 @@ async function removeCardImage(){
   if(!confirm('Remove image from this card?')) return;
   const { data: sess } = await _supa.auth.getSession();
   const token = sess?.session?.access_token;
-  if(!token){ showToast('Faça login admin para remover imagens.'); return; }
+  if(!token){ showToast('Sign in as admin to remove images.'); return; }
   const r = await fetch(SUPA_URL+'/rest/v1/cards?id=eq.'+_editingCard.id, {
     method:'PATCH',
     headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+token,'Content-Type':'application/json','Prefer':'return=minimal'},
@@ -12692,7 +12691,7 @@ function handleHlSelection(e){
       if(inVignette && !localStorage.getItem('bmd_hl_hint_shown')){
         localStorage.setItem('bmd_hl_hint_shown', '1');
         if(typeof showToast === 'function'){
-          showToast('💡 Grifo na pergunta some quando você marcar Good/Hard/Easy (mantém em Again). Na explicação fica pra sempre.', 7000);
+          showToast('💡 Highlights on the question disappear when you mark Good/Hard/Easy (kept on Again). Highlights on the explanation are saved forever.', 7000);
         }
       }
     } catch(hintErr){}
@@ -15371,9 +15370,10 @@ function selectProfileStep(step) {
 mark.hl-yellow, .hl-yellow { background:#ffe066; color:inherit; border-radius:2px; cursor:pointer; display:inline; padding:0; margin:0; line-height:inherit; box-decoration-break:clone; -webkit-box-decoration-break:clone; }
 mark.hl-green,  .hl-green  { background:#86efac; color:inherit; border-radius:2px; cursor:pointer; display:inline; padding:0; margin:0; line-height:inherit; box-decoration-break:clone; -webkit-box-decoration-break:clone; }
 mark.hl-blue,   .hl-blue   { background:#7dd3fc; color:inherit; border-radius:2px; cursor:pointer; display:inline; padding:0; margin:0; line-height:inherit; box-decoration-break:clone; -webkit-box-decoration-break:clone; }
-html:not(.light) mark.hl-yellow, html:not(.light) .hl-yellow { background:none !important; color:#fde047 !important; }
-html:not(.light) mark.hl-green,  html:not(.light) .hl-green  { background:none !important; color:#86efac !important; }
-html:not(.light) mark.hl-blue,   html:not(.light) .hl-blue   { background:none !important; color:#7dd3fc !important; }
+/* FIX 2026-05-15: dark mode estilo UWorld — fundo colorido sólido + texto preto */
+html:not(.light) mark.hl-yellow, html:not(.light) span.hl-yellow, html:not(.light) .hl-yellow { background:#ffe066 !important; color:#000 !important; }
+html:not(.light) mark.hl-green,  html:not(.light) span.hl-green,  html:not(.light) .hl-green  { background:#86efac !important; color:#000 !important; }
+html:not(.light) mark.hl-blue,   html:not(.light) span.hl-blue,   html:not(.light) .hl-blue   { background:#7dd3fc !important; color:#000 !important; }
 .hl-btn-active { border-color:#374151!important; box-shadow:0 0 0 2px rgba(0,0,0,.3); transform:scale(1.15); }
 html:not(.light) .hl-btn-active { border-color:#fff!important; }
 </style>
@@ -18661,20 +18661,20 @@ window.stormThisCard = function(card, forceMode){
     } catch(e){}
   }
   if(!card){
-    alert('Storm cancelado: card não disponível.');
+    alert('Storm canceled: card not available.');
     return;
   }
   var mode = forceMode || window._stormGetMode();
   console.log('[Storm v6] card:', card.id, '| mode:', mode);
 
   var ov = document.getElementById('bs-overlay');
-  if(!ov){ alert('Storm cancelado: bs-overlay não existe no DOM.'); return; }
+  if(!ov){ alert('Storm canceled: bs-overlay missing from DOM.'); return; }
   ov.classList.add('on');
   document.body.style.overflow = 'hidden';
 
   var bs = window.BS;
   if(!bs){
-    alert('Storm cancelado: variável BS não acessível.');
+    alert('Storm canceled: BS variable not accessible.');
     return;
   }
 
