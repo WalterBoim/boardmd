@@ -7486,6 +7486,23 @@ function revealAnswer(sel,card){
   window._currentCard = card;
   window._v2card = card;
 
+  // FIX 2026-05-15: registrar a alternativa escolhida AQUI (fonte mais direta).
+  // O `sel` é o texto exato passado pelo botão clicado em onclick (linha 7202).
+  // Antes dependia de um delegate listener no document que podia rodar fora de
+  // ordem ou ser sobrescrito por outro reset — fazendo o Attending receber
+  // "not recorded" em vez da alternativa real. Agora setamos direto:
+  try {
+    window.lastChosenText = (sel != null) ? String(sel) : null;
+    window.lastChosenCorrect = (card && card.c != null) ? (String(sel) === String(card.c)) : null;
+    // mantém índice tb (útil pra outros usos legados), mas texto é fonte de verdade
+    if(card && Array.isArray(card.w)){
+      const all = [card.c].concat(card.w);
+      const i = all.indexOf(sel);
+      if(i >= 0) window.lastChosenIdx = i;
+    }
+    console.log('[BMD] reveal — chosen:', window.lastChosenText, '| correct?', window.lastChosenCorrect);
+  } catch(e){ console.warn('reveal chosen capture:', e); }
+
   // BoardMD Venn inline — exibe diagrama de Venn logo após o "Correct answer"
   // quando o card tem dado .venn estruturado. Idempotente: se nao houver dado, esconde.
   try { if(typeof _bmdRenderVennInline === 'function') _bmdRenderVennInline(card); } catch(e){ console.warn('venn render:', e); }
