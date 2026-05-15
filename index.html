@@ -10009,22 +10009,106 @@ async function deleteCurrentCard(){
   const card = _editingCard;
   if(!confirm(`Delete this card permanently?\n\nQID ${card.qid || card.id}\n"${(card.q||'').slice(0,80)}..."\n\nThis cannot be undone.`)) return;
 
-  try {
-    // Delete from Supabase
-    const { error } = await _supa.from('cards').delete().eq('id', card.id);
-    if(error) throw error;
+  // FIX 2026-05-14: verificar sessão admin ANTES de tentar deletar.
+  // Sem sessão válida, o RLS do Supabase recusa silenciosamente (retorna 0 linhas).
+  const { data: sess } = await _supa.auth.getSession();
+  const token = sess?.session?.access_token;
+  if(!token){
+    alert('Você precisa estar logado como admin para deletar cards.');
+    return;
+  }
 
-    // Remove from local deck
+  try {
+    // DELETE direto via REST com header Prefer pra confirmar quantas linhas foram removidas
+    const r = await fetch(SUPA_URL + '/rest/v1/cards?id=eq.' + encodeURIComponent(card.id), {
+      method: 'DELETE',
+      headers: {
+        'apikey': SUPA_KEY,
+        'Authorization': 'Bearer ' + token,
+        'Prefer': 'return=representation'  // retorna as linhas deletadas
+      }
+    });
+
+    if(!r.ok){
+      const t = await r.text();
+      console.error('BoardMD: Delete failed', r.status, t);
+      if(r.status === 401 || r.status === 403){
+        alert('Sem permissão. Você não é admin no Supabase.');
+      } else {
+        alert('Erro ao deletar: ' + r.status + ' — ' + t);
+      }
+      return;
+    }
+
+    // Confirmação: o Supabase retorna array com as linhas deletadas.
+    // Se array vazio = RLS bloqueou OU id não existia.
+    const resp = await r.json().catch(()=>[]);
+    if(!Array.isArray(resp) || resp.length === 0){
+      console.warn('BoardMD: Delete retornou 0 linhas — RLS bloqueou ou card não existia no servidor.');
+      alert('Card não foi deletado no servidor (talvez não esteja sincronizado lá, ou RLS bloqueou).\n\nVou remover só localmente.');
+      // continua pra remover local mesmo assim
+    } else {
+      console.log('BoardMD: Card deletado no Supabase:', resp[0]?.id);
+    }
+
+    // Remove de todas as listas em memória
     Object.keys(window.DECKS || {}).forEach(dk => {
       if(DECKS[dk]) DECKS[dk] = DECKS[dk].filter(c => c.id !== card.id);
     });
 
+    // Remove do deck atual em estudo + againQueue
+    try {
+      if(Array.isArray(deck))         deck = deck.filter(c => c.id !== card.id);
+      if(Array.isArray(againQueue))   againQueue = againQueue.filter(c => c.id !== card.id);
+    } catch(e){}
+
+    // Remove qualquer edição salva pra esse card (pra não voltar fantasma)
+    try {
+      const edits = getCardEdits();
+      delete edits[card.id];
+      saveCardEdits(edits);
+    } catch(e){}
+
+    // Limpa do cache IndexedDB
+    try{
+      const req = indexedDB.open('boardmd_cache');
+      req.onsuccess = e => {
+        const db = e.target.result;
+        if(db.objectStoreNames.contains('cards')){
+          const tx = db.transaction('cards','readwrite');
+          tx.objectStore('cards').delete(card.id);
+        }
+      };
+    }catch(ex){}
+
+    // Limpa estado FSRS desse card
+    try {
+      if(window.fsrs && window.fsrs[card.id]){
+        delete window.fsrs[card.id];
+        if(typeof saveFsrs === 'function') saveFsrs();
+      }
+    } catch(e){}
+
     closeCardEditor();
-    showToast('Card deleted');
-    // Advance to next card
-    if(typeof rate === 'function') rate(2);
+    showToast('Card deletado ✓');
+
+    // Avança pra próximo card (sem rate, que conta como revisão)
+    if(typeof idx !== 'undefined' && Array.isArray(deck)){
+      // se ainda há cards, re-renderiza; senão volta pra home
+      if(idx >= deck.length) idx = Math.max(0, deck.length - 1);
+      if(deck.length === 0){
+        if(typeof showSection === 'function') showSection('home');
+      } else {
+        if(typeof renderCard === 'function') renderCard();
+      }
+    }
+
+    // Atualiza badges/contadores da home
+    try { if(typeof bmdDashSync === 'function') bmdDashSync(); } catch(e){}
+    try { if(typeof bsUpdateChipCounts === 'function') bsUpdateChipCounts(); } catch(e){}
   } catch(e) {
-    alert('Error deleting card: ' + (e.message || e));
+    console.error('BoardMD: Delete exception', e);
+    alert('Erro ao deletar card: ' + (e.message || e));
   }
 }
 
@@ -10050,10 +10134,12 @@ function saveCardEdit(){
   const correctText = opts[correctIdx] || opts[0];
   const wrongTexts = opts.filter((_,i)=>i!==correctIdx);
 
+  // FIX 2026-05-14: salvar TODOS os campos editados (incluindo `e` que estava sumindo)
   edits[card.id] = {
     q: newQ || card.q,
     c: correctText || card.c,
     w: wrongTexts.length ? wrongTexts : card.w,
+    e: newExp || card.e,           // ← antes não estava sendo salvo
     d: newDist || card.d,
     system: newSystem || card.system,
     topic: newTopic || card.topic,
@@ -10066,14 +10152,15 @@ function saveCardEdit(){
   // Aplicar ao card em memória imediatamente
   Object.assign(card, edits[card.id]);
 
-  // Salvar direto no Supabase (usa token da sessão autenticada)
+  // FIX 2026-05-14: campo `e` (explanation) recebia valor de `d` (distractors).
+  // Agora cada campo vai no seu lugar correto.
   const supaUpdate = {
     q: edits[card.id].q,
     c: edits[card.id].c,
     w: edits[card.id].w,
-    e: edits[card.id].d,
+    e: edits[card.id].e,           // ← explanation
+    d: edits[card.id].d,           // ← distractors
     system: edits[card.id].system,
-    d: edits[card.id].d,
     topic: edits[card.id].topic
   };
   (async () => {
@@ -10085,19 +10172,26 @@ function saveCardEdit(){
       return;
     }
     try {
-      const r = await fetch(SUPA_URL + '/rest/v1/cards?id=eq.' + card.id, {
+      const r = await fetch(SUPA_URL + '/rest/v1/cards?id=eq.' + encodeURIComponent(card.id), {
         method: 'PATCH',
         headers: {
           'apikey': SUPA_KEY,
           'Authorization': 'Bearer ' + token,
           'Content-Type': 'application/json',
-          'Prefer': 'return=minimal'
+          'Prefer': 'return=representation'  // ← retorna o registro pra confirmar
         },
         body: JSON.stringify(supaUpdate)
       });
       if(r.ok){
-        console.log('BoardMD: Supabase updated', card.id);
-        showToast('Card salvo no Supabase ✓');
+        const respJson = await r.json().catch(()=>null);
+        console.log('BoardMD: Supabase updated', card.id, respJson);
+        // Verificação: se retornou array vazio, NADA foi atualizado (RLS bloqueou ou id errado)
+        if(Array.isArray(respJson) && respJson.length === 0){
+          console.error('BoardMD: Supabase retornou 0 registros — RLS bloqueou ou ID não existe.');
+          showToast('⚠ Salvo localmente, mas servidor não confirmou (RLS / permissão).');
+        } else {
+          showToast('Card salvo no Supabase ✓');
+        }
         // Invalida cache IndexedDB
         try{
           const req = indexedDB.open('boardmd_cache');
@@ -10126,8 +10220,12 @@ function saveCardEdit(){
 
   // Feedback visual
   const msg = document.getElementById('editor-saved-msg');
-  msg.style.opacity = '1';
-  setTimeout(()=>{ msg.style.opacity='0'; closeCardEditor(); renderCard(); }, 1200);
+  if(msg){
+    msg.style.opacity = '1';
+    setTimeout(()=>{ msg.style.opacity='0'; closeCardEditor(); renderCard(); }, 1200);
+  } else {
+    setTimeout(()=>{ closeCardEditor(); renderCard(); }, 600);
+  }
 }
 
 async function setCardImage(){
