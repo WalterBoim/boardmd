@@ -3658,11 +3658,11 @@ html.light .att-ibtn{background:var(--surface2);}
 mark.hl-yellow, .hl-yellow { background:#ffe066; color:inherit; border-radius:2px; cursor:pointer; display:inline; padding:0; margin:0; line-height:inherit; box-decoration-break:clone; -webkit-box-decoration-break:clone; }
 mark.hl-green,  .hl-green  { background:#86efac; color:inherit; border-radius:2px; cursor:pointer; display:inline; padding:0; margin:0; line-height:inherit; box-decoration-break:clone; -webkit-box-decoration-break:clone; }
 mark.hl-blue,   .hl-blue   { background:#7dd3fc; color:inherit; border-radius:2px; cursor:pointer; display:inline; padding:0; margin:0; line-height:inherit; box-decoration-break:clone; -webkit-box-decoration-break:clone; }
-html.dark mark.hl-yellow, html.dark .hl-yellow { background:none !important; color:#fde047 !important; }
-html.dark mark.hl-green,  html.dark .hl-green  { background:none !important; color:#86efac !important; }
-html.dark mark.hl-blue,   html.dark .hl-blue   { background:none !important; color:#7dd3fc !important; }
+html:not(.light) mark.hl-yellow, html:not(.light) .hl-yellow { background:none !important; color:#fde047 !important; }
+html:not(.light) mark.hl-green,  html:not(.light) .hl-green  { background:none !important; color:#86efac !important; }
+html:not(.light) mark.hl-blue,   html:not(.light) .hl-blue   { background:none !important; color:#7dd3fc !important; }
 .hl-btn-active { border-color:#374151!important; box-shadow:0 0 0 2px rgba(0,0,0,.3); transform:scale(1.15); }
-html.dark .hl-btn-active { border-color:#fff!important; }
+html:not(.light) .hl-btn-active { border-color:#fff!important; }
 
 /* === BOTTOM NAV === */
 .bmd-bottom-nav {
@@ -4132,9 +4132,9 @@ span.hl, span.hl-yellow, span.hl-green, span.hl-blue {
 span.hl-yellow { background: #ffe066; }
 span.hl-green  { background: #86efac; }
 span.hl-blue   { background: #7dd3fc; }
-html.dark span.hl-yellow { background: none !important; color: #fde047 !important; }
-html.dark span.hl-green  { background: none !important; color: #86efac !important; }
-html.dark span.hl-blue   { background: none !important; color: #7dd3fc !important; }
+html:not(.light) span.hl-yellow { background: none !important; color: #fde047 !important; }
+html:not(.light) span.hl-green  { background: none !important; color: #86efac !important; }
+html:not(.light) span.hl-blue   { background: none !important; color: #7dd3fc !important; }
 
 /* FIX 2026-05-15 v6: <mark> nunca altera font-size/weight/family/spacing — só background.
    Diagnóstico: ao inserir <mark> via range.surroundContents, o texto do .card-question
@@ -15371,11 +15371,11 @@ function selectProfileStep(step) {
 mark.hl-yellow, .hl-yellow { background:#ffe066; color:inherit; border-radius:2px; cursor:pointer; display:inline; padding:0; margin:0; line-height:inherit; box-decoration-break:clone; -webkit-box-decoration-break:clone; }
 mark.hl-green,  .hl-green  { background:#86efac; color:inherit; border-radius:2px; cursor:pointer; display:inline; padding:0; margin:0; line-height:inherit; box-decoration-break:clone; -webkit-box-decoration-break:clone; }
 mark.hl-blue,   .hl-blue   { background:#7dd3fc; color:inherit; border-radius:2px; cursor:pointer; display:inline; padding:0; margin:0; line-height:inherit; box-decoration-break:clone; -webkit-box-decoration-break:clone; }
-html.dark mark.hl-yellow, html.dark .hl-yellow { background:none !important; color:#fde047 !important; }
-html.dark mark.hl-green,  html.dark .hl-green  { background:none !important; color:#86efac !important; }
-html.dark mark.hl-blue,   html.dark .hl-blue   { background:none !important; color:#7dd3fc !important; }
+html:not(.light) mark.hl-yellow, html:not(.light) .hl-yellow { background:none !important; color:#fde047 !important; }
+html:not(.light) mark.hl-green,  html:not(.light) .hl-green  { background:none !important; color:#86efac !important; }
+html:not(.light) mark.hl-blue,   html:not(.light) .hl-blue   { background:none !important; color:#7dd3fc !important; }
 .hl-btn-active { border-color:#374151!important; box-shadow:0 0 0 2px rgba(0,0,0,.3); transform:scale(1.15); }
-html.dark .hl-btn-active { border-color:#fff!important; }
+html:not(.light) .hl-btn-active { border-color:#fff!important; }
 </style>
 
 <!-- SEARCH PICKER MODAL -->
