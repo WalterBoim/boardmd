@@ -10335,13 +10335,26 @@ async function runDeleteDiagnostic(){
   add('Card in editor', _editingCard ? (_editingCard.id + ' / ' + (_editingCard.qid||'')) : 'NONE', _editingCard ? '#22c55e' : '#ef4444');
   sep();
 
+  try {
+
+  // 0) _supa existe?
+  add('Supabase client', (typeof _supa !== 'undefined' && _supa) ? 'OK' : 'MISSING', (typeof _supa !== 'undefined' && _supa) ? '#22c55e' : '#ef4444');
+  add('SUPA_URL', (typeof SUPA_URL !== 'undefined') ? SUPA_URL : 'MISSING', (typeof SUPA_URL !== 'undefined') ? '#22c55e' : '#ef4444');
+  add('SUPA_KEY length', (typeof SUPA_KEY !== 'undefined' && SUPA_KEY) ? SUPA_KEY.length+' chars' : 'MISSING', (typeof SUPA_KEY !== 'undefined' && SUPA_KEY) ? '#22c55e' : '#ef4444');
+  if(typeof _supa === 'undefined' || !_supa){
+    add('STOP', '_supa is missing — page did not load Supabase client', '#ef4444');
+    return;
+  }
+  sep();
+
   // 1) Sessão
   let sess = null;
   try {
     const { data, error } = await _supa.auth.getSession();
     if(error){ add('getSession ERROR', error.message, '#ef4444'); return; }
     sess = data;
-  } catch(e){ add('getSession exception', String(e), '#ef4444'); return; }
+    add('getSession', 'OK', '#22c55e');
+  } catch(e){ add('getSession exception', String(e && e.message || e), '#ef4444'); return; }
 
   const uid = sess?.session?.user?.id;
   const email = sess?.session?.user?.email;
@@ -10469,6 +10482,11 @@ async function runDeleteDiagnostic(){
   }
 
   add('Done', 'Click "Copy log" and send it to debug.', '#22c55e');
+
+  } catch(outerErr){
+    add('FATAL EXCEPTION', String(outerErr && outerErr.message || outerErr), '#ef4444');
+    add('Stack', String(outerErr && outerErr.stack || '(no stack)'), '#94a3b8');
+  }
 }
 window.runDeleteDiagnostic = runDeleteDiagnostic;
 
