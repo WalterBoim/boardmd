@@ -10348,13 +10348,24 @@ async function runDeleteDiagnostic(){
   sep();
 
   // 1) Sessão
+  add('Step', 'Calling _supa.auth.getSession() with 5s timeout...');
   let sess = null;
+  // Helper: race the promise with a timeout so we never hang
+  const withTimeout = (p, ms, label) => Promise.race([
+    p,
+    new Promise((_, rej) => setTimeout(() => rej(new Error('TIMEOUT after '+ms+'ms ('+label+')')), ms))
+  ]);
   try {
-    const { data, error } = await _supa.auth.getSession();
+    const result = await withTimeout(_supa.auth.getSession(), 5000, 'getSession');
+    const { data, error } = result || {};
     if(error){ add('getSession ERROR', error.message, '#ef4444'); return; }
     sess = data;
     add('getSession', 'OK', '#22c55e');
-  } catch(e){ add('getSession exception', String(e && e.message || e), '#ef4444'); return; }
+  } catch(e){
+    add('getSession exception', String(e && e.message || e), '#ef4444');
+    add('Hint', 'If TIMEOUT: Supabase client is hanging. Try a hard reload or check network tab.', '#f59e0b');
+    return;
+  }
 
   const uid = sess?.session?.user?.id;
   const email = sess?.session?.user?.email;
@@ -10381,12 +10392,13 @@ async function runDeleteDiagnostic(){
   }
 
   // 2) Refresh session
-  add('Step', 'Refreshing session...');
+  add('Step', 'Refreshing session (5s timeout)...');
   try {
-    const { data: rd, error: re } = await _supa.auth.refreshSession();
+    const result = await withTimeout(_supa.auth.refreshSession(), 5000, 'refreshSession');
+    const { data: rd, error: re } = result || {};
     if(re){ add('refreshSession ERROR', re.message, '#f59e0b'); }
     else if(rd?.session){ add('refreshSession OK', 'new token issued', '#22c55e'); sess = rd; }
-  } catch(e){ add('refreshSession exception', String(e), '#f59e0b'); }
+  } catch(e){ add('refreshSession exception', String(e && e.message || e), '#f59e0b'); }
   const freshToken = sess?.session?.access_token || token;
   sep();
 
