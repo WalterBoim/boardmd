@@ -4126,6 +4126,29 @@ mark, mark.hl-yellow, mark.hl-green, mark.hl-blue, mark.hy, mark.hg, mark.hb {
   padding: 0 !important;
   margin: 0 !important;
 }
+
+/* FIX 2026-05-15 v4: forçar letter-spacing FIXO em todas as zonas grifáveis.
+   Observado: ao inserir <mark> via surroundContents, o letter-spacing efetivo
+   muda sutilmente (possivelmente por algum reflow do Source Serif 4 ou kerning
+   recalculado quando o nó de texto é dividido em 3). A solução mais robusta é
+   eliminar a variabilidade: zerar letter-spacing nas zonas E em todos os filhos
+   (incluindo o próprio <mark>). word-spacing também fixado pra normal. */
+#c-q, #c-q *, .card-question, .card-question *,
+#exp-txt, #exp-txt *, .exp-text, .exp-text *,
+#exp-dist, #exp-dist *, .exp-dist, .exp-dist * {
+  letter-spacing: 0 !important;
+  word-spacing: 0 !important;
+  font-kerning: normal !important;
+}
+/* Ligaduras estáveis — algumas fontes (Source Serif 4 incluída) ativam ligaduras
+   contextuais que mudam quando o nó é fragmentado pelo <mark>. Desativar. */
+#c-q, #c-q *, .card-question, .card-question *,
+#exp-txt, #exp-txt *, .exp-text, .exp-text *,
+#exp-dist, #exp-dist *, .exp-dist, .exp-dist * {
+  font-variant-ligatures: none !important;
+  font-feature-settings: "kern" 1 !important;
+  text-rendering: geometricPrecision !important;
+}
 /* Garante que o container do enunciado mantenha SEMPRE mesma tipografia,
    mesmo quando contém <mark> filho — usando o seletor parent:has() para
    forçar redeclaração igual. Browsers que não suportam :has() ignoram a
