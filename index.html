@@ -4149,6 +4149,36 @@ mark, mark.hl-yellow, mark.hl-green, mark.hl-blue, mark.hy, mark.hg, mark.hb {
   font-feature-settings: "kern" 1 !important;
   text-rendering: geometricPrecision !important;
 }
+/* FIX 2026-05-15 v5: travar TODA propriedade que afeta tamanho/layout do texto.
+   Investigação anterior só monitorava 13 props; alguma OUTRA muda quando o <mark>
+   é inserido. Esta regra elimina TODAS as variáveis de uma só vez. */
+#c-q, .card-question,
+#exp-txt, .exp-text,
+#exp-dist, .exp-dist {
+  text-size-adjust: 100% !important;
+  -webkit-text-size-adjust: 100% !important;
+  -moz-text-size-adjust: 100% !important;
+  text-indent: 0 !important;
+  text-align: left !important;
+  white-space: normal !important;
+  text-transform: none !important;
+  tab-size: 4 !important;
+  font-synthesis: none !important;
+  font-optical-sizing: none !important;
+  font-variant: normal !important;
+  font-variant-numeric: normal !important;
+  font-variant-caps: normal !important;
+  font-variant-east-asian: normal !important;
+  font-variant-position: normal !important;
+  hanging-punctuation: none !important;
+  text-wrap: wrap !important;
+  text-justify: auto !important;
+  word-break: normal !important;
+  overflow-wrap: break-word !important;
+  hyphens: none !important;
+  -webkit-hyphens: none !important;
+  zoom: 1 !important;
+}
 /* Garante que o container do enunciado mantenha SEMPRE mesma tipografia,
    mesmo quando contém <mark> filho — usando o seletor parent:has() para
    forçar redeclaração igual. Browsers que não suportam :has() ignoram a
@@ -10044,97 +10074,115 @@ function closeCardEditor(){
   _editingCard = null;
 }
 
+// ── TOMBSTONE: registra cards deletados mesmo se voltarem do Supabase ──
+// Bug que cria a necessidade: se o DELETE no Supabase falhou (RLS, auth),
+// o card volta no próximo backgroundRefresh. Solução: mantemos lista local
+// de IDs "mortos" que filtramos em qualquer carga de cards. Assim mesmo
+// se o servidor retorna o card, a UI nunca mostra.
+const TOMBSTONE_KEY = 'bmd_deleted_card_ids_v1';
+function getTombstones(){
+  try { return JSON.parse(localStorage.getItem(TOMBSTONE_KEY) || '[]'); }
+  catch(e){ return []; }
+}
+function addTombstone(cardId){
+  if(!cardId) return;
+  try {
+    const arr = getTombstones();
+    if(arr.indexOf(cardId) < 0) arr.push(cardId);
+    localStorage.setItem(TOMBSTONE_KEY, JSON.stringify(arr));
+  } catch(e){}
+}
+function isCardTombstoned(cardId){
+  return getTombstones().indexOf(cardId) >= 0;
+}
+window.getTombstones = getTombstones;
+window.addTombstone = addTombstone;
+window.isCardTombstoned = isCardTombstoned;
+
 async function deleteCurrentCard(){
   if(!_editingCard) return;
   const card = _editingCard;
   if(!confirm(`Delete this card permanently?\n\nQID ${card.qid || card.id}\n"${(card.q||'').slice(0,80)}..."\n\nThis cannot be undone.`)) return;
 
-  // FIX 2026-05-14: verificar sessão admin ANTES de tentar deletar.
-  // Sem sessão válida, o RLS do Supabase recusa silenciosamente (retorna 0 linhas).
-  const { data: sess } = await _supa.auth.getSession();
-  const token = sess?.session?.access_token;
-  if(!token){
-    alert('Você precisa estar logado como admin para deletar cards.');
-    return;
+  console.log('[BMD delete] iniciando para card.id =', card.id);
+
+  // FIX 2026-05-15: TOMBSTONE PRIMEIRO. Mesmo se o Supabase falhar, o card
+  // não volta na UI porque é filtrado em buildDecks/loadCards.
+  addTombstone(card.id);
+  console.log('[BMD delete] tombstone adicionado');
+
+  // Tenta deletar no servidor (best-effort). Se falhar, tudo bem — o tombstone
+  // garante que não volta na UI. Quando o admin acessar com permissão correta,
+  // o registro do servidor será deletado pela sincronização (a fazer).
+  let serverDeleted = false;
+  try {
+    const { data: sess } = await _supa.auth.getSession();
+    const token = sess?.session?.access_token;
+    if(!token){
+      console.warn('[BMD delete] sem token — card só será removido localmente');
+    } else {
+      const r = await fetch(SUPA_URL + '/rest/v1/cards?id=eq.' + encodeURIComponent(card.id), {
+        method: 'DELETE',
+        headers: {
+          'apikey': SUPA_KEY,
+          'Authorization': 'Bearer ' + token,
+          'Prefer': 'return=representation'
+        }
+      });
+      console.log('[BMD delete] servidor respondeu', r.status);
+      if(r.ok){
+        const resp = await r.json().catch(()=>[]);
+        if(Array.isArray(resp) && resp.length > 0){
+          serverDeleted = true;
+          console.log('[BMD delete] servidor confirmou delete:', resp[0]?.id);
+        } else {
+          console.warn('[BMD delete] servidor retornou 0 linhas — RLS bloqueou ou ID não existia');
+        }
+      } else {
+        const t = await r.text();
+        console.error('[BMD delete] erro do servidor:', r.status, t);
+      }
+    }
+  } catch(e){
+    console.error('[BMD delete] exceção no fetch:', e);
   }
 
   try {
-    // DELETE direto via REST com header Prefer pra confirmar quantas linhas foram removidas
-    const r = await fetch(SUPA_URL + '/rest/v1/cards?id=eq.' + encodeURIComponent(card.id), {
-      method: 'DELETE',
-      headers: {
-        'apikey': SUPA_KEY,
-        'Authorization': 'Bearer ' + token,
-        'Prefer': 'return=representation'  // retorna as linhas deletadas
-      }
-    });
-
-    if(!r.ok){
-      const t = await r.text();
-      console.error('BoardMD: Delete failed', r.status, t);
-      if(r.status === 401 || r.status === 403){
-        alert('Sem permissão. Você não é admin no Supabase.');
-      } else {
-        alert('Erro ao deletar: ' + r.status + ' — ' + t);
-      }
-      return;
-    }
-
-    // Confirmação: o Supabase retorna array com as linhas deletadas.
-    // Se array vazio = RLS bloqueou OU id não existia.
-    const resp = await r.json().catch(()=>[]);
-    if(!Array.isArray(resp) || resp.length === 0){
-      console.warn('BoardMD: Delete retornou 0 linhas — RLS bloqueou ou card não existia no servidor.');
-      alert('Card não foi deletado no servidor (talvez não esteja sincronizado lá, ou RLS bloqueou).\n\nVou remover só localmente.');
-      // continua pra remover local mesmo assim
-    } else {
-      console.log('BoardMD: Card deletado no Supabase:', resp[0]?.id);
-    }
-
     // Remove de todas as listas em memória
     Object.keys(window.DECKS || {}).forEach(dk => {
       if(DECKS[dk]) DECKS[dk] = DECKS[dk].filter(c => c.id !== card.id);
     });
+    console.log('[BMD delete] removido de DECKS');
 
     // Remove do deck atual em estudo + againQueue
-    try {
-      if(Array.isArray(deck))         deck = deck.filter(c => c.id !== card.id);
-      if(Array.isArray(againQueue))   againQueue = againQueue.filter(c => c.id !== card.id);
-    } catch(e){}
+    if(Array.isArray(deck))         deck = deck.filter(c => c.id !== card.id);
+    if(Array.isArray(againQueue))   againQueue = againQueue.filter(c => c.id !== card.id);
 
-    // Remove qualquer edição salva pra esse card (pra não voltar fantasma)
-    try {
-      const edits = getCardEdits();
-      delete edits[card.id];
-      saveCardEdits(edits);
-    } catch(e){}
+    // Remove qualquer edição salva pra esse card
+    const edits = getCardEdits();
+    delete edits[card.id];
+    saveCardEdits(edits);
 
     // Limpa do cache IndexedDB
     try{
-      const req = indexedDB.open('boardmd_cache');
-      req.onsuccess = e => {
-        const db = e.target.result;
-        if(db.objectStoreNames.contains('cards')){
-          const tx = db.transaction('cards','readwrite');
-          tx.objectStore('cards').delete(card.id);
-        }
-      };
-    }catch(ex){}
+      const db = await openIDB();
+      const tx = db.transaction(IDB_STORE, 'readwrite');
+      tx.objectStore(IDB_STORE).delete(card.id);
+      await new Promise(res => { tx.oncomplete = res; tx.onerror = res; });
+      console.log('[BMD delete] removido do IDB');
+    }catch(ex){ console.warn('[BMD delete] IDB falhou', ex); }
 
     // Limpa estado FSRS desse card
-    try {
-      if(window.fsrs && window.fsrs[card.id]){
-        delete window.fsrs[card.id];
-        if(typeof saveFsrs === 'function') saveFsrs();
-      }
-    } catch(e){}
+    if(window.fsrs && window.fsrs[card.id]){
+      delete window.fsrs[card.id];
+      if(typeof saveFsrs === 'function') saveFsrs();
+    }
 
     closeCardEditor();
-    showToast('Card deletado ✓');
+    showToast(serverDeleted ? 'Card deletado ✓' : 'Card escondido localmente (servidor não autorizou)');
 
-    // Avança pra próximo card (sem rate, que conta como revisão)
+    // Avança pro próximo card
     if(typeof idx !== 'undefined' && Array.isArray(deck)){
-      // se ainda há cards, re-renderiza; senão volta pra home
       if(idx >= deck.length) idx = Math.max(0, deck.length - 1);
       if(deck.length === 0){
         if(typeof showSection === 'function') showSection('home');
@@ -10143,12 +10191,12 @@ async function deleteCurrentCard(){
       }
     }
 
-    // Atualiza badges/contadores da home
+    // Atualiza badges/contadores da home + chips do BS
     try { if(typeof bmdDashSync === 'function') bmdDashSync(); } catch(e){}
     try { if(typeof bsUpdateChipCounts === 'function') bsUpdateChipCounts(); } catch(e){}
   } catch(e) {
-    console.error('BoardMD: Delete exception', e);
-    alert('Erro ao deletar card: ' + (e.message || e));
+    console.error('[BMD delete] exceção pós-servidor:', e);
+    alert('Erro ao limpar card local: ' + (e.message || e));
   }
 }
 
@@ -10808,6 +10856,19 @@ function buildDecks(allCards){
   const DECK_NAME_MAP = {
     'New Step 2 CK': 'new_s2ck',
   };
+  // FIX 2026-05-15: filtra cards deletados localmente (tombstones).
+  // Se o DELETE no Supabase falhou por RLS, o card volta no cache/refresh.
+  // Aqui garantimos que ele NUNCA aparece na UI, mesmo voltando do servidor.
+  let tomb = [];
+  try { tomb = (typeof getTombstones === 'function') ? getTombstones() : []; } catch(e){}
+  const tombSet = new Set(tomb);
+  if(tombSet.size > 0){
+    const before = allCards.length;
+    allCards = allCards.filter(c => !tombSet.has(c.id));
+    if(before !== allCards.length){
+      console.log('[BMD] tombstone filtrou', before - allCards.length, 'cards deletados');
+    }
+  }
   window.DECKS = {};
   for(const card of allCards){
     if(typeof card.w === 'string'){ try { card.w = JSON.parse(card.w); } catch(e){ card.w = []; } }
@@ -12510,26 +12571,41 @@ function handleHlSelection(e){
     // Se algo mudar depois, imprimimos a diff no console pra você me mandar.
     const _diagEl = document.getElementById('c-q') || document.querySelector('.card-question');
     let _before = null;
-    if(_diagEl){
-      const cs = getComputedStyle(_diagEl);
-      const rect = _diagEl.getBoundingClientRect();
-      _before = {
-        fontSize:        cs.fontSize,
-        lineHeight:      cs.lineHeight,
-        letterSpacing:   cs.letterSpacing,
-        wordSpacing:     cs.wordSpacing,
-        fontFamily:      cs.fontFamily,
-        fontWeight:      cs.fontWeight,
-        fontStyle:       cs.fontStyle,
-        fontStretch:     cs.fontStretch,
-        textRendering:   cs.textRendering,
-        fontFeatures:    cs.fontFeatureSettings,
-        fontVariant:     cs.fontVariantLigatures,
-        padding:         cs.padding,
-        width:           rect.width.toFixed(2),
-        height:          rect.height.toFixed(2),
-      };
-    }
+    // FIX 2026-05-15: snapshot de TODAS as propriedades computadas (não só 13).
+    // Ao expandir, qualquer prop que mude vai ser detectada.
+    const _captureAll = (el) => {
+      if(!el) return null;
+      const cs = getComputedStyle(el);
+      const rect = el.getBoundingClientRect();
+      const out = {};
+      // Lista exaustiva de propriedades que podem afetar layout/tipografia
+      const props = [
+        'fontSize','fontFamily','fontWeight','fontStyle','fontStretch','fontVariant',
+        'fontVariantLigatures','fontVariantCaps','fontVariantNumeric','fontVariantEastAsian',
+        'fontFeatureSettings','fontKerning','fontOpticalSizing','fontSynthesis',
+        'lineHeight','letterSpacing','wordSpacing','textIndent','textAlign','textTransform',
+        'textRendering','textSizeAdjust','webkitTextSizeAdjust','textWrap','textJustify',
+        'whiteSpace','wordBreak','overflowWrap','hyphens','tabSize',
+        'padding','paddingLeft','paddingRight','paddingTop','paddingBottom',
+        'margin','width','minWidth','maxWidth','height','minHeight','maxHeight',
+        'transform','zoom','scale','filter','letterSpacing',
+        'writingMode','direction','unicodeBidi',
+      ];
+      props.forEach(p => { try { out[p] = cs[p]; } catch(e){} });
+      out['_rect_w'] = rect.width.toFixed(3);
+      out['_rect_h'] = rect.height.toFixed(3);
+      // Também captura do PAI (pode ser propriedade herdada do pai que muda)
+      const par = el.parentElement;
+      if(par){
+        const pcs = getComputedStyle(par);
+        out['_parent.transform'] = pcs.transform;
+        out['_parent.zoom'] = pcs.zoom;
+        out['_parent.fontSize'] = pcs.fontSize;
+        out['_parent.letterSpacing'] = pcs.letterSpacing;
+      }
+      return out;
+    };
+    _before = _captureAll(_diagEl);
 
     range.surroundContents(mark);
     sel.removeAllRanges();
@@ -12547,24 +12623,7 @@ function handleHlSelection(e){
     // Compara ANTES vs DEPOIS após reflow + lock (200ms)
     if(_diagEl && _before){
       setTimeout(() => {
-        const cs2 = getComputedStyle(_diagEl);
-        const rect2 = _diagEl.getBoundingClientRect();
-        const _after = {
-          fontSize:        cs2.fontSize,
-          lineHeight:      cs2.lineHeight,
-          letterSpacing:   cs2.letterSpacing,
-          wordSpacing:     cs2.wordSpacing,
-          fontFamily:      cs2.fontFamily,
-          fontWeight:      cs2.fontWeight,
-          fontStyle:       cs2.fontStyle,
-          fontStretch:     cs2.fontStretch,
-          textRendering:   cs2.textRendering,
-          fontFeatures:    cs2.fontFeatureSettings,
-          fontVariant:     cs2.fontVariantLigatures,
-          padding:         cs2.padding,
-          width:           rect2.width.toFixed(2),
-          height:          rect2.height.toFixed(2),
-        };
+        const _after = _captureAll(_diagEl);
         const diffs = [];
         Object.keys(_before).forEach(k => {
           if(_before[k] !== _after[k]) diffs.push({prop: k, before: _before[k], after: _after[k]});
