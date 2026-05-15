@@ -7653,8 +7653,12 @@ function revealAnswer(sel,card){
   window._lastResponseMs = _responseMs;
   window._lastTimeCategory = _timeCategory;
 
-  // Limpa grifos da pergunta ao revelar — mantém só os da explicação
-  clearQHighlights();
+  // FIX 2026-05-15: NÃO limpa grifos aqui. Decisão movida pro rate():
+  //  - Again (r=0): MANTÉM grifo do vignette (aluno ainda em learning phase)
+  //  - Hard/Good/Easy (r=1,2,3): LIMPA grifo do vignette (próxima vez = teste novo)
+  //  - Explicação SEMPRE mantém grifos (referência permanente)
+  // Filosofia: active recall depende de "primeira vista limpa" na revisão.
+  // (clearQHighlights() era chamado aqui — agora chamado condicionalmente em rate())
   const answeredCorrectly=(sel===card.c);
 
   // ── SETOR B+ (filosofia MCQ-first): incrementa contador de sessao
@@ -7891,6 +7895,14 @@ function revealAnswer(sel,card){
   }
   // FIX 2026-05-14 v3: lock tipográfico DEPOIS de popular exp-txt e exp-dist
   try { if(typeof window._lockTypographyOnZones === 'function') setTimeout(window._lockTypographyOnZones, 30); } catch(e){}
+  // FIX 2026-05-15: re-aplica grifos salvos na explicação (exp-txt, exp-dist).
+  // O applyHighlightsToCard inicial no renderCard não consegue porque exp-txt
+  // está vazio antes do reveal. Agora que populou, restaura os grifos salvos.
+  try {
+    if(typeof applyHighlightsToCard === 'function'){
+      setTimeout(() => applyHighlightsToCard(card.id), 40);
+    }
+  } catch(e){}
 
   // KEY POINT — usa campo kp do Supabase
   const kpWrap = document.getElementById('key-point-wrap');
@@ -8154,6 +8166,16 @@ function rate(r){
   const ns=applyRating(state,rating);
   fsrs[card.id]=ns;
   saveFsrs();
+
+  // FIX 2026-05-15: Limpar grifo do VIGNETTE apenas se NÃO for Again.
+  // Filosofia:
+  //  - Again (r=0): aluno errou/quer rever em minutos → MANTÉM grifo (continua estudando)
+  //  - Hard/Good/Easy (r=1,2,3): card vai pra revisão futura → LIMPA grifo
+  //    pra próxima vez ser teste limpo (active recall preservado)
+  // Explicação (exp-txt, exp-dist) SEMPRE mantém — é referência permanente.
+  if(r !== 0){
+    try { if(typeof clearQHighlights === 'function') clearQHighlights(); } catch(e){}
+  }
 
   // Track session
   const keys=['again','hard','good','easy'];
@@ -10707,17 +10729,17 @@ function submitReport(){
   closeReportIssue();
   showToast('Report submitted. Thank you!');
 }
-function showToast(msg){
+function showToast(msg, duration){
   let t = document.getElementById('bmd-toast');
   if(!t){
     t = document.createElement('div');
     t.id = 'bmd-toast';
-    t.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--surface);border:1px solid var(--border);color:var(--text);padding:10px 20px;border-radius:8px;font-size:13px;font-family:Lato,sans-serif;font-weight:600;z-index:99999;opacity:0;transition:opacity .3s;pointer-events:none;';
+    t.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--surface);border:1px solid var(--border);color:var(--text);padding:10px 20px;border-radius:8px;font-size:13px;font-family:Lato,sans-serif;font-weight:600;z-index:99999;opacity:0;transition:opacity .3s;pointer-events:none;max-width:min(440px,90vw);text-align:center;line-height:1.5;';
     document.body.appendChild(t);
   }
   t.textContent = msg;
   t.style.opacity = '1';
-  setTimeout(() => { t.style.opacity = '0'; }, 2500);
+  setTimeout(() => { t.style.opacity = '0'; }, duration || 2500);
 }
 function exportReports(){
   try {
@@ -12659,6 +12681,22 @@ function handleHlSelection(e){
     range.surroundContents(mark);
     sel.removeAllRanges();
 
+    // FIX 2026-05-15: hint sobre o comportamento do grifo no vignette.
+    // Mostra UMA VEZ na primeira vez que o aluno grifa no vignette de uma
+    // questão. Depois nunca mais aparece (salva flag no localStorage).
+    try {
+      const zone = (range.commonAncestorContainer.nodeType === 1
+        ? range.commonAncestorContainer
+        : range.commonAncestorContainer.parentElement);
+      const inVignette = zone && zone.closest && zone.closest('#c-q, .card-question');
+      if(inVignette && !localStorage.getItem('bmd_hl_hint_shown')){
+        localStorage.setItem('bmd_hl_hint_shown', '1');
+        if(typeof showToast === 'function'){
+          showToast('💡 Grifo na pergunta some quando você marcar Good/Hard/Easy (mantém em Again). Na explicação fica pra sempre.', 7000);
+        }
+      }
+    } catch(hintErr){}
+
     // ─── LOCK NUCLEAR: aplica em 5 momentos diferentes pra cobrir qualquer reflow ───
     const _doLock = () => {
       try { if(typeof window._lockTypographyOnZones === 'function') window._lockTypographyOnZones(); } catch(e){}
@@ -12733,8 +12771,17 @@ function applyHighlightsToCard(cardId){
     if(!saved[zoneId]) return;
     const el = document.getElementById(zoneId);
     if(!el) return;
+    // FIX 2026-05-15: Só restaura highlight se a zona JÁ está populada com texto.
+    // Caso contrário (ex: exp-txt vazio antes do reveal), aplicar agora vai
+    // sobrescrever o vazio em vez de pintar grifos no texto que ainda vai chegar.
+    // O revealAnswer chama applyHighlightsToCard de novo após popular exp-txt.
+    // (Mais robusto que checar innerHTML.length > 0 sozinho — também ignora
+    // placeholders tipo "Loading..." que poderiam contar como conteúdo.)
+    const currentText = (el.textContent || '').trim();
+    if(currentText.length < 10) return;
+    // Aplica o grifo salvo
     el.innerHTML = saved[zoneId];
-    // Re-attach click handlers to marks
+    // Re-attach click handlers to marks/spans (remover ao clicar)
     el.querySelectorAll('mark.hl-yellow,mark.hl-green,mark.hl-blue,span.hl-yellow,span.hl-green,span.hl-blue').forEach(m=>{
       m.onclick = function(ev){
         ev.stopPropagation();
