@@ -10103,6 +10103,7 @@ function studySearchResults(){
       <button onclick="saveCardEdit()" style="background:var(--accent);color:#fff;border:none;border-radius:9px;padding:11px 26px;font-family:'Lato',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:all .15s" onmouseover="this.style.background='#5a8fff'" onmouseout="this.style.background='var(--accent)'">Save Changes</button>
       <button onclick="resetCardEdit()" style="background:none;color:var(--rose);border:1px solid rgba(244,63,94,.3);border-radius:9px;padding:11px 18px;font-family:'Lato',sans-serif;font-size:13px;cursor:pointer;transition:all .15s" onmouseover="this.style.background='rgba(244,63,94,.08)'" onmouseout="this.style.background='none'">Reset</button>
       <button onclick="deleteCurrentCard()" style="background:none;color:var(--rose);border:1px solid rgba(244,63,94,.5);border-radius:9px;padding:11px 18px;font-family:'Lato',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:all .15s" onmouseover="this.style.background='rgba(244,63,94,.12)'" onmouseout="this.style.background='none'">Delete Card</button>
+      <button onclick="runDeleteDiagnostic()" title="Test delete permissions and show full result on screen" style="background:none;color:var(--text-dim);border:1px solid var(--border);border-radius:9px;padding:11px 14px;font-family:'Lato',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text-dim)'">🔬 Diagnose</button>
       <button onclick="closeCardEditor();showEditsManager()" style="background:none;color:var(--text-faint);border:1px solid var(--border);border-radius:9px;padding:11px 18px;font-family:'Lato',sans-serif;font-size:13px;cursor:pointer;transition:all .15s;margin-left:auto" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text-faint)'">My Edits →</button>
       <span id="editor-saved-msg" style="font-size:12px;color:var(--emerald);font-weight:700;opacity:0;transition:opacity .3s">Saved ✓</span>
     </div>
@@ -10295,6 +10296,181 @@ GRANT EXECUTE ON FUNCTION public.admin_delete_card(text) TO authenticated;
   document.body.appendChild(overlay);
 }
 window.showAdminSqlHelpModal = showAdminSqlHelpModal;
+
+async function runDeleteDiagnostic(){
+  // Cria/limpa modal de resultado
+  let ov = document.getElementById('bmd-diag-overlay');
+  if(ov) ov.remove();
+  ov = document.createElement('div');
+  ov.id = 'bmd-diag-overlay';
+  ov.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:99999;display:flex;align-items:center;justify-content:center;padding:20px;font-family:Lato,sans-serif';
+  ov.innerHTML = `
+    <div style="background:var(--surface,#fff);border-radius:14px;max-width:720px;width:100%;max-height:90vh;overflow-y:auto;box-shadow:0 25px 60px rgba(0,0,0,.4);padding:24px;color:var(--text,#0f172a)">
+      <div style="display:flex;justify-content:space-between;align-items:start;gap:16px;margin-bottom:14px">
+        <h2 style="margin:0;font-size:20px;font-weight:800">🔬 Delete Diagnostic</h2>
+        <button onclick="document.getElementById('bmd-diag-overlay').remove()" style="background:none;border:1px solid var(--border);border-radius:8px;padding:6px 10px;cursor:pointer;font-size:14px">✕</button>
+      </div>
+      <div id="bmd-diag-log" style="background:#0f172a;color:#e2e8f0;border-radius:10px;padding:14px;font-family:'JetBrains Mono',monospace;font-size:12px;line-height:1.6;max-height:60vh;overflow-y:auto;white-space:pre-wrap;word-break:break-word"></div>
+      <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
+        <button onclick="
+          const el=document.getElementById('bmd-diag-log');
+          navigator.clipboard.writeText(el.textContent).then(()=>{this.textContent='✓ Copied';setTimeout(()=>{this.textContent='Copy log'},1500)});
+        " style="background:var(--accent,#2563eb);color:#fff;border:none;border-radius:9px;padding:9px 16px;font-weight:700;font-size:13px;cursor:pointer">Copy log</button>
+        <button onclick="document.getElementById('bmd-diag-overlay').remove()" style="background:none;border:1px solid var(--border);border-radius:9px;padding:9px 16px;font-weight:700;font-size:13px;cursor:pointer">Close</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(ov);
+
+  const log = document.getElementById('bmd-diag-log');
+  const add = (label, value, color) => {
+    const v = (typeof value === 'object') ? JSON.stringify(value, null, 2) : String(value);
+    const c = color || '#e2e8f0';
+    log.innerHTML += `<span style="color:#94a3b8">${label}:</span> <span style="color:${c}">${v}</span>\n`;
+    log.scrollTop = log.scrollHeight;
+  };
+  const sep = () => { log.innerHTML += '<span style="color:#475569">─────────────────────────────────────────</span>\n'; };
+
+  add('Time', new Date().toISOString());
+  add('Card in editor', _editingCard ? (_editingCard.id + ' / ' + (_editingCard.qid||'')) : 'NONE', _editingCard ? '#22c55e' : '#ef4444');
+  sep();
+
+  // 1) Sessão
+  let sess = null;
+  try {
+    const { data, error } = await _supa.auth.getSession();
+    if(error){ add('getSession ERROR', error.message, '#ef4444'); return; }
+    sess = data;
+  } catch(e){ add('getSession exception', String(e), '#ef4444'); return; }
+
+  const uid = sess?.session?.user?.id;
+  const email = sess?.session?.user?.email;
+  const token = sess?.session?.access_token;
+  add('Logged user email', email || '(none)', email ? '#22c55e' : '#ef4444');
+  add('Logged user UID', uid || '(none)', uid ? '#22c55e' : '#ef4444');
+  add('JWT token present?', token ? 'YES' : 'NO', token ? '#22c55e' : '#ef4444');
+  if(token){
+    // Decode JWT payload
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      const expDate = new Date(payload.exp*1000);
+      const now = new Date();
+      const expired = expDate < now;
+      add('Token expires at', expDate.toISOString() + (expired?' (EXPIRED)':' (valid)'), expired?'#ef4444':'#22c55e');
+      add('Token role claim', payload.role||'(none)', payload.role==='authenticated'?'#22c55e':'#f59e0b');
+    } catch(e){ add('JWT decode', 'failed', '#ef4444'); }
+  }
+  sep();
+
+  if(!uid){
+    add('STOP', 'No user logged in. Sign in first.', '#ef4444');
+    return;
+  }
+
+  // 2) Refresh session
+  add('Step', 'Refreshing session...');
+  try {
+    const { data: rd, error: re } = await _supa.auth.refreshSession();
+    if(re){ add('refreshSession ERROR', re.message, '#f59e0b'); }
+    else if(rd?.session){ add('refreshSession OK', 'new token issued', '#22c55e'); sess = rd; }
+  } catch(e){ add('refreshSession exception', String(e), '#f59e0b'); }
+  const freshToken = sess?.session?.access_token || token;
+  sep();
+
+  // 3) Admin check
+  add('Step', 'Checking admins table...');
+  try {
+    const { data, error } = await _supa.from('admins').select('user_id, created_at').eq('user_id', uid).maybeSingle();
+    if(error){
+      add('admins query ERROR', error.message + ' (code: ' + (error.code||'?') + ')', '#ef4444');
+    } else if(!data){
+      add('Admin row', 'NOT FOUND for your UID', '#ef4444');
+      add('FIX', "Run: INSERT INTO admins(user_id) VALUES ('"+uid+"');", '#f59e0b');
+    } else {
+      add('Admin row', 'FOUND ✓', '#22c55e');
+      add('Admin since', data.created_at || '?');
+    }
+  } catch(e){ add('admins exception', String(e), '#ef4444'); }
+  sep();
+
+  // 4) Tenta o DELETE no card atual
+  const card = _editingCard;
+  if(!card){
+    add('STOP', 'Open a card in the editor first, then click Diagnose.', '#f59e0b');
+    return;
+  }
+  add('Step', 'Testing REST DELETE on card '+card.id+'...');
+  let serverDeleted = false;
+  try {
+    const url = SUPA_URL + '/rest/v1/cards?id=eq.' + encodeURIComponent(card.id);
+    add('URL', url);
+    const r = await fetch(url, {
+      method: 'DELETE',
+      headers: {
+        'apikey': SUPA_KEY,
+        'Authorization': 'Bearer ' + freshToken,
+        'Prefer': 'return=representation'
+      }
+    });
+    add('REST status', r.status + ' ' + r.statusText, r.ok?'#22c55e':'#ef4444');
+    const txt = await r.text();
+    add('REST body', txt || '(empty)');
+    if(r.ok){
+      try {
+        const arr = JSON.parse(txt);
+        if(Array.isArray(arr) && arr.length>0){
+          serverDeleted = true;
+          add('Verdict', 'SUCCESS — card deleted on server ✓', '#22c55e');
+        } else {
+          add('Verdict', 'RLS blocked silently (200 OK but 0 rows). Need DELETE policy.', '#ef4444');
+        }
+      } catch(e){ add('JSON parse', 'failed: '+e.message, '#ef4444'); }
+    } else {
+      add('Verdict', 'HTTP error '+r.status+' — likely missing policy or expired token', '#ef4444');
+    }
+  } catch(e){ add('REST exception', String(e), '#ef4444'); }
+  sep();
+
+  // 5) Confirma com SELECT se o card ainda existe
+  add('Step', 'Verifying with SELECT...');
+  try {
+    const r = await fetch(SUPA_URL + '/rest/v1/cards?id=eq.' + encodeURIComponent(card.id) + '&select=id', {
+      headers: { 'apikey': SUPA_KEY, 'Authorization': 'Bearer ' + freshToken }
+    });
+    const arr = r.ok ? await r.json() : null;
+    if(arr && arr.length===0){
+      add('SELECT result', 'Card NOT in cards table (=DELETED on server) ✓', '#22c55e');
+    } else if(arr && arr.length>0){
+      add('SELECT result', 'Card STILL EXISTS on server ✗', '#ef4444');
+    } else {
+      add('SELECT result', 'Could not verify (status '+r.status+')', '#f59e0b');
+    }
+  } catch(e){ add('SELECT exception', String(e), '#ef4444'); }
+  sep();
+
+  // 6) Tenta RPC se REST não deletou
+  if(!serverDeleted){
+    add('Step', 'Testing RPC admin_delete_card as fallback...');
+    try {
+      const { data: rpcOk, error: rpcErr } = await _supa.rpc('admin_delete_card', { card_id: card.id });
+      if(rpcErr){
+        add('RPC ERROR', rpcErr.message + ' (code: ' + (rpcErr.code||'?') + ')', '#ef4444');
+        if(rpcErr.message && rpcErr.message.toLowerCase().includes('not exist')){
+          add('FIX', 'The function admin_delete_card was not created. Re-run section 5 of the SQL.', '#f59e0b');
+        } else if(rpcErr.message && rpcErr.message.toLowerCase().includes('not authorized')){
+          add('FIX', 'You are not in admins table OR session is using old token. Logout and login again.', '#f59e0b');
+        }
+      } else {
+        add('RPC result', String(rpcOk), rpcOk===true?'#22c55e':'#ef4444');
+        if(rpcOk===true){ add('Verdict', 'RPC SUCCESS — card deleted on server ✓', '#22c55e'); }
+      }
+    } catch(e){ add('RPC exception', String(e), '#ef4444'); }
+    sep();
+  }
+
+  add('Done', 'Click "Copy log" and send it to debug.', '#22c55e');
+}
+window.runDeleteDiagnostic = runDeleteDiagnostic;
 
 async function deleteCurrentCard(){
   // FIX 2026-05-15: se _editingCard se perdeu (state inconsistente), tenta
