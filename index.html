@@ -10162,6 +10162,103 @@ window.getTombstones = getTombstones;
 window.addTombstone = addTombstone;
 window.isCardTombstoned = isCardTombstoned;
 
+// ── HELPER: mostra modal grande com instruções de SQL pro admin colar no Supabase ──
+function showAdminSqlHelpModal(cardId, reason){
+  let overlay = document.getElementById('bmd-sql-help-overlay');
+  if(overlay) overlay.remove();
+  overlay = document.createElement('div');
+  overlay.id = 'bmd-sql-help-overlay';
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:99999;display:flex;align-items:center;justify-content:center;padding:20px';
+  const reasonText = ({
+    'NO_TOKEN':     'You are not signed in as admin.',
+    'AUTH_EXPIRED': 'Your session expired. Sign out, sign in again, and retry.',
+    'NOT_ADMIN':    'Your account is not in the admins table.',
+    'FORBIDDEN':    'Your account does not have DELETE permission on the cards table (RLS policy).',
+    'RLS_BLOCKED':  'Supabase RLS blocked the DELETE silently (server returned 0 rows). Most likely there is no DELETE policy for the cards table.',
+    'HTTP_500':     'Supabase returned 500. Could be a foreign-key constraint blocking the delete.',
+    'EXCEPTION':    'Network or JS exception during the DELETE call.',
+  })[reason] || 'Server did not confirm the delete.';
+
+  const sql = `-- 1) Make sure your user is in the admins table
+--    Replace YOUR_USER_ID with your auth.users.id (you can see it in
+--    Authentication → Users in the Supabase Dashboard).
+INSERT INTO public.admins (user_id)
+VALUES ('YOUR_USER_ID')
+ON CONFLICT DO NOTHING;
+
+-- 2) Enable RLS on cards (if not enabled yet)
+ALTER TABLE public.cards ENABLE ROW LEVEL SECURITY;
+
+-- 3) Create / replace the DELETE policy so admins can delete any card
+DROP POLICY IF EXISTS "admins can delete cards" ON public.cards;
+CREATE POLICY "admins can delete cards" ON public.cards
+  FOR DELETE
+  TO authenticated
+  USING (
+    EXISTS (
+      SELECT 1 FROM public.admins a WHERE a.user_id = auth.uid()
+    )
+  );
+
+-- 4) (Optional but recommended) SECURITY DEFINER RPC as a robust fallback.
+--    The frontend will call this if the direct DELETE returns 0 rows.
+CREATE OR REPLACE FUNCTION public.admin_delete_card(card_id text)
+RETURNS boolean
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+  is_admin boolean;
+  rows_deleted integer;
+BEGIN
+  SELECT EXISTS(SELECT 1 FROM public.admins WHERE user_id = auth.uid())
+    INTO is_admin;
+  IF NOT is_admin THEN
+    RAISE EXCEPTION 'not authorized';
+  END IF;
+  DELETE FROM public.cards WHERE id = card_id;
+  GET DIAGNOSTICS rows_deleted = ROW_COUNT;
+  RETURN rows_deleted > 0;
+END;
+$$;
+
+GRANT EXECUTE ON FUNCTION public.admin_delete_card(text) TO authenticated;
+
+-- 5) After running the SQL above, click "Delete Card" again in BoardMD.`;
+
+  overlay.innerHTML = `
+    <div style="background:var(--bg,#fff);border-radius:14px;max-width:780px;width:100%;max-height:90vh;overflow-y:auto;box-shadow:0 25px 60px rgba(0,0,0,.4);padding:24px;font-family:'Lato',sans-serif;color:var(--ink,#0f172a)">
+      <div style="display:flex;justify-content:space-between;align-items:start;gap:16px;margin-bottom:14px">
+        <div>
+          <h2 style="margin:0 0 6px;font-size:20px;font-weight:800">Server did not delete this card</h2>
+          <div style="font-size:13px;opacity:.75">Card <code style="background:rgba(0,0,0,.08);padding:2px 6px;border-radius:4px">${cardId}</code> was hidden locally, but it still exists on Supabase.</div>
+        </div>
+        <button onclick="document.getElementById('bmd-sql-help-overlay').remove()" style="background:none;border:1px solid rgba(0,0,0,.15);border-radius:8px;padding:6px 10px;cursor:pointer;font-size:14px">✕</button>
+      </div>
+      <div style="background:rgba(244,63,94,.08);border:1px solid rgba(244,63,94,.25);border-radius:10px;padding:12px 14px;margin-bottom:14px;font-size:13px;line-height:1.45">
+        <b>Reason:</b> ${reasonText}
+      </div>
+      <p style="font-size:13px;line-height:1.5;margin:0 0 8px">
+        To delete cards server-side, run the SQL below in your Supabase Dashboard:
+        <b>SQL Editor → New query → paste → Run</b>. You only need to run this <b>once</b>.
+      </p>
+      <pre id="bmd-sql-block" style="background:#0f172a;color:#e2e8f0;border-radius:10px;padding:14px;font-family:'JetBrains Mono',monospace;font-size:12px;line-height:1.55;overflow:auto;max-height:340px;margin:8px 0 14px;white-space:pre">${sql.replace(/</g,'&lt;')}</pre>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <button onclick="
+          navigator.clipboard.writeText(document.getElementById('bmd-sql-block').textContent).then(()=>{
+            this.textContent='✓ Copied'; setTimeout(()=>{this.textContent='Copy SQL'},1500);
+          });
+        " style="background:var(--blue,#2563eb);color:#fff;border:none;border-radius:9px;padding:10px 16px;font-weight:700;font-size:13px;cursor:pointer">Copy SQL</button>
+        <a href="https://supabase.com/dashboard/project/hwdcgbcnphkmxaasties/sql/new" target="_blank" rel="noopener" style="background:none;border:1px solid rgba(0,0,0,.2);color:var(--ink,#0f172a);border-radius:9px;padding:10px 16px;font-weight:700;font-size:13px;text-decoration:none;display:inline-block">Open Supabase SQL Editor ↗</a>
+        <button onclick="document.getElementById('bmd-sql-help-overlay').remove()" style="background:none;border:1px solid rgba(0,0,0,.2);border-radius:9px;padding:10px 16px;font-weight:700;font-size:13px;cursor:pointer">Close</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+}
+window.showAdminSqlHelpModal = showAdminSqlHelpModal;
+
 async function deleteCurrentCard(){
   // FIX 2026-05-15: se _editingCard se perdeu (state inconsistente), tenta
   // recuperar a partir do editor-card-id no DOM. Antes a função saía silenciosa
@@ -10196,20 +10293,26 @@ async function deleteCurrentCard(){
 
   console.log('[BMD delete] iniciando para card.id =', card.id);
 
-  // FIX 2026-05-15: TOMBSTONE PRIMEIRO. Mesmo se o Supabase falhar, o card
-  // não volta na UI porque é filtrado em buildDecks/loadCards.
-  addTombstone(card.id);
-  console.log('[BMD delete] tombstone adicionado');
+  // FIX 2026-05-15 (rev 2): pré-check de admin ANTES de mexer em nada local.
+  // Se não é admin, mostra modal com instruções e não toca em tombstone/IDB.
+  // Assim você nunca acaba com "card sumiu localmente mas continua no servidor".
+  let isAdminUser = false;
+  try {
+    isAdminUser = (typeof checkIsAdmin === 'function') ? await checkIsAdmin({retries:1}) : false;
+  } catch(e){ isAdminUser = false; }
+  console.log('[BMD delete] isAdmin =', isAdminUser);
 
-  // Tenta deletar no servidor (best-effort). Se falhar, tudo bem — o tombstone
-  // garante que não volta na UI. Quando o admin acessar com permissão correta,
-  // o registro do servidor será deletado pela sincronização (a fazer).
+  // FIX 2026-05-15 (rev 2): TOMBSTONE só será aplicado se o servidor confirmar
+  // o delete OU se já formos admin e o servidor responder algo conclusivo.
+  // Não aplicamos tombstone preventivamente para evitar mascarar problemas.
+
   let serverDeleted = false;
   let errorReason = '';
+  let httpStatus = 0;
+  let httpBody = '';
+
   try {
-    // FIX 2026-05-15: REFRESH da sessão antes do delete.
-    // Sessão Supabase expira em ~1h. Se está perto do limite, o token volta
-    // válido mas o servidor recusa. Forçar refresh garante token fresco.
+    // Refresh da sessão antes do delete (sessão Supabase expira em ~1h).
     let sess = null;
     try {
       const { data, error: refErr } = await _supa.auth.refreshSession();
@@ -10218,7 +10321,6 @@ async function deleteCurrentCard(){
         console.log('[BMD delete] sessão refrescada com sucesso');
       } else if(refErr){
         console.warn('[BMD delete] refresh falhou:', refErr.message);
-        // tenta pegar sessão existente como fallback
         const { data: existing } = await _supa.auth.getSession();
         sess = existing;
       }
@@ -10230,12 +10332,15 @@ async function deleteCurrentCard(){
 
     const token = sess?.session?.access_token;
     const userEmail = sess?.session?.user?.email || 'unknown';
-    console.log('[BMD delete] user:', userEmail, '| token presente:', !!token);
+    console.log('[BMD delete] user:', userEmail, '| token presente:', !!token, '| isAdmin:', isAdminUser);
 
     if(!token){
       errorReason = 'NO_TOKEN';
-      console.warn('[BMD delete] sem token — card só será removido localmente');
+    } else if(!isAdminUser){
+      errorReason = 'NOT_ADMIN';
+      console.warn('[BMD delete] usuário não está na tabela admins — pulando DELETE');
     } else {
+      // ── ATTEMPT 1: DELETE direto via REST ────────────────────────────
       const r = await fetch(SUPA_URL + '/rest/v1/cards?id=eq.' + encodeURIComponent(card.id), {
         method: 'DELETE',
         headers: {
@@ -10244,34 +10349,87 @@ async function deleteCurrentCard(){
           'Prefer': 'return=representation'
         }
       });
-      console.log('[BMD delete] servidor respondeu', r.status, r.statusText);
+      httpStatus = r.status;
+      console.log('[BMD delete] REST DELETE respondeu', r.status, r.statusText);
       if(r.ok){
         const resp = await r.json().catch(()=>[]);
         if(Array.isArray(resp) && resp.length > 0){
           serverDeleted = true;
-          console.log('[BMD delete] ✓ servidor confirmou delete:', resp[0]?.id);
+          console.log('[BMD delete] ✓ servidor confirmou delete (REST):', resp[0]?.id);
         } else {
-          errorReason = 'RLS_BLOCKED';
-          console.warn('[BMD delete] ✗ servidor retornou 0 linhas — RLS bloqueou ou ID não existia');
-          console.warn('[BMD delete] → verificar Policy de DELETE na tabela cards no Supabase Dashboard');
+          // 0 linhas: RLS silenciosa OU id já não existia. Confirma com SELECT.
+          console.warn('[BMD delete] REST retornou 0 linhas — verificando se card ainda existe…');
+          const chk = await fetch(SUPA_URL + '/rest/v1/cards?id=eq.' + encodeURIComponent(card.id) + '&select=id', {
+            headers: { 'apikey': SUPA_KEY, 'Authorization': 'Bearer ' + token }
+          });
+          const chkJson = chk.ok ? await chk.json().catch(()=>[]) : [];
+          if(Array.isArray(chkJson) && chkJson.length === 0){
+            // Card já não existe: ok, foi deletado por outra sessão.
+            serverDeleted = true;
+            console.log('[BMD delete] ✓ card já não existe no servidor (consistente)');
+          } else {
+            // Card ainda existe → RLS bloqueou. Tenta fallback RPC.
+            console.warn('[BMD delete] card ainda existe → tentando RPC admin_delete_card…');
+            try {
+              const { data: rpcOk, error: rpcErr } = await _supa.rpc('admin_delete_card', { card_id: card.id });
+              if(rpcErr){
+                errorReason = 'RLS_BLOCKED';
+                console.warn('[BMD delete] RPC falhou:', rpcErr.message || rpcErr);
+                httpBody = String(rpcErr.message || rpcErr);
+              } else if(rpcOk === true){
+                serverDeleted = true;
+                console.log('[BMD delete] ✓ servidor confirmou delete (RPC)');
+              } else {
+                errorReason = 'RLS_BLOCKED';
+                console.warn('[BMD delete] RPC retornou', rpcOk);
+              }
+            } catch(rpcExc){
+              errorReason = 'RLS_BLOCKED';
+              console.warn('[BMD delete] RPC exceção:', rpcExc);
+            }
+          }
         }
       } else {
         const t = await r.text();
+        httpBody = t;
         errorReason = 'HTTP_' + r.status;
         console.error('[BMD delete] ✗ erro HTTP:', r.status, t);
-        if(r.status === 401){
-          errorReason = 'AUTH_EXPIRED';
-          console.warn('[BMD delete] → token inválido/expirado. Faça logout e login de novo.');
-        } else if(r.status === 403){
-          errorReason = 'FORBIDDEN';
-          console.warn('[BMD delete] → seu usuário não tem permissão (RLS DELETE policy).');
+        if(r.status === 401)      errorReason = 'AUTH_EXPIRED';
+        else if(r.status === 403) errorReason = 'FORBIDDEN';
+        else if(r.status >= 500)  errorReason = 'HTTP_500';
+        // Tenta RPC mesmo em 401/403 — pode ser que a policy direta esteja
+        // restrita mas a SECURITY DEFINER function permita.
+        try {
+          const { data: rpcOk, error: rpcErr } = await _supa.rpc('admin_delete_card', { card_id: card.id });
+          if(!rpcErr && rpcOk === true){
+            serverDeleted = true;
+            errorReason = '';
+            console.log('[BMD delete] ✓ RPC salvou o delete após falha REST');
+          } else if(rpcErr){
+            console.warn('[BMD delete] RPC também falhou:', rpcErr.message || rpcErr);
+          }
+        } catch(rpcExc){
+          console.warn('[BMD delete] RPC exceção:', rpcExc);
         }
       }
     }
   } catch(e){
     errorReason = 'EXCEPTION';
+    httpBody = String(e && e.message || e);
     console.error('[BMD delete] exceção no fetch:', e);
   }
+
+  // ── Decide: aplicar mudanças locais ou não ───────────────────────────
+  if(!serverDeleted){
+    // Servidor não confirmou. NÃO removemos localmente — abrimos modal com SQL.
+    console.warn('[BMD delete] servidor não confirmou. Abrindo help modal. reason=', errorReason);
+    showAdminSqlHelpModal(card.id, errorReason || 'RLS_BLOCKED');
+    return;
+  }
+
+  // ── Servidor confirmou. Limpa tudo local. ────────────────────────────
+  // Adiciona tombstone (para o caso do cache IDB ainda devolver o card)
+  addTombstone(card.id);
 
   try {
     // Remove de todas as listas em memória
@@ -10305,20 +10463,7 @@ async function deleteCurrentCard(){
     }
 
     closeCardEditor();
-    // FIX 2026-05-15: toast claro sobre o que aconteceu
-    if(serverDeleted){
-      showToast('Card deleted ✓ (server confirmed)');
-    } else {
-      const reasonMsg = {
-        'NO_TOKEN':      'Card hidden locally — please sign in as admin to delete on server',
-        'AUTH_EXPIRED':  'Card hidden locally — your session expired. Sign out and back in.',
-        'FORBIDDEN':     'Card hidden locally — your user has no DELETE permission on cards table',
-        'RLS_BLOCKED':   'Card hidden locally — Supabase DELETE policy blocked (check RLS on cards table)',
-        'HTTP_500':      'Card hidden locally — server error 500 (transient, try again later)',
-        'EXCEPTION':     'Card hidden locally — network/JS exception',
-      }[errorReason] || 'Card hidden locally — server did not authorize';
-      showToast(reasonMsg, 5000);
-    }
+    showToast('Card deleted ✓ (server confirmed)');
 
     // Avança pro próximo card
     if(typeof idx !== 'undefined' && Array.isArray(deck)){
@@ -10330,12 +10475,12 @@ async function deleteCurrentCard(){
       }
     }
 
-    // Atualiza badges/contadores da home + chips do BS
+    // Atualiza badges/contadores
     try { if(typeof bmdDashSync === 'function') bmdDashSync(); } catch(e){}
     try { if(typeof bsUpdateChipCounts === 'function') bsUpdateChipCounts(); } catch(e){}
   } catch(e) {
     console.error('[BMD delete] exceção pós-servidor:', e);
-    alert('Error clearing card locally: ' + (e.message || e));
+    alert('Card deleted on server, but local cleanup failed: ' + (e.message || e) + '\nReload the page.');
   }
 }
 
