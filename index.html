@@ -10163,7 +10163,34 @@ window.addTombstone = addTombstone;
 window.isCardTombstoned = isCardTombstoned;
 
 async function deleteCurrentCard(){
-  if(!_editingCard) return;
+  // FIX 2026-05-15: se _editingCard se perdeu (state inconsistente), tenta
+  // recuperar a partir do editor-card-id no DOM. Antes a função saía silenciosa
+  // sem nenhum feedback — agora ou recupera ou mostra erro claro.
+  if(!_editingCard){
+    console.warn('[BMD delete] _editingCard está null — tentando recuperar do DOM');
+    try {
+      const idEl = document.getElementById('editor-card-id');
+      if(idEl){
+        const m = idEl.textContent.match(/ID:\s*([^\s·]+)/);
+        if(m && m[1]){
+          const cardId = m[1].trim();
+          // Procura nos decks carregados
+          let found = null;
+          Object.keys(window.DECKS || {}).forEach(dk => {
+            (DECKS[dk]||[]).forEach(c => { if(c.id === cardId) found = c; });
+          });
+          if(found){
+            _editingCard = found;
+            console.log('[BMD delete] recuperado _editingCard via DOM:', cardId);
+          }
+        }
+      }
+    } catch(recErr){ console.error('[BMD delete] erro recuperando:', recErr); }
+  }
+  if(!_editingCard){
+    alert('No card loaded in editor. Close and reopen the editor, then try again.');
+    return;
+  }
   const card = _editingCard;
   if(!confirm(`Delete this card permanently?\n\nQID ${card.qid || card.id}\n"${(card.q||'').slice(0,80)}..."\n\nThis cannot be undone.`)) return;
 
