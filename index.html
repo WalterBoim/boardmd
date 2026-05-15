@@ -10178,10 +10178,35 @@ async function deleteCurrentCard(){
   // garante que não volta na UI. Quando o admin acessar com permissão correta,
   // o registro do servidor será deletado pela sincronização (a fazer).
   let serverDeleted = false;
+  let errorReason = '';
   try {
-    const { data: sess } = await _supa.auth.getSession();
+    // FIX 2026-05-15: REFRESH da sessão antes do delete.
+    // Sessão Supabase expira em ~1h. Se está perto do limite, o token volta
+    // válido mas o servidor recusa. Forçar refresh garante token fresco.
+    let sess = null;
+    try {
+      const { data, error: refErr } = await _supa.auth.refreshSession();
+      if(data && data.session){
+        sess = data;
+        console.log('[BMD delete] sessão refrescada com sucesso');
+      } else if(refErr){
+        console.warn('[BMD delete] refresh falhou:', refErr.message);
+        // tenta pegar sessão existente como fallback
+        const { data: existing } = await _supa.auth.getSession();
+        sess = existing;
+      }
+    } catch(refExc){
+      console.warn('[BMD delete] exceção no refresh:', refExc);
+      const { data: existing } = await _supa.auth.getSession();
+      sess = existing;
+    }
+
     const token = sess?.session?.access_token;
+    const userEmail = sess?.session?.user?.email || 'unknown';
+    console.log('[BMD delete] user:', userEmail, '| token presente:', !!token);
+
     if(!token){
+      errorReason = 'NO_TOKEN';
       console.warn('[BMD delete] sem token — card só será removido localmente');
     } else {
       const r = await fetch(SUPA_URL + '/rest/v1/cards?id=eq.' + encodeURIComponent(card.id), {
@@ -10192,21 +10217,32 @@ async function deleteCurrentCard(){
           'Prefer': 'return=representation'
         }
       });
-      console.log('[BMD delete] servidor respondeu', r.status);
+      console.log('[BMD delete] servidor respondeu', r.status, r.statusText);
       if(r.ok){
         const resp = await r.json().catch(()=>[]);
         if(Array.isArray(resp) && resp.length > 0){
           serverDeleted = true;
-          console.log('[BMD delete] servidor confirmou delete:', resp[0]?.id);
+          console.log('[BMD delete] ✓ servidor confirmou delete:', resp[0]?.id);
         } else {
-          console.warn('[BMD delete] servidor retornou 0 linhas — RLS bloqueou ou ID não existia');
+          errorReason = 'RLS_BLOCKED';
+          console.warn('[BMD delete] ✗ servidor retornou 0 linhas — RLS bloqueou ou ID não existia');
+          console.warn('[BMD delete] → verificar Policy de DELETE na tabela cards no Supabase Dashboard');
         }
       } else {
         const t = await r.text();
-        console.error('[BMD delete] erro do servidor:', r.status, t);
+        errorReason = 'HTTP_' + r.status;
+        console.error('[BMD delete] ✗ erro HTTP:', r.status, t);
+        if(r.status === 401){
+          errorReason = 'AUTH_EXPIRED';
+          console.warn('[BMD delete] → token inválido/expirado. Faça logout e login de novo.');
+        } else if(r.status === 403){
+          errorReason = 'FORBIDDEN';
+          console.warn('[BMD delete] → seu usuário não tem permissão (RLS DELETE policy).');
+        }
       }
     }
   } catch(e){
+    errorReason = 'EXCEPTION';
     console.error('[BMD delete] exceção no fetch:', e);
   }
 
@@ -10242,7 +10278,20 @@ async function deleteCurrentCard(){
     }
 
     closeCardEditor();
-    showToast(serverDeleted ? 'Card deleted ✓' : 'Card hidden locally (server did not authorize)');
+    // FIX 2026-05-15: toast claro sobre o que aconteceu
+    if(serverDeleted){
+      showToast('Card deleted ✓ (server confirmed)');
+    } else {
+      const reasonMsg = {
+        'NO_TOKEN':      'Card hidden locally — please sign in as admin to delete on server',
+        'AUTH_EXPIRED':  'Card hidden locally — your session expired. Sign out and back in.',
+        'FORBIDDEN':     'Card hidden locally — your user has no DELETE permission on cards table',
+        'RLS_BLOCKED':   'Card hidden locally — Supabase DELETE policy blocked (check RLS on cards table)',
+        'HTTP_500':      'Card hidden locally — server error 500 (transient, try again later)',
+        'EXCEPTION':     'Card hidden locally — network/JS exception',
+      }[errorReason] || 'Card hidden locally — server did not authorize';
+      showToast(reasonMsg, 5000);
+    }
 
     // Avança pro próximo card
     if(typeof idx !== 'undefined' && Array.isArray(deck)){
