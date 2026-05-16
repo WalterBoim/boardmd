@@ -17288,7 +17288,7 @@ function bmdSetupDrag(){
     <div class="bs-int-search">
       <div class="bs-int-search-bar">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
-        <input class="bs-int-search-input" id="bs-search" type="text" placeholder="Search topic, keyword, QID…" oninput="bsSearch(this.value)" autocomplete="off">
+        <input class="bs-int-search-input" id="bs-search" type="text" placeholder="Search topic, keyword, QID… (or paste multiple QIDs: 12345, 67890, 11111)" oninput="bsSearch(this.value)" autocomplete="off">
         <button class="bs-int-clear" id="bs-int-clear" onclick="bsIntClear()" style="display:none">✕</button>
       </div>
       <div class="bs-int-chips">
@@ -17773,7 +17773,11 @@ function showDone(){
 window.bsStart=function(){
   BS.cards=getCards();
   // Apply search filter if active
-  if(BS._searchFilter){
+  // 2026-05-15: agora suporta multi-QID (BS._searchTokens) além de substring (_searchFilter)
+  if(BS._searchTokens && BS._searchTokens.length){
+    const toks = BS._searchTokens;
+    BS.cards = BS.cards.filter(c => toks.some(t => _bmdQidMatchesToken(c.qid, t)));
+  } else if(BS._searchFilter){
     const q=BS._searchFilter;
     BS.cards=BS.cards.filter(c=>{
       const t=(c.topic||c.subject||'').toLowerCase();
@@ -17862,6 +17866,7 @@ window.bsIntClear=function(){
   const clr=document.getElementById('bs-int-clear');if(clr)clr.style.display='none';
   const m=document.getElementById('bs-int-match');if(m){m.style.display='none';m.textContent='';}
   BS._searchFilter='';
+  BS._searchTokens=null;
   // Reset chips
   document.querySelectorAll('.bs-chip').forEach((c,i)=>c.classList.toggle('active',i===0));
 };
@@ -17875,6 +17880,7 @@ window.bsChip=function(el,val){
   } else {
     const inp=document.getElementById('bs-search');if(inp&&inp.value){inp.value='';inp.dispatchEvent(new Event('input'));}
     BS._searchFilter='';
+    BS._searchTokens=null;
     const m=document.getElementById('bs-int-match');if(m)m.style.display='none';
   }
 };
@@ -17884,33 +17890,112 @@ window.bsOpenAttendingCurrent=function(){
   const topic=card.topic||card.subject||'this topic';
   bsOpenAttending(topic,'');
 };
+// ── 2026-05-15: helper de parsing de múltiplos QIDs ─────────────────────
+// Aceita lista colada do UWorld: vírgula, ponto-vírgula, quebra de linha,
+// tab ou espaço. Se detecta ≥2 tokens numéricos, trata como busca por QIDs.
+// Se é só 1 termo, mantém o comportamento antigo (substring em topic/kp/q/qid).
+function _bmdParseSearchInput(raw){
+  if(!raw) return { mode:'empty', tokens:[], original:'' };
+  const s = String(raw).trim();
+  if(!s) return { mode:'empty', tokens:[], original:'' };
+  // Split por qualquer separador comum
+  const parts = s.split(/[,;\s\n\t]+/g).map(x => x.trim()).filter(Boolean);
+  if(parts.length >= 2){
+    // Considera "multi" quando 2+ tokens E pelo menos a maioria parece QID
+    const qidLike = parts.filter(t => /^\d{2,}$/.test(t) || /^[A-Za-z]+-?[A-Za-z0-9]*-?\d{2,}$/.test(t));
+    if(qidLike.length >= 2){
+      return { mode:'multi', tokens: parts, original: s };
+    }
+  }
+  return { mode:'single', tokens:[s], original: s };
+}
+
+// Testa se o QID de um card casa com um token da lista.
+// - Token numérico puro: casa se o QID do card TERMINA com esse número
+//   (assim "2710" casa com "BMD-S2-2710" e "BMD-S1-2710")
+// - Token com prefixo: exige match exato (case-insensitive)
+function _bmdQidMatchesToken(cardQid, token){
+  if(!cardQid) return false;
+  const cq = String(cardQid).toLowerCase();
+  const tk = String(token).toLowerCase();
+  if(/^\d+$/.test(tk)){
+    // numérico puro: extrai a parte numérica final do QID e compara
+    const tail = cq.match(/(\d+)$/);
+    return tail && tail[1] === tk;
+  }
+  return cq === tk;
+}
+
 window.bsSearch=function(q){
-  // Filter cards by search query (topic, subject, QID, keyword)
-  q=(q||'').trim().toLowerCase();
-  if(!q){BS._searchFilter='';return;}
-  BS._searchFilter=q;
-  // Visual feedback: show match count
-  const D=window.DECKS||{};
-  let pool=[];
-  if(BS.deck==='all'){pool=[...(D.boardmd_s2||[]),...(D.core||[]),...(D.boardmd_s1||[]),...(D.s1_core||[]),...(D.new_s2ck||[])];}
-  else pool=D[BS.deck]||[];
-  const matches=pool.filter(c=>{
-    const t=(c.topic||c.subject||'').toLowerCase();
-    const kp=(c.kp||'').toLowerCase();
-    const q2=(c.q||'').toLowerCase();
-    const qid=String(c.qid||'');
-    return t.includes(q)||kp.includes(q)||q2.includes(q)||qid.includes(q);
-  });
-  // Update search placeholder to show count
-  const inp=document.getElementById('bs-search');
-  if(inp)inp.style.borderColor=matches.length?'var(--accent)':'var(--rose)';
-  const clr=document.getElementById('bs-int-clear');if(clr)clr.style.display=q?'':'none';
-  const m=document.getElementById('bs-int-match');
-  if(m&&q){
-    m.style.display='';
-    m.className='bs-int-match '+(matches.length?'hit':'miss');
-    m.textContent=matches.length?matches.length+' cards match':'no matches';
-  } else if(m){m.style.display='none';}
+  const parsed = _bmdParseSearchInput(q);
+  if(parsed.mode === 'empty'){
+    BS._searchFilter = '';
+    BS._searchTokens = null;
+    const inp=document.getElementById('bs-search');if(inp)inp.style.borderColor='';
+    const clr=document.getElementById('bs-int-clear');if(clr)clr.style.display='none';
+    const m=document.getElementById('bs-int-match');if(m){m.style.display='none';m.textContent='';}
+    return;
+  }
+
+  // Pool de busca: mesma lógica anterior
+  const D = window.DECKS || {};
+  let pool = [];
+  if(BS.deck === 'all'){
+    pool = [...(D.boardmd_s2||[]),...(D.core||[]),...(D.boardmd_s1||[]),...(D.s1_core||[]),...(D.new_s2ck||[])];
+  } else {
+    pool = D[BS.deck] || [];
+  }
+
+  let matches;
+  if(parsed.mode === 'multi'){
+    // Multi-QID: filtra por QID exato (numérico → tail match, prefixado → exato)
+    BS._searchFilter = parsed.original.toLowerCase();
+    BS._searchTokens = parsed.tokens;
+    matches = pool.filter(c => parsed.tokens.some(t => _bmdQidMatchesToken(c.qid, t)));
+  } else {
+    // Single: comportamento antigo (substring em todos os campos)
+    const qLow = parsed.tokens[0].toLowerCase();
+    BS._searchFilter = qLow;
+    BS._searchTokens = null;
+    matches = pool.filter(c => {
+      const t = (c.topic||c.subject||'').toLowerCase();
+      const kp = (c.kp||'').toLowerCase();
+      const q2 = (c.q||'').toLowerCase();
+      const qid = String(c.qid||'').toLowerCase();
+      return t.includes(qLow) || kp.includes(qLow) || q2.includes(qLow) || qid.includes(qLow);
+    });
+  }
+
+  // Feedback visual
+  const inp = document.getElementById('bs-search');
+  if(inp) inp.style.borderColor = matches.length ? 'var(--accent)' : 'var(--rose)';
+  const clr = document.getElementById('bs-int-clear');
+  if(clr) clr.style.display = parsed.original ? '' : 'none';
+  const m = document.getElementById('bs-int-match');
+  if(m){
+    m.style.display = '';
+    m.className = 'bs-int-match ' + (matches.length ? 'hit' : 'miss');
+    if(parsed.mode === 'multi'){
+      const hits = matches.length;
+      const total = parsed.tokens.length;
+      const missing = total - hits;
+      if(hits === 0){
+        m.textContent = '0/' + total + ' QIDs found — none match';
+      } else if(missing === 0){
+        m.textContent = hits + ' cards · all ' + total + ' QIDs matched ✓';
+      } else {
+        // Identifica quais QIDs não bateram pra mostrar
+        const matchedQids = new Set(matches.map(c => String(c.qid||'').toLowerCase()));
+        const missingTokens = parsed.tokens.filter(t =>
+          !matches.some(c => _bmdQidMatchesToken(c.qid, t))
+        );
+        const missPreview = missingTokens.slice(0,5).join(', ') + (missingTokens.length>5?'…':'');
+        m.textContent = hits + ' cards · ' + missing + ' QID' + (missing>1?'s':'') + ' not found: ' + missPreview;
+      }
+    } else {
+      m.textContent = matches.length ? matches.length + ' cards match' : 'no matches';
+    }
+  }
 };
 
 
