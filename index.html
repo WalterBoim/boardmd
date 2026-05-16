@@ -12454,6 +12454,17 @@ function injectAttendingInline(card, sel){
         More MCQs
       </button>
     </div>
+    <!-- 2026-05-16: Modos 260+ avançados — Mock Me + Predict the Distractor -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:0 14px 8px;">
+      <button ${dis} onclick="askAttendingInline('mock',this)" style="display:flex;align-items:center;justify-content:center;gap:6px;background:linear-gradient(135deg,rgba(232,168,54,.10),rgba(244,114,182,.08));border:1px solid rgba(232,168,54,.40);border-radius:12px;padding:11px 10px;font-size:12px;font-weight:700;color:#e8a836;cursor:pointer;font-family:Inter,sans-serif;transition:all .2s;" onmouseover="this.style.background='linear-gradient(135deg,rgba(232,168,54,.20),rgba(244,114,182,.15))';this.style.borderColor='rgba(232,168,54,.7)'" onmouseout="this.style.background='linear-gradient(135deg,rgba(232,168,54,.10),rgba(244,114,182,.08))';this.style.borderColor='rgba(232,168,54,.40)'">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v16H4z"/><path d="M9 9h6v6H9z"/></svg>
+        Mock Me
+      </button>
+      <button ${dis} onclick="askAttendingInline('predict',this)" style="display:flex;align-items:center;justify-content:center;gap:6px;background:linear-gradient(135deg,rgba(168,85,247,.10),rgba(236,72,153,.08));border:1px solid rgba(168,85,247,.40);border-radius:12px;padding:11px 10px;font-size:12px;font-weight:700;color:#a855f7;cursor:pointer;font-family:Inter,sans-serif;transition:all .2s;" onmouseover="this.style.background='linear-gradient(135deg,rgba(168,85,247,.20),rgba(236,72,153,.15))';this.style.borderColor='rgba(168,85,247,.7)'" onmouseout="this.style.background='linear-gradient(135deg,rgba(168,85,247,.10),rgba(236,72,153,.08))';this.style.borderColor='rgba(168,85,247,.40)'">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+        Predict Trap
+      </button>
+    </div>
     <div style="display:flex;gap:8px;padding:0 14px 12px;align-items:flex-end;position:relative;">
       <textarea id="att-ask-input" rows="1" placeholder="Ask anything about this topic…" style="flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:12px;color:var(--text);font-family:'Inter',sans-serif;font-size:13px;line-height:1.5;padding:10px 36px 10px 14px;outline:none;transition:border-color .2s;resize:none;overflow-y:hidden;min-height:40px;max-height:200px;" oninput="document.getElementById('att-ask-clear').style.display=this.value?'flex':'none';this.style.height='auto';this.style.height=Math.min(this.scrollHeight,200)+'px';this.style.overflowY=this.scrollHeight>200?'auto':'hidden';"></textarea>
       <button id="att-ask-clear" style="display:none;position:absolute;right:78px;top:10px;background:none;border:none;color:var(--text-faint);cursor:pointer;font-size:14px;padding:4px;line-height:1;">&#x2715;</button>
@@ -12782,12 +12793,41 @@ EXPLANATION: ${(card.e||'').replace(/<[^>]+>/g,' ').slice(0,300)}${pubmedRefs}`;
 
   const prompts = {
     why: `You are a brilliant, warm attending physician. The student just answered this USMLE board question:\n\n${ctx}\n\nIn 2-3 paragraphs: acknowledge right/wrong (one sentence). Explain WHY this is the correct answer using core pathophysiology. Be direct, clinical — like a great attending, not a textbook. End with one punchy clinical pearl.\n\nFinally, on a new line, write exactly: PUBMED_QUERY: [6-8 specific medical terms for PubMed search relevant to this answer]`,
-    explain: `You are a brilliant USMLE attending physician — equal parts master clinician and NBME test-taking strategist. The student wants a deeper, sharper, board-ready breakdown of:\n\n${ctx}\n\nWrite a focused 5-section response. Use these EXACT section headers (caps, no markdown):\n\nCORE CONCEPT\nIn 2-3 sentences: the pathophysiology that drives this question. One vivid analogy or mental model. Be concrete, not academic.\n\nCLINICAL RECOGNITION\nIn 2-4 sentences: the key bedside findings, lab clues, and the "classic vignette flag" the NBME uses to hint at this diagnosis. What separates this from its closest mimics?\n\nNBME TRAPS & LOGIC PITFALLS\nThis section is the gold. Explicitly dissect:\n- The specific distractors the NBME uses on this concept and WHY students fall for them (cognitive shortcut they exploit).\n- "Narrative fluff": filler details in the vignette that LOOK important but are red herrings.\n- "Vibe over fact" traps: when the wrong answer "feels right" because it sounds more aggressive/more conservative/more recent.\n- When the correct answer is chosen by gestalt or comparative likelihood rather than textbook criteria — name this explicitly when relevant.\n\nTEST-TAKING STRATEGY (transferable across questions)\nGive 2-3 strategies that apply to this question AND generalize:\n- How to attack this question type if you don't know the answer cold.\n- How to use process of elimination effectively here (which 2 options to kill first, and why).\n- How to "educated guess" when 2 options look equally plausible — what tiebreaker the boards favor.\n- Pattern recognition cues that signal "this is testing concept X" so you can shortcut to the right framework.\n\nONE-LINER (high-yield takeaway)\nSingle sentence, ≤25 words. The pearl that, if memorized, would prevent missing this type of question on the NBME. Bold-worthy. No hedging.\n\nRULES:\n- Refer to options by their CLINICAL CONTENT, never by letter (A/B/C/D) — options are randomized.\n- Confident, declarative voice. No "may", "might", "could potentially". This is an attending teaching, not hedging.\n- If REFERENCES are provided above, cite inline using superscript ¹ ² ³. Never invent references.\n- Total length: 280-420 words.\n\nAt the very end, write:\nPUBMED_QUERY: [6-8 specific medical terms for PubMed search relevant to this topic]`,
+    explain: `You are a USMLE attending physician who scored 270+ on Step 2 CK. The student wants a deeper, board-ready breakdown of this concept, structured to build a reflex — not to dump information.
+
+CONTEXT:
+${ctx}
+
+Write a 4-section response with EXACTLY these headers in caps (no markdown, no asterisks, no bullets):
+
+THESIS
+ONE sentence. The headline of this topic. The single declarative truth that, if remembered, anchors everything else. ≤25 words. No hedging.
+
+MECHANISM
+3 numbered steps (1. / 2. / 3.) capturing the pathophysiologic chain. Each step ≤20 words. Concrete, mechanistic, no fluff. The student should be able to recite this chain from memory.
+
+WHY NBME TESTS THIS
+2 sentences. WHERE this trap recurs on the exam — the specific cognitive error this question type exploits. Name the seductive wrong answer pattern (e.g., "students give antibiotics first", "students treat the symptom, not the disease", "students match age-disease pattern naively"). Make it portable to other questions.
+
+SHORTCUT
+ONE sentence in quotes. The memorable mental algorithm. Format: "X BEFORE Y", or "Any [trigger] → [response]", or a vivid metaphor. Must be ≤15 words and instantly retrievable during the exam.
+
+CRITICAL RULES:
+- Refer to options/drugs/tests by CLINICAL CONTENT, never by letter
+- Confident, surgical voice. Zero hedging ("may", "might", "could potentially" are banned)
+- No markdown, no asterisks, no bullets except numbers in MECHANISM
+- Total length: 160-240 words
+- The student aims for 260+. Match that bar.
+
+If REFERENCES are provided above, cite inline using superscript ¹ ² ³. Never invent references.
+
+At the very end, write:
+PUBMED_QUERY: [6-8 specific medical terms for PubMed search relevant to this topic]`,
     mcq: `You are a brilliant USMLE question writer. Based on this topic:\n\n${ctx}\n\nWrite 3 new USMLE-style MCQs on the SAME CORE TOPIC/DISEASE but each testing a DIFFERENT clinical facet. The original card tested one angle — your job is to expand coverage so the student masters the topic from multiple sides.\n\nPick 3 DISTINCT facets from this list (skip the one the original card already tested):\n- Diagnosis (most likely Dx given findings)\n- Next best step in workup (specific test/imaging/lab)\n- Best initial / definitive treatment\n- Mechanism / pathophysiology applied to a clinical scenario\n- Complication or sequela (acute or chronic)\n- Risk factor / predisposing condition\n- Prognosis or natural history\n- Screening / prevention\n- Differential diagnosis (distinguishing from a look-alike)\n- Pharmacology specific to this disease (mechanism, side effect, contraindication)\n\nIMPORTANT:\n- Each of the 3 MCQs must test a DIFFERENT facet (no repetition).\n- Vary patient demographics (age, sex, setting) to avoid pattern recognition shortcuts.\n- Each stem should feel like a real NBME vignette — clinically rich, 4-7 lines.\n- The correct answer position must vary (don't make all "A"; mix A/B/C/D).\n\nReturn ONLY valid JSON, no markdown, no extra text:\n{"questions":[{"facet":"[name of facet 1, e.g. 'Next best step']","stem":"[clinical vignette]","options":["A. text","B. text","C. text","D. text"],"correct":"A","explanation":"[2-3 sentences why correct answer is right]","distractors":{"B":"[why B is wrong]","C":"[why C is wrong]","D":"[why D is wrong]"},"keypoint":"[one punchy ≤15 word board pearl]"},{"facet":"[facet 2]","stem":"[vignette]","options":["A. text","B. text","C. text","D. text"],"correct":"B","explanation":"[2-3 sentences]","distractors":{"A":"[why wrong]","C":"[why wrong]","D":"[why wrong]"},"keypoint":"[≤15 word pearl]"},{"facet":"[facet 3]","stem":"[vignette]","options":["A. text","B. text","C. text","D. text"],"correct":"C","explanation":"[2-3 sentences]","distractors":{"A":"[why wrong]","B":"[why wrong]","D":"[why wrong]"},"keypoint":"[≤15 word pearl]"}]}\n\nPUBMED_QUERY: [6-8 specific medical terms for PubMed search relevant to these questions]`,
     surprise: `You are a brilliant attending. Give ONE unforgettable clinical pearl about:\n\n${ctx}\n\nSomething NOT in the explanation — a real-world connection, classic trick, or board trap that sticks in memory. Be vivid and direct. 2 paragraphs max.\n\nIf REFERENCES are provided above, cite them inline using superscript numbers ¹ ² ³ — only cite references that actually exist in the list. Do NOT invent references. If no references are provided, write without citations.\n\nAt the very end, write:\nPUBMED_QUERY: [6-8 specific medical terms for PubMed search relevant to this topic]`,
     custom: `You are a brilliant attending physician. The student has a question about this USMLE topic:\n\n${ctx}\n\nStudent question: "${document.getElementById('att-ask-input')?.value||''}"\n\nAnswer clearly and clinically in 2-3 paragraphs. Focus on what's relevant for USMLE boards.\n\nFinally, on a new line, write exactly: PUBMED_QUERY: [6-8 specific medical terms for PubMed search relevant to this answer]`,
     compare: `You are a brilliant USMLE attending. The student just answered this question:\n\n${ctx}\n\nIdentify the correct diagnosis AND the single most commonly confused alternative (main distractor).\n\nReturn ONLY valid JSON, no markdown:\n{"left_label":"[correct dx name]","right_label":"[distractor name]","left":["exclusive feature 1","exclusive feature 2","exclusive feature 3","exclusive feature 4"],"shared":["shared feature 1","shared feature 2","shared feature 3"],"right":["exclusive feature 1","exclusive feature 2","exclusive feature 3","exclusive feature 4"],"pubmed_query":"[6-8 terms comparing these two diagnoses]"}`,
-    wrong: `You are a USMLE attending physician — board examiner and clinical preceptor — speaking directly to a student who just got this question wrong. Your tone: confident, clinical, warm, never condescending. Like a great preceptor pulling the student aside on rounds.
+    wrong: `You are a USMLE attending physician who scored 270+ on Step 2 CK. You are speaking directly to a student who just got this question wrong. Your tone: confident, surgical, warm, and metacognitive — you teach REFLEXES, not facts.
 
 QUESTION: ${card.q}
 OPTIONS (presented to the student in RANDOMIZED order, so DO NOT refer to letters A/B/C/D — only refer to options by their clinical content):
@@ -12799,39 +12839,125 @@ EXPLANATION: ${(card.e||'').replace(/<[^>]+>/g,' ').slice(0,300)}${pubmedRefs}
 
 The student picked "${userChoiceText}". The correct answer is "${card.c}".
 
-Write EXACTLY this structure (use these exact headers in caps, no other formatting/no markdown):
+Write EXACTLY this 5-section structure (use these EXACT headers in caps, no markdown, no asterisks):
 
-WHY YOU PICKED THIS
-In 1-2 sentences, explain in second person ("you") the specific clinical reasoning that led you to choose "${userChoiceText}". Be direct about the cognitive shortcut — the one finding or association that pulled you toward this answer. NO hedging words ("may have", "might be", "could have"). State it directly. Refer to the chosen option by its clinical name "${userChoiceText}" — NEVER as "option A/B/C/D" or any letter.
+THE TRAP
+1-2 sentences in SECOND PERSON ("you"). Identify the SPECIFIC cognitive shortcut that pulled you toward "${userChoiceText}". What pattern did you match on? Be brutally specific — name the exact word/finding/association in the vignette that hijacked your reasoning.
 
-WHY THIS IS WRONG
-In 2-3 sentences, explain the single clinical/pathophysiologic reason "${userChoiceText}" cannot be correct in THIS vignette. Cite the specific finding, lab value, history element, or mechanism from the question that rules it out. Be precise.
+DISCRIMINATOR
+1-2 sentences. The SINGLE clinical detail that should have rerouted you from "${userChoiceText}" to "${card.c}". This is the pivot — the one element that NBME planted to test if you can override the obvious pattern. Make it impossible to miss next time.
 
-WHY "${card.c}" IS RIGHT
-In 2-3 sentences, explain the pathognomonic finding or pathophysiologic chain that makes "${card.c}" the answer. Connect it directly to specifics of the case.
+NBME PATTERN
+1-2 sentences on WHERE this trap recurs. What category of NBME question routinely uses this exact misdirection? (age-incongruent presentation, timing trap, "treat symptom vs treat disease", red-herring lab, etc). Help the student recognize the GENERIC pattern so it generalizes to future questions.
 
-USMLE BOARD TIP
-One sentence on how Step 1/Step 2 CK tests this exact distinction. Mention the classic vignette element the boards use as the discriminator (e.g., "USMLE flags this with [specific finding]" or "Boards confuse students by adding [distractor element]"). Make it actionable for next time.
+260+ REFLEX
+1-2 sentences. The SHORTCUT a 260+ scorer would use to avoid this trap automatically next time. Format: "Any [trigger] → think [response] FIRST, [override] only after [check]." Make it a one-line mental algorithm they can execute in 5 seconds during the exam.
+
+PREEMPT YOURSELF
+ONE question the student should ask themselves BEFORE answering this type of question, ever again. Format as a direct question, second person. Examples: "Does the patient's age match the disease's base rate?" or "Am I treating the symptom instead of the disease?" Make it portable to other questions.
 
 CRITICAL RULES:
-- Speak in second person ("you picked", "you were drawn to") — NEVER "the student"
-- Refer to options ONLY by their clinical content/name (e.g., "switching to valsartan-sacubitril", "adding ivabradine") — NEVER by letter (A, B, C, D) because options are randomized on screen
-- Never say "Not recorded" or any placeholder — use real option text
-- No "THE TRAP" / "LOCK IT IN" labels — just the 4 headers above
-- Total length: 130-180 words
-- Confident, declarative sentences. No hedging.
+- Speak in second person ("you picked", "you were drawn to")
+- Refer to options ONLY by clinical content, NEVER by letter (A/B/C/D)
+- Confident, declarative sentences. Zero hedging.
+- No markdown, no asterisks, no bullets — just the 5 headers and their text
+- Total length: 180-260 words
+- The student aims for 260+. Don't dumb it down.
 
 If REFERENCES are provided above, cite them inline using superscript ¹ ² ³. Never invent references.
 
 At the very end, write:
 PUBMED_QUERY: [6-8 specific medical terms for PubMed search relevant to distinguishing ${card.c} from ${userChoiceText}]`,
+    mock: `You are a USMLE Step 2 CK examiner who writes NBME-grade question variants. The student already saw this card and wants to test if they REALLY know the diagnosis — not just the original vignette pattern.
+
+ORIGINAL CARD:
+${ctx}
+
+Generate ONE variant vignette with the SAME core diagnosis but with elements that CHANGE to test true mastery. Make it harder than the original by SHIFTING surface features while preserving the underlying pathophysiology.
+
+VARIATION STRATEGIES (use 2-3 of these in the new vignette):
+- Atypical demographic (elderly when usually young, or vice versa — when clinically plausible)
+- Classic exam findings ABSENT (e.g., negative Kernig in bacterial meningitis)
+- Comorbidity that confounds reasoning (diabetes, immunosuppression, pregnancy)
+- Atypical lab/imaging values that are still diagnostic
+- Subtle presentation (oligosymptomatic, indolent course)
+- Different setting (outpatient vs ER, postpartum vs nonpregnant, ICU vs ward)
+
+CRITICAL RULES:
+- The DIAGNOSIS must remain the same as the original card.
+- The answer must still be derivable from the new vignette — no impossible cases.
+- Length: 4-7 lines of clinical vignette.
+- Include vitals, key labs/imaging when relevant.
+- Generate 4 plausible answer options. Mark which is correct.
+
+Write EXACTLY this structure (no markdown, use these EXACT headers in caps):
+
+NEW VIGNETTE
+[4-7 line clinical vignette here]
+
+WHAT IS THE DIAGNOSIS?
+A. [option text]
+B. [option text]
+C. [option text]
+D. [option text]
+
+CORRECT ANSWER: [letter and full text]
+
+WHY THIS IS HARDER
+2-3 sentences. What did you CHANGE from the original? Why is this variant harder to recognize? What pattern shortcut from the original would FAIL here?
+
+260+ MASTERY CHECK
+1 sentence. If the student gets this variant right, they have mastery (not just memorization). If they miss it, they pattern-matched the original.
+
+At the very end, write:
+PUBMED_QUERY: [6-8 specific medical terms for this topic]`,
+
+    predict: `You are a USMLE Step 2 CK examiner. The student is about to see the answer options for this question, but FIRST you are going to train their meta-skill: predicting the NBME trap.
+
+QUESTION CONTEXT:
+${ctx}
+
+The correct answer is: ${card.c}
+
+Your task: write a 4-section response that trains the student to ANTICIPATE the seductive wrong answer NBME would plant.
+
+Write EXACTLY this structure (use these EXACT headers in caps, no markdown):
+
+BEFORE YOU SEE THE OPTIONS
+1 sentence. Tell the student: "You're about to choose from 4 options. The correct answer is [category, NOT the actual answer — e.g., 'a workup test', 'a specific treatment change', 'a diagnosis']. Now PREDICT: what wrong answer would NBME put as the most tempting trap?"
+
+(Pause for student to mentally answer before continuing.)
+
+THE ACTUAL TRAP NBME WOULD USE
+State the most likely seductive distractor in 1 line. Then 2-3 sentences explaining WHY it's tempting: what cognitive shortcut it exploits, what pattern it pretends to match, what students typically pick when they fall for it.
+
+WHY IT'S WRONG (in 1 line)
+The specific clinical reason it fails. Cite the discriminator from the vignette.
+
+WHY THE CORRECT ANSWER WINS
+2-3 sentences. The pathophysiologic or clinical reason "${card.c}" is right. Connect it back to the EXACT detail in the vignette that should have flagged this.
+
+DID YOU PREDICT IT?
+2 sentences. Tell the student: "If you predicted the trap → your pattern recognition for NBME traps is forming. If you didn't → note the pattern: [name the generic trap type here, e.g., 'treat symptom vs treat disease', 'recent vs classic', 'aggressive vs conservative']. Watch for it in future questions."
+
+CRITICAL RULES:
+- Never reveal "${card.c}" until the WHY THE CORRECT ANSWER WINS section
+- Refer to options ONLY by clinical content, never by letter
+- Confident, surgical, second person ("you")
+- No hedging
+- Total length: 200-280 words
+
+At the very end, write:
+PUBMED_QUERY: [6-8 specific medical terms for this topic]`,
+
     translate: `Translate the following medical flashcard content to Brazilian Portuguese. Keep medical terms accurate. Return ONLY the translation in this exact format:\n\nQUESTÃO: [translated question]\nA. [option] B. [option] C. [option] D. [option]\nRESPOSTA CORRETA: [translated answer]\nEXPLICAÇÃO: [translated explanation]\nPONTO-CHAVE: [translated key point]\n\nContent to translate:\nQUESTION: ${card.q}\nOPTIONS: ${(card.w||[]).map((o,i)=>String.fromCharCode(65+i)+'. '+o).join(' ')}\nCORRECT ANSWER: ${card.c}\nEXPLANATION: ${(card.e||'').replace(/<[^>]+>/g,' ').slice(0,500)}\nKEY POINT: ${(card.kp||'')}`,
   };
 
   const typeLabels = {
     why:'Why This Answer', explain:'Deeper Explanation',
     mcq:'Practice Questions', surprise:'Clinical Pearl',
-    wrong:'Why I Was Wrong', custom:'Your Question', translate:'Tradução PT-BR', compare:'Lens'
+    wrong:'Why I Was Wrong', custom:'Your Question', translate:'Tradução PT-BR', compare:'Lens',
+    mock:'Mock Me — Variant Vignette', predict:'Predict the Distractor'
   };
 
   try {
@@ -17268,6 +17394,103 @@ function bmdSetupDrag(){
 
 @keyframes crCommitFade{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
 
+/* ═══════════════════════════════════════════════════════════════
+   2026-05-16: "What you needed to catch" — caixa pedagógica
+   Aparece quando aluno clica "I didn't" — mostra triggers explicados
+   antes de revelar o Diagnosis/Treatment.
+   ═══════════════════════════════════════════════════════════════ */
+.bs-cr-pearl{
+  margin:10px 24px 14px;
+  background:linear-gradient(135deg,rgba(232,168,54,.08),rgba(59,127,255,.06));
+  border:1px solid rgba(232,168,54,.35);
+  border-radius:14px;
+  padding:16px 18px 14px;
+  animation:crPearlSlide .4s ease-out;
+}
+.bs-cr-pearl.fading{
+  opacity:0;transform:translateY(-6px);
+  transition:opacity .3s,transform .3s;
+}
+.bs-cr-pearl-h{
+  font-size:10.5px;font-weight:800;
+  letter-spacing:.15em;text-transform:uppercase;
+  color:var(--gold);margin-bottom:12px;
+  display:flex;align-items:center;gap:8px;
+}
+.bs-cr-pearl-h::before{
+  content:'';width:6px;height:6px;border-radius:50%;
+  background:var(--gold);
+  box-shadow:0 0 8px rgba(232,168,54,.6);
+}
+.bs-cr-pearl-body{display:flex;flex-direction:column;gap:10px;margin-bottom:12px}
+.bs-cr-pearl-row{
+  display:flex;gap:10px;align-items:flex-start;
+  padding:8px 10px;border-radius:8px;
+  background:rgba(255,255,255,.04);
+}
+.bs-cr-pearl-dot{
+  width:8px;height:8px;border-radius:50%;
+  background:var(--accent);margin-top:7px;flex-shrink:0;
+  box-shadow:0 0 6px rgba(59,127,255,.4);
+}
+.bs-cr-pearl-text{flex:1;min-width:0}
+.bs-cr-pearl-trig{
+  font-weight:700;font-size:14px;color:var(--text);
+  line-height:1.4;
+}
+.fz-md .bs-cr-pearl-trig{font-size:14px}
+.fz-lg .bs-cr-pearl-trig{font-size:15.5px}
+.fz-xl .bs-cr-pearl-trig{font-size:17.5px}
+.bs-cr-pearl-pts{
+  font-size:12.5px;color:var(--text-dim);
+  margin-top:3px;line-height:1.5;font-style:italic;
+}
+.fz-lg .bs-cr-pearl-pts{font-size:13.5px}
+.fz-xl .bs-cr-pearl-pts{font-size:15px}
+
+.bs-cr-pearl-shortcut{
+  margin-top:14px;padding:12px 14px;
+  background:linear-gradient(135deg,rgba(168,85,247,.10),rgba(236,72,153,.07));
+  border-left:3px solid #a855f7;
+  border-radius:0 10px 10px 0;
+}
+.bs-cr-pearl-shortcut-l{
+  font-size:10px;font-weight:800;letter-spacing:.14em;
+  text-transform:uppercase;color:#a855f7;
+  margin-bottom:5px;display:flex;align-items:center;gap:6px;
+}
+.bs-cr-pearl-shortcut-l::before{
+  content:'⚡';font-size:11px;
+}
+.bs-cr-pearl-shortcut-t{
+  font-weight:600;line-height:1.55;color:var(--text);
+  font-style:italic;font-size:13.5px;
+}
+.fz-lg .bs-cr-pearl-shortcut-t{font-size:14.5px}
+.fz-xl .bs-cr-pearl-shortcut-t{font-size:16px}
+
+.bs-cr-pearl-ok{
+  width:100%;margin-top:12px;
+  padding:11px 18px;border-radius:10px;
+  border:1.5px solid rgba(59,127,255,.5);
+  background:rgba(59,127,255,.10);
+  color:var(--accent);font-weight:700;font-size:13px;
+  cursor:pointer;font-family:inherit;
+  transition:all .15s;letter-spacing:.02em;
+}
+.bs-cr-pearl-ok:hover{
+  background:rgba(59,127,255,.18);
+  border-color:var(--accent);
+  transform:translateY(-1px);
+}
+
+@keyframes crPearlSlide{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
+
+@media (max-width:700px){
+  .bs-cr-pearl{margin:10px 16px 14px;padding:14px}
+  .bs-cr-pearl-row{padding:7px 8px}
+}
+
 /* 260+ INSIGHT — 4ª camada */
 .bs-cr-insight{
   margin:8px 24px 4px;
@@ -19253,7 +19476,6 @@ window.crCommit = function(claimedKnew){
   const dxEl = document.getElementById('bs-cr-dx');
   if(!dxEl) return;
 
-  // Marca claim global (para uso futuro em FSRS overconfidence)
   try {
     if(window.BS){
       window.BS._lastCrClaim = claimedKnew ? 'knew' : 'didnt';
@@ -19261,24 +19483,137 @@ window.crCommit = function(claimedKnew){
     }
   } catch(e){}
 
-  // Esconde botões de commit 1
   if(commit){ commit.classList.add('hidden'); }
 
-  // Revela Dx automaticamente
-  if(!dxEl.classList.contains('revealed')){
-    setTimeout(function(){
-      const hasAct = !!document.getElementById('bs-cr-act');
-      if(typeof window.crReveal === 'function'){
-        window.crReveal(dxEl, !hasAct, 'dx');
-      }
-      // Mostra commit-2 (pergunta sobre o Action) depois de revelar Dx
-      if(hasAct){
-        setTimeout(function(){
-          const commit2 = document.getElementById('bs-cr-commit-2');
-          if(commit2){ commit2.classList.remove('hidden'); }
-        }, 400);
-      }
-    }, 150);
+  // 2026-05-16: SMART PATH
+  // "I knew" → reveal direto. "I didn't" → caixa pedagógica primeiro.
+  if(claimedKnew){
+    if(!dxEl.classList.contains('revealed')){
+      setTimeout(function(){
+        const hasAct = !!document.getElementById('bs-cr-act');
+        if(typeof window.crReveal === 'function'){
+          window.crReveal(dxEl, !hasAct, 'dx');
+        }
+        if(hasAct){
+          setTimeout(function(){
+            const commit2 = document.getElementById('bs-cr-commit-2');
+            if(commit2){ commit2.classList.remove('hidden'); }
+          }, 400);
+        }
+      }, 150);
+    }
+  } else {
+    showWhatYouNeededToCatch('dx');
+  }
+};
+
+// 2026-05-16: caixa "What you needed to catch" — modo pedagógico ao "I didn't"
+window.showWhatYouNeededToCatch = function(phase){
+  const wrap = document.getElementById('bs-cr-wrap');
+  if(!wrap) return;
+  const card = (window.BS && BS.cards) ? BS.cards[BS.cur] : null;
+  if(!card) return;
+
+  let bs = null;
+  try {
+    bs = typeof card.brainstorm === 'string' ? JSON.parse(card.brainstorm) : card.brainstorm;
+    if(typeof bs === 'string') bs = JSON.parse(bs);
+  } catch(e){ bs = null; }
+  if(!bs) return;
+
+  // Remove caixa antiga se existir
+  const old = wrap.querySelector('.bs-cr-pearl');
+  if(old) old.remove();
+
+  let chunks = [];
+  let shortcut = '';
+
+  if(phase === 'dx'){
+    // Tenta usar chunks_explained gerado pelo Sonnet (após batch)
+    if(bs.chunks_explained && Array.isArray(bs.chunks_explained) && bs.chunks_explained.length){
+      chunks = bs.chunks_explained;
+    } else {
+      // Fallback: parsa hy_clue por "+" e gera chunks sem explicação
+      const hy = bs.hy_clue || '';
+      // Remove prefixo demográfico tipo "52F:" ou "4M:"
+      const cleanHy = hy.replace(/^\s*\d+\s*[FMfm]\s*:?\s*/,'');
+      const pieces = cleanHy.split(/\s*\+\s*/).filter(p => p.trim().length > 1);
+      chunks = pieces.map(p => ({ trigger: p.trim(), points_to: '' }));
+    }
+    shortcut = bs.decision_pivot || bs.phrase || '';
+  } else {
+    // phase === 'act' (futuro)
+    chunks = bs.action_chunks_explained || [];
+    shortcut = bs.decision_pivot || '';
+  }
+
+  let html = '<div class="bs-cr-pearl" id="bs-cr-pearl">';
+  html += '<div class="bs-cr-pearl-h">What you needed to catch</div>';
+  html += '<div class="bs-cr-pearl-body">';
+  chunks.forEach(function(c){
+    html += '<div class="bs-cr-pearl-row">';
+    html += '<div class="bs-cr-pearl-dot"></div>';
+    html += '<div class="bs-cr-pearl-text">';
+    html += '<div class="bs-cr-pearl-trig">' + escapeHtml(c.trigger || '') + '</div>';
+    if(c.points_to){
+      html += '<div class="bs-cr-pearl-pts">→ ' + escapeHtml(c.points_to) + '</div>';
+    }
+    html += '</div></div>';
+  });
+  if(shortcut){
+    html += '<div class="bs-cr-pearl-shortcut">';
+    html += '<div class="bs-cr-pearl-shortcut-l">260+ shortcut</div>';
+    html += '<div class="bs-cr-pearl-shortcut-t">' + escapeHtml(shortcut) + '</div>';
+    html += '</div>';
+  }
+  html += '</div>';
+  html += '<button class="bs-cr-pearl-ok" onclick="pearlContinue(\''+phase+'\')">OK, reveal answer ↓</button>';
+  html += '</div>';
+
+  // Insere a caixa após o commit (escondido) — entre HY Clue e Diagnosis
+  const commitEl = wrap.querySelector('#bs-cr-commit');
+  if(commitEl && commitEl.parentNode){
+    commitEl.insertAdjacentHTML('afterend', html);
+  }
+};
+
+// Helper escapa HTML em strings (segurança contra qualquer injeção via brainstorm)
+function escapeHtml(s){
+  if(s == null) return '';
+  return String(s)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
+// 2026-05-16: continua o fluxo após o usuário ler a caixa pedagógica
+window.pearlContinue = function(phase){
+  const wrap = document.getElementById('bs-cr-wrap');
+  const pearl = wrap ? wrap.querySelector('#bs-cr-pearl') : null;
+  if(pearl){
+    pearl.classList.add('fading');
+    setTimeout(function(){ if(pearl.parentNode) pearl.parentNode.removeChild(pearl); }, 350);
+  }
+  if(phase === 'dx'){
+    const dxEl = document.getElementById('bs-cr-dx');
+    if(dxEl && !dxEl.classList.contains('revealed')){
+      setTimeout(function(){
+        const hasAct = !!document.getElementById('bs-cr-act');
+        if(typeof window.crReveal === 'function'){ window.crReveal(dxEl, !hasAct, 'dx'); }
+        if(hasAct){
+          setTimeout(function(){
+            const commit2 = document.getElementById('bs-cr-commit-2');
+            if(commit2){ commit2.classList.remove('hidden'); }
+          }, 400);
+        }
+      }, 250);
+    }
+  } else if(phase === 'act'){
+    const actEl = document.getElementById('bs-cr-act');
+    if(actEl && !actEl.classList.contains('revealed')){
+      setTimeout(function(){
+        if(typeof window.crReveal === 'function'){ window.crReveal(actEl, true, 'act'); }
+      }, 250);
+    }
   }
 };
 
@@ -19287,23 +19622,20 @@ window.crCommit2 = function(claimedKnew){
   const actEl = document.getElementById('bs-cr-act');
   if(!actEl) return;
 
-  // Marca claim global da Action (separado do claim da Dx)
   try {
-    if(window.BS){
-      window.BS._lastCrActionClaim = claimedKnew ? 'knew' : 'didnt';
-    }
+    if(window.BS){ window.BS._lastCrActionClaim = claimedKnew ? 'knew' : 'didnt'; }
   } catch(e){}
 
-  // Esconde botões de commit 2
   if(commit2){ commit2.classList.add('hidden'); }
 
-  // Revela Action automaticamente
-  if(!actEl.classList.contains('revealed')){
-    setTimeout(function(){
-      if(typeof window.crReveal === 'function'){
-        window.crReveal(actEl, true, 'act');
-      }
-    }, 150);
+  if(claimedKnew){
+    if(!actEl.classList.contains('revealed')){
+      setTimeout(function(){
+        if(typeof window.crReveal === 'function'){ window.crReveal(actEl, true, 'act'); }
+      }, 150);
+    }
+  } else {
+    showWhatYouNeededToCatch('act');
   }
 };
 
