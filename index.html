@@ -17188,6 +17188,116 @@ function bmdSetupDrag(){
 }
 .bs-cr-occlude.revealed::after{display:none;}
 .bs-cr-occlude:hover::after{color:#fff;}
+
+/* ═══════════════════════════════════════════════════════════════
+   2026-05-16: CLINICAL CHAIN — chip + commit-before-reveal + 260+ INSIGHT
+   Transforma Clinical Reasoning de reveal passivo em retrieval ativo.
+   ═══════════════════════════════════════════════════════════════ */
+
+/* Header chip "CLINICAL CHAIN" */
+.bs-cr-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:6px 24px 0;flex-wrap:wrap;gap:8px;
+}
+.bs-cr-chip{
+  display:inline-flex;align-items:center;
+  padding:3px 10px;
+  background:linear-gradient(135deg,rgba(59,127,255,.18),rgba(34,197,94,.13));
+  border:1px solid rgba(59,127,255,.42);
+  border-radius:999px;
+  font-size:9.5px;font-weight:800;letter-spacing:.12em;
+  color:var(--accent);
+  text-transform:uppercase;
+  white-space:nowrap;
+}
+.bs-cr-header-hint{
+  font-size:10.5px;color:var(--text-faint);
+  font-style:italic;letter-spacing:.04em;
+  user-select:none;
+}
+
+/* Commit-before-reveal */
+.bs-cr-commit{
+  margin:6px 24px 10px;
+  display:block;text-align:center;
+  animation:crCommitFade .35s ease-out;
+}
+.bs-cr-commit.hidden{display:none}
+.bs-cr-commit-q{
+  font-size:12px;color:var(--text-dim);
+  margin-bottom:10px;font-style:italic;
+  letter-spacing:.02em;
+}
+.bs-cr-commit-btns{
+  display:flex;gap:10px;justify-content:center;flex-wrap:wrap;
+}
+.bs-cr-commit-btn{
+  padding:9px 20px;border-radius:10px;
+  border:1.5px solid var(--border);
+  background:var(--surface);
+  font-family:inherit;font-size:13px;font-weight:700;
+  color:var(--text);cursor:pointer;
+  transition:all .15s;min-width:120px;
+}
+.bs-cr-commit-btn:hover{transform:translateY(-1px)}
+.bs-cr-commit-btn.knew{
+  border-color:rgba(34,197,94,.5);color:#22c55e;
+}
+.bs-cr-commit-btn.knew:hover{
+  background:rgba(34,197,94,.10);border-color:#22c55e;
+}
+.bs-cr-commit-btn.didnt{
+  border-color:rgba(244,63,94,.5);color:var(--rose);
+}
+.bs-cr-commit-btn.didnt:hover{
+  background:rgba(244,63,94,.10);border-color:var(--rose);
+}
+
+@keyframes crCommitFade{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
+
+/* 260+ INSIGHT — 4ª camada */
+.bs-cr-insight{
+  margin:8px 24px 4px;
+  background:linear-gradient(135deg,rgba(168,85,247,.10),rgba(236,72,153,.08));
+  border-left:3px solid #a855f7;
+  border-radius:0 12px 12px 0;
+  padding:14px 18px;
+  display:none;
+}
+.bs-cr-insight.show{
+  display:block;
+  animation:crInsightFade .4s ease-out;
+}
+.bs-cr-insight-l{
+  font-size:10px;font-weight:800;letter-spacing:.12em;
+  text-transform:uppercase;color:#a855f7;
+  margin-bottom:6px;
+  display:flex;align-items:center;gap:6px;
+}
+.bs-cr-insight-l::before{
+  content:'';display:inline-block;
+  width:12px;height:12px;
+  background:radial-gradient(circle,#a855f7,#7c3aed);
+  border-radius:50%;
+  box-shadow:0 0 10px rgba(168,85,247,.6);
+}
+.bs-cr-insight-t{
+  font-weight:600;line-height:1.7;color:var(--text);
+  font-style:italic;
+}
+.fz-md .bs-cr-insight-t{font-size:14.5px}
+.fz-lg .bs-cr-insight-t{font-size:16.5px}
+.fz-xl .bs-cr-insight-t{font-size:19px}
+
+@keyframes crInsightFade{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
+
+@media (max-width:700px){
+  .bs-cr-header{padding:6px 16px 0}
+  .bs-cr-commit{margin:6px 16px 10px}
+  .bs-cr-commit-btn{min-width:0;flex:1;padding:10px 16px}
+  .bs-cr-insight{margin:8px 16px 4px;padding:12px 14px}
+}
+
 .bs-cr-fsrs{
   opacity:0;transform:translateY(8px);
   transition:opacity .4s,transform .4s;
@@ -19020,20 +19130,24 @@ function renderClinicalReasoningReveal(card, el) {
   const action = bs.action_content || '';
   const hasAction = atype !== 'NONE' && action;
   const amap = ACTION_MAP[atype] || null;
-
-  let revealed = 0;
-  const total = hasAction ? 2 : 1;
-
-  function checkFsrs() {
-    if (revealed >= total) {
-      const fsrsEl = el.querySelector('.bs-cr-fsrs');
-      if (fsrsEl) {
-        setTimeout(() => fsrsEl.classList.add('show'), 200);
-      }
-    }
-  }
+  // 260+ INSIGHT: usa decision_pivot se existir, senão fallback pra phrase
+  const insight = (bs.decision_pivot && bs.decision_pivot.trim())
+                    ? bs.decision_pivot
+                    : (card.phrase || '');
+  const showInsight = insight && insight !== action && insight !== bs.diagnosis;
 
   let html = '<div class="bs-cr" id="bs-cr-wrap">';
+
+  // ═══════════════════════════════════════════════════════════════
+  // 2026-05-16: Chip "CLINICAL CHAIN" — afirma a tese do modo
+  // (raciocínio sequencial completo, não escolha isolada)
+  // + botões "Commit-before-reveal" (I knew / I didn't)
+  // Os botões revelam Dx automaticamente e habilitam reveal de Action
+  // ═══════════════════════════════════════════════════════════════
+  html += '<div class="bs-cr-header">' +
+    '<span class="bs-cr-chip">CLINICAL CHAIN</span>' +
+    '<span class="bs-cr-header-hint">clue → diagnosis → action</span>' +
+  '</div>';
 
   // HY Clue — normal
   html += '<div class="bs-crk bs-crk-hy show">' +
@@ -19041,10 +19155,19 @@ function renderClinicalReasoningReveal(card, el) {
     '<div class="bs-crk-t">' + hlBold(bs.hy_clue||'') + '</div>' +
   '</div>';
 
-  // Diagnosis — ocluido
+  // Commit-before-reveal (some after first commit)
+  html += '<div class="bs-cr-commit" id="bs-cr-commit">' +
+    '<div class="bs-cr-commit-q">Before revealing — do you know the diagnosis?</div>' +
+    '<div class="bs-cr-commit-btns">' +
+      '<button class="bs-cr-commit-btn knew" onclick="crCommit(true)">I knew it</button>' +
+      '<button class="bs-cr-commit-btn didnt" onclick="crCommit(false)">I didn\'t</button>' +
+    '</div>' +
+  '</div>';
+
+  // Diagnosis — ocluido (revelável por tap OU por commit)
   html += '<div class="bs-crk bs-crk-dx show">' +
     '<div class="bs-crk-l">Diagnosis</div>' +
-    '<div class="bs-crk-t bs-cr-occlude" onclick="crReveal(this,' + (hasAction?'false':'true') + ',\'dx\')">' +
+    '<div class="bs-crk-t bs-cr-occlude" id="bs-cr-dx" onclick="crReveal(this,' + (hasAction?'false':'true') + ',\'dx\')">' +
     hlBold(bs.diagnosis||'') +
     '</div></div>';
 
@@ -19052,20 +19175,23 @@ function renderClinicalReasoningReveal(card, el) {
   if (hasAction && amap) {
     html += '<div class="bs-crk bs-crk-' + amap.cls + ' show">' +
       '<div class="bs-crk-l">' + amap.lbl + '</div>' +
-      '<div class="bs-crk-t bs-cr-occlude" style="border-left:3px solid ' + amap.color + ';background:' + amap.color + '18" onclick="crReveal(this,true,\'act\')">' +
+      '<div class="bs-crk-t bs-cr-occlude" id="bs-cr-act" style="border-left:3px solid ' + amap.color + ';background:' + amap.color + '18" onclick="crReveal(this,true,\'act\')">' +
       hlBold(action) +
       '</div></div>';
   }
 
-  // FIX 2026-05-10: KP REMOVIDO do Clinical Reasoning — não pertence aqui,
-  // está virando ruído. O KP do card está no app principal e no modo
-  // "Key Point only" do Brainstorm. Clinical Reasoning é HY Clue → Dx → Action.
+  // ═══════════════════════════════════════════════════════════════
+  // 2026-05-16: 260+ INSIGHT — 4ª camada (decision pivot)
+  // Fica oculta até reveal completo, aparece com gradiente roxo
+  // ═══════════════════════════════════════════════════════════════
+  if (showInsight) {
+    html += '<div class="bs-cr-insight" id="bs-cr-insight">' +
+      '<div class="bs-cr-insight-l">260+ INSIGHT</div>' +
+      '<div class="bs-cr-insight-t">' + hlBold(insight) + '</div>' +
+    '</div>';
+  }
 
   // FSRS — intervalos reais
-  // FIX 2026-05-10: Antes chamava crFsrs('again', card.id) — mas card.id é string
-  // (ex: "boardmd_s2_xxxx") e era inserido SEM aspas no HTML, virando
-  // onclick="crFsrs('again', boardmd_s2_xxxx)" → ReferenceError → botão silencioso.
-  // Trocado para bsRate(0..3) que já funciona com BS.cards[BS.cur].
   (function(){
     var _si=getState(card.id);
     var _ivi=getIntervals(_si);
@@ -19082,8 +19208,41 @@ function renderClinicalReasoningReveal(card, el) {
 
   // Attach reveal state
   el._crRevealed = 0;
-  el._crTotal = total;
+  el._crTotal = hasAction ? 2 : 1;
+  el._crHasInsight = showInsight;
 }
+
+// ═══════════════════════════════════════════════════════════════════════
+// 2026-05-16: crCommit — Commit-Before-Reveal para Clinical Reasoning
+// Botão revela Diagnosis automaticamente após commit do user.
+// Action continua reveal manual (tap-to-reveal preserva ritmo de leitura).
+// ═══════════════════════════════════════════════════════════════════════
+window.crCommit = function(claimedKnew){
+  const commit = document.getElementById('bs-cr-commit');
+  const dxEl = document.getElementById('bs-cr-dx');
+  if(!dxEl) return;
+
+  // Marca claim global (para uso futuro em FSRS overconfidence)
+  try {
+    if(window.BS){
+      window.BS._lastCrClaim = claimedKnew ? 'knew' : 'didnt';
+      window.BS._lastCrCardId = (BS.cards && BS.cards[BS.cur]) ? BS.cards[BS.cur].id : null;
+    }
+  } catch(e){}
+
+  // Esconde botões de commit
+  if(commit){ commit.classList.add('hidden'); }
+
+  // Revela Dx automaticamente (simula click)
+  if(!dxEl.classList.contains('revealed')){
+    setTimeout(function(){
+      const hasAct = !!document.getElementById('bs-cr-act');
+      if(typeof window.crReveal === 'function'){
+        window.crReveal(dxEl, !hasAct, 'dx');
+      }
+    }, 150);
+  }
+};
 
 // ═══════════════════════════════════════════════════════════════════════
 // 2026-05-16: KEY POINT REFLEX MODE — funções
@@ -19161,19 +19320,38 @@ window.kprReveal = function(ev){
 window.crReveal = function(el, isLast, type) {
   if (el.classList.contains('revealed')) return;
   el.classList.add('revealed');
-  
+
   const wrap = el.closest('#bs-cr-wrap') || el.closest('.bs-cr');
   if (!wrap) return;
-  
+
+  // 2026-05-16: se user clicou direto na Dx sem committer, esconde o commit
+  const commit = wrap.querySelector('#bs-cr-commit');
+  if (commit && !commit.classList.contains('hidden')) {
+    try {
+      if(window.BS){
+        window.BS._lastCrClaim = 'skipped';
+        window.BS._lastCrCardId = (BS.cards && BS.cards[BS.cur]) ? BS.cards[BS.cur].id : null;
+      }
+    } catch(e){}
+    commit.classList.add('hidden');
+  }
+
   const fsrsEl = wrap.querySelector('.bs-cr-fsrs');
   if (!fsrsEl) return;
-  
+
   // Count revealed
   const allOcclude = wrap.querySelectorAll('.bs-cr-occlude');
   const revealedCount = wrap.querySelectorAll('.bs-cr-occlude.revealed').length;
-  
+
   if (revealedCount >= allOcclude.length) {
-    setTimeout(() => fsrsEl.classList.add('show'), 200);
+    // 2026-05-16: revela 260+ INSIGHT (se existir) ANTES do FSRS
+    const insight = wrap.querySelector('#bs-cr-insight');
+    if (insight) {
+      setTimeout(() => insight.classList.add('show'), 250);
+      setTimeout(() => fsrsEl.classList.add('show'), 600);
+    } else {
+      setTimeout(() => fsrsEl.classList.add('show'), 200);
+    }
   }
 };
 
