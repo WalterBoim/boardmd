@@ -17004,6 +17004,66 @@ function bmdSetupDrag(){
 .bs-kpl{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:6px}
 .bs-kpt{font-weight:600;line-height:1.7;color:var(--text)}
 .fz-md .bs-kpt{font-size:15px}.fz-lg .bs-kpt{font-size:17px}.fz-xl .bs-kpt{font-size:20px}
+
+/* ═══════════════════════════════════════════════════════════════
+   2026-05-16: KEY POINT REFLEX MODE (trigger → response → 260+ insight)
+   Substitui o KP em prosa por estrutura de retrieval ativo.
+   ═══════════════════════════════════════════════════════════════ */
+.bs-kpr{margin:14px 24px 4px;display:flex;flex-direction:column;gap:10px}
+.bs-kpr-l{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;margin-bottom:6px}
+
+.bs-kpr-trig{background:rgba(232,168,54,.12);border-left:3px solid var(--gold);border-radius:0 12px 12px 0;padding:14px 18px}
+.bs-kpr-trig .bs-kpr-l{color:var(--gold)}
+.bs-kpr-trig .bs-kpr-t{font-weight:600;line-height:1.65;color:var(--text)}
+.fz-md .bs-kpr-trig .bs-kpr-t{font-size:15px}
+.fz-lg .bs-kpr-trig .bs-kpr-t{font-size:17px}
+.fz-xl .bs-kpr-trig .bs-kpr-t{font-size:20px}
+
+.bs-kpr-arrow{text-align:center;font-size:22px;color:var(--text-faint);line-height:1;margin:-4px 0;user-select:none}
+
+.bs-kpr-resp{background:rgba(34,197,94,.10);border-left:3px solid #22c55e;border-radius:0 12px 12px 0;padding:14px 18px;cursor:pointer;position:relative;transition:all .2s;min-height:58px}
+.bs-kpr-resp:hover:not(.revealed){background:rgba(34,197,94,.15)}
+.bs-kpr-resp .bs-kpr-l{color:#22c55e}
+.bs-kpr-resp .bs-kpr-t{font-weight:700;line-height:1.65;color:var(--text);display:none}
+.fz-md .bs-kpr-resp .bs-kpr-t{font-size:15px}
+.fz-lg .bs-kpr-resp .bs-kpr-t{font-size:17px}
+.fz-xl .bs-kpr-resp .bs-kpr-t{font-size:20px}
+.bs-kpr-resp .bs-kpr-mask{font-size:13px;color:var(--text-faint);font-style:italic;font-weight:400;letter-spacing:.04em;user-select:none;text-align:center;padding:4px 0}
+.bs-kpr-resp.revealed{cursor:default}
+.bs-kpr-resp.revealed .bs-kpr-mask{display:none}
+.bs-kpr-resp.revealed .bs-kpr-t{display:block;animation:kprFadeIn .35s ease-out}
+
+@keyframes kprFadeIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
+
+.bs-kpr-insight{background:linear-gradient(135deg,rgba(168,85,247,.10),rgba(236,72,153,.08));border-left:3px solid #a855f7;border-radius:0 12px 12px 0;padding:14px 18px;display:none;animation:kprFadeIn .4s ease-out}
+.bs-kpr-insight.show{display:block}
+.bs-kpr-insight .bs-kpr-l{color:#a855f7;display:flex;align-items:center;gap:6px}
+.bs-kpr-insight .bs-kpr-l::before{content:'';display:inline-block;width:14px;height:14px;background:radial-gradient(circle,#a855f7,#7c3aed);border-radius:50%;box-shadow:0 0 10px rgba(168,85,247,.6)}
+.bs-kpr-insight .bs-kpr-t{font-weight:600;line-height:1.7;color:var(--text);font-style:italic}
+.fz-md .bs-kpr-insight .bs-kpr-t{font-size:14.5px}
+.fz-lg .bs-kpr-insight .bs-kpr-t{font-size:16.5px}
+.fz-xl .bs-kpr-insight .bs-kpr-t{font-size:19px}
+
+/* Commit-before-reveal (botões "I knew / I didn't") */
+.bs-kpr-commit{margin:10px 24px 4px;text-align:center;display:block}
+.bs-kpr-commit.hidden{display:none}
+.bs-kpr-commit-q{font-size:12px;color:var(--text-dim);margin-bottom:10px;font-style:italic;letter-spacing:.02em}
+.bs-kpr-commit-btns{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.bs-kpr-commit-btn{padding:9px 20px;border-radius:10px;border:1.5px solid var(--border);background:var(--surface);font-family:inherit;font-size:13px;font-weight:700;color:var(--text);cursor:pointer;transition:all .15s;min-width:120px}
+.bs-kpr-commit-btn:hover{transform:translateY(-1px)}
+.bs-kpr-commit-btn.knew{border-color:rgba(34,197,94,.5);color:#22c55e}
+.bs-kpr-commit-btn.knew:hover{background:rgba(34,197,94,.10);border-color:#22c55e}
+.bs-kpr-commit-btn.didnt{border-color:rgba(244,63,94,.5);color:var(--rose)}
+.bs-kpr-commit-btn.didnt:hover{background:rgba(244,63,94,.10);border-color:var(--rose)}
+
+.bs-kpr-fsrs.show{display:flex!important}
+
+@media (max-width:700px){
+  .bs-kpr{margin:12px 16px 4px;gap:8px}
+  .bs-kpr-trig,.bs-kpr-resp,.bs-kpr-insight{padding:12px 14px}
+  .bs-kpr-commit{margin:8px 16px 4px}
+  .bs-kpr-commit-btn{min-width:0;flex:1;padding:10px 16px}
+}
 .bs-ctrl{padding:16px 28px;border-top:1px solid var(--border);display:flex;justify-content:center;gap:10px;align-items:center;flex-wrap:wrap;background:var(--bg);position:sticky;bottom:0}
 .bs-btn{padding:11px 22px;border-radius:11px;border:1.5px solid var(--border);background:var(--surface);font-size:14px;font-weight:700;color:var(--text);cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:7px;transition:all .15s}
 .bs-btn:hover{border-color:var(--accent)}
@@ -17699,20 +17759,81 @@ function render(){
     if(card.e)h+='<div class="bs-exp">'+card.e+'</div>';
   }else if(ph==='kp'){
     if(card.kp){
-      // FIX 2026-05-10: Cloze desativado por enquanto. KP aparece como texto puro.
-      // Quando batch Haiku marcar **bold** nas palavras-chave, reativamos a oclusão.
-      h+='<div class="bs-kp"><div class="bs-kpl">Key Point</div><div class="bs-kpt">'+card.kp+'</div></div>';
-      // FSRS buttons after Key Point
-      (function(){
-        const _s=getState(card.id);
-        const _iv=getIntervals(_s);
-        h+='<div class="bs-cr-fsrs show" style="padding:0 18px 6px;display:flex;gap:8px;">'+
-          '<button class="bs-cr-fsrs-btn again" onclick="bsRate(0)"><span>Again</span><span class="bs-cr-fsrs-sub">'+_iv.again.label+'</span></button>'+
-          '<button class="bs-cr-fsrs-btn hard" onclick="bsRate(1)"><span>Hard</span><span class="bs-cr-fsrs-sub">'+_iv.hard.label+'</span></button>'+
-          '<button class="bs-cr-fsrs-btn good" onclick="bsRate(2)"><span>Good</span><span class="bs-cr-fsrs-sub">'+_iv.good.label+'</span></button>'+
-          '<button class="bs-cr-fsrs-btn easy" onclick="bsRate(3)"><span>Easy</span><span class="bs-cr-fsrs-sub">'+_iv.easy.label+'</span></button>'+
-          '</div>';
-      })();
+      // ═══════════════════════════════════════════════════════════════
+      // 2026-05-16: KEY POINT REFLEX MODE — substitui exibição de prosa
+      // por trigger → response com commit-before-reveal e 260+ insight.
+      // Tenta extrair trigger/response do brainstorm.hy_clue/action_content;
+      // se não houver, faz fallback gracioso para o KP completo.
+      // ═══════════════════════════════════════════════════════════════
+      let _bs = null;
+      try {
+        if(card.brainstorm){
+          _bs = typeof card.brainstorm === 'string' ? JSON.parse(card.brainstorm) : card.brainstorm;
+          if(typeof _bs === 'string') _bs = JSON.parse(_bs);
+        }
+      } catch(e){ _bs = null; }
+
+      const _trigger  = (_bs && _bs.hy_clue) ? _bs.hy_clue : '';
+      const _response = (_bs && _bs.action_content) ? _bs.action_content : '';
+      const _diagnosis = (_bs && _bs.diagnosis) ? _bs.diagnosis : '';
+      const _insight  = (_bs && (_bs.decision_pivot || _bs.kp_response)) ? (_bs.decision_pivot || _bs.kp_response) : (card.phrase || '');
+
+      if(_trigger && _response){
+        // Modo Reflex (estrutura nova trigger → response → 260+ insight)
+        h += '<div class="bs-kpr" id="bs-kpr-wrap">'
+          + '<div class="bs-kpr-trig">'
+            + '<div class="bs-kpr-l">TRIGGER</div>'
+            + '<div class="bs-kpr-t">' + hlBold(_trigger) + '</div>'
+          + '</div>'
+          + '<div class="bs-kpr-arrow">↓</div>'
+          + '<div class="bs-kpr-resp" id="bs-kpr-resp" onclick="kprReveal(event)">'
+            + '<div class="bs-kpr-l">RESPONSE</div>'
+            + '<div class="bs-kpr-mask">tap to reveal</div>'
+            + '<div class="bs-kpr-t bs-kpr-hidden">' + hlBold(_response) + '</div>'
+          + '</div>';
+        // 260+ INSIGHT (4ª camada, fica oculta até reveal do response)
+        if(_insight && _insight !== _response){
+          h += '<div class="bs-kpr-insight" id="bs-kpr-insight">'
+            + '<div class="bs-kpr-l">260+ INSIGHT</div>'
+            + '<div class="bs-kpr-t">' + hlBold(_insight) + '</div>'
+          + '</div>';
+        }
+        h += '</div>';
+
+        // Commit-before-reveal: botões "I knew it / I didn't" antes do FSRS
+        h += '<div class="bs-kpr-commit" id="bs-kpr-commit">'
+          + '<div class="bs-kpr-commit-q">Before revealing — did you know it?</div>'
+          + '<div class="bs-kpr-commit-btns">'
+            + '<button class="bs-kpr-commit-btn knew" onclick="kprCommit(true)">I knew it</button>'
+            + '<button class="bs-kpr-commit-btn didnt" onclick="kprCommit(false)">I didn\'t</button>'
+          + '</div>'
+        + '</div>';
+
+        // FSRS (escondido até reveal completo)
+        (function(){
+          const _s=getState(card.id);
+          const _iv=getIntervals(_s);
+          h+='<div class="bs-cr-fsrs bs-kpr-fsrs" id="bs-kpr-fsrs" style="padding:0 18px 6px;display:none;gap:8px;">'+
+            '<button class="bs-cr-fsrs-btn again" onclick="bsRate(0)"><span>Again</span><span class="bs-cr-fsrs-sub">'+_iv.again.label+'</span></button>'+
+            '<button class="bs-cr-fsrs-btn hard" onclick="bsRate(1)"><span>Hard</span><span class="bs-cr-fsrs-sub">'+_iv.hard.label+'</span></button>'+
+            '<button class="bs-cr-fsrs-btn good" onclick="bsRate(2)"><span>Good</span><span class="bs-cr-fsrs-sub">'+_iv.good.label+'</span></button>'+
+            '<button class="bs-cr-fsrs-btn easy" onclick="bsRate(3)"><span>Easy</span><span class="bs-cr-fsrs-sub">'+_iv.easy.label+'</span></button>'+
+            '</div>';
+        })();
+      } else {
+        // Fallback antigo: KP como prosa (cards sem brainstorm completo)
+        h+='<div class="bs-kp"><div class="bs-kpl">Key Point</div><div class="bs-kpt">'+card.kp+'</div></div>';
+        (function(){
+          const _s=getState(card.id);
+          const _iv=getIntervals(_s);
+          h+='<div class="bs-cr-fsrs show" style="padding:0 18px 6px;display:flex;gap:8px;">'+
+            '<button class="bs-cr-fsrs-btn again" onclick="bsRate(0)"><span>Again</span><span class="bs-cr-fsrs-sub">'+_iv.again.label+'</span></button>'+
+            '<button class="bs-cr-fsrs-btn hard" onclick="bsRate(1)"><span>Hard</span><span class="bs-cr-fsrs-sub">'+_iv.hard.label+'</span></button>'+
+            '<button class="bs-cr-fsrs-btn good" onclick="bsRate(2)"><span>Good</span><span class="bs-cr-fsrs-sub">'+_iv.good.label+'</span></button>'+
+            '<button class="bs-cr-fsrs-btn easy" onclick="bsRate(3)"><span>Easy</span><span class="bs-cr-fsrs-sub">'+_iv.easy.label+'</span></button>'+
+            '</div>';
+        })();
+      }
     }
     if(card.phrase&&BS.mode!=='kp')h+='<div class="bs-exp"><strong>Phrase:</strong> '+hl(card.phrase)+'</div>';
     // Attending AI button — always visible after Key Point reveal
@@ -18945,6 +19066,79 @@ function renderClinicalReasoningReveal(card, el) {
   el._crRevealed = 0;
   el._crTotal = total;
 }
+
+// ═══════════════════════════════════════════════════════════════════════
+// 2026-05-16: KEY POINT REFLEX MODE — funções
+// kprCommit: user diz "I knew / I didn't" ANTES de revelar (commit-before-reveal)
+//   - registra a auto-avaliação em BS._kprStats (telemetria)
+//   - revela automaticamente a RESPONSE depois do commit
+// kprReveal: tap manual em "RESPONSE" caso o user prefira revelar sem committer
+// ═══════════════════════════════════════════════════════════════════════
+if(typeof window !== 'undefined' && !window.BS) window.BS = window.BS || {};
+window.BS._kprStats = window.BS._kprStats || { knew_correct:0, knew_wrong:0, didnt_correct:0, didnt_wrong:0 };
+
+window.kprCommit = function(claimedKnew){
+  const resp = document.getElementById('bs-kpr-resp');
+  const commit = document.getElementById('bs-kpr-commit');
+  const fsrs = document.getElementById('bs-kpr-fsrs');
+  const insight = document.getElementById('bs-kpr-insight');
+  if(!resp) return;
+
+  // Marca estado pra usar no rating depois (overconfidence penalty)
+  try {
+    if(window.BS){
+      window.BS._lastKprClaim = claimedKnew ? 'knew' : 'didnt';
+      window.BS._lastKprCardId = (BS.cards && BS.cards[BS.cur]) ? BS.cards[BS.cur].id : null;
+    }
+  } catch(e){}
+
+  // Esconde botões de commit
+  if(commit){ commit.classList.add('hidden'); }
+
+  // Revela RESPONSE com animação
+  if(!resp.classList.contains('revealed')){
+    resp.classList.add('revealed');
+  }
+
+  // Revela 260+ INSIGHT logo após
+  if(insight){
+    setTimeout(function(){ insight.classList.add('show'); }, 250);
+  }
+
+  // Mostra FSRS depois da revelação completa
+  if(fsrs){
+    setTimeout(function(){
+      fsrs.style.display = 'flex';
+      fsrs.classList.add('show');
+    }, 500);
+  }
+};
+
+window.kprReveal = function(ev){
+  // Tap direto na response (sem clicar I knew/didn't) — também revela mas sem registrar commit
+  const resp = (ev && ev.currentTarget) ? ev.currentTarget : document.getElementById('bs-kpr-resp');
+  if(!resp || resp.classList.contains('revealed')) return;
+  const commit = document.getElementById('bs-kpr-commit');
+  const fsrs = document.getElementById('bs-kpr-fsrs');
+  const insight = document.getElementById('bs-kpr-insight');
+
+  try {
+    if(window.BS){
+      window.BS._lastKprClaim = 'skipped';
+      window.BS._lastKprCardId = (BS.cards && BS.cards[BS.cur]) ? BS.cards[BS.cur].id : null;
+    }
+  } catch(e){}
+
+  resp.classList.add('revealed');
+  if(commit){ commit.classList.add('hidden'); }
+  if(insight){ setTimeout(function(){ insight.classList.add('show'); }, 250); }
+  if(fsrs){
+    setTimeout(function(){
+      fsrs.style.display = 'flex';
+      fsrs.classList.add('show');
+    }, 500);
+  }
+};
 
 window.crReveal = function(el, isLast, type) {
   if (el.classList.contains('revealed')) return;
