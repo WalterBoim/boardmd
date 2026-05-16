@@ -17223,10 +17223,23 @@ function bmdSetupDrag(){
   animation:crCommitFade .35s ease-out;
 }
 .bs-cr-commit.hidden{display:none}
+.bs-cr-commit-step{
+  font-size:9.5px;font-weight:800;letter-spacing:.18em;
+  color:var(--accent);
+  text-transform:uppercase;
+  margin-bottom:5px;
+  opacity:.85;
+}
+.bs-cr-commit-2 .bs-cr-commit-step{
+  color:#22c55e;
+}
 .bs-cr-commit-q{
-  font-size:12px;color:var(--text-dim);
-  margin-bottom:10px;font-style:italic;
-  letter-spacing:.02em;
+  font-size:13px;color:var(--text-dim);
+  margin-bottom:10px;
+  letter-spacing:.01em;
+}
+.bs-cr-commit-q b{
+  color:var(--text);font-weight:700;
 }
 .bs-cr-commit-btns{
   display:flex;gap:10px;justify-content:center;flex-wrap:wrap;
@@ -19157,7 +19170,8 @@ function renderClinicalReasoningReveal(card, el) {
 
   // Commit-before-reveal (some after first commit)
   html += '<div class="bs-cr-commit" id="bs-cr-commit">' +
-    '<div class="bs-cr-commit-q">Before revealing — do you know the diagnosis?</div>' +
+    '<div class="bs-cr-commit-step">STEP 1 of ' + (hasAction ? '2' : '1') + '</div>' +
+    '<div class="bs-cr-commit-q">Do you know the <b>diagnosis</b>?</div>' +
     '<div class="bs-cr-commit-btns">' +
       '<button class="bs-cr-commit-btn knew" onclick="crCommit(true)">I knew it</button>' +
       '<button class="bs-cr-commit-btn didnt" onclick="crCommit(false)">I didn\'t</button>' +
@@ -19170,6 +19184,24 @@ function renderClinicalReasoningReveal(card, el) {
     '<div class="bs-crk-t bs-cr-occlude" id="bs-cr-dx" onclick="crReveal(this,' + (hasAction?'false':'true') + ',\'dx\')">' +
     hlBold(bs.diagnosis||'') +
     '</div></div>';
+
+  // ═══════════════════════════════════════════════════════════════
+  // 2026-05-16: SEGUNDO COMMIT — pergunta sobre Treatment
+  // Aparece SÓ depois que Diagnosis foi revelado, pra preservar a sequência:
+  // HY Clue → commit Dx → reveal Dx → commit Action → reveal Action → INSIGHT
+  // Label dinâmico baseado no action_type (Treatment / Next Step / Best Test...)
+  // ═══════════════════════════════════════════════════════════════
+  if (hasAction && amap) {
+    const actionQ = amap.lbl.toLowerCase(); // "treatment", "next step", "best test", etc
+    html += '<div class="bs-cr-commit bs-cr-commit-2 hidden" id="bs-cr-commit-2">' +
+      '<div class="bs-cr-commit-step">STEP 2 of 2</div>' +
+      '<div class="bs-cr-commit-q">Do you know the <b>' + actionQ + '</b>?</div>' +
+      '<div class="bs-cr-commit-btns">' +
+        '<button class="bs-cr-commit-btn knew" onclick="crCommit2(true)">I knew it</button>' +
+        '<button class="bs-cr-commit-btn didnt" onclick="crCommit2(false)">I didn\'t</button>' +
+      '</div>' +
+    '</div>';
+  }
 
   // Action — ocluido
   if (hasAction && amap) {
@@ -19213,9 +19245,10 @@ function renderClinicalReasoningReveal(card, el) {
 }
 
 // ═══════════════════════════════════════════════════════════════════════
-// 2026-05-16: crCommit — Commit-Before-Reveal para Clinical Reasoning
-// Botão revela Diagnosis automaticamente após commit do user.
-// Action continua reveal manual (tap-to-reveal preserva ritmo de leitura).
+// 2026-05-16: crCommit / crCommit2 — Commit-Before-Reveal em DUAS etapas
+// Etapa 1 (crCommit): user commita Dx → revela Dx → mostra commit-2
+// Etapa 2 (crCommit2): user commita Action → revela Action → INSIGHT + FSRS
+// Preserva a SEQUÊNCIA clínica: clue → ask Dx → reveal Dx → ask Action → reveal Action
 // ═══════════════════════════════════════════════════════════════════════
 window.crCommit = function(claimedKnew){
   const commit = document.getElementById('bs-cr-commit');
@@ -19230,15 +19263,47 @@ window.crCommit = function(claimedKnew){
     }
   } catch(e){}
 
-  // Esconde botões de commit
+  // Esconde botões de commit 1
   if(commit){ commit.classList.add('hidden'); }
 
-  // Revela Dx automaticamente (simula click)
+  // Revela Dx automaticamente
   if(!dxEl.classList.contains('revealed')){
     setTimeout(function(){
       const hasAct = !!document.getElementById('bs-cr-act');
       if(typeof window.crReveal === 'function'){
         window.crReveal(dxEl, !hasAct, 'dx');
+      }
+      // Mostra commit-2 (pergunta sobre o Action) depois de revelar Dx
+      if(hasAct){
+        setTimeout(function(){
+          const commit2 = document.getElementById('bs-cr-commit-2');
+          if(commit2){ commit2.classList.remove('hidden'); }
+        }, 400);
+      }
+    }, 150);
+  }
+};
+
+window.crCommit2 = function(claimedKnew){
+  const commit2 = document.getElementById('bs-cr-commit-2');
+  const actEl = document.getElementById('bs-cr-act');
+  if(!actEl) return;
+
+  // Marca claim global da Action (separado do claim da Dx)
+  try {
+    if(window.BS){
+      window.BS._lastCrActionClaim = claimedKnew ? 'knew' : 'didnt';
+    }
+  } catch(e){}
+
+  // Esconde botões de commit 2
+  if(commit2){ commit2.classList.add('hidden'); }
+
+  // Revela Action automaticamente
+  if(!actEl.classList.contains('revealed')){
+    setTimeout(function(){
+      if(typeof window.crReveal === 'function'){
+        window.crReveal(actEl, true, 'act');
       }
     }, 150);
   }
@@ -19334,6 +19399,27 @@ window.crReveal = function(el, isLast, type) {
       }
     } catch(e){}
     commit.classList.add('hidden');
+  }
+
+  // 2026-05-16: se acabou de revelar Dx e existe Action ocluido, mostra commit-2
+  // Isso preserva a sequência clínica: Dx revelado → pergunta Action → reveal Action
+  if (type === 'dx') {
+    const actEl = wrap.querySelector('#bs-cr-act');
+    const commit2 = wrap.querySelector('#bs-cr-commit-2');
+    if (actEl && commit2 && !actEl.classList.contains('revealed') && commit2.classList.contains('hidden')) {
+      setTimeout(function(){ commit2.classList.remove('hidden'); }, 400);
+    }
+  }
+
+  // 2026-05-16: se clicou direto no Action sem committer no commit-2, esconde commit-2
+  if (type === 'act') {
+    const commit2 = wrap.querySelector('#bs-cr-commit-2');
+    if (commit2 && !commit2.classList.contains('hidden')) {
+      try {
+        if(window.BS){ window.BS._lastCrActionClaim = 'skipped'; }
+      } catch(e){}
+      commit2.classList.add('hidden');
+    }
   }
 
   const fsrsEl = wrap.querySelector('.bs-cr-fsrs');
