@@ -17226,10 +17226,28 @@ function bmdSetupDrag(){
 /* Question block */
 .bs-ar-q{opacity:0;transform:translateY(8px);transition:opacity .4s,transform .4s}
 .bs-ar-q.show{opacity:1;transform:translateY(0)}
-.bs-ar-q-l{font-size:11px;font-weight:700;color:var(--text-dim);margin-bottom:10px;letter-spacing:.02em}
-.bs-ar-opts{display:flex;flex-direction:column;gap:8px}
+.bs-ar-q-l{font-size:11px;font-weight:700;color:var(--text-dim);margin-bottom:10px;letter-spacing:.02em;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+
+/* ═══════════════════════════════════════════════════════════════
+   2026-05-16: "BEST vs TRAP" chip — afirma a tese central do produto
+   ("fico entre 2") na UI sem mudar a estrutura. Pequeno, discreto,
+   mas presente em toda pergunta de Active Recall.
+   ═══════════════════════════════════════════════════════════════ */
+.bs-ar-mode-chip{
+  display:inline-flex;align-items:center;
+  padding:3px 9px;
+  background:linear-gradient(135deg,rgba(232,168,54,.18),rgba(244,63,94,.15));
+  border:1px solid rgba(232,168,54,.45);
+  border-radius:999px;
+  font-size:9.5px;font-weight:800;letter-spacing:.12em;
+  color:var(--gold);
+  text-transform:uppercase;
+  white-space:nowrap;
+}
+
+.bs-ar-opts{display:flex;flex-direction:column;gap:10px}
 .bs-ar-opt{
-  padding:13px 18px;border-radius:10px;
+  padding:14px 18px;border-radius:11px;
   border:1.5px solid var(--border);
   background:var(--surface);
   cursor:pointer;font-size:15px;font-weight:500;
@@ -18618,7 +18636,7 @@ function renderARFallback(card, el, bs) {
 
   // Dx — reveal clicável
   html += '<div class="bs-ar-q show" id="ar-dx-q" style="margin-top:4px">';
-  html += '<div class="bs-ar-q-l" style="color:var(--text-dim);font-size:11px;font-weight:700;margin-bottom:8px">What is the most likely diagnosis?</div>';
+  html += '<div class="bs-ar-q-l" style="color:var(--text-dim);font-size:11px;font-weight:700;margin-bottom:8px"><span class="bs-ar-mode-chip">BEST vs TRAP</span>What is the most likely diagnosis?</div>';
   html += '<div class="bs-cr-occlude bs-ar-opt" style="padding:14px 18px;border-radius:10px;border:1.5px solid var(--border);display:block;cursor:pointer;font-size:15px;text-align:center;color:var(--accent);font-weight:700" onclick="arRevealFallbackDx(this)">Tap to reveal diagnosis</div></div>';
   
   // Dx confirmed (hidden)
@@ -18735,7 +18753,7 @@ function renderActiveRecall(card, el) {
   // 2. Dx Question
   if (dxOpts) {
     html += `<div class="bs-ar-q" id="ar-dx-q">
-      <div class="bs-ar-q-l">What is the most likely diagnosis?</div>
+      <div class="bs-ar-q-l"><span class="bs-ar-mode-chip">BEST vs TRAP</span>What is the most likely diagnosis?</div>
       <div class="bs-ar-opts">`;
     dxOpts.forEach((opt, i) => {
       const letter = i === 0 ? 'A' : 'B';
@@ -18768,7 +18786,7 @@ function renderActiveRecall(card, el) {
     const acolor = ACTION_COLORS[atype] || '#22c55e';
     const alabel = ACTION_LABELS[atype] || 'Action';
     html += `<div class="bs-ar-q" id="ar-act-q" style="display:none">
-      <div class="bs-ar-q-l">What is the ${alabel.toLowerCase()}?</div>
+      <div class="bs-ar-q-l"><span class="bs-ar-mode-chip">BEST vs TRAP</span>What is the ${alabel.toLowerCase()}?</div>
       <div class="bs-ar-opts">`;
     actOpts.forEach((opt, i) => {
       const letter = i === 0 ? 'A' : 'B';
