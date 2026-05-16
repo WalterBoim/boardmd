@@ -15,7 +15,11 @@ if('caches' in window){
 }
 </script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>BoardMD — Medical Board Review</title><!-- build:20260507-201448 -->
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>BoardMD — Medical Board Review</title><!-- build:20260515-2058-delete-fix -->
+<script>window.__BMD_BUILD__ = '20260515-2058-delete-fix';</script>
 <!-- PWA -->
 <link rel="manifest" href="/manifest.json">
 <meta name="theme-color" content="#080c12">
@@ -10503,228 +10507,303 @@ async function runDeleteDiagnostic(){
 window.runDeleteDiagnostic = runDeleteDiagnostic;
 
 async function deleteCurrentCard(){
-  // FIX 2026-05-15: se _editingCard se perdeu (state inconsistente), tenta
-  // recuperar a partir do editor-card-id no DOM. Antes a função saía silenciosa
-  // sem nenhum feedback — agora ou recupera ou mostra erro claro.
+  // ═══════════════════════════════════════════════════════════════════
+  // 2026-05-15 rev4 — DELETE com painel visual ao vivo.
+  // Toda a operação acontece dentro de um overlay com log na tela,
+  // sem depender do console do browser. Cada passo é exibido em
+  // tempo real para garantir que o usuário veja onde está travando.
+  // ═══════════════════════════════════════════════════════════════════
+
+  // 1) Recupera card (mesma lógica anterior — robusta a state inconsistente)
   if(!_editingCard){
-    console.warn('[BMD delete] _editingCard está null — tentando recuperar do DOM');
     try {
       const idEl = document.getElementById('editor-card-id');
       if(idEl){
         const m = idEl.textContent.match(/ID:\s*([^\s·]+)/);
         if(m && m[1]){
           const cardId = m[1].trim();
-          // Procura nos decks carregados
           let found = null;
           Object.keys(window.DECKS || {}).forEach(dk => {
             (DECKS[dk]||[]).forEach(c => { if(c.id === cardId) found = c; });
           });
-          if(found){
-            _editingCard = found;
-            console.log('[BMD delete] recuperado _editingCard via DOM:', cardId);
-          }
+          if(found) _editingCard = found;
         }
       }
-    } catch(recErr){ console.error('[BMD delete] erro recuperando:', recErr); }
+    } catch(recErr){ console.error('[BMD delete] recovery error:', recErr); }
   }
   if(!_editingCard){
-    alert('No card loaded in editor. Close and reopen the editor, then try again.');
+    alert('No card loaded in editor. Close and reopen, then try again.');
     return;
   }
   const card = _editingCard;
-  if(!confirm(`Delete this card permanently?\n\nQID ${card.qid || card.id}\n"${(card.q||'').slice(0,80)}..."\n\nThis cannot be undone.`)) return;
 
-  console.log('[BMD delete] iniciando para card.id =', card.id);
+  // 2) Cria overlay visual com log ao vivo
+  let ov = document.getElementById('bmd-del-overlay');
+  if(ov) ov.remove();
+  ov = document.createElement('div');
+  ov.id = 'bmd-del-overlay';
+  ov.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:99999;display:flex;align-items:center;justify-content:center;padding:20px;font-family:Lato,sans-serif';
+  ov.innerHTML = ''+
+    '<div style="background:var(--surface,#fff);border-radius:14px;max-width:720px;width:100%;max-height:90vh;overflow-y:auto;box-shadow:0 25px 60px rgba(0,0,0,.4);padding:24px;color:var(--text,#0f172a)">'+
+      '<div style="display:flex;justify-content:space-between;align-items:start;gap:16px;margin-bottom:14px">'+
+        '<div>'+
+          '<h2 style="margin:0 0 4px;font-size:20px;font-weight:800">🗑️ Delete Card — Live Trace</h2>'+
+          '<div style="font-size:11px;color:var(--text-faint,#94a3b8);font-family:monospace">build: '+(window.__BMD_BUILD__ || '(unknown)')+' · card: '+card.id+' / '+(card.qid||'(no qid)')+'</div>'+
+        '</div>'+
+        '<button id="bmd-del-close" style="background:none;border:1px solid var(--border,#ccc);border-radius:8px;padding:6px 10px;cursor:pointer;font-size:14px">✕</button>'+
+      '</div>'+
+      '<div id="bmd-del-log" style="background:#0f172a;color:#e2e8f0;border-radius:10px;padding:14px;font-family:monospace;font-size:12px;line-height:1.6;max-height:50vh;overflow-y:auto;white-space:pre-wrap;word-break:break-word"></div>'+
+      '<div id="bmd-del-actions" style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;align-items:center"></div>'+
+    '</div>';
+  document.body.appendChild(ov);
+  const log = document.getElementById('bmd-del-log');
+  const actions = document.getElementById('bmd-del-actions');
+  document.getElementById('bmd-del-close').onclick = () => ov.remove();
 
-  // FIX 2026-05-15 (rev 2): pré-check de admin ANTES de mexer em nada local.
-  // Se não é admin, mostra modal com instruções e não toca em tombstone/IDB.
-  // Assim você nunca acaba com "card sumiu localmente mas continua no servidor".
-  let isAdminUser = false;
-  try {
-    isAdminUser = (typeof checkIsAdmin === 'function') ? await checkIsAdmin({retries:1}) : false;
-  } catch(e){ isAdminUser = false; }
-  console.log('[BMD delete] isAdmin =', isAdminUser);
-
-  // FIX 2026-05-15 (rev 2): TOMBSTONE só será aplicado se o servidor confirmar
-  // o delete OU se já formos admin e o servidor responder algo conclusivo.
-  // Não aplicamos tombstone preventivamente para evitar mascarar problemas.
-
-  let serverDeleted = false;
-  let errorReason = '';
-  let httpStatus = 0;
-  let httpBody = '';
-
-  try {
-    // Refresh da sessão antes do delete (sessão Supabase expira em ~1h).
-    let sess = null;
-    try {
-      const { data, error: refErr } = await _supa.auth.refreshSession();
-      if(data && data.session){
-        sess = data;
-        console.log('[BMD delete] sessão refrescada com sucesso');
-      } else if(refErr){
-        console.warn('[BMD delete] refresh falhou:', refErr.message);
-        const { data: existing } = await _supa.auth.getSession();
-        sess = existing;
-      }
-    } catch(refExc){
-      console.warn('[BMD delete] exceção no refresh:', refExc);
-      const { data: existing } = await _supa.auth.getSession();
-      sess = existing;
-    }
-
-    const token = sess?.session?.access_token;
-    const userEmail = sess?.session?.user?.email || 'unknown';
-    console.log('[BMD delete] user:', userEmail, '| token presente:', !!token, '| isAdmin:', isAdminUser);
-
-    if(!token){
-      errorReason = 'NO_TOKEN';
-    } else if(!isAdminUser){
-      errorReason = 'NOT_ADMIN';
-      console.warn('[BMD delete] usuário não está na tabela admins — pulando DELETE');
-    } else {
-      // ── ATTEMPT 1: DELETE direto via REST ────────────────────────────
-      const r = await fetch(SUPA_URL + '/rest/v1/cards?id=eq.' + encodeURIComponent(card.id), {
-        method: 'DELETE',
-        headers: {
-          'apikey': SUPA_KEY,
-          'Authorization': 'Bearer ' + token,
-          'Prefer': 'return=representation'
-        }
-      });
-      httpStatus = r.status;
-      console.log('[BMD delete] REST DELETE respondeu', r.status, r.statusText);
-      if(r.ok){
-        const resp = await r.json().catch(()=>[]);
-        if(Array.isArray(resp) && resp.length > 0){
-          serverDeleted = true;
-          console.log('[BMD delete] ✓ servidor confirmou delete (REST):', resp[0]?.id);
-        } else {
-          // 0 linhas: RLS silenciosa OU id já não existia. Confirma com SELECT.
-          console.warn('[BMD delete] REST retornou 0 linhas — verificando se card ainda existe…');
-          const chk = await fetch(SUPA_URL + '/rest/v1/cards?id=eq.' + encodeURIComponent(card.id) + '&select=id', {
-            headers: { 'apikey': SUPA_KEY, 'Authorization': 'Bearer ' + token }
-          });
-          const chkJson = chk.ok ? await chk.json().catch(()=>[]) : [];
-          if(Array.isArray(chkJson) && chkJson.length === 0){
-            // Card já não existe: ok, foi deletado por outra sessão.
-            serverDeleted = true;
-            console.log('[BMD delete] ✓ card já não existe no servidor (consistente)');
-          } else {
-            // Card ainda existe → RLS bloqueou. Tenta fallback RPC.
-            console.warn('[BMD delete] card ainda existe → tentando RPC admin_delete_card…');
-            try {
-              const { data: rpcOk, error: rpcErr } = await _supa.rpc('admin_delete_card', { card_id: card.id });
-              if(rpcErr){
-                errorReason = 'RLS_BLOCKED';
-                console.warn('[BMD delete] RPC falhou:', rpcErr.message || rpcErr);
-                httpBody = String(rpcErr.message || rpcErr);
-              } else if(rpcOk === true){
-                serverDeleted = true;
-                console.log('[BMD delete] ✓ servidor confirmou delete (RPC)');
-              } else {
-                errorReason = 'RLS_BLOCKED';
-                console.warn('[BMD delete] RPC retornou', rpcOk);
-              }
-            } catch(rpcExc){
-              errorReason = 'RLS_BLOCKED';
-              console.warn('[BMD delete] RPC exceção:', rpcExc);
-            }
-          }
-        }
-      } else {
-        const t = await r.text();
-        httpBody = t;
-        errorReason = 'HTTP_' + r.status;
-        console.error('[BMD delete] ✗ erro HTTP:', r.status, t);
-        if(r.status === 401)      errorReason = 'AUTH_EXPIRED';
-        else if(r.status === 403) errorReason = 'FORBIDDEN';
-        else if(r.status >= 500)  errorReason = 'HTTP_500';
-        // Tenta RPC mesmo em 401/403 — pode ser que a policy direta esteja
-        // restrita mas a SECURITY DEFINER function permita.
-        try {
-          const { data: rpcOk, error: rpcErr } = await _supa.rpc('admin_delete_card', { card_id: card.id });
-          if(!rpcErr && rpcOk === true){
-            serverDeleted = true;
-            errorReason = '';
-            console.log('[BMD delete] ✓ RPC salvou o delete após falha REST');
-          } else if(rpcErr){
-            console.warn('[BMD delete] RPC também falhou:', rpcErr.message || rpcErr);
-          }
-        } catch(rpcExc){
-          console.warn('[BMD delete] RPC exceção:', rpcExc);
-        }
-      }
-    }
-  } catch(e){
-    errorReason = 'EXCEPTION';
-    httpBody = String(e && e.message || e);
-    console.error('[BMD delete] exceção no fetch:', e);
+  function logLine(label, value, color){
+    const v = (typeof value === 'object') ? JSON.stringify(value, null, 2) : String(value);
+    const c = color || '#e2e8f0';
+    log.innerHTML += '<span style="color:#94a3b8">'+label+':</span> <span style="color:'+c+'">'+v+'</span>\n';
+    log.scrollTop = log.scrollHeight;
+  }
+  function logSep(){
+    log.innerHTML += '<span style="color:#475569">───────────────────────────────</span>\n';
+  }
+  function setActions(html){ actions.innerHTML = html; }
+  function withTimeout(p, ms, label){
+    return Promise.race([
+      p,
+      new Promise((_, rej) => setTimeout(() => rej(new Error('TIMEOUT '+ms+'ms ('+label+')')), ms))
+    ]);
+  }
+  function copyLogButton(){
+    return '<button onclick="navigator.clipboard.writeText(document.getElementById(\'bmd-del-log\').textContent).then(()=>{this.textContent=\'✓ Copied\';setTimeout(()=>{this.textContent=\'Copy log\'},1500)})" style="background:var(--accent,#2563eb);color:#fff;border:none;border-radius:9px;padding:9px 16px;font-weight:700;font-size:13px;cursor:pointer">Copy log</button>';
+  }
+  function closeButton(label){
+    return '<button onclick="document.getElementById(\'bmd-del-overlay\').remove()" style="background:none;border:1px solid var(--border,#ccc);border-radius:9px;padding:9px 16px;font-weight:700;font-size:13px;cursor:pointer">'+(label||'Close')+'</button>';
   }
 
-  // ── Decide: aplicar mudanças locais ou não ───────────────────────────
-  if(!serverDeleted){
-    // Servidor não confirmou. NÃO removemos localmente — abrimos modal com SQL.
-    console.warn('[BMD delete] servidor não confirmou. Abrindo help modal. reason=', errorReason);
-    showAdminSqlHelpModal(card.id, errorReason || 'RLS_BLOCKED');
+  // 3) Pede confirmação INLINE (dentro do overlay)
+  logLine('Build', window.__BMD_BUILD__ || '(unknown)');
+  logLine('Card', card.id+' / '+(card.qid||'(no qid)'));
+  logLine('Question preview', (card.q||'').slice(0, 70)+'...');
+  logSep();
+  logLine('Action', 'Awaiting your confirmation…', '#f59e0b');
+
+  const confirmed = await new Promise((resolve) => {
+    setActions(
+      '<button id="bmd-del-confirm" style="background:#dc2626;color:#fff;border:none;border-radius:9px;padding:11px 22px;font-weight:700;font-size:13px;cursor:pointer">Yes, delete permanently</button>'+
+      '<button id="bmd-del-cancel" style="background:none;border:1px solid var(--border,#ccc);border-radius:9px;padding:11px 22px;font-weight:700;font-size:13px;cursor:pointer">Cancel</button>'
+    );
+    document.getElementById('bmd-del-confirm').onclick = () => resolve(true);
+    document.getElementById('bmd-del-cancel').onclick = () => resolve(false);
+  });
+  if(!confirmed){
+    logLine('Action', 'Cancelled by user', '#94a3b8');
+    setActions(closeButton());
+    return;
+  }
+  setActions('<div style="color:var(--text-faint,#94a3b8);font-size:12px">Working…</div>');
+  logLine('Action', 'CONFIRMED — proceeding', '#22c55e');
+  logSep();
+
+  // 4) Verifica ambiente
+  if(typeof _supa === 'undefined' || !_supa){
+    logLine('FATAL', 'Supabase client missing', '#ef4444');
+    setActions(copyLogButton()+closeButton());
+    return;
+  }
+  logLine('Supabase', 'client OK', '#22c55e');
+  logLine('SUPA_URL', SUPA_URL);
+
+  // 5) Pega sessão (com timeout)
+  let sess = null;
+  try {
+    logLine('Step', 'getSession() with 5s timeout...');
+    const res = await withTimeout(_supa.auth.getSession(), 5000, 'getSession');
+    if(res.error){ throw res.error; }
+    sess = res.data;
+    logLine('getSession', 'OK', '#22c55e');
+  } catch(e){
+    logLine('getSession ERROR', String(e && e.message || e), '#ef4444');
+    setActions(copyLogButton()+closeButton());
     return;
   }
 
-  // ── Servidor confirmou. Limpa tudo local. ────────────────────────────
-  // Adiciona tombstone (para o caso do cache IDB ainda devolver o card)
-  addTombstone(card.id);
+  let uid = sess?.session?.user?.id;
+  let email = sess?.session?.user?.email;
+  let token = sess?.session?.access_token;
+  logLine('User UID', uid || '(none)', uid?'#22c55e':'#ef4444');
+  logLine('User email', email || '(none)');
+  logLine('Token present', token ? 'YES' : 'NO', token?'#22c55e':'#ef4444');
+  if(!token){
+    logLine('FATAL', 'No token — sign in as admin first', '#ef4444');
+    setActions(copyLogButton()+closeButton());
+    return;
+  }
 
+  // 6) Refresh do token (tenta, sem bloquear se falhar)
   try {
-    // Remove de todas as listas em memória
+    logLine('Step', 'refreshSession() with 5s timeout...');
+    const refRes = await withTimeout(_supa.auth.refreshSession(), 5000, 'refreshSession');
+    if(refRes.error){
+      logLine('refreshSession WARN', refRes.error.message||refRes.error, '#f59e0b');
+    } else if(refRes.data?.session){
+      token = refRes.data.session.access_token || token;
+      uid = refRes.data.session.user?.id || uid;
+      logLine('refreshSession', 'OK, new token', '#22c55e');
+    }
+  } catch(e){
+    logLine('refreshSession WARN', String(e && e.message || e), '#f59e0b');
+  }
+  logSep();
+
+  // 7) Verifica admins
+  try {
+    logLine('Step', 'Checking admins table (10s timeout)...');
+    const res = await withTimeout(
+      _supa.from('admins').select('user_id, added_at, created_at').eq('user_id', uid).maybeSingle(),
+      10000, 'admins select'
+    );
+    if(res.error){
+      logLine('admins query ERROR', res.error.message+' (code: '+(res.error.code||'?')+')', '#ef4444');
+    } else if(!res.data){
+      logLine('Admin row', 'NOT FOUND for your UID', '#ef4444');
+      logLine('FIX', 'Run in Supabase SQL Editor: INSERT INTO admins(user_id) VALUES (\''+uid+'\');', '#f59e0b');
+      setActions(copyLogButton()+closeButton());
+      return;
+    } else {
+      logLine('Admin row', 'FOUND ✓', '#22c55e');
+    }
+  } catch(e){
+    logLine('admins exception', String(e && e.message || e), '#ef4444');
+  }
+  logSep();
+
+  // 8) DELETE via REST
+  let serverDeleted = false;
+  let errorReason = '';
+  try {
+    const url = SUPA_URL + '/rest/v1/cards?id=eq.' + encodeURIComponent(card.id);
+    logLine('Step', 'REST DELETE '+url);
+    const r = await withTimeout(fetch(url, {
+      method: 'DELETE',
+      headers: {
+        'apikey': SUPA_KEY,
+        'Authorization': 'Bearer ' + token,
+        'Prefer': 'return=representation'
+      }
+    }), 15000, 'REST DELETE');
+    logLine('REST status', r.status+' '+r.statusText, r.ok?'#22c55e':'#ef4444');
+    const txt = await r.text().catch(()=>'');
+    if(txt) logLine('REST body', txt.slice(0,500));
+    if(r.ok){
+      let arr = [];
+      try { arr = JSON.parse(txt||'[]'); } catch(e){}
+      if(Array.isArray(arr) && arr.length > 0){
+        serverDeleted = true;
+        logLine('Verdict', 'SERVER CONFIRMED ✓', '#22c55e');
+      } else {
+        // 0 rows — pode ser que já não existisse. Verifica.
+        logLine('REST', 'returned 0 rows. Verifying...', '#f59e0b');
+        try {
+          const chk = await withTimeout(fetch(SUPA_URL+'/rest/v1/cards?id=eq.'+encodeURIComponent(card.id)+'&select=id', {
+            headers: {'apikey':SUPA_KEY, 'Authorization':'Bearer '+token}
+          }), 10000, 'verify SELECT');
+          const chkArr = chk.ok ? await chk.json().catch(()=>[]) : [];
+          if(Array.isArray(chkArr) && chkArr.length === 0){
+            serverDeleted = true;
+            logLine('Verify', 'Card no longer in server (already deleted)', '#22c55e');
+          } else {
+            errorReason = 'RLS_BLOCKED';
+            logLine('Verify', 'Card STILL EXISTS — RLS blocked silently', '#ef4444');
+          }
+        } catch(ve){ logLine('Verify exception', String(ve&&ve.message||ve), '#ef4444'); errorReason='RLS_BLOCKED'; }
+      }
+    } else {
+      errorReason = 'HTTP_'+r.status;
+      if(r.status===401) errorReason='AUTH_EXPIRED';
+      else if(r.status===403) errorReason='FORBIDDEN';
+      else if(r.status>=500) errorReason='HTTP_500';
+    }
+  } catch(e){
+    errorReason='EXCEPTION';
+    logLine('REST exception', String(e && e.message || e), '#ef4444');
+  }
+
+  // 9) Fallback RPC se REST falhou
+  if(!serverDeleted){
+    logSep();
+    try {
+      logLine('Step', 'Trying RPC admin_delete_card(...) (10s timeout)');
+      const rpcRes = await withTimeout(_supa.rpc('admin_delete_card', { card_id: card.id }), 10000, 'RPC');
+      if(rpcRes.error){
+        logLine('RPC ERROR', rpcRes.error.message+' (code: '+(rpcRes.error.code||'?')+')', '#ef4444');
+        if((rpcRes.error.message||'').toLowerCase().includes('not exist')){
+          logLine('FIX', 'Function admin_delete_card was not created. Re-run the SQL.', '#f59e0b');
+        } else if((rpcRes.error.message||'').toLowerCase().includes('not authorized')){
+          logLine('FIX', 'Logout+login in BoardMD to refresh JWT.', '#f59e0b');
+        }
+      } else if(rpcRes.data === true){
+        serverDeleted = true;
+        errorReason = '';
+        logLine('RPC', 'SUCCESS ✓', '#22c55e');
+      } else {
+        logLine('RPC returned', String(rpcRes.data), '#ef4444');
+      }
+    } catch(e){ logLine('RPC exception', String(e && e.message || e), '#ef4444'); }
+  }
+
+  logSep();
+
+  // 10) Resultado final
+  if(!serverDeleted){
+    logLine('FINAL', 'Server did NOT delete the card', '#ef4444');
+    logLine('Reason code', errorReason || 'UNKNOWN', '#ef4444');
+    logLine('Next', 'Card was NOT removed locally either (no tombstone) — open the SQL help for the fix.', '#f59e0b');
+    setActions(
+      copyLogButton()+
+      '<button onclick="showAdminSqlHelpModal(\''+card.id+'\', \''+errorReason+'\')" style="background:#f59e0b;color:#fff;border:none;border-radius:9px;padding:9px 16px;font-weight:700;font-size:13px;cursor:pointer">Open SQL help</button>'+
+      closeButton()
+    );
+    return;
+  }
+
+  // 11) Server deletou → limpa local
+  logLine('Cleanup', 'Removing card from local state...', '#22c55e');
+  try {
+    addTombstone(card.id);
     Object.keys(window.DECKS || {}).forEach(dk => {
       if(DECKS[dk]) DECKS[dk] = DECKS[dk].filter(c => c.id !== card.id);
     });
-    console.log('[BMD delete] removido de DECKS');
-
-    // Remove do deck atual em estudo + againQueue
     if(Array.isArray(deck))         deck = deck.filter(c => c.id !== card.id);
     if(Array.isArray(againQueue))   againQueue = againQueue.filter(c => c.id !== card.id);
-
-    // Remove qualquer edição salva pra esse card
     const edits = getCardEdits();
     delete edits[card.id];
     saveCardEdits(edits);
-
-    // Limpa do cache IndexedDB
     try{
       const db = await openIDB();
       const tx = db.transaction(IDB_STORE, 'readwrite');
       tx.objectStore(IDB_STORE).delete(card.id);
       await new Promise(res => { tx.oncomplete = res; tx.onerror = res; });
-      console.log('[BMD delete] removido do IDB');
-    }catch(ex){ console.warn('[BMD delete] IDB falhou', ex); }
-
-    // Limpa estado FSRS desse card
+    }catch(ex){ logLine('IDB warn', String(ex&&ex.message||ex), '#f59e0b'); }
     if(window.fsrs && window.fsrs[card.id]){
       delete window.fsrs[card.id];
       if(typeof saveFsrs === 'function') saveFsrs();
     }
-
-    closeCardEditor();
-    showToast('Card deleted ✓ (server confirmed)');
-
-    // Avança pro próximo card
-    if(typeof idx !== 'undefined' && Array.isArray(deck)){
-      if(idx >= deck.length) idx = Math.max(0, deck.length - 1);
-      if(deck.length === 0){
-        if(typeof showSection === 'function') showSection('home');
-      } else {
-        if(typeof renderCard === 'function') renderCard();
-      }
-    }
-
-    // Atualiza badges/contadores
-    try { if(typeof bmdDashSync === 'function') bmdDashSync(); } catch(e){}
-    try { if(typeof bsUpdateChipCounts === 'function') bsUpdateChipCounts(); } catch(e){}
-  } catch(e) {
-    console.error('[BMD delete] exceção pós-servidor:', e);
-    alert('Card deleted on server, but local cleanup failed: ' + (e.message || e) + '\nReload the page.');
+    logLine('Cleanup', 'DONE ✓', '#22c55e');
+  } catch(e){
+    logLine('Cleanup warn', String(e && e.message || e), '#f59e0b');
   }
+
+  logSep();
+  logLine('FINAL', '✓ CARD DELETED', '#22c55e');
+
+  // 12) Botões finais
+  setActions(
+    '<button onclick="document.getElementById(\'bmd-del-overlay\').remove(); if(typeof closeCardEditor===\'function\')closeCardEditor(); if(typeof idx!==\'undefined\' && Array.isArray(deck)){if(idx>=deck.length)idx=Math.max(0,deck.length-1); if(deck.length===0){if(typeof showSection===\'function\')showSection(\'home\');}else{if(typeof renderCard===\'function\')renderCard();}} try{if(typeof bmdDashSync===\'function\')bmdDashSync();}catch(e){} try{if(typeof bsUpdateChipCounts===\'function\')bsUpdateChipCounts();}catch(e){}" style="background:#22c55e;color:#fff;border:none;border-radius:9px;padding:11px 22px;font-weight:700;font-size:13px;cursor:pointer">Continue</button>'+
+    copyLogButton()
+  );
 }
 
 function saveCardEdit(){
