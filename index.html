@@ -19170,7 +19170,6 @@ function renderClinicalReasoningReveal(card, el) {
 
   // Commit-before-reveal (some after first commit)
   html += '<div class="bs-cr-commit" id="bs-cr-commit">' +
-    '<div class="bs-cr-commit-step">STEP 1 of ' + (hasAction ? '2' : '1') + '</div>' +
     '<div class="bs-cr-commit-q">Do you know the <b>diagnosis</b>?</div>' +
     '<div class="bs-cr-commit-btns">' +
       '<button class="bs-cr-commit-btn knew" onclick="crCommit(true)">I knew it</button>' +
@@ -19194,7 +19193,6 @@ function renderClinicalReasoningReveal(card, el) {
   if (hasAction && amap) {
     const actionQ = amap.lbl.toLowerCase(); // "treatment", "next step", "best test", etc
     html += '<div class="bs-cr-commit bs-cr-commit-2 hidden" id="bs-cr-commit-2">' +
-      '<div class="bs-cr-commit-step">STEP 2 of 2</div>' +
       '<div class="bs-cr-commit-q">Do you know the <b>' + actionQ + '</b>?</div>' +
       '<div class="bs-cr-commit-btns">' +
         '<button class="bs-cr-commit-btn knew" onclick="crCommit2(true)">I knew it</button>' +
