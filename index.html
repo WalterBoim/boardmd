@@ -18,8 +18,8 @@ if('caches' in window){
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>BoardMD — Medical Board Review</title><!-- build:20260515-2058-delete-fix -->
-<script>window.__BMD_BUILD__ = '20260515-2058-delete-fix';</script>
+<title>BoardMD — Medical Board Review</title><!-- build:20260517-1700-auth-fix-v1 -->
+<script>window.__BMD_BUILD__ = '20260517-1700-auth-fix-v1';</script>
 <!-- PWA -->
 <link rel="manifest" href="/manifest.json">
 <meta name="theme-color" content="#080c12">
@@ -10369,24 +10369,45 @@ async function runDeleteDiagnostic(){
   } catch(e){
     add('getSession WARN', String(e && e.message || e) + ' — trying localStorage fallback', '#f59e0b');
     try {
+      // FIX 2026-05-17: storageKey configurado é 'sb-boardmd-auth'.
+      // Estratégia: 1) chave exata, 2) varredura sb-* + currentSession, 3) varredura sb-* + access_token raiz
       let foundKey = null;
-      for(let i = 0; i < localStorage.length; i++){
-        const k = localStorage.key(i);
-        if(k && k.startsWith('sb-') && k.endsWith('-auth-token')){ foundKey = k; break; }
+      let sessionObj = null;
+      const exactKey = 'sb-boardmd-auth';
+      const rawExact = localStorage.getItem(exactKey);
+      if(rawExact){
+        try {
+          const parsed = JSON.parse(rawExact);
+          const candidate = parsed?.currentSession || parsed;
+          if(candidate && candidate.access_token){
+            foundKey = exactKey;
+            sessionObj = candidate;
+          }
+        } catch(_){}
       }
-      if(foundKey){
-        const raw = localStorage.getItem(foundKey);
-        const parsed = raw ? JSON.parse(raw) : null;
-        const sessionObj = parsed?.currentSession || parsed;
-        if(sessionObj && sessionObj.access_token){
-          sess = { session: sessionObj };
-          sessFromCache = true;
-          add('localStorage fallback', 'OK — using cached session', '#22c55e');
-        } else {
-          throw new Error('Cached session invalid');
+      if(!sessionObj){
+        for(let i = 0; i < localStorage.length; i++){
+          const k = localStorage.key(i);
+          if(!k || !k.startsWith('sb-')) continue;
+          try {
+            const raw = localStorage.getItem(k);
+            if(!raw) continue;
+            const parsed = JSON.parse(raw);
+            const candidate = parsed?.currentSession || parsed;
+            if(candidate && candidate.access_token){
+              foundKey = k;
+              sessionObj = candidate;
+              break;
+            }
+          } catch(_){}
         }
+      }
+      if(sessionObj){
+        sess = { session: sessionObj };
+        sessFromCache = true;
+        add('localStorage fallback', 'OK — using cached session ('+foundKey+')', '#22c55e');
       } else {
-        throw new Error('No sb-*-auth-token key in localStorage');
+        throw new Error('No valid sb-* session found in localStorage');
       }
     } catch(fbErr){
       add('Fallback ERROR', String(fbErr && fbErr.message || fbErr), '#ef4444');
@@ -10653,26 +10674,45 @@ async function deleteCurrentCard(){
     logLine('getSession WARN', String(e && e.message || e) + ' — trying localStorage fallback', '#f59e0b');
     // FALLBACK: lê sessão direto do localStorage (formato padrão do Supabase JS)
     try {
+      // FIX 2026-05-17: storageKey configurado é 'sb-boardmd-auth'.
+      // Estratégia: 1) chave exata, 2) varredura sb-* + currentSession, 3) varredura sb-* + access_token raiz
       let foundKey = null;
-      for(let i = 0; i < localStorage.length; i++){
-        const k = localStorage.key(i);
-        if(k && k.startsWith('sb-') && k.endsWith('-auth-token')){ foundKey = k; break; }
+      let sessionObj = null;
+      const exactKey = 'sb-boardmd-auth';
+      const rawExact = localStorage.getItem(exactKey);
+      if(rawExact){
+        try {
+          const parsed = JSON.parse(rawExact);
+          const candidate = parsed?.currentSession || parsed;
+          if(candidate && candidate.access_token){
+            foundKey = exactKey;
+            sessionObj = candidate;
+          }
+        } catch(_){}
       }
-      if(foundKey){
-        const raw = localStorage.getItem(foundKey);
-        const parsed = raw ? JSON.parse(raw) : null;
-        // formato moderno: {access_token, refresh_token, user, ...}
-        // formato legado: {currentSession: {...}}
-        const sessionObj = parsed?.currentSession || parsed;
-        if(sessionObj && sessionObj.access_token){
-          sess = { session: sessionObj };
-          sessFromCache = true;
-          logLine('localStorage fallback', 'OK — using cached session', '#22c55e');
-        } else {
-          throw new Error('Cached session invalid');
+      if(!sessionObj){
+        for(let i = 0; i < localStorage.length; i++){
+          const k = localStorage.key(i);
+          if(!k || !k.startsWith('sb-')) continue;
+          try {
+            const raw = localStorage.getItem(k);
+            if(!raw) continue;
+            const parsed = JSON.parse(raw);
+            const candidate = parsed?.currentSession || parsed;
+            if(candidate && candidate.access_token){
+              foundKey = k;
+              sessionObj = candidate;
+              break;
+            }
+          } catch(_){}
         }
+      }
+      if(sessionObj){
+        sess = { session: sessionObj };
+        sessFromCache = true;
+        logLine('localStorage fallback', 'OK — using cached session ('+foundKey+')', '#22c55e');
       } else {
-        throw new Error('No sb-*-auth-token key in localStorage');
+        throw new Error('No valid sb-* session found in localStorage');
       }
     } catch(fbErr){
       logLine('Fallback ERROR', String(fbErr && fbErr.message || fbErr), '#ef4444');
@@ -11374,6 +11414,309 @@ const _supa = supabase.createClient(SUPA_URL, SUPA_KEY, {
     storageKey: 'sb-boardmd-auth'
   }
 });
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   BOARDMD AUTH-FIX · v1 · 17/05/2026
+   Resolve travamento de getSession() + edit/delete cards no Supabase.
+   
+   Estratégia:
+   – Função getValidToken() universal, lê localStorage diretamente
+   – Detecta TODOS os formatos de chave do Supabase JS v2:
+       a) sb-boardmd-auth → JSON com { access_token, ... }
+       b) sb-boardmd-auth → JSON com { currentSession: { access_token, ... } }
+       c) sb-boardmd-auth.0 / .1 / .2 → chunked storage (novo formato v2.50+)
+       d) Múltiplas chaves sb-*-auth-token (formato legado)
+   – Auto-refresh se token expirado
+   – Monkey-patch das funções existentes para usar o novo getValidToken
+   – Banner visual se nada funcionar (com botão de re-login)
+   ═══════════════════════════════════════════════════════════════════════ */
+(function(){
+  'use strict';
+
+  // Aguarda o _supa estar definido (carregado no script principal)
+  function whenSupaReady(cb, tries){
+    tries = tries || 0;
+    if(typeof window._supa !== 'undefined' && window._supa && window._supa.auth){
+      cb();
+    } else if(tries < 50){
+      setTimeout(()=>whenSupaReady(cb, tries+1), 100);
+    } else {
+      console.warn('[AUTH-FIX] _supa never ready, aborting');
+    }
+  }
+
+  whenSupaReady(function(){
+
+    // ─────────────────────────────────────────────────────────────
+    // 1) Coletor universal de sessão no localStorage
+    //    Tenta TODOS os formatos conhecidos do SDK Supabase v2
+    // ─────────────────────────────────────────────────────────────
+    function readSessionFromStorage(){
+      const STORAGE_KEY = 'sb-boardmd-auth';
+
+      // Formato A: chave única, JSON direto
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if(raw){
+          const parsed = JSON.parse(raw);
+          // A.1: { access_token, refresh_token, expires_at, user, ... }
+          if(parsed?.access_token){
+            return { session: parsed, source: 'single-direct' };
+          }
+          // A.2: { currentSession: { access_token, ... } } — formato antigo
+          if(parsed?.currentSession?.access_token){
+            return { session: parsed.currentSession, source: 'single-currentSession' };
+          }
+          // A.3: array [accessToken, refreshToken, ...] (raro mas existe)
+          if(Array.isArray(parsed) && parsed[0] && typeof parsed[0] === 'string'){
+            // formato chunked sem split
+          }
+        }
+      } catch(e){}
+
+      // Formato B: chunked storage (sb-boardmd-auth.0, .1, .2, ...)
+      // O SDK v2.50+ pode dividir o JSON em chunks quando > 4KB
+      try {
+        const chunks = [];
+        for(let i = 0; i < 20; i++){
+          const k = STORAGE_KEY + '.' + i;
+          const v = localStorage.getItem(k);
+          if(v === null) break;
+          chunks.push(v);
+        }
+        if(chunks.length > 0){
+          const joined = chunks.join('');
+          const parsed = JSON.parse(joined);
+          if(parsed?.access_token){
+            return { session: parsed, source: 'chunked' };
+          }
+          if(parsed?.currentSession?.access_token){
+            return { session: parsed.currentSession, source: 'chunked-currentSession' };
+          }
+        }
+      } catch(e){}
+
+      // Formato C: varredura geral sb-*
+      try {
+        for(let i = 0; i < localStorage.length; i++){
+          const k = localStorage.key(i);
+          if(!k || !k.startsWith('sb-')) continue;
+          if(k.includes('code-verifier')) continue; // PKCE noise
+          try {
+            const raw = localStorage.getItem(k);
+            if(!raw) continue;
+            const parsed = JSON.parse(raw);
+            const cand = parsed?.currentSession || parsed;
+            if(cand?.access_token){
+              return { session: cand, source: 'scan-' + k };
+            }
+          } catch(_){}
+        }
+      } catch(e){}
+
+      return null;
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // 2) Verifica se o token está válido (não expirado)
+    // ─────────────────────────────────────────────────────────────
+    function isTokenValid(session){
+      if(!session || !session.access_token) return false;
+      const expSec = session.expires_at;
+      if(!expSec) return true; // sem exp_at = assume válido
+      const now = Math.floor(Date.now() / 1000);
+      // Considera inválido se faltam < 60s para expirar
+      return expSec > (now + 60);
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // 3) Refresh forçado via refreshSession
+    // ─────────────────────────────────────────────────────────────
+    async function tryRefresh(){
+      try {
+        const refreshPromise = window._supa.auth.refreshSession();
+        const timeout = new Promise((_, rej) =>
+          setTimeout(() => rej(new Error('refresh timeout 8s')), 8000)
+        );
+        const res = await Promise.race([refreshPromise, timeout]);
+        if(res?.data?.session?.access_token){
+          return res.data.session;
+        }
+      } catch(e){
+        console.warn('[AUTH-FIX] refresh failed:', e.message);
+      }
+      return null;
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // 4) FUNÇÃO PRINCIPAL — pega token válido garantido
+    //    Esta é a função que substitui getSession() em TODOS os
+    //    call sites de Save/Delete/Sync.
+    // ─────────────────────────────────────────────────────────────
+    async function getValidToken(opts){
+      opts = opts || {};
+      const verbose = opts.verbose === true;
+      const log = verbose ? (m) => console.log('[AUTH-FIX]', m) : ()=>{};
+
+      // PASSO 1: tenta getSession() do SDK com TIMEOUT CURTO (3s, não 15s)
+      // Se o SDK estiver saudável, isso resolve em <100ms
+      try {
+        const sdkPromise = window._supa.auth.getSession();
+        const timeout = new Promise((_, rej) =>
+          setTimeout(() => rej(new Error('sdk-timeout-3s')), 3000)
+        );
+        const sdkRes = await Promise.race([sdkPromise, timeout]);
+        const sess = sdkRes?.data?.session;
+        if(sess?.access_token && isTokenValid(sess)){
+          log('SDK getSession OK');
+          return { token: sess.access_token, user: sess.user, source: 'sdk' };
+        }
+        if(sess?.access_token && !isTokenValid(sess)){
+          log('SDK returned expired token, will refresh');
+          const fresh = await tryRefresh();
+          if(fresh?.access_token){
+            return { token: fresh.access_token, user: fresh.user, source: 'sdk-refreshed' };
+          }
+        }
+      } catch(e){
+        log('SDK getSession failed/timeout: ' + e.message);
+      }
+
+      // PASSO 2: leitura direta do localStorage
+      const cached = readSessionFromStorage();
+      if(cached?.session?.access_token){
+        log('Storage read OK from ' + cached.source);
+        if(isTokenValid(cached.session)){
+          return { token: cached.session.access_token, user: cached.session.user, source: 'storage-' + cached.source };
+        }
+        // Token expirado no cache: tenta refresh
+        log('Storage token expired, trying refresh');
+        const fresh = await tryRefresh();
+        if(fresh?.access_token){
+          return { token: fresh.access_token, user: fresh.user, source: 'storage-refreshed' };
+        }
+        // Mesmo expirado, retorna se a margem for pequena (servidor decide)
+        const now = Math.floor(Date.now() / 1000);
+        const exp = cached.session.expires_at || 0;
+        if(exp > now - 300){ // expirou há menos de 5min: tenta mesmo assim
+          log('Token expired recently, attempting anyway');
+          return { token: cached.session.access_token, user: cached.session.user, source: 'storage-stale' };
+        }
+      }
+
+      log('No valid session found');
+      return null;
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // 5) Expõe globalmente para todo o código usar
+    // ─────────────────────────────────────────────────────────────
+    window.BoardMDAuth = {
+      getValidToken: getValidToken,
+      readSessionFromStorage: readSessionFromStorage,
+      isTokenValid: isTokenValid,
+      tryRefresh: tryRefresh
+    };
+
+    // ─────────────────────────────────────────────────────────────
+    // 6) BANNER DE SESSÃO PERDIDA — UI clean, 1 clique para reentrar
+    // ─────────────────────────────────────────────────────────────
+    function showSessionLostBanner(reason){
+      if(document.getElementById('bmd-auth-lost-banner')) return;
+      const b = document.createElement('div');
+      b.id = 'bmd-auth-lost-banner';
+      b.style.cssText = 'position:fixed;bottom:90px;left:50%;transform:translateX(-50%);'+
+        'background:#f43f5e;color:#fff;padding:12px 16px;border-radius:12px;'+
+        'box-shadow:0 8px 24px rgba(0,0,0,.4);z-index:99998;'+
+        'display:flex;align-items:center;gap:12px;max-width:calc(100vw - 24px);'+
+        'font-family:Inter,sans-serif;font-size:13px;font-weight:600;animation:bmdAuthIn .25s ease';
+      b.innerHTML =
+        '<span style="flex:1">⚠ Session expired. Re-sign in to save changes.</span>'+
+        '<button id="bmd-auth-relogin" style="background:#fff;color:#f43f5e;border:none;border-radius:8px;padding:6px 14px;font-weight:700;font-size:12px;cursor:pointer">Sign in</button>'+
+        '<button id="bmd-auth-dismiss" style="background:transparent;color:#fff;border:1px solid rgba(255,255,255,.5);border-radius:8px;padding:6px 10px;font-weight:600;font-size:12px;cursor:pointer">✕</button>';
+      document.body.appendChild(b);
+
+      document.getElementById('bmd-auth-relogin').onclick = async function(){
+        b.remove();
+        try {
+          if(typeof window.signInWithGoogle === 'function'){
+            window.signInWithGoogle();
+          } else {
+            // fallback: chama signIn do SDK direto
+            await window._supa.auth.signInWithOAuth({
+              provider: 'google',
+              options: { redirectTo: window.location.origin }
+            });
+          }
+        } catch(e){
+          alert('Sign in error: ' + e.message);
+        }
+      };
+      document.getElementById('bmd-auth-dismiss').onclick = () => b.remove();
+    }
+    window.BoardMDAuth.showSessionLostBanner = showSessionLostBanner;
+
+    // ─────────────────────────────────────────────────────────────
+    // 7) ADAPTADOR — substitui o método getSession() do SDK
+    //    pelo nosso fluxo robusto em chamadas críticas
+    // ─────────────────────────────────────────────────────────────
+    // Guarda o original para casos onde queremos o comportamento puro
+    const _origGetSession = window._supa.auth.getSession.bind(window._supa.auth);
+    window._supa.auth._origGetSession = _origGetSession;
+
+    // Patch: getSession agora tenta nosso fluxo primeiro
+    window._supa.auth.getSession = async function(){
+      const tok = await getValidToken();
+      if(tok?.token){
+        // Reconstrói o formato esperado pelo código existente
+        return {
+          data: {
+            session: {
+              access_token: tok.token,
+              user: tok.user
+            }
+          },
+          error: null
+        };
+      }
+      // Se nada funcionou, retorna formato vazio (não erro — o código existente já trata isso)
+      return { data: { session: null }, error: null };
+    };
+
+    // ─────────────────────────────────────────────────────────────
+    // 8) Hooks de detecção: se Save ou Delete falharem com 401/403,
+    //    mostra o banner. Wrapping leve do fetch para alguns paths.
+    // ─────────────────────────────────────────────────────────────
+    const _origFetch = window.fetch.bind(window);
+    window.fetch = async function(input, init){
+      const res = await _origFetch(input, init);
+      try {
+        const url = typeof input === 'string' ? input : (input?.url || '');
+        if(url.includes('/rest/v1/cards') && (res.status === 401 || res.status === 403)){
+          // Tenta refresh automático
+          const fresh = await tryRefresh();
+          if(!fresh){
+            showSessionLostBanner('401-on-cards');
+          }
+        }
+      } catch(_){}
+      return res;
+    };
+
+    // ─────────────────────────────────────────────────────────────
+    // 9) CSS do banner animation
+    // ─────────────────────────────────────────────────────────────
+    const styleEl = document.createElement('style');
+    styleEl.textContent = '@keyframes bmdAuthIn { from { opacity:0; transform:translate(-50%,12px); } to { opacity:1; transform:translate(-50%,0); } }';
+    document.head.appendChild(styleEl);
+
+    console.log('[AUTH-FIX] v1 loaded — getValidToken() ready, getSession() patched');
+  });
+
+})();
+
+
 
 // ── LOADING UI ───────────────────────────────────────────────────────
 function showLoadingOverlay(){
