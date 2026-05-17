@@ -12875,7 +12875,7 @@ ${ctx}
 
 Generate ONE variant vignette with the SAME core diagnosis but with elements that CHANGE to test true mastery. Make it harder than the original by SHIFTING surface features while preserving the underlying pathophysiology.
 
-VARIATION STRATEGIES (use 2-3 of these in the new vignette):
+VARIATION STRATEGIES (use 2-3 in the new vignette):
 - Atypical demographic (elderly when usually young, or vice versa — when clinically plausible)
 - Classic exam findings ABSENT (e.g., negative Kernig in bacterial meningitis)
 - Comorbidity that confounds reasoning (diabetes, immunosuppression, pregnancy)
@@ -12883,33 +12883,16 @@ VARIATION STRATEGIES (use 2-3 of these in the new vignette):
 - Subtle presentation (oligosymptomatic, indolent course)
 - Different setting (outpatient vs ER, postpartum vs nonpregnant, ICU vs ward)
 
-CRITICAL RULES:
+REQUIREMENTS:
 - The DIAGNOSIS must remain the same as the original card.
 - The answer must still be derivable from the new vignette — no impossible cases.
-- Length: 4-7 lines of clinical vignette.
-- Include vitals, key labs/imaging when relevant.
-- Generate 4 plausible answer options. Mark which is correct.
+- Stem: 4-7 lines of clinical content, with vitals and key labs/imaging when relevant.
+- 4 plausible options. Vary the correct answer letter (don't always make it A).
+- Include explanation for correct answer + why each distractor is wrong.
 
-Write EXACTLY this structure (no markdown, use these EXACT headers in caps):
+Return ONLY valid JSON, no markdown, no extra text:
+{"questions":[{"facet":"Mock Me — Variant Vignette","stem":"[4-7 line clinical vignette with changed surface features]","options":["A. [option text]","B. [option text]","C. [option text]","D. [option text]"],"correct":"[A/B/C/D]","explanation":"[2-3 sentences explaining why the correct answer is right AND what makes this variant harder than the original — what surface feature did you change, and what pattern-shortcut would fail here]","distractors":{"A":"[why wrong, ≤30 words]","B":"[why wrong, ≤30 words]","C":"[why wrong, ≤30 words]","D":"[why wrong, ≤30 words]"},"keypoint":"[≤15 word 260+ mastery pearl — the discriminator that survives across all variants of this disease]"}]}
 
-NEW VIGNETTE
-[4-7 line clinical vignette here]
-
-WHAT IS THE DIAGNOSIS?
-A. [option text]
-B. [option text]
-C. [option text]
-D. [option text]
-
-CORRECT ANSWER: [letter and full text]
-
-WHY THIS IS HARDER
-2-3 sentences. What did you CHANGE from the original? Why is this variant harder to recognize? What pattern shortcut from the original would FAIL here?
-
-260+ MASTERY CHECK
-1 sentence. If the student gets this variant right, they have mastery (not just memorization). If they miss it, they pattern-matched the original.
-
-At the very end, write:
 PUBMED_QUERY: [6-8 specific medical terms for this topic]`,
 
     predict: `You are a USMLE Step 2 CK examiner. The student is about to see the answer options for this question, but FIRST you are going to train their meta-skill: predicting the NBME trap.
@@ -13015,7 +12998,8 @@ PUBMED_QUERY: [6-8 specific medical terms for this topic]`,
     }
 
     // MCQ interativo — parse JSON e renderiza com botões
-    if(type === 'mcq'){
+    // 2026-05-16: 'mock' usa o mesmo render pipeline (1 questão clicável)
+    if(type === 'mcq' || type === 'mock'){
       try {
         const data = extractJSON(responseText);
         if (!data || !data.questions) throw new Error('Could not extract MCQ JSON');
