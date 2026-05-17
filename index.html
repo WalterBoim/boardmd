@@ -10352,23 +10352,47 @@ async function runDeleteDiagnostic(){
   sep();
 
   // 1) Sessão
-  add('Step', 'Calling _supa.auth.getSession() with 5s timeout...');
+  add('Step', 'Calling _supa.auth.getSession() with 15s timeout...');
   let sess = null;
+  let sessFromCache = false;
   // Helper: race the promise with a timeout so we never hang
   const withTimeout = (p, ms, label) => Promise.race([
     p,
     new Promise((_, rej) => setTimeout(() => rej(new Error('TIMEOUT after '+ms+'ms ('+label+')')), ms))
   ]);
   try {
-    const result = await withTimeout(_supa.auth.getSession(), 5000, 'getSession');
+    const result = await withTimeout(_supa.auth.getSession(), 15000, 'getSession');
     const { data, error } = result || {};
-    if(error){ add('getSession ERROR', error.message, '#ef4444'); return; }
+    if(error){ throw error; }
     sess = data;
     add('getSession', 'OK', '#22c55e');
   } catch(e){
-    add('getSession exception', String(e && e.message || e), '#ef4444');
-    add('Hint', 'If TIMEOUT: Supabase client is hanging. Try a hard reload or check network tab.', '#f59e0b');
-    return;
+    add('getSession WARN', String(e && e.message || e) + ' — trying localStorage fallback', '#f59e0b');
+    try {
+      let foundKey = null;
+      for(let i = 0; i < localStorage.length; i++){
+        const k = localStorage.key(i);
+        if(k && k.startsWith('sb-') && k.endsWith('-auth-token')){ foundKey = k; break; }
+      }
+      if(foundKey){
+        const raw = localStorage.getItem(foundKey);
+        const parsed = raw ? JSON.parse(raw) : null;
+        const sessionObj = parsed?.currentSession || parsed;
+        if(sessionObj && sessionObj.access_token){
+          sess = { session: sessionObj };
+          sessFromCache = true;
+          add('localStorage fallback', 'OK — using cached session', '#22c55e');
+        } else {
+          throw new Error('Cached session invalid');
+        }
+      } else {
+        throw new Error('No sb-*-auth-token key in localStorage');
+      }
+    } catch(fbErr){
+      add('Fallback ERROR', String(fbErr && fbErr.message || fbErr), '#ef4444');
+      add('Hint', 'Sign out and sign back in to refresh session', '#f59e0b');
+      return;
+    }
   }
 
   const uid = sess?.session?.user?.id;
@@ -10616,18 +10640,46 @@ async function deleteCurrentCard(){
   logLine('Supabase', 'client OK', '#22c55e');
   logLine('SUPA_URL', SUPA_URL);
 
-  // 5) Pega sessão (com timeout)
+  // 5) Pega sessão (com timeout) — com fallback pro localStorage se travar
   let sess = null;
+  let sessFromCache = false;
   try {
-    logLine('Step', 'getSession() with 5s timeout...');
-    const res = await withTimeout(_supa.auth.getSession(), 5000, 'getSession');
+    logLine('Step', 'getSession() with 15s timeout...');
+    const res = await withTimeout(_supa.auth.getSession(), 15000, 'getSession');
     if(res.error){ throw res.error; }
     sess = res.data;
     logLine('getSession', 'OK', '#22c55e');
   } catch(e){
-    logLine('getSession ERROR', String(e && e.message || e), '#ef4444');
-    setActions(copyLogButton()+closeButton());
-    return;
+    logLine('getSession WARN', String(e && e.message || e) + ' — trying localStorage fallback', '#f59e0b');
+    // FALLBACK: lê sessão direto do localStorage (formato padrão do Supabase JS)
+    try {
+      let foundKey = null;
+      for(let i = 0; i < localStorage.length; i++){
+        const k = localStorage.key(i);
+        if(k && k.startsWith('sb-') && k.endsWith('-auth-token')){ foundKey = k; break; }
+      }
+      if(foundKey){
+        const raw = localStorage.getItem(foundKey);
+        const parsed = raw ? JSON.parse(raw) : null;
+        // formato moderno: {access_token, refresh_token, user, ...}
+        // formato legado: {currentSession: {...}}
+        const sessionObj = parsed?.currentSession || parsed;
+        if(sessionObj && sessionObj.access_token){
+          sess = { session: sessionObj };
+          sessFromCache = true;
+          logLine('localStorage fallback', 'OK — using cached session', '#22c55e');
+        } else {
+          throw new Error('Cached session invalid');
+        }
+      } else {
+        throw new Error('No sb-*-auth-token key in localStorage');
+      }
+    } catch(fbErr){
+      logLine('Fallback ERROR', String(fbErr && fbErr.message || fbErr), '#ef4444');
+      logLine('FIX', 'Sign out and sign back in to refresh session', '#f59e0b');
+      setActions(copyLogButton()+closeButton());
+      return;
+    }
   }
 
   let uid = sess?.session?.user?.id;
@@ -10642,19 +10694,23 @@ async function deleteCurrentCard(){
     return;
   }
 
-  // 6) Refresh do token (tenta, sem bloquear se falhar)
-  try {
-    logLine('Step', 'refreshSession() with 5s timeout...');
-    const refRes = await withTimeout(_supa.auth.refreshSession(), 5000, 'refreshSession');
-    if(refRes.error){
-      logLine('refreshSession WARN', refRes.error.message||refRes.error, '#f59e0b');
-    } else if(refRes.data?.session){
-      token = refRes.data.session.access_token || token;
-      uid = refRes.data.session.user?.id || uid;
-      logLine('refreshSession', 'OK, new token', '#22c55e');
+  // 6) Refresh do token (tenta, sem bloquear se falhar — pula se já está no fallback)
+  if(!sessFromCache) {
+    try {
+      logLine('Step', 'refreshSession() with 15s timeout...');
+      const refRes = await withTimeout(_supa.auth.refreshSession(), 15000, 'refreshSession');
+      if(refRes.error){
+        logLine('refreshSession WARN', refRes.error.message||refRes.error, '#f59e0b');
+      } else if(refRes.data?.session){
+        token = refRes.data.session.access_token || token;
+        uid = refRes.data.session.user?.id || uid;
+        logLine('refreshSession', 'OK, new token', '#22c55e');
+      }
+    } catch(e){
+      logLine('refreshSession WARN', String(e && e.message || e), '#f59e0b');
     }
-  } catch(e){
-    logLine('refreshSession WARN', String(e && e.message || e), '#f59e0b');
+  } else {
+    logLine('refreshSession', 'SKIPPED (using cached session)', '#f59e0b');
   }
   logSep();
 
