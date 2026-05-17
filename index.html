@@ -12868,32 +12868,57 @@ If REFERENCES are provided above, cite them inline using superscript ¹ ² ³. N
 
 At the very end, write:
 PUBMED_QUERY: [6-8 specific medical terms for PubMed search relevant to distinguishing ${card.c} from ${userChoiceText}]`,
-    mock: `You are a USMLE Step 2 CK examiner who writes NBME-grade question variants. The student already saw this card and wants to test if they REALLY know the diagnosis — not just the original vignette pattern.
+    mock: `You are a USMLE Step 2 CK examiner who designs Mock Me variants that force TRUE mastery. The student has already aced this card. Now you write a vignette that EXPOSES whether they understand the discriminators — or just pattern-matched the original.
 
 ORIGINAL CARD:
 ${ctx}
 
-Generate ONE variant vignette with the SAME core diagnosis but with elements that CHANGE to test true mastery. Make it harder than the original by SHIFTING surface features while preserving the underlying pathophysiology.
+═══════════════════════════════════════════════════════════════════════
+THE MOCK ME STRATEGY (READ THIS CAREFULLY)
+═══════════════════════════════════════════════════════════════════════
 
-VARIATION STRATEGIES (use 2-3 in the new vignette):
-- Atypical demographic (elderly when usually young, or vice versa — when clinically plausible)
-- Classic exam findings ABSENT (e.g., negative Kernig in bacterial meningitis)
-- Comorbidity that confounds reasoning (diabetes, immunosuppression, pregnancy)
-- Atypical lab/imaging values that are still diagnostic
-- Subtle presentation (oligosymptomatic, indolent course)
-- Different setting (outpatient vs ER, postpartum vs nonpregnant, ICU vs ward)
+Do NOT generate a vignette where the SAME diagnosis ("${card.c}") is the answer with cosmetic changes. That is useless repetition.
 
-REQUIREMENTS:
-- The DIAGNOSIS must remain the same as the original card.
-- The answer must still be derivable from the new vignette — no impossible cases.
-- Stem: 4-7 lines of clinical content, with vitals and key labs/imaging when relevant.
-- 4 plausible options. Vary the correct answer letter (don't always make it A).
-- Include explanation for correct answer + why each distractor is wrong.
+Instead: PROMOTE the strongest distractor (one of the WRONG options from the original card) to be the NEW CORRECT ANSWER. Demote "${card.c}" (the original correct answer) to the most tempting trap in the new vignette.
 
-Return ONLY valid JSON, no markdown, no extra text:
-{"questions":[{"facet":"Mock Me — Variant Vignette","stem":"[4-7 line clinical vignette with changed surface features]","options":["A. [option text]","B. [option text]","C. [option text]","D. [option text]"],"correct":"[A/B/C/D]","explanation":"[2-3 sentences explaining why the correct answer is right AND what makes this variant harder than the original — what surface feature did you change, and what pattern-shortcut would fail here]","distractors":{"A":"[why wrong, ≤30 words]","B":"[why wrong, ≤30 words]","C":"[why wrong, ≤30 words]","D":"[why wrong, ≤30 words]"},"keypoint":"[≤15 word 260+ mastery pearl — the discriminator that survives across all variants of this disease]"}]}
+Why this trains 260+: it forces the student to identify the discriminator between two COGNITIVE NEIGHBORS — the original correct answer and its closest mimic. This is the exam-day skill that separates 240 from 260+.
 
-PUBMED_QUERY: [6-8 specific medical terms for this topic]`,
+═══════════════════════════════════════════════════════════════════════
+HOW TO PICK THE STRONGEST DISTRACTOR
+═══════════════════════════════════════════════════════════════════════
+
+From the 3 wrong options in the original card, pick the one that is:
+- Pathophysiologically CLOSE to "${card.c}" (similar mechanism, organ system, or presentation)
+- The "cognitive neighbor" — what a student would consider second
+- NOT obviously wrong (avoid options that are clearly different organ systems)
+
+If two seem equally close, pick the one with more shared clinical features with "${card.c}".
+
+═══════════════════════════════════════════════════════════════════════
+HOW TO WRITE THE NEW VIGNETTE
+═══════════════════════════════════════════════════════════════════════
+
+1. The SAME clinical SCENARIO TYPE (similar age/setting/chief complaint) as original — to preserve cognitive overlap
+2. CHANGE the discriminating findings so the strongest distractor is now correct
+3. KEEP enough surface features from "${card.c}" to make it the tempting trap
+4. The new vignette must include the EXACT discriminator that separates the two diagnoses — this is where the student must focus
+
+═══════════════════════════════════════════════════════════════════════
+NEW OPTIONS STRUCTURE
+═══════════════════════════════════════════════════════════════════════
+
+- Correct answer = the promoted strongest distractor from original card
+- Most tempting trap = "${card.c}" (the original correct answer, now wrong)
+- Other 2 options = the 2 remaining distractors from original card (or replace with new plausible ones)
+- VARY which letter (A/B/C/D) is correct — don't always make it A
+
+═══════════════════════════════════════════════════════════════════════
+OUTPUT FORMAT (STRICT JSON, NO MARKDOWN)
+═══════════════════════════════════════════════════════════════════════
+
+{"questions":[{"facet":"Mock Me — Cognitive Neighbor","stem":"[4-7 line clinical vignette where the strongest distractor from the original is now correct]","options":["A. [option text]","B. [option text]","C. [option text]","D. [option text]"],"correct":"[A/B/C/D]","explanation":"[3-4 sentences explaining: (1) WHY this is now the correct answer in this vignette, (2) WHAT specific finding rerouted it from the original answer, (3) THE DISCRIMINATOR — the clinical detail that separates the original answer from this cognitive neighbor]","distractors":{"A":"[why wrong, ≤30 words]","B":"[why wrong, ≤30 words]","C":"[why wrong, ≤30 words]","D":"[why wrong, ≤30 words]"},"keypoint":"[≤20 words: the discriminator that always separates these two cognitive neighbors — the 260+ pearl]"}]}
+
+PUBMED_QUERY: [6-8 specific medical terms for distinguishing the original correct answer from the promoted distractor]`,
 
     predict: `You are a USMLE Step 2 CK examiner. The student is about to see the answer options for this question, but FIRST you are going to train their meta-skill: predicting the NBME trap.
 
@@ -12940,7 +12965,7 @@ PUBMED_QUERY: [6-8 specific medical terms for this topic]`,
     why:'Why This Answer', explain:'Deeper Explanation',
     mcq:'Practice Questions', surprise:'Clinical Pearl',
     wrong:'Why I Was Wrong', custom:'Your Question', translate:'Tradução PT-BR', compare:'Lens',
-    mock:'Mock Me — Variant Vignette', predict:'Predict the Distractor'
+    mock:'Mock Me — Cognitive Neighbor', predict:'Predict the Distractor'
   };
 
   try {
