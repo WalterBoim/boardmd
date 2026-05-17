@@ -16120,6 +16120,12 @@ html:not(.light) .hl-btn-active { border-color:#fff!important; }
       <button id="sf-tab-s2" onclick="setSFTab('s2')" style="flex:1;padding:8px 10px;border-radius:10px;border:1.5px solid var(--border2);background:var(--surface2);font-size:12px;font-weight:700;color:var(--muted);font-family:'Inter',sans-serif;cursor:pointer;transition:all .15s;">Step 2 CK</button>
     </div>
 
+    <!-- 2026-05-16: Deck chip row — só aparece quando Step 2 CK está ativo -->
+    <div id="sf-deck-row" style="display:none;margin-bottom:14px;">
+      <div style="font-size:10px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:8px;font-family:'Inter',sans-serif;">Decks to study from</div>
+      <div id="sf-deck-chips" style="display:flex;flex-wrap:wrap;gap:8px;"></div>
+    </div>
+
     <!-- Chip containers -->
     <div id="sf-chips-s1" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px;"></div>
     <div id="sf-chips-s2" style="display:none;flex-wrap:wrap;gap:8px;margin-bottom:20px;"></div>
@@ -16149,6 +16155,12 @@ html:not(.light) .hl-btn-active { border-color:#fff!important; }
     <div style="display:flex;gap:6px;margin-bottom:16px;">
       <button id="df-tab-s1" onclick="setDFTab('s1')" style="flex:1;padding:8px 10px;border-radius:10px;border:1.5px solid #f59e0b;background:rgba(245,158,11,.15);font-size:12px;font-weight:700;color:#f59e0b;font-family:'Inter',sans-serif;cursor:pointer;transition:all .15s;">Step 1</button>
       <button id="df-tab-s2" onclick="setDFTab('s2')" style="flex:1;padding:8px 10px;border-radius:10px;border:1.5px solid var(--border2);background:var(--surface2);font-size:12px;font-weight:700;color:var(--muted);font-family:'Inter',sans-serif;cursor:pointer;transition:all .15s;">Step 2 CK</button>
+    </div>
+
+    <!-- 2026-05-16: Deck chip row — só aparece quando Step 2 CK está ativo -->
+    <div id="df-deck-row" style="display:none;margin-bottom:14px;">
+      <div style="font-size:10px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:8px;font-family:'Inter',sans-serif;">Decks to study from</div>
+      <div id="df-deck-chips" style="display:flex;flex-wrap:wrap;gap:8px;"></div>
     </div>
 
     <!-- Chip containers -->
@@ -16801,6 +16813,10 @@ function setSFTab(step) {
   _sfTab = step;
   document.getElementById('sf-chips-s1').style.display = step === 's1' ? 'flex' : 'none';
   document.getElementById('sf-chips-s2').style.display = step === 's2' ? 'flex' : 'none';
+  // 2026-05-16: Deck row visible only on Step 2 CK tab
+  var sfDeckRow = document.getElementById('sf-deck-row');
+  if(sfDeckRow) sfDeckRow.style.display = step === 's2' ? 'block' : 'none';
+  if(step === 's2' && typeof _buildDeckChips === 'function') _buildDeckChips('sf');
   var t1 = document.getElementById('sf-tab-s1');
   var t2 = document.getElementById('sf-tab-s2');
   if(step === 's1') {
@@ -16828,6 +16844,8 @@ function studySystemFilter() {
   }
   var allCards = Object.values(window.DECKS||{}).reduce(function(a,b){return a.concat(b);},[]);
   var pool = allCards.filter(function(c) {
+    // 2026-05-16: deck filter aplica em Step 2 CK
+    if(_sfTab === 's2' && typeof _cardInSelectedDecks === 'function' && !_cardInSelectedDecks(c)) return false;
     var fieldVal = ((c.system||'')+'').toLowerCase().trim();
     if(!fieldVal) return false;
     return sel.some(function(s) {
@@ -16836,12 +16854,12 @@ function studySystemFilter() {
     });
   });
   if(pool.length === 0) {
-    document.getElementById('sf-status').textContent = 'No cards found for selected systems';
+    document.getElementById('sf-status').textContent = 'No cards found for selected systems/decks';
     return;
   }
   closeSystemFilter();
   pool.sort(function(){return Math.random()-.5;});
-  showToast(pool.length + ' cards found — ' + sel.join(', '));
+  showToast(pool.length + ' cards found - ' + sel.join(', '));
   currentDeck = '_search';
   deck = pool;
   againQueue = []; idx = 0; revealed = false; sessionRatings = {};
@@ -16927,6 +16945,10 @@ function setDFTab(step) {
   _dfTab = step;
   document.getElementById('df-chips-s1').style.display = step === 's1' ? 'flex' : 'none';
   document.getElementById('df-chips-s2').style.display = step === 's2' ? 'flex' : 'none';
+  // 2026-05-16: Deck row visible only on Step 2 CK tab
+  var dfDeckRow = document.getElementById('df-deck-row');
+  if(dfDeckRow) dfDeckRow.style.display = step === 's2' ? 'block' : 'none';
+  if(step === 's2' && typeof _buildDeckChips === 'function') _buildDeckChips('df');
   var t1 = document.getElementById('df-tab-s1');
   var t2 = document.getElementById('df-tab-s2');
   if(step === 's1') {
@@ -16954,6 +16976,8 @@ function studyDisciplineFilter() {
   }
   var allCards = Object.values(window.DECKS||{}).reduce(function(a,b){return a.concat(b);},[]);
   var pool = allCards.filter(function(c) {
+    // 2026-05-16: deck filter aplica em Step 2 CK
+    if(_dfTab === 's2' && typeof _cardInSelectedDecks === 'function' && !_cardInSelectedDecks(c)) return false;
     var fieldVal = ((c.subject||c.discipline||'')+'').toLowerCase().trim();
     if(!fieldVal) return false;
     return sel.some(function(d) {
@@ -16962,12 +16986,12 @@ function studyDisciplineFilter() {
     });
   });
   if(pool.length === 0) {
-    document.getElementById('df-status').textContent = 'No cards found for selected disciplines';
+    document.getElementById('df-status').textContent = 'No cards found for selected disciplines/decks';
     return;
   }
   closeDisciplineFilter();
   pool.sort(function(){return Math.random()-.5;});
-  showToast(pool.length + ' cards found — ' + sel.join(', '));
+  showToast(pool.length + ' cards found - ' + sel.join(', '));
   currentDeck = '_search';
   deck = pool;
   againQueue = []; idx = 0; revealed = false; sessionRatings = {};
