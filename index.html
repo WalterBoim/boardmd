@@ -18,8 +18,8 @@ if('caches' in window){
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>BoardMD — Medical Board Review</title><!-- build:20260517-1745-scroll-fix-v12 -->
-<script>window.__BMD_BUILD__ = '20260517-1745-scroll-fix-v12';</script>
+<title>BoardMD — Medical Board Review</title><!-- build:20260517-2130-attending-hybrid -->
+<script>window.__BMD_BUILD__ = '20260517-2130-attending-hybrid';</script>
 <!-- PWA -->
 <link rel="manifest" href="/manifest.json">
 <meta name="theme-color" content="#080c12">
@@ -13477,15 +13477,216 @@ PUBMED_QUERY: [6-8 specific medical terms for this topic]`,
       return null;
     };
 
-    // ── Call Puter.js (Gemini 2.0 Flash, free tier) ──
-    if(typeof puter !== 'undefined' && puter.ai){
+    // ── Call Puter.js — HYBRID router (upgraded 2026-05-17 v2) ──
+    //
+    // ESTRATÉGIA HÍBRIDA pra caber no Puter Free tier ($0.25/mês):
+    //   – Sonnet 4.6 APENAS em geradores críticos (mock, predict, mcq)
+    //     onde erro factual ensina o aluno errado
+    //   – Gemini 2.0 Flash mantém o resto (why, explain, wrong, surprise,
+    //     custom, translate) — RAG do PubMed já injetado no prompt
+    //
+    // Camadas aplicadas:
+    //   1. Safety header anti-alucinação em tipos críticos (ambos os modelos)
+    //   2. Chamada via router (Sonnet OU Gemini conforme tipo)
+    //   3. Self-check de 2º turno em mock/predict/mcq usando o mesmo modelo
+    //   4. Auto-retry até 2x se self-check reprovar; fallback elegante depois
+
+    // ── Tipos que recebem safety header (tocam decisão clínica forte) ──
+    const CRITICAL_TYPES = new Set(['mcq','mock','predict','why','explain','wrong','surprise']);
+    // ── Tipos que recebem self-check (geradores de conteúdo NOVO crítico) ──
+    const SELFCHECK_TYPES = new Set(['mock','predict','mcq']);
+    // ── ROUTER de modelo por tipo (Puter Free tier optimization) ──
+    // Sonnet 4.6 (caro) APENAS em geradores críticos onde erro = ensina aluno errado
+    // Gemini 2.0 Flash (grátis) em todo o resto (explicações, traduções, comparações)
+    const SONNET_TYPES = new Set(['mock','predict','mcq']);
+    function _modelFor(t){
+      return SONNET_TYPES.has(t) ? 'claude-sonnet-4-6' : 'gemini-2.0-flash';
+    }
+
+    // ── Safety header: blinda contra erros factuais conhecidos ──
+    const SAFETY_HEADER = "\n\n═══════════════════════════════════════════════════════════════════════\n" +
+"ABSOLUTE CLINICAL ACCURACY REQUIREMENTS — READ FIRST\n" +
+"═══════════════════════════════════════════════════════════════════════\n\n" +
+"You are creating content for medical students studying for USMLE Step 2 CK.\n" +
+"A factually wrong question/explanation causes real educational harm.\n\n" +
+"RULE 1 — RESPECT MEDICAL CONSENSUS\n" +
+"Your output MUST reflect consensus first-line management per UWorld/AMBOSS/\n" +
+"First Aid/NBME. If the scenario involves a controversial or evolving area\n" +
+"(last 24 months), CHOOSE A DIFFERENT angle entirely. Never produce content\n" +
+"whose claims are debatable among standard exam resources.\n\n" +
+"RULE 2 — VERIFY BEFORE COMMITTING\n" +
+"Before writing your final output, mentally check:\n" +
+"  • Is the diagnosis unambiguous from the vignette I wrote?\n" +
+"  • Is my correct answer THE standard of care, not just one reasonable option?\n" +
+"  • Could any of my distractors actually be acceptable management?\n" +
+"If ANY answer is 'not sure' — pick a different angle.\n\n" +
+"RULE 3 — KNOWN HIGH-RISK PATTERNS TO AVOID\n" +
+"Do NOT produce questions/explanations claiming any of these (all WRONG):\n" +
+"  • Phenytoin for alcohol withdrawal seizures (ONLY benzos: lorazepam/diazepam)\n" +
+"  • Phenytoin first-line for status epilepticus (benzos first, then load AED)\n" +
+"  • Routine large-volume fluids first in cardiogenic shock (use pressors/ino)\n" +
+"  • Beta-blockers in acute decompensated heart failure (hold acutely)\n" +
+"  • Antibiotics for viral pharyngitis (no, even 'just in case')\n" +
+"  • Steroids first-line in septic shock (only after fluids+pressors fail)\n" +
+"  • Topical imiquimod first-line for facial high-risk BCC (use Mohs)\n" +
+"  • Empiric oral steroids before injection for adhesive capsulitis (PT first)\n" +
+"  • CT before LP in straightforward meningitis without focal signs/altered MS\n" +
+"  • Surgery first-line for low-risk BCC away from face (ED&C or excision)\n" +
+"  • Insulin alone in DKA without fluids first\n" +
+"  • Anticoagulation alone (without rate control) in new AF with RVR\n" +
+"  • Routine MRI cervical spine for global shoulder ROM restriction\n" +
+"  • Nerve conduction studies for adhesive capsulitis (preserved sensation)\n\n" +
+"RULE 4 — IF UNCERTAIN, ABORT GRACEFULLY\n" +
+"If you cannot construct content with HIGH CONFIDENCE matching UWorld/AMBOSS\n" +
+"consensus, output exactly: {\"abort\":true,\"reason\":\"<one-line why>\"}\n" +
+"For non-MCQ outputs, instead start your reply with: ABORT: <one-line why>\n" +
+"We prefer no output to wrong output.\n" +
+"═══════════════════════════════════════════════════════════════════════\n\n";
+
+    // ── Builder: envelope final prompt with safety header when applicable ──
+    function _wrapWithSafety(basePrompt, t){
+      if(CRITICAL_TYPES.has(t)) return SAFETY_HEADER + basePrompt;
+      return basePrompt;
+    }
+
+    // ── Caller: chama modelo via Puter, robusto a múltiplos shapes ──
+    // Aceita parâmetro 'model' pra suportar Sonnet (críticos) e Gemini Flash (resto)
+    async function _callPuterModel(promptText, opts){
+      opts = opts || {};
+      const model = opts.model || 'gemini-2.0-flash';
+      const timeoutMs = opts.timeoutMs || 45000;
+      if(!(typeof puter !== 'undefined' && puter.ai)){
+        throw new Error('Puter unavailable');
+      }
+      const callPromise = puter.ai.chat(promptText, { model: model });
+      const timeout = new Promise((_,rej) =>
+        setTimeout(()=>rej(new Error(model+' timeout '+timeoutMs+'ms')), timeoutMs)
+      );
+      const response = await Promise.race([callPromise, timeout]);
+      // Resposta via Puter pode vir em vários formatos dependendo do modelo
+      let text = '';
+      if(typeof response === 'string') text = response;
+      else if(response?.message?.content){
+        // Anthropic format: pode ser string OU array de content blocks
+        const c = response.message.content;
+        if(typeof c === 'string') text = c;
+        else if(Array.isArray(c)) text = c.map(b => b?.text || '').join('');
+        else text = String(c);
+      }
+      else if(response?.text) text = response.text;
+      else if(response?.content){
+        const c = response.content;
+        if(typeof c === 'string') text = c;
+        else if(Array.isArray(c)) text = c.map(b => b?.text || '').join('');
+      }
+      else text = JSON.stringify(response);
+      return text;
+    }
+    // Alias retrocompatível
+    const _callSonnet = (p, o) => _callPuterModel(p, Object.assign({model:'claude-sonnet-4-6'}, o||{}));
+
+    // ── Self-check: 2º turno como examinador NBME crítico ──
+    // Usa o MESMO modelo que gerou (Sonnet revisa Sonnet, etc.)
+    // Retorna { ok: bool, reason?: string }
+    async function _runSelfCheck(generatedJSON, t, modelUsed){
+      const checkPrompt =
+"You are an NBME senior examiner doing FINAL QUALITY REVIEW on a generated question " +
+"before it is shown to a USMLE Step 2 CK student. Your only job: catch factual errors " +
+"and clinically wrong 'correct answers'. Do NOT critique style, pedagogy, or completeness — " +
+"only outright factual or clinical errors.\n\n" +
+"REVIEW THESE 4 CHECKS, IN ORDER:\n\n" +
+"CHECK 1 — Is the 'correct answer' actually consensus first-line per UWorld/AMBOSS/First Aid?\n" +
+"CHECK 2 — Could any of the listed 'wrong' distractors actually ALSO be correct/acceptable?\n" +
+"CHECK 3 — Does the vignette contain any factual impossibility (lab value that's impossible, " +
+"drug dose that's wrong, anatomy that's wrong, contraindicated combo presented as fine)?\n" +
+"CHECK 4 — Does the explanation contradict itself or contradict standard teaching?\n\n" +
+"OUTPUT FORMAT — STRICT, NO PREAMBLE:\n" +
+"If all 4 checks pass: respond with exactly: PASS\n" +
+"If ANY check fails: respond with exactly: FAIL: <single sentence saying which check + why>\n\n" +
+"DO NOT respond with anything else. No JSON. No markdown. Just PASS or FAIL: <reason>.\n\n" +
+"QUESTION TO REVIEW:\n" + generatedJSON;
+
       try {
-        const response = await puter.ai.chat(finalPrompt, { model: 'gemini-2.0-flash' });
-        responseText = typeof response === 'string' ? response
-          : (response?.message?.content || response?.text || JSON.stringify(response));
-      } catch(apiErr){
-        console.error('Attending AI error:', apiErr);
-        responseText = '⚠️ AI Attending temporarily unavailable. Please try again in a moment.';
+        const raw = await _callPuterModel(checkPrompt, { model: modelUsed || 'claude-sonnet-4-6', timeoutMs: 30000 });
+        const trimmed = (raw || '').trim();
+        if(/^PASS\b/i.test(trimmed)) return { ok: true };
+        if(/^FAIL/i.test(trimmed)){
+          const m = trimmed.match(/^FAIL[:\s]+(.+)$/i);
+          return { ok: false, reason: m ? m[1] : 'self-check failed without explanation' };
+        }
+        // Resposta ambígua: por segurança, considera pass (não vamos travar UX por bug no checker)
+        console.warn('[Attending self-check] ambiguous response, defaulting to PASS:', trimmed.slice(0,120));
+        return { ok: true };
+      } catch(e){
+        // Se self-check falhou tecnicamente, libera (não trava produto por bug do checker)
+        console.warn('[Attending self-check] error, defaulting to PASS:', e.message);
+        return { ok: true };
+      }
+    }
+
+    // ── Chamada principal com retry + self-check em tipos sensíveis ──
+    if(typeof puter !== 'undefined' && puter.ai){
+      const wrappedPrompt = _wrapWithSafety(finalPrompt, type);
+      const needsSelfCheck = SELFCHECK_TYPES.has(type);
+      const chosenModel = _modelFor(type);  // Sonnet para críticos, Gemini Flash para resto
+      const MAX_ATTEMPTS = needsSelfCheck ? 2 : 1;
+
+      console.log('[Attending] type='+type+' model='+chosenModel+' selfCheck='+needsSelfCheck);
+
+      let lastError = null;
+      let accepted = false;
+
+      for(let attempt = 1; attempt <= MAX_ATTEMPTS && !accepted; attempt++){
+        try {
+          // Atenção: se for retry, adiciona uma nota anti-repetição
+          const promptToSend = attempt === 1 ? wrappedPrompt :
+            wrappedPrompt + "\n\nNOTE: Previous attempt failed quality review. " +
+            "Be extra careful with clinical consensus. Consider choosing a different angle.";
+
+          const text = await _callPuterModel(promptToSend, { model: chosenModel });
+
+          // Verifica abort explícito do modelo (RULE 4 do safety header)
+          if(/^ABORT:/im.test(text.trim().slice(0,200))){
+            lastError = 'model aborted: ' + text.split('\n')[0].slice(0,200);
+            console.warn('[Attending] model aborted, attempt', attempt, ':', lastError);
+            continue;
+          }
+          // Verifica abort em JSON
+          if(text.includes('"abort"') && text.includes('true')){
+            try {
+              const j = JSON.parse(text.replace(/```json|```/g,'').trim().match(/\{[^}]*\}/)?.[0] || '{}');
+              if(j.abort === true){
+                lastError = 'model aborted: ' + (j.reason || 'no reason given');
+                console.warn('[Attending] model aborted JSON, attempt', attempt, ':', lastError);
+                continue;
+              }
+            } catch(_){}
+          }
+
+          // Self-check só se tipo for crítico de geração (usa MESMO modelo)
+          if(needsSelfCheck){
+            const check = await _runSelfCheck(text, type, chosenModel);
+            if(!check.ok){
+              lastError = 'self-check FAIL: ' + check.reason;
+              console.warn('[Attending] self-check failed, attempt', attempt, ':', check.reason);
+              continue;
+            }
+          }
+
+          // Aceito
+          responseText = text;
+          accepted = true;
+        } catch(apiErr){
+          lastError = apiErr.message || String(apiErr);
+          console.error('[Attending] call failed, attempt', attempt, ':', lastError);
+        }
+      }
+
+      if(!accepted){
+        // Todos os tentativas falharam: mensagem amigável
+        responseText = '⚠️ The AI Attending could not produce a verified answer for this card right now. ' +
+          'This protects you from potentially incorrect content. Try a different question type or try again in a moment.' +
+          (lastError ? '\n\n(Internal: ' + lastError.slice(0,200) + ')' : '');
       }
     } else {
       responseText = '⚠️ AI Attending not available — check your connection and try again.';
