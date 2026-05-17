@@ -18,8 +18,8 @@ if('caches' in window){
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>BoardMD — Medical Board Review</title><!-- build:20260517-2130-attending-hybrid -->
-<script>window.__BMD_BUILD__ = '20260517-2130-attending-hybrid';</script>
+<title>BoardMD — Medical Board Review</title><!-- build:20260517-2200-splitter-fix -->
+<script>window.__BMD_BUILD__ = '20260517-2200-splitter-fix';</script>
 <!-- PWA -->
 <link rel="manifest" href="/manifest.json">
 <meta name="theme-color" content="#080c12">
@@ -22380,11 +22380,70 @@ function v2build(card){
   if(!bl||!bl.length){
     const exp=(card.e||'').replace(/<[^>]+>/g,' ').replace(/\s+/g,' ').trim();
     const kp=(card.kp||'').replace(/<[^>]+>/g,' ').trim();
-    const sn=exp.match(/[^.!?]+[.!?]+/g)||[exp];
-    if(sn[0])bl.push({type:'context',content:sn.slice(0,2).join(' ')});
-    if(sn.length>2)bl.push({type:'correct',content:sn.slice(2,4).join(' ')});
-    if(sn.length>4)bl.push({type:'trap',content:sn.slice(4).join(' ')});
-    else if(kp)bl.push({type:'hook',content:kp});
+    // ── FIX 2026-05-17: splitter inteligente ──
+    // Protege decimais e abreviações antes de dividir; depois restaura.
+    // Bug antigo: /[^.!?]+[.!?]+/g quebrava em 0.5, E. coli, etc.
+    function _smartSplit(txt){
+      if(!txt) return [];
+      // Sentinelas únicos para não conflitar
+      const DOT = '\u2756';   // decimal/abreviação
+      const QSL = '\u2757';   // ? em meio (raro)
+      const ESL = '\u2758';   // ! em meio (raro)
+      let s = txt;
+      // 1) Protege decimais: dígito.dígito → dígito{DOT}dígito
+      s = s.replace(/(\d)\.(\d)/g, '$1'+DOT+'$2');
+      // 2) Protege abreviações médicas/comuns (lista expansível)
+      const ABBR = [
+        'E','H','S','M','B','C','P','N','K','L','T','G','F','D','R',  // gêneros bacterianos (E. coli, H. pylori, S. aureus...)
+        'e\\.g','i\\.e','vs','etc','approx','min','max','avg','no',
+        'mg','mL','ml','kg','cm','mm','mEq','mmHg','bpm','rpm','hr','wk','mo','yr','yrs','mos',
+        'p\\.o','i\\.v','i\\.m','s\\.c','q\\.d','b\\.i\\.d','t\\.i\\.d','q\\.i\\.d','p\\.r\\.n',
+        'Dr','Mr','Mrs','Ms','St','Jr','Sr','Inc','Ltd','vs','Fig','fig','Eq','eq','Ref','ref',
+        'Sr','Cr','Hb','HCT','Hct','WBC','RBC','BUN','LDH','ALT','AST','CRP','ESR',
+        'U','IU','mIU','µg','ug','ng','pg','dL','dl'
+      ];
+      ABBR.forEach(function(a){
+        // matches "A." (somente quando seguido por espaço+algo, evita quebrar)
+        const re = new RegExp('\\b('+a+')\\.','g');
+        s = s.replace(re, '$1'+DOT);
+      });
+      // 3) Agora divide somente em . ! ? seguidos de espaço + letra maiúscula
+      //    (sinal real de fim de frase). Mantém os terminadores.
+      const parts = s.split(/(?<=[.!?])\s+(?=[A-Z\u00C0-\u017F])/);
+      // 4) Restaura os sentinelas
+      return parts.map(function(p){
+        return p.replace(new RegExp(DOT,'g'),'.')
+                .replace(new RegExp(QSL,'g'),'?')
+                .replace(new RegExp(ESL,'g'),'!')
+                .trim();
+      }).filter(function(p){ return p.length > 0; });
+    }
+    const sn = _smartSplit(exp);
+    if(sn.length === 0){
+      // fallback: sem split, joga tudo em context
+      if(exp) bl.push({type:'context',content:exp});
+    } else if(sn.length <= 2){
+      // explicação curta: tudo vai em context
+      bl.push({type:'context',content:sn.join(' ')});
+      if(kp) bl.push({type:'hook',content:kp});
+    } else if(sn.length === 3){
+      // 1 frase pra cada
+      bl.push({type:'context',content:sn[0]});
+      bl.push({type:'correct',content:sn[1]});
+      bl.push({type:'trap',content:sn[2]});
+    } else {
+      // 4+ frases: divide proporcionalmente (1/3 cada bloco)
+      const n = sn.length;
+      const a = Math.max(1, Math.floor(n/3));
+      const b = Math.max(a+1, Math.floor(2*n/3));
+      bl.push({type:'context',content:sn.slice(0,a).join(' ')});
+      bl.push({type:'correct',content:sn.slice(a,b).join(' ')});
+      bl.push({type:'trap',content:sn.slice(b).join(' ')});
+    }
+    // Se sobrou keypoint e ainda não foi usado, adiciona como hook
+    if(kp && !bl.some(function(x){return x.type==='hook';})){
+      bl.push({type:'hook',content:kp});
+    }
   }
   if(!bl.length)return;
   window._v2bl=bl;window._v2bi=0;
