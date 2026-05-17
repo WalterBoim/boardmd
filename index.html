@@ -14288,13 +14288,16 @@ function syncPerfQuickStats() {
           return {sys, correct: st.correct||0, incorrect: st.incorrect||0, tot, pct};
         })
         .filter(e => e.tot >= 1)
-        .sort((a,b) => b.tot - a.tot);
+        // 2026-05-16: fraqueza primeiro (pct crescente). Aluno 260+ estuda o buraco.
+        .sort((a,b) => a.pct - b.pct);
 
       if(sysEntries.length > 0){
         const avgPct = Math.round(sysEntries.reduce((s,e)=>s+e.pct,0)/sysEntries.length);
         sysList.innerHTML = sysEntries.map(e => {
           const color = e.pct >= 80 ? 'var(--green)' : e.pct >= 60 ? 'var(--amber)' : 'var(--red)';
           const abbr = e.sys.split(/[\s\/&]+/).map(w=>w[0]||'').join('').toUpperCase().slice(0,2);
+          // 2026-05-16: botão Study → aparece sempre (estuda fraqueza OU revisa força)
+          const sysEsc = e.sys.replace(/'/g,"\\'").replace(/"/g,'&quot;');
           return `<div class="system-card">
             <div class="sys-top">
               <div class="sys-icon" style="background:${e.pct>=80?'rgba(0,212,170,.1)':e.pct>=60?'rgba(245,158,11,.1)':'rgba(255,83,112,.1)'};color:${color}">${abbr}</div>
@@ -14311,6 +14314,7 @@ function syncPerfQuickStats() {
             <div class="sys-detail">
               <div class="sys-d"><div class="dot" style="background:var(--green)"></div><span style="color:var(--green)">${e.correct} correct</span></div>
               <div class="sys-d"><div class="dot" style="background:var(--red)"></div><span style="color:var(--red)">${e.incorrect} incorrect</span></div>
+              <button class="sys-study-btn" onclick="studySystem('${sysEsc}')" style="margin-left:auto;background:${e.pct<70?'rgba(255,83,112,.12)':e.pct<85?'rgba(245,158,11,.10)':'rgba(0,212,170,.10)'};color:${color};border:1px solid ${color};border-radius:8px;padding:6px 12px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:4px;transition:all .15s" onmouseover="this.style.background='${color}';this.style.color='#fff'" onmouseout="this.style.background='${e.pct<70?'rgba(255,83,112,.12)':e.pct<85?'rgba(245,158,11,.10)':'rgba(0,212,170,.10)'}';this.style.color='${color}'">Study →</button>
             </div>
           </div>`;
         }).join('');
@@ -14340,21 +14344,25 @@ function syncPerfQuickStats() {
           html += weak.map((e,i)=>{
             const color = e.pct<50?'var(--red)':'var(--amber)';
             const bg = e.pct<50?'rgba(255,83,112,.15)':'rgba(245,158,11,.12)';
+            const sysEsc = e.sys.replace(/'/g,"\\'").replace(/"/g,'&quot;');
             return `<div class="weak-row">
               <div class="weak-num" style="background:${bg};color:${color}">${i+1}</div>
               <div class="weak-info"><div class="weak-topic">${e.sys}</div><div class="weak-sub">${e.tot} questions answered</div></div>
-              <div class="weak-right"><div class="weak-pct" style="color:${color}">${e.pct}%</div></div>
+              <div class="weak-right" style="display:flex;align-items:center;gap:10px"><div class="weak-pct" style="color:${color}">${e.pct}%</div><button onclick="studySystem('${sysEsc}')" style="background:${color};color:#fff;border:none;border-radius:8px;padding:7px 12px;font-size:11px;font-weight:800;cursor:pointer;font-family:inherit;letter-spacing:.04em">STUDY →</button></div>
             </div>`;
           }).join('');
         }
         if(strong.length>0){
           // Add a divider
           html += `<div style="padding:8px 16px;background:var(--surface2);font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--muted)">Strong Areas</div>`;
-          html += strong.map((e,i)=>`<div class="weak-row">
+          html += strong.map((e,i)=>{
+            const sysEsc = e.sys.replace(/'/g,"\\'").replace(/"/g,'&quot;');
+            return `<div class="weak-row">
               <div class="weak-num" style="background:rgba(0,212,170,.1);color:var(--green)">${i+1}</div>
               <div class="weak-info"><div class="weak-topic">${e.sys}</div><div class="weak-sub">${e.tot} questions answered</div></div>
-              <div class="weak-right"><div class="weak-pct" style="color:var(--green)">${e.pct}%</div></div>
-            </div>`).join('');
+              <div class="weak-right" style="display:flex;align-items:center;gap:10px"><div class="weak-pct" style="color:var(--green)">${e.pct}%</div><button onclick="studySystem('${sysEsc}')" style="background:rgba(0,212,170,.1);color:var(--green);border:1px solid var(--green);border-radius:8px;padding:6px 11px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">Review →</button></div>
+            </div>`;
+          }).join('');
         }
         weakList.innerHTML = html;
       } else {
@@ -18257,6 +18265,12 @@ function showDone(){
 
 window.bsStart=function(){
   BS.cards=getCards();
+  // 2026-05-16: SYSTEM FILTER — chamado via studySystem(name) do Stats
+  // Filtra cards do system específico antes de qualquer outro filtro de busca.
+  if(BS._systemFilter){
+    const sysName = BS._systemFilter;
+    BS.cards = BS.cards.filter(c => (c.system||'') === sysName);
+  }
   // Apply search filter if active
   // 2026-05-15: agora suporta multi-QID (BS._searchTokens) além de substring (_searchFilter)
   if(BS._searchTokens && BS._searchTokens.length){
@@ -18285,7 +18299,13 @@ window.bsStart=function(){
   },1000);
   if(!BS.cards.length){
     const q=BS._searchFilter;
-    alert(q?'No cards match "'+q+'" in this deck. Try a different search.':'No cards available for this mode/deck.');
+    const sys=BS._systemFilter;
+    let msg;
+    if(sys) msg='No cards in "'+sys+'" for this deck/mode.';
+    else if(q) msg='No cards match "'+q+'" in this deck. Try a different search.';
+    else msg='No cards available for this mode/deck.';
+    alert(msg);
+    BS._systemFilter=null;
     return;
   }
   document.getElementById('bs-cfg').style.display='none';
@@ -18294,6 +18314,28 @@ window.bsStart=function(){
   const attFloat=document.getElementById('bs-att-float');if(attFloat)attFloat.style.display='flex';
   render();
 };
+
+// ═══════════════════════════════════════════════════════════════════════
+// 2026-05-16: studySystem — chamado pelos botões "Study →" do Stats heat-map
+// Navega para o BrainStorm, filtra pelo sistema específico, e inicia sessão
+// imediatamente. Loop fechado: fraqueza visível → 1 clique → estuda fraqueza.
+// ═══════════════════════════════════════════════════════════════════════
+window.studySystem = function(systemName){
+  if(!systemName) return;
+  // Limpa qualquer filtro anterior
+  BS._searchFilter = '';
+  BS._searchTokens = null;
+  BS._systemFilter = systemName;
+  // Modo padrão: Clinical Reasoning (mais completo para revisão de fraqueza)
+  BS.mode = 'cr';
+  // Navega pra aba Storm e inicia sessão
+  try {
+    if(typeof openBrainStorm === 'function') openBrainStorm();
+  } catch(e){ console.warn('openBrainStorm failed', e); }
+  // Pequeno delay pra UI montar antes de bsStart
+  setTimeout(function(){ try { bsStart(); } catch(e){ console.warn('bsStart failed', e); } }, 200);
+};
+
 window.bsConfig=function(){
   stopPlay();
   document.getElementById('bs-cfg').style.display='block';
