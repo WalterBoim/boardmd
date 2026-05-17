@@ -6517,9 +6517,9 @@ function buildDeckHomeTable(){
             </div>
           </div>
         </td>
-        <td class="dt-num ${shelfNew>0?'dt-new':'dt-zero'}">${shelfNew}</td>
-        <td class="dt-num ${shelfLrn>0?'dt-lrn':'dt-zero'}">${shelfLrn}</td>
-        <td class="dt-num ${shelfRev>0?'dt-rev':'dt-zero'}">${shelfRev}</td>
+        <td class="dt-num ${shelfNew>0?'dt-new':'dt-zero'}" data-label="New">${shelfNew}</td>
+        <td class="dt-num ${shelfLrn>0?'dt-lrn':'dt-zero'}" data-label="Lrn">${shelfLrn}</td>
+        <td class="dt-num ${shelfRev>0?'dt-rev':'dt-zero'}" data-label="Due">${shelfRev}</td>
         <td style="text-align:center;padding:0 12px;">
           <button onclick="event.stopPropagation();switchDeck('shelf_surgery');openSettings();" title="Settings" style="background:none;border:none;color:var(--text-faint);cursor:pointer;padding:4px 6px;border-radius:6px;display:inline-flex;align-items:center;opacity:.5;transition:opacity .15s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='.5'">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
@@ -6557,9 +6557,9 @@ function buildDeckHomeTable(){
           </div>
         </div>
       </td>
-      <td class="dt-num ${nw>0?'dt-new':'dt-zero'}">${nw}</td>
-      <td class="dt-num ${lrn>0?'dt-lrn':'dt-zero'}">${lrn}</td>
-      <td class="dt-num ${rev>0?'dt-rev':'dt-zero'}">${rev}</td>
+      <td class="dt-num ${nw>0?'dt-new':'dt-zero'}" data-label="New">${nw}</td>
+      <td class="dt-num ${lrn>0?'dt-lrn':'dt-zero'}" data-label="Lrn">${lrn}</td>
+      <td class="dt-num ${rev>0?'dt-rev':'dt-zero'}" data-label="Due">${rev}</td>
       <td style="text-align:center;padding:0 12px;">
         <button onclick="event.stopPropagation();switchDeck('${id}');openSettings();" title="Settings" style="background:none;border:none;color:var(--text-faint);cursor:pointer;padding:4px 6px;border-radius:6px;display:inline-flex;align-items:center;opacity:.5;transition:opacity .15s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='.5'">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
@@ -17779,6 +17779,1600 @@ function bmdSetupDrag(){
 .fz-md .bs-cr-fallback{font-size:16px}
 .fz-lg .bs-cr-fallback{font-size:19px}
 .fz-xl .bs-cr-fallback{font-size:23px}
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   BOARDMD MOBILE PREMIUM LAYER · v1 · 17/05/2026
+   Inspirado em UWorld / Amboss / Chess.com
+   – Aplicado APENAS em telas ≤ 760px (não toca no desktop)
+   – Última camada do CSS = prioridade máxima sem !important war
+   ═══════════════════════════════════════════════════════════════════════ */
+
+@media (max-width: 760px) {
+
+  /* ───────────────────────────────────────────────────────────────────
+     0 · TOKENS MOBILE & SAFE-AREA · respeita notch iOS, gesture bar Android
+     ─────────────────────────────────────────────────────────────────── */
+  :root {
+    --m-sat: env(safe-area-inset-top, 0px);
+    --m-sab: env(safe-area-inset-bottom, 0px);
+    --m-nav-h: 58px;          /* altura da bottom nav */
+    --m-hdr-h: 52px;          /* altura do app-header principal */
+    --m-card-radius: 16px;
+    --m-tap: 44px;            /* HIG mínimo de toque */
+    --m-pad-x: 16px;
+    --m-gap: 12px;
+    --m-elev-1: 0 1px 0 rgba(255,255,255,.04), 0 4px 16px rgba(0,0,0,.25);
+    --m-elev-pop: 0 8px 32px rgba(0,0,0,.45);
+  }
+  html.light {
+    --m-elev-1: 0 1px 2px rgba(15,23,42,.04), 0 2px 12px rgba(15,23,42,.06);
+    --m-elev-pop: 0 8px 32px rgba(15,23,42,.12);
+  }
+
+  /* Hard reset de overflow horizontal — qualquer URL longa, tabela ou
+     SVG nunca pode fazer a viewport rolar lateralmente. UWorld & Amboss
+     tratam isso religiosamente. */
+  html, body {
+    overflow-x: hidden !important;
+    max-width: 100vw !important;
+    -webkit-text-size-adjust: 100%;
+  }
+  #app, #app.active {
+    min-height: 100vh !important;
+    min-height: 100dvh !important;
+    height: auto !important;
+    overflow-x: hidden !important;
+  }
+
+  /* ───────────────────────────────────────────────────────────────────
+     1 · APP-HEADER (topo) — Amboss style: compacto, denso, info-only
+     ─────────────────────────────────────────────────────────────────── */
+  .app-header {
+    background: var(--bg) !important;
+    border-bottom: 1px solid var(--border) !important;
+    backdrop-filter: blur(20px) saturate(140%) !important;
+    -webkit-backdrop-filter: blur(20px) saturate(140%) !important;
+    padding-top: var(--m-sat) !important;
+  }
+  /* Linha 1: logo + ações principais */
+  .app-header .hdr {
+    height: var(--m-hdr-h) !important;
+    padding: 0 var(--m-pad-x) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 8px !important;
+  }
+  .app-header .hdr .logo {
+    font-size: 19px !important;
+    font-weight: 800 !important;
+    letter-spacing: -.4px !important;
+    color: var(--text) !important;
+    font-family: 'Inter', -apple-system, sans-serif !important;
+  }
+  .app-header .hdr .logo span {
+    color: var(--accent) !important;
+  }
+  .app-header .hdr-right {
+    display: flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+  }
+  /* Botões circulares do header (theme/refresh/settings) — minimal, 32px */
+  .app-header .hdr-action-btn {
+    width: 34px !important;
+    height: 34px !important;
+    padding: 0 !important;
+    border-radius: 10px !important;
+    border: 1px solid var(--border) !important;
+    background: var(--surface) !important;
+    color: var(--text-dim) !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    transition: all .15s ease !important;
+    flex-shrink: 0 !important;
+  }
+  .app-header .hdr-action-btn:active {
+    transform: scale(.92) !important;
+    background: var(--surface2) !important;
+  }
+  .app-header .hdr-action-btn svg {
+    width: 15px !important;
+    height: 15px !important;
+  }
+
+  /* Linha 2: streak-bar — Chess.com style, número grande, label microtipo */
+  .app-header .streak-bar {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-around !important;
+    gap: 0 !important;
+    padding: 8px 14px !important;
+    background: transparent !important;
+    border-bottom: 1px solid var(--border) !important;
+  }
+  .app-header .streak-bar .sb-item {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: 2px !important;
+    flex: 1 !important;
+    min-width: 0 !important;
+  }
+  .app-header .streak-bar .sb-val {
+    font-size: 18px !important;
+    font-weight: 800 !important;
+    font-family: 'Inter', sans-serif !important;
+    letter-spacing: -.5px !important;
+    line-height: 1 !important;
+  }
+  .app-header .streak-bar .sb-label {
+    font-size: 9px !important;
+    font-weight: 700 !important;
+    letter-spacing: .8px !important;
+    text-transform: uppercase !important;
+    color: var(--text-faint, var(--muted)) !important;
+    line-height: 1.2 !important;
+  }
+  .app-header .streak-bar .sb-div {
+    display: none !important;
+  }
+
+  /* Linha 3: step pills — UWorld style, segmented control */
+  .app-header .bmd-step-pills {
+    display: flex !important;
+    gap: 4px !important;
+    padding: 8px 12px 10px !important;
+    background: transparent !important;
+    border-bottom: 1px solid var(--border) !important;
+    justify-content: stretch !important;
+  }
+  .app-header .bmd-step-pills .step-pill {
+    flex: 1 !important;
+    height: 32px !important;
+    padding: 0 !important;
+    border-radius: 9px !important;
+    background: transparent !important;
+    border: 1px solid transparent !important;
+    color: var(--text-dim) !important;
+    font-size: 12px !important;
+    font-weight: 700 !important;
+    font-family: 'Inter', sans-serif !important;
+    letter-spacing: .2px !important;
+    cursor: pointer !important;
+    transition: all .15s ease !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+  .app-header .bmd-step-pills .step-pill:active {
+    transform: scale(.96) !important;
+  }
+  .app-header .bmd-step-pills .step-pill.active {
+    background: var(--accent) !important;
+    color: #fff !important;
+    border-color: var(--accent) !important;
+    box-shadow: 0 2px 8px rgba(59,127,255,.25) !important;
+  }
+
+  /* ───────────────────────────────────────────────────────────────────
+     2 · DECK HOME (HOME tab) — UWorld dashboard cards
+     ─────────────────────────────────────────────────────────────────── */
+  .deck-home {
+    padding: 14px 14px calc(var(--m-nav-h) + var(--m-sab) + 20px) !important;
+    gap: 14px !important;
+    background: var(--bg) !important;
+  }
+  .deck-home-title {
+    font-size: 22px !important;
+    font-family: 'Instrument Serif', serif !important;
+    margin-bottom: 2px !important;
+  }
+  .deck-home-sub {
+    font-size: 12px !important;
+  }
+
+  /* Stats pills — agora 2x2 grid, mais lúdico no mobile */
+  .deck-home .deck-stats-row {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 8px !important;
+  }
+  .deck-home .ds-pill {
+    padding: 12px 14px !important;
+    border-radius: 12px !important;
+    border: 1px solid var(--border) !important;
+    gap: 3px !important;
+  }
+  .deck-home .ds-pill-num {
+    font-size: 20px !important;
+    line-height: 1 !important;
+  }
+  .deck-home .ds-pill-label {
+    font-size: 9px !important;
+    letter-spacing: .6px !important;
+  }
+
+  /* Deck table → vira lista de cards verticais (mobile-native) */
+  .deck-home .deck-table {
+    background: transparent !important;
+    border: none !important;
+    display: block !important;
+  }
+  .deck-home .deck-table thead {
+    display: none !important;
+  }
+  .deck-home .deck-table tbody,
+  .deck-home .deck-table tbody tr {
+    display: block !important;
+    width: 100% !important;
+  }
+  .deck-home .deck-table tbody tr {
+    background: var(--surface) !important;
+    border: 1px solid var(--border) !important;
+    border-radius: 14px !important;
+    padding: 14px 16px !important;
+    margin-bottom: 10px !important;
+    box-shadow: var(--m-elev-1) !important;
+    position: relative !important;
+    transition: transform .12s ease, border-color .15s ease !important;
+  }
+  .deck-home .deck-table tbody tr:active {
+    transform: scale(.98) !important;
+  }
+  .deck-home .deck-table tbody tr.dt-active {
+    border-color: var(--accent) !important;
+    background: linear-gradient(135deg, var(--surface), rgba(59,127,255,.04)) !important;
+  }
+  .deck-home .deck-table tbody td {
+    display: inline-block !important;
+    padding: 0 !important;
+    border: none !important;
+    vertical-align: middle !important;
+  }
+  /* nome do deck = full width primeiro */
+  .deck-home .deck-table tbody td:first-child {
+    display: block !important;
+    margin-bottom: 10px !important;
+  }
+  .deck-home .deck-table tbody td:first-child .dt-name {
+    font-size: 15px !important;
+    font-weight: 700 !important;
+    color: var(--text) !important;
+    letter-spacing: -.1px !important;
+  }
+  .deck-home .deck-table tbody td:first-child .dt-sub {
+    font-size: 11px !important;
+    margin-top: 2px !important;
+    color: var(--text-faint) !important;
+  }
+  /* Linha de números: NEW · LRN · DUE como chips coloridos */
+  .deck-home .deck-table tbody td:not(:first-child) {
+    display: inline-flex !important;
+    align-items: center !important;
+    margin-right: 14px !important;
+    font-size: 12px !important;
+    font-family: 'JetBrains Mono', monospace !important;
+    font-weight: 700 !important;
+  }
+  .deck-home .deck-table tbody td:not(:first-child)::before {
+    content: attr(data-label);
+    font-size: 9px;
+    font-weight: 700;
+    color: var(--text-faint);
+    letter-spacing: .5px;
+    text-transform: uppercase;
+    margin-right: 5px;
+    font-family: 'Inter', sans-serif;
+  }
+
+  /* Action buttons — sticky-style abaixo */
+  .deck-home .deck-home-actions {
+    display: flex !important;
+    gap: 8px !important;
+    flex-direction: column !important;
+  }
+  .deck-home .dh-btn-study {
+    width: 100% !important;
+    height: 48px !important;
+    border-radius: 12px !important;
+    font-size: 15px !important;
+    font-weight: 800 !important;
+    letter-spacing: .2px !important;
+    box-shadow: 0 4px 16px rgba(59,127,255,.3) !important;
+  }
+  .deck-home .dh-btn-study:active {
+    transform: scale(.97) !important;
+    box-shadow: 0 2px 8px rgba(59,127,255,.25) !important;
+  }
+  .deck-home .dh-btn-settings {
+    width: 100% !important;
+    height: 44px !important;
+    border-radius: 12px !important;
+    font-size: 13px !important;
+    justify-content: center !important;
+  }
+
+  /* ───────────────────────────────────────────────────────────────────
+     3 · STUDY VIEW (card-el) — UWorld + Amboss híbrido
+     – Layout vertical fluido, sem espaços fantasmas
+     – Card respira: header → conteúdo → FSRS sticky no rodapé
+     ─────────────────────────────────────────────────────────────────── */
+  .app-layout {
+    display: flex !important;
+    flex-direction: column !important;
+    width: 100% !important;
+    min-height: calc(100vh - var(--m-hdr-h)) !important;
+    min-height: calc(100dvh - var(--m-hdr-h)) !important;
+    overflow: visible !important;
+  }
+  .sidebar { display: none !important; }
+  .study-main {
+    flex: 1 !important;
+    width: 100% !important;
+    padding: 0 !important;
+    overflow: visible !important;
+    display: flex !important;
+    flex-direction: column !important;
+  }
+  .study-inner {
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 0 !important;
+    gap: 0 !important;
+    flex: 1 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    /* CRÍTICO: padding-bottom = altura da bottom nav + FSRS sticky + safe area */
+    padding-bottom: 0 !important;
+  }
+
+  /* Progress bar — UWorld discreto, full-width, fininho */
+  .study-inner .progress-wrap {
+    padding: 8px 14px 6px !important;
+    background: var(--surface) !important;
+    border-bottom: 1px solid var(--border) !important;
+  }
+  .study-inner .progress-info {
+    font-size: 10px !important;
+    margin-bottom: 5px !important;
+    color: var(--text-faint) !important;
+  }
+  .study-inner .progress-bar {
+    height: 3px !important;
+    border-radius: 2px !important;
+    overflow: hidden !important;
+  }
+
+  /* CARD-EL: container principal — flui livremente */
+  #card-el {
+    flex: 1 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    background: var(--surface) !important;
+    border: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    overflow: visible !important;
+    min-height: 0 !important;
+  }
+
+  /* Card header — compacto, single-line, chips alinhados */
+  #card-el > .card-header {
+    display: flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    padding: 8px 14px !important;
+    background: var(--surface) !important;
+    border: none !important;
+    border-bottom: 1px solid var(--border) !important;
+    border-radius: 0 !important;
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    scrollbar-width: none !important;
+    flex-shrink: 0 !important;
+  }
+  #card-el > .card-header::-webkit-scrollbar { display: none !important; }
+  #card-el > .card-header #c-deck-badge {
+    font-size: 9px !important;
+    padding: 3px 8px !important;
+    border-radius: 999px !important;
+    flex-shrink: 0 !important;
+  }
+  /* A-/A+/Highlight/Edit buttons — uniforme 28px */
+  #card-el > .card-header > button {
+    width: 28px !important;
+    height: 28px !important;
+    padding: 0 !important;
+    font-size: 11px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex-shrink: 0 !important;
+    border-radius: 7px !important;
+  }
+  #card-el > .card-header > button svg {
+    width: 12px !important;
+    height: 12px !important;
+  }
+  #card-el > .card-header #c-qid {
+    font-size: 9px !important;
+    color: var(--text-faint) !important;
+    margin-left: auto !important;
+    flex-shrink: 0 !important;
+    white-space: nowrap !important;
+  }
+  /* Highlight swatches inline (yellow/green/blue) */
+  #card-el > .card-header .hl-swatches {
+    flex-shrink: 0 !important;
+  }
+
+  /* Back/Skip — virou tira sutil abaixo do header */
+  .bmd-card-nav {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    padding: 6px 14px !important;
+    background: var(--surface) !important;
+    border-bottom: 1px solid var(--border) !important;
+    flex-shrink: 0 !important;
+  }
+  .bmd-card-nav .bmd-nav-link {
+    background: none !important;
+    border: none !important;
+    color: var(--text-dim) !important;
+    font-size: 11px !important;
+    font-weight: 700 !important;
+    font-family: 'Inter', sans-serif !important;
+    padding: 4px 0 !important;
+    cursor: pointer !important;
+    letter-spacing: .2px !important;
+  }
+  .bmd-card-nav .bmd-nav-sep { display: none !important; }
+  .bmd-card-nav .bmd-nav-link:active {
+    color: var(--accent) !important;
+  }
+
+  /* Cols-row: vira coluna única vertical fluida */
+  #bmd-cols-row {
+    display: flex !important;
+    flex-direction: column !important;
+    flex: 1 !important;
+    overflow: visible !important;
+    min-height: 0 !important;
+  }
+  #bmd-q-col, #bmd-ans-col {
+    width: 100% !important;
+    max-width: 100% !important;
+    flex: 0 0 auto !important;
+    padding: 0 !important;
+    overflow: visible !important;
+    min-height: 0 !important;
+  }
+  #bmd-split-divider {
+    display: none !important;
+  }
+  #bmd-q-inner {
+    padding: 0 !important;
+  }
+
+  /* Card body: padding generoso para leitura, sem ruído */
+  .card-body {
+    padding: 18px 16px 8px !important;
+  }
+  .card-question {
+    font-size: 16px !important;
+    line-height: 1.65 !important;
+    font-weight: 400 !important;
+    color: var(--text) !important;
+    letter-spacing: -.005em !important;
+    margin-bottom: 18px !important;
+    word-break: break-word !important;
+    overflow-wrap: anywhere !important;
+  }
+
+  /* Options — UWorld style, hierarquia clara */
+  .options {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 7px !important;
+  }
+  .opt-btn {
+    width: 100% !important;
+    min-height: 52px !important;
+    padding: 12px 14px !important;
+    background: var(--surface) !important;
+    border: 1.5px solid var(--border) !important;
+    border-radius: 11px !important;
+    display: flex !important;
+    align-items: flex-start !important;
+    gap: 10px !important;
+    font-size: 14.5px !important;
+    line-height: 1.5 !important;
+    font-weight: 400 !important;
+    color: var(--text) !important;
+    cursor: pointer !important;
+    text-align: left !important;
+    transition: all .15s ease !important;
+    word-break: break-word !important;
+    overflow-wrap: anywhere !important;
+  }
+  .opt-btn:active:not([disabled]) {
+    transform: scale(.985) !important;
+    border-color: var(--accent) !important;
+  }
+  .opt-btn .opt-letter {
+    font-size: 13px !important;
+    font-weight: 700 !important;
+    color: var(--text-dim) !important;
+    flex-shrink: 0 !important;
+    margin-top: 1px !important;
+    width: 18px !important;
+  }
+  /* Answered states */
+  .opt-btn.correct {
+    background: rgba(34,197,94,.08) !important;
+    border-color: var(--emerald) !important;
+    color: var(--emerald) !important;
+  }
+  .opt-btn.wrong {
+    background: rgba(244,63,94,.08) !important;
+    border-color: var(--rose) !important;
+    color: var(--rose) !important;
+  }
+  .opt-btn.show-correct {
+    background: rgba(34,197,94,.05) !important;
+    border-color: rgba(34,197,94,.4) !important;
+    color: var(--emerald) !important;
+  }
+  .opt-btn.other-wrong {
+    opacity: .4 !important;
+    background: var(--surface) !important;
+    border-color: var(--border) !important;
+  }
+
+  /* Timer discreto */
+  .bmd-timer-discreet {
+    margin-top: 14px !important;
+    padding: 8px 12px !important;
+    border-radius: 9px !important;
+    background: var(--surface2) !important;
+    border: 1px solid var(--border) !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    font-size: 11px !important;
+  }
+  .bmd-timer-discreet .btd-time {
+    font-family: 'JetBrains Mono', monospace !important;
+    font-weight: 700 !important;
+    color: var(--text-dim) !important;
+  }
+  .bmd-timer-discreet .btd-coins {
+    color: var(--gold) !important;
+    font-weight: 700 !important;
+  }
+
+  /* Footer counter (new+lrn+due) — small discreto */
+  .card-footer-counter {
+    display: flex !important;
+    justify-content: center !important;
+    gap: 8px !important;
+    padding: 12px 14px 4px !important;
+    font-size: 11px !important;
+    font-family: 'JetBrains Mono', monospace !important;
+    font-weight: 700 !important;
+  }
+
+  /* Explanation column — quando aparece, vira card sólido */
+  #bmd-ans-col .explanation {
+    padding: 16px 16px 4px !important;
+    background: var(--surface) !important;
+  }
+  .exp-section {
+    padding: 14px !important;
+    background: var(--surface2) !important;
+    border: 1px solid var(--border) !important;
+    border-radius: 12px !important;
+    margin-bottom: 12px !important;
+  }
+  .exp-label {
+    font-size: 10px !important;
+    font-weight: 800 !important;
+    letter-spacing: .8px !important;
+    text-transform: uppercase !important;
+    color: var(--text-faint) !important;
+    margin-bottom: 8px !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+  }
+  .exp-correct-inner {
+    font-size: 15px !important;
+    font-weight: 600 !important;
+    color: var(--emerald) !important;
+    line-height: 1.5 !important;
+  }
+  .exp-text {
+    font-size: 14.5px !important;
+    line-height: 1.7 !important;
+    color: var(--text) !important;
+    word-break: break-word !important;
+    overflow-wrap: anywhere !important;
+  }
+  .exp-dist {
+    font-size: 14px !important;
+    line-height: 1.65 !important;
+    word-break: break-word !important;
+    overflow-wrap: anywhere !important;
+  }
+  .dist-item {
+    margin-bottom: 8px !important;
+  }
+
+  /* Card image full-width */
+  .card-img-wrap {
+    margin: 12px -16px !important;
+    padding: 0 16px !important;
+  }
+  .card-img-wrap img {
+    width: 100% !important;
+    height: auto !important;
+    border-radius: 10px !important;
+  }
+
+  /* Storm split-button — controle compacto */
+  #storm-this-wrap {
+    padding: 10px 14px !important;
+    text-align: center !important;
+  }
+  .storm-split {
+    display: inline-flex !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    background: var(--surface2) !important;
+    border: 1px solid var(--border) !important;
+    border-radius: 12px !important;
+    overflow: hidden !important;
+  }
+  .storm-split-main {
+    flex: 1 !important;
+    padding: 11px 14px !important;
+    font-size: 13px !important;
+    font-weight: 700 !important;
+    background: none !important;
+    border: none !important;
+    color: var(--text) !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 8px !important;
+  }
+  .storm-split-main .ss-icon {
+    width: 18px !important;
+    height: 18px !important;
+  }
+  .storm-split-divider {
+    width: 1px !important;
+    background: var(--border) !important;
+  }
+  .storm-split-mode {
+    padding: 0 14px !important;
+    font-size: 12px !important;
+    color: var(--text-dim) !important;
+    background: none !important;
+    border: none !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 4px !important;
+  }
+
+  /* Study status bar (cards · time · /card) — discreto rodapé */
+  .study-status-bar {
+    padding: 10px 14px !important;
+    font-size: 10px !important;
+    border-top: 1px solid var(--border) !important;
+    background: var(--surface) !important;
+  }
+  .study-status-bar .ssb-sep {
+    margin: 0 8px !important;
+  }
+
+  /* ───────────────────────────────────────────────────────────────────
+     4 · FSRS BUTTONS — Chess.com style sticky bottom
+     – Sticky acima da bottom-nav
+     – Antes da resposta: pílulas leves, opacas, sem confusão
+     – Depois da resposta: chips coloridos com intervalo
+     ─────────────────────────────────────────────────────────────────── */
+  /* Reset: remove dock duplicado */
+  #study-footer-dock { display: none !important; }
+
+  .fsrs-nav {
+    position: sticky !important;
+    bottom: var(--m-nav-h) !important;
+    z-index: 60 !important;
+    display: flex !important;
+    width: 100% !important;
+    padding: 10px 12px !important;
+    background: var(--surface) !important;
+    border-top: 1px solid var(--border) !important;
+    box-shadow: 0 -2px 12px rgba(0,0,0,.18) !important;
+    margin: 0 !important;
+    /* CRITICAL: zera o padding-bottom 90px que tava sobrando */
+    padding-bottom: 10px !important;
+  }
+  html.light .fsrs-nav {
+    box-shadow: 0 -2px 12px rgba(15,23,42,.08) !important;
+  }
+
+  .fsrs-nav .fsrs-row {
+    display: flex !important;
+    width: 100% !important;
+    gap: 6px !important;
+  }
+  .fsrs-nav .fsrs-btn {
+    flex: 1 !important;
+    min-height: 50px !important;
+    padding: 6px 4px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 2px !important;
+    border: none !important;
+    border-radius: 11px !important;
+    cursor: pointer !important;
+    transition: transform .12s ease !important;
+  }
+  .fsrs-nav .fsrs-btn:active {
+    transform: scale(.92) !important;
+  }
+  .fsrs-nav .fsrs-lbl {
+    font-size: 12px !important;
+    font-weight: 800 !important;
+    letter-spacing: .2px !important;
+    line-height: 1 !important;
+  }
+  .fsrs-nav .fsrs-int {
+    font-size: 9px !important;
+    font-weight: 600 !important;
+    line-height: 1 !important;
+    font-family: 'JetBrains Mono', monospace !important;
+  }
+
+  /* Before answer: muito dim */
+  .fsrs-nav:not(.visible) .fsrs-btn {
+    opacity: .22 !important;
+    pointer-events: none !important;
+  }
+
+  /* ───────────────────────────────────────────────────────────────────
+     5 · BOTTOM NAV — Chess.com / Amboss vibe
+     Fixed bottom · safe-area aware · selected state com pill bg
+     ─────────────────────────────────────────────────────────────────── */
+  .bmd-bottom-nav {
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 8px 0 calc(8px + var(--m-sab)) !important;
+    height: calc(var(--m-nav-h) + var(--m-sab)) !important;
+    background: var(--surface) !important;
+    border-top: 1px solid var(--border) !important;
+    border-radius: 0 !important;
+    backdrop-filter: blur(20px) saturate(150%) !important;
+    -webkit-backdrop-filter: blur(20px) saturate(150%) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-around !important;
+    z-index: 100 !important;
+    box-shadow: 0 -2px 16px rgba(0,0,0,.20) !important;
+  }
+  html.light .bmd-bottom-nav {
+    box-shadow: 0 -1px 8px rgba(15,23,42,.06) !important;
+  }
+
+  .bmd-bottom-nav .nav-item {
+    flex: 1 !important;
+    height: 42px !important;
+    padding: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 2px !important;
+    border-radius: 10px !important;
+    cursor: pointer !important;
+    transition: all .15s ease !important;
+    position: relative !important;
+  }
+  .bmd-bottom-nav .nav-item:active {
+    transform: scale(.92) !important;
+  }
+  .bmd-bottom-nav .nav-item svg {
+    width: 20px !important;
+    height: 20px !important;
+    stroke: var(--text-faint, var(--muted)) !important;
+    fill: none !important;
+    stroke-width: 1.8 !important;
+    transition: all .2s ease !important;
+  }
+  .bmd-bottom-nav .nav-item .nav-label {
+    font-size: 9.5px !important;
+    font-weight: 700 !important;
+    color: var(--text-faint, var(--muted)) !important;
+    letter-spacing: .2px !important;
+    line-height: 1 !important;
+    transition: color .15s ease !important;
+  }
+  .bmd-bottom-nav .nav-item.active svg {
+    stroke: var(--accent) !important;
+    transform: scale(1.08) !important;
+  }
+  .bmd-bottom-nav .nav-item.active .nav-label {
+    color: var(--accent) !important;
+    font-weight: 800 !important;
+  }
+
+  /* Center BrainStorm button — fica MAIS protagonista, mas balanceado */
+  .bmd-bottom-nav .nav-center {
+    flex: 0 0 auto !important;
+    margin: 0 4px !important;
+    position: relative !important;
+    margin-top: -22px !important;
+  }
+  .bmd-bottom-nav .nav-center-btn,
+  .bmd-bottom-nav .nav-center-btn.bs-storm-btn {
+    width: 52px !important;
+    height: 52px !important;
+    border-radius: 16px !important;
+    border: 2px solid var(--bg) !important;
+    background: linear-gradient(135deg, var(--accent), #2563eb) !important;
+    box-shadow: 0 6px 18px rgba(59,127,255,.45), 0 0 0 3px var(--bg) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    cursor: pointer !important;
+    transition: transform .15s ease !important;
+  }
+  .bmd-bottom-nav .nav-center-btn:active {
+    transform: scale(.92) !important;
+  }
+  .bmd-bottom-nav .nav-center-btn svg {
+    width: 26px !important;
+    height: 26px !important;
+  }
+  .bmd-bottom-nav .nav-center-btn.bs-storm-btn svg path[stroke="white"] {
+    stroke: #fff !important;
+  }
+  .bmd-bottom-nav .nav-center-btn.bs-storm-btn svg path[fill="#e8a836"] {
+    fill: #ffd56b !important;
+  }
+  /* Hide storm label below (covered by bottom-nav row) */
+  .bmd-bottom-nav .bs-storm-lbl,
+  .bs-storm-lbl {
+    display: none !important;
+  }
+
+  /* ───────────────────────────────────────────────────────────────────
+     6 · PADDING-BOTTOM GLOBAL — qualquer view fica acima do nav
+     Padding = bottom-nav height + safe-area + 12px folga
+     ─────────────────────────────────────────────────────────────────── */
+  #app.active .deck-home,
+  #app.active .lb-panel,
+  #app.active #profile-panel,
+  #app.active #poststep-panel {
+    padding-bottom: calc(var(--m-nav-h) + var(--m-sab) + 12px) !important;
+  }
+
+  /* Study-inner — não precisa de bottom padding, porque FSRS é sticky */
+  #app.active .study-inner {
+    padding-bottom: 0 !important;
+  }
+
+  /* ───────────────────────────────────────────────────────────────────
+     7 · LEADERBOARD PANEL — Chess.com ranking style
+     ─────────────────────────────────────────────────────────────────── */
+  .lb-panel {
+    padding: 14px 14px calc(var(--m-nav-h) + var(--m-sab) + 14px) !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    background: var(--bg) !important;
+  }
+  .lb-panel .lb-header-title {
+    font-size: 24px !important;
+  }
+  .lb-panel .lb-header-sub {
+    font-size: 11px !important;
+  }
+  .lb-panel .lb-tabs {
+    width: 100% !important;
+    display: flex !important;
+  }
+  .lb-panel .lb-tab {
+    flex: 1 !important;
+    padding: 7px 12px !important;
+    font-size: 11px !important;
+  }
+  .lb-panel .lb-podium {
+    gap: 10px !important;
+    padding: 12px 0 6px !important;
+  }
+  .lb-panel .lb-podium-item.rank1 .lbp-avatar {
+    width: 56px !important;
+    height: 56px !important;
+    font-size: 19px !important;
+  }
+  .lb-panel .lbp-avatar {
+    width: 44px !important;
+    height: 44px !important;
+    font-size: 15px !important;
+  }
+  .lb-panel .lbp-name {
+    font-size: 10px !important;
+    max-width: 72px !important;
+  }
+  /* your-card (perfil próprio no leaderboard) */
+  .lb-panel .your-card {
+    border-radius: 14px !important;
+    padding: 12px 14px !important;
+  }
+  .lb-panel .your-top {
+    gap: 10px !important;
+  }
+  .lb-panel .your-avatar {
+    width: 38px !important;
+    height: 38px !important;
+    font-size: 14px !important;
+  }
+  .lb-panel .your-name {
+    font-size: 14px !important;
+  }
+  .lb-panel .your-school {
+    font-size: 10px !important;
+  }
+  .lb-panel .tier-badge {
+    font-size: 9px !important;
+    padding: 3px 8px !important;
+  }
+
+  /* ───────────────────────────────────────────────────────────────────
+     8 · PROFILE PANEL
+     ─────────────────────────────────────────────────────────────────── */
+  .profile-panel {
+    padding: 14px 14px calc(var(--m-nav-h) + var(--m-sab) + 14px) !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+  .profile-stats-grid {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 8px !important;
+  }
+  .badges-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 8px !important;
+  }
+
+  /* ───────────────────────────────────────────────────────────────────
+     9 · MODAIS / OVERLAYS — slide-up bottom-sheet iOS style
+     ─────────────────────────────────────────────────────────────────── */
+  .qid-modal, .bid-modal {
+    width: calc(100vw - 24px) !important;
+    max-width: 480px !important;
+    padding: 20px 16px !important;
+    border-radius: 16px !important;
+  }
+  .modal-overlay .modal {
+    border-radius: 18px 18px 0 0 !important;
+    padding-bottom: calc(24px + var(--m-sab)) !important;
+  }
+  /* Storm menu — sempre acima da bottom-nav */
+  .storm-menu {
+    z-index: 200 !important;
+    max-width: calc(100vw - 28px) !important;
+  }
+
+  /* ───────────────────────────────────────────────────────────────────
+     10 · LIGHT MODE FINE-TUNING
+     ─────────────────────────────────────────────────────────────────── */
+  html.light .app-header {
+    background: rgba(255,255,255,.92) !important;
+  }
+  html.light .bmd-bottom-nav {
+    background: rgba(255,255,255,.94) !important;
+  }
+  html.light .fsrs-nav {
+    background: var(--surface) !important;
+  }
+
+  /* ───────────────────────────────────────────────────────────────────
+     11 · HOTFIX — gambiarras antigas que estavam sobrando
+     ─────────────────────────────────────────────────────────────────── */
+  /* O padding-bottom: 90px da fsrs-nav que criava o "espaço gigante" */
+  .fsrs-nav {
+    padding-bottom: 10px !important;
+  }
+  /* O dock duplicado nunca mais aparece no mobile */
+  #study-footer-dock,
+  #fsrs-nav-dock { display: none !important; }
+  /* Hidden legacy elements that occasionally leak in */
+  #legacy-hdr-els { display: none !important; }
+
+  /* Ranking v2 - elementos extras */
+  .lb-panel .header,
+  #poststep-panel .header {
+    padding: 12px 14px !important;
+    padding-top: calc(12px + var(--m-sat)) !important;
+  }
+
+  /* Hide nav v2 ranking-specific top-header se duplicar */
+  #lb-panel > header.header { display: none !important; }
+
+  /* Search panel - se existir */
+  #search-panel,
+  #stats-panel {
+    padding: 14px 14px calc(var(--m-nav-h) + var(--m-sab) + 14px) !important;
+  }
+
+  /* ───────────────────────────────────────────────────────────────────
+     12 · TYPOGRAPHY POLISH (iOS smoothing)
+     ─────────────────────────────────────────────────────────────────── */
+  body, #app, .card-question, .exp-text, .opt-btn {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* ───────────────────────────────────────────────────────────────────
+     13 · ANIMATIONS — discretas
+     ─────────────────────────────────────────────────────────────────── */
+  @keyframes mFadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+  .deck-home.active,
+  .lb-panel.active,
+  .profile-panel.active {
+    animation: mFadeIn .25s ease-out;
+  }
+
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   Tweak extra para smartphones MUITO estreitos (≤ 360px, e.g. iPhone SE)
+   ═══════════════════════════════════════════════════════════════════════ */
+@media (max-width: 360px) {
+  :root { --m-pad-x: 12px; --m-nav-h: 56px; }
+  .app-header .hdr .logo { font-size: 17px !important; }
+  .app-header .streak-bar .sb-val { font-size: 16px !important; }
+  .app-header .bmd-step-pills .step-pill { font-size: 11px !important; }
+  .card-question { font-size: 15px !important; }
+  .opt-btn { font-size: 13.5px !important; padding: 11px 12px !important; }
+  .fsrs-nav .fsrs-lbl { font-size: 11px !important; }
+  .bmd-bottom-nav .nav-item .nav-label { font-size: 9px !important; }
+  .bmd-bottom-nav .nav-item svg { width: 19px !important; height: 19px !important; }
+  .bmd-bottom-nav .nav-center-btn { width: 48px !important; height: 48px !important; }
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   BOARDMD MOBILE PREMIUM · v1.1 PATCHES · 17/05/2026
+   – Pendentes da v1:
+     1. Esconder streak-bar + step-pills durante estudo (foco)
+     2. BrainStorm overlay mobile (bs-overlay)
+     3. Search-picker bottom-sheet
+     4. Profile tab-nav scrollable nativo
+     5. Storm overlay safe-area
+     6. iOS PWA fixes
+   ═══════════════════════════════════════════════════════════════════════ */
+
+@media (max-width: 760px) {
+
+  /* ───────────────────────────────────────────────────────────────────
+     PATCH 1 · MODO ESTUDO — esconde streak-bar + step-pills
+     Quando body.studying está ativo (após hideDeckHome()), o foco
+     é só no card. Header fica enxuto: só logo + ações.
+     ─────────────────────────────────────────────────────────────────── */
+  body.studying .app-header .streak-bar,
+  body.studying .app-header .bmd-step-pills {
+    display: none !important;
+  }
+  body.studying .app-header {
+    border-bottom: 1px solid var(--border) !important;
+  }
+  /* Ao estudar, o header fica só com 52px (sem as 3 linhas) */
+  body.studying .app-header .hdr {
+    border-bottom: none !important;
+  }
+
+  /* ───────────────────────────────────────────────────────────────────
+     PATCH 2 · BRAINSTORM OVERLAY — full-screen mobile
+     Hoje o bs-overlay tem bottom:88px (deixa espaço pra bottom-nav).
+     No mobile, fazemos fullscreen com padding-bottom safe.
+     ─────────────────────────────────────────────────────────────────── */
+  .bs-overlay {
+    bottom: 0 !important;
+    padding-top: var(--m-sat) !important;
+    padding-bottom: var(--m-sab) !important;
+  }
+  /* Header do brainstorm — denso */
+  .bs-overlay .bs-h {
+    padding: 10px 14px !important;
+    gap: 8px !important;
+    flex-wrap: nowrap !important;
+    border-bottom: 1px solid var(--border) !important;
+    position: sticky !important;
+    top: 0 !important;
+    background: var(--bg) !important;
+    z-index: 10 !important;
+  }
+  .bs-overlay .bs-t {
+    font-size: 16px !important;
+    gap: 8px !important;
+    flex-shrink: 1 !important;
+    min-width: 0 !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+  }
+  .bs-overlay .bs-t svg {
+    width: 24px !important;
+    height: 24px !important;
+    flex-shrink: 0 !important;
+  }
+  .bs-overlay .bs-hr {
+    gap: 6px !important;
+    flex-shrink: 0 !important;
+  }
+  /* Font-size widget compacto */
+  .bs-overlay .bs-fz {
+    padding: 2px !important;
+    gap: 0 !important;
+  }
+  .bs-overlay .bs-fz button {
+    width: 26px !important;
+    height: 26px !important;
+    font-size: 11px !important;
+  }
+  .bs-overlay .bs-fz span {
+    font-size: 9px !important;
+    min-width: 32px !important;
+    padding: 0 3px !important;
+  }
+  /* Settings + Close buttons compactos */
+  .bs-overlay .bs-ib-cfg {
+    width: 30px !important;
+    height: 30px !important;
+    padding: 0 !important;
+    gap: 0 !important;
+    font-size: 0 !important;
+  }
+  .bs-overlay .bs-ib-cfg svg {
+    width: 13px !important;
+    height: 13px !important;
+  }
+  .bs-overlay .bs-ib {
+    width: 30px !important;
+    height: 30px !important;
+    font-size: 14px !important;
+  }
+  /* Body do brainstorm — padding nativo */
+  .bs-overlay .bs-body {
+    padding: 14px !important;
+  }
+  /* Modes & decks — grid 1-col em telas ≤ 360, 2-col em 361-760 */
+  .bs-overlay .bs-modes {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 8px !important;
+  }
+  .bs-overlay .bs-mode {
+    padding: 12px !important;
+    border-radius: 11px !important;
+  }
+  .bs-overlay .bs-mode-n {
+    font-size: 13px !important;
+    font-weight: 700 !important;
+  }
+  .bs-overlay .bs-mode-d {
+    font-size: 10px !important;
+    margin-top: 3px !important;
+  }
+  .bs-overlay .bs-decks {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 8px !important;
+  }
+  .bs-overlay .bs-deck {
+    padding: 10px 12px !important;
+    font-size: 12px !important;
+    font-weight: 700 !important;
+    border-radius: 10px !important;
+    text-align: left !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 2px !important;
+  }
+  .bs-overlay .bs-deck-sub {
+    font-size: 10px !important;
+    opacity: .65 !important;
+  }
+  /* CTA button — full width sticky bottom feel */
+  .bs-overlay .bs-cta {
+    width: 100% !important;
+    height: 52px !important;
+    border-radius: 13px !important;
+    font-size: 15px !important;
+    font-weight: 800 !important;
+    margin-top: 14px !important;
+    box-shadow: 0 4px 16px rgba(59,127,255,.3) !important;
+  }
+  /* Section headers */
+  .bs-overlay .bs-sh {
+    font-size: 10px !important;
+    letter-spacing: 1px !important;
+    margin: 16px 0 8px !important;
+  }
+  /* Stats line — wrap-friendly */
+  .bs-overlay .bs-stats {
+    flex-wrap: wrap !important;
+    gap: 6px 10px !important;
+    font-size: 11px !important;
+    padding: 8px 14px !important;
+  }
+  /* Control bar (footer brainstorm) */
+  .bs-overlay .bs-ctrl {
+    padding: 12px 14px calc(12px + var(--m-sab)) !important;
+    gap: 6px !important;
+    flex-wrap: wrap !important;
+  }
+  .bs-overlay .bs-btn {
+    padding: 10px 14px !important;
+    font-size: 12px !important;
+    border-radius: 10px !important;
+  }
+  /* Chips do search integrado */
+  .bs-overlay .bs-int-chips {
+    gap: 6px !important;
+    margin-top: 8px !important;
+  }
+  .bs-overlay .bs-chip {
+    padding: 5px 12px !important;
+    font-size: 11px !important;
+    border-radius: 16px !important;
+  }
+
+  /* ───────────────────────────────────────────────────────────────────
+     PATCH 3 · SEARCH-PICKER OVERLAY — bottom-sheet iOS style
+     ─────────────────────────────────────────────────────────────────── */
+  #search-picker-overlay {
+    align-items: flex-end !important;
+    padding: 0 !important;
+  }
+  #search-picker-overlay > div {
+    width: 100% !important;
+    max-width: 100% !important;
+    border-radius: 18px 18px 0 0 !important;
+    padding: 20px 16px calc(28px + var(--m-sab)) !important;
+    animation: mSlideUp .25s cubic-bezier(.34,1.2,.64,1) !important;
+  }
+  #search-picker-overlay button {
+    padding: 14px 14px !important;
+    border-radius: 12px !important;
+  }
+  @keyframes mSlideUp {
+    from { transform: translateY(100%); opacity: .8; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+
+  /* ───────────────────────────────────────────────────────────────────
+     PATCH 4 · PROFILE TAB-NAV — Chess.com scrollable segmented
+     ─────────────────────────────────────────────────────────────────── */
+  .profile-panel .tab-nav {
+    padding: 4px 12px !important;
+    gap: 0 !important;
+    margin-bottom: 8px !important;
+    border-bottom: 1px solid var(--border) !important;
+    background: var(--bg) !important;
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 5 !important;
+  }
+  .profile-panel .tab-btn {
+    padding: 10px 12px 9px !important;
+    font-size: 11px !important;
+    letter-spacing: .3px !important;
+  }
+  .profile-panel .tab-btn.active {
+    color: var(--accent) !important;
+    border-bottom-color: var(--accent) !important;
+  }
+  /* Ring de accuracy — não passa de 96px */
+  .profile-panel .ring-wrap svg {
+    width: 84px !important;
+    height: 84px !important;
+  }
+  .profile-panel .ring-pct {
+    font-size: 22px !important;
+  }
+  /* USMLE Readiness card */
+  .profile-panel .usmle-pred {
+    padding: 12px !important;
+    border-radius: 12px !important;
+  }
+  .profile-panel .pred-title {
+    font-size: 13px !important;
+  }
+
+  /* ───────────────────────────────────────────────────────────────────
+     PATCH 5 · STORM-MENU dropdown — clear da bottom-nav
+     ─────────────────────────────────────────────────────────────────── */
+  .storm-menu {
+    position: fixed !important;
+    bottom: calc(var(--m-nav-h) + var(--m-sab) + 60px) !important;
+    left: 12px !important;
+    right: 12px !important;
+    max-width: calc(100vw - 24px) !important;
+    border-radius: 14px !important;
+    box-shadow: 0 8px 32px rgba(0,0,0,.4) !important;
+  }
+  .storm-menu-item {
+    padding: 12px 14px !important;
+  }
+  .smi-title {
+    font-size: 13px !important;
+  }
+  .smi-sub {
+    font-size: 11px !important;
+  }
+
+  /* ───────────────────────────────────────────────────────────────────
+     PATCH 6 · POSTSTEP PANEL — score report mobile
+     ─────────────────────────────────────────────────────────────────── */
+  #poststep-panel {
+    min-height: 100vh !important;
+    min-height: 100dvh !important;
+    padding-bottom: calc(var(--m-nav-h) + var(--m-sab) + 14px) !important;
+  }
+  #poststep-panel > header.header {
+    padding: 12px 14px !important;
+    padding-top: calc(12px + var(--m-sat)) !important;
+  }
+  #poststep-panel #headerTitle {
+    font-size: 14px !important;
+  }
+
+  /* ───────────────────────────────────────────────────────────────────
+     PATCH 7 · MODAL BOTTOM-SHEET handle visível + dim background
+     ─────────────────────────────────────────────────────────────────── */
+  .qid-modal, .bid-modal {
+    position: relative !important;
+  }
+  .qid-modal::before, .bid-modal::before {
+    content: '';
+    display: block;
+    width: 36px;
+    height: 4px;
+    background: var(--border2, var(--border));
+    border-radius: 2px;
+    margin: -4px auto 16px;
+    opacity: .6;
+  }
+
+  /* ───────────────────────────────────────────────────────────────────
+     PATCH 8 · iOS PWA STATUS BAR — quando rodando em standalone
+     ─────────────────────────────────────────────────────────────────── */
+  @supports (-webkit-touch-callout: none) {
+    .app-header {
+      padding-top: max(var(--m-sat), 4px) !important;
+    }
+    .bmd-bottom-nav {
+      padding-bottom: max(var(--m-sab), 8px) !important;
+    }
+  }
+
+  /* ───────────────────────────────────────────────────────────────────
+     PATCH 9 · BMD-RETURN-BANNER mobile (volta pro BrainStorm)
+     ─────────────────────────────────────────────────────────────────── */
+  #bmd-bs-return-banner {
+    padding: 8px 12px !important;
+    font-size: 12px !important;
+  }
+  #bmd-bs-return-banner .bs-rb-info .bs-rb-sub {
+    display: none !important;
+  }
+  #bmd-bs-return-banner .bs-rb-btn {
+    padding: 6px 12px !important;
+    font-size: 11px !important;
+  }
+
+  /* ───────────────────────────────────────────────────────────────────
+     PATCH 10 · KEY POINT BOX no card — Anki-like, compacto
+     ─────────────────────────────────────────────────────────────────── */
+  #v2kp .v2kpbox {
+    margin: 8px 14px 4px !important;
+    padding: 12px 14px !important;
+    border-radius: 11px !important;
+  }
+  #v2kp .v2kphdr {
+    font-size: 11px !important;
+    margin-bottom: 6px !important;
+  }
+  #v2kp .v2kptxt {
+    font-size: 13.5px !important;
+    line-height: 1.55 !important;
+  }
+
+  /* ───────────────────────────────────────────────────────────────────
+     PATCH 11 · V2-TABS (Visual | Full text) — segmented mobile
+     ─────────────────────────────────────────────────────────────────── */
+  #v2-tabs {
+    display: flex !important;
+    gap: 4px !important;
+    padding: 10px 14px 4px !important;
+    background: var(--surface) !important;
+  }
+  .v2t {
+    flex: 1 !important;
+    padding: 8px 10px !important;
+    font-size: 11px !important;
+    font-weight: 700 !important;
+    border-radius: 8px !important;
+    background: var(--surface2) !important;
+    border: 1px solid var(--border) !important;
+    color: var(--text-dim) !important;
+    cursor: pointer !important;
+    transition: all .15s ease !important;
+  }
+  .v2t:active { transform: scale(.97) !important; }
+  .v2t.on {
+    background: var(--accent-dim, rgba(59,127,255,.12)) !important;
+    border-color: var(--accent) !important;
+    color: var(--accent) !important;
+  }
+  #v2blocks {
+    padding: 10px 0 !important;
+  }
+  #v2next {
+    width: 100% !important;
+    height: 44px !important;
+    border-radius: 11px !important;
+    margin-top: 8px !important;
+    font-size: 13px !important;
+    font-weight: 700 !important;
+  }
+
+  /* ───────────────────────────────────────────────────────────────────
+     PATCH 12 · DECK MANAGE MODAL & QID MODAL — full mobile reach
+     ─────────────────────────────────────────────────────────────────── */
+  .qid-modal textarea, .bid-modal textarea {
+    min-height: 120px !important;
+    font-size: 13px !important;
+  }
+  .qid-modal button, .bid-modal button {
+    min-height: 44px !important;
+  }
+
+  /* ───────────────────────────────────────────────────────────────────
+     PATCH 13 · CARD HEADER — extra polish: TOPIC ellipsis em vez de overflow
+     ─────────────────────────────────────────────────────────────────── */
+  #card-el > .card-header #c-top {
+    display: none !important;  /* topic info já tá na exp section */
+  }
+  /* Highlight toolbar swatches — alinhados */
+  .hl-swatches {
+    display: inline-flex !important;
+    gap: 4px !important;
+    align-items: center !important;
+  }
+  .hl-swatches .sw {
+    width: 16px !important;
+    height: 16px !important;
+    border-radius: 5px !important;
+    cursor: pointer !important;
+  }
+
+  /* ───────────────────────────────────────────────────────────────────
+     PATCH 14 · ATTENDING INLINE — quando aparece, fica clean
+     ─────────────────────────────────────────────────────────────────── */
+  #att-inline-wrap {
+    margin: 8px 14px 12px !important;
+    border-radius: 14px !important;
+  }
+  .att-trigger-row {
+    height: 48px !important;
+    padding: 0 14px !important;
+  }
+
+  /* ───────────────────────────────────────────────────────────────────
+     PATCH 15 · BURY INDICATOR & EXP IMAGE
+     ─────────────────────────────────────────────────────────────────── */
+  .card-img-wrap {
+    margin: 12px 0 !important;
+    padding: 0 14px !important;
+  }
+  .card-img-wrap img {
+    width: 100% !important;
+    height: auto !important;
+    max-height: 60vh !important;
+    object-fit: contain !important;
+    border-radius: 10px !important;
+  }
+  .card-img-credit {
+    padding: 4px 0 0 !important;
+    font-size: 10px !important;
+    color: var(--text-faint) !important;
+  }
+
+  /* ───────────────────────────────────────────────────────────────────
+     PATCH 16 · STREAK-BAR header tap-effect ao tocar números
+     ─────────────────────────────────────────────────────────────────── */
+  .app-header .streak-bar .sb-item {
+    transition: opacity .15s ease;
+  }
+  .app-header .streak-bar .sb-item:active {
+    opacity: .6;
+  }
+
+  /* ───────────────────────────────────────────────────────────────────
+     PATCH 17 · BUILD-CHECK — confirmar que está renderizando
+     ─────────────────────────────────────────────────────────────────── */
+  body::after {
+    content: 'mobile-v1.1';
+    position: fixed;
+    bottom: 2px;
+    right: 4px;
+    font-size: 8px;
+    color: var(--text-faint, #94a3b8);
+    opacity: .35;
+    z-index: 1;
+    pointer-events: none;
+    font-family: 'JetBrains Mono', monospace;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   ≤ 360px (iPhone SE, dispositivos antigos) — micro-ajustes
+   ═══════════════════════════════════════════════════════════════════════ */
+@media (max-width: 360px) {
+  .bs-overlay .bs-modes,
+  .bs-overlay .bs-decks {
+    grid-template-columns: 1fr !important;
+  }
+  .bs-overlay .bs-t {
+    font-size: 14px !important;
+  }
+  .profile-panel .tab-btn {
+    padding: 9px 8px !important;
+    font-size: 10px !important;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   LANDSCAPE MOBILE (telefone deitado, altura curta) — esconde streak-bar
+   pra não comer espaço vertical
+   ═══════════════════════════════════════════════════════════════════════ */
+@media (max-width: 900px) and (orientation: landscape) and (max-height: 500px) {
+  .app-header .streak-bar {
+    display: none !important;
+  }
+  .app-header .bmd-step-pills {
+    padding: 4px 12px 6px !important;
+  }
+  .app-header .bmd-step-pills .step-pill {
+    height: 28px !important;
+  }
+  .bmd-bottom-nav {
+    height: calc(48px + var(--m-sab)) !important;
+    padding: 4px 0 calc(4px + var(--m-sab)) !important;
+  }
+  :root { --m-nav-h: 48px; }
+}
 
 </style>
 
