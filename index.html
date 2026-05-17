@@ -18,8 +18,8 @@ if('caches' in window){
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>BoardMD — Medical Board Review</title><!-- build:20260517-1700-auth-fix-v1 -->
-<script>window.__BMD_BUILD__ = '20260517-1700-auth-fix-v1';</script>
+<title>BoardMD — Medical Board Review</title><!-- build:20260517-1745-scroll-fix-v12 -->
+<script>window.__BMD_BUILD__ = '20260517-1745-scroll-fix-v12';</script>
 <!-- PWA -->
 <link rel="manifest" href="/manifest.json">
 <meta name="theme-color" content="#080c12">
@@ -11717,6 +11717,76 @@ const _supa = supabase.createClient(SUPA_URL, SUPA_KEY, {
 })();
 
 
+/* ═══════════════════════════════════════════════════════════════════════
+   BOARDMD SCROLL WATCHDOG · v1.2 · 17/05/2026
+   Garante que o body NUNCA fique com overflow:hidden quando não há
+   overlay aberto. Roda a cada 800ms — barato e à prova de bug.
+   ═══════════════════════════════════════════════════════════════════════ */
+(function(){
+  'use strict';
+
+  // Só ativa em viewport mobile
+  function isMobile(){
+    return window.innerWidth <= 760;
+  }
+
+  // Lista de overlays que LEGITIMAMENTE travam scroll do body
+  const OVERLAY_SELECTORS = [
+    '.bs-overlay.on',                 // BrainStorm
+    '#bmd-del-overlay',                // Delete card trace
+    '#bmd-loading-overlay',            // Loading inicial
+    '#poststep-panel.active',          // Score report
+    '.modal-overlay.open',             // Modais settings
+    '#search-picker-overlay[style*="flex"]', // Search picker (display:flex)
+  ];
+
+  function hasActiveOverlay(){
+    for(const sel of OVERLAY_SELECTORS){
+      try {
+        const el = document.querySelector(sel);
+        if(el && getComputedStyle(el).display !== 'none'){
+          return true;
+        }
+      } catch(_){}
+    }
+    return false;
+  }
+
+  function watchdog(){
+    if(!isMobile()) return;
+    const bodyOverflow = document.body.style.overflow;
+    if(bodyOverflow === 'hidden' && !hasActiveOverlay()){
+      // FORÇA destrava — algum modal fechou mas esqueceu de restaurar
+      document.body.style.overflow = '';
+      console.log('[Scroll Watchdog] freed body overflow');
+    }
+  }
+
+  // Watchdog a cada 800ms (custo desprezível)
+  setInterval(watchdog, 800);
+
+  // Também roda em eventos críticos
+  document.addEventListener('click', () => setTimeout(watchdog, 200), { passive: true });
+  document.addEventListener('touchend', () => setTimeout(watchdog, 200), { passive: true });
+  window.addEventListener('popstate', () => setTimeout(watchdog, 100));
+
+  // Garante destrava no DOMContentLoaded (caso loading-overlay tenha deixado preso)
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', watchdog);
+  }
+
+  // Hook na finalização de loading overlay
+  window.addEventListener('load', function(){
+    setTimeout(watchdog, 1500);
+    setTimeout(watchdog, 3000);
+  });
+
+  console.log('[Scroll Watchdog] v1.2 active');
+})();
+
+
+
+
 
 // ── LOADING UI ───────────────────────────────────────────────────────
 function showLoadingOverlay(){
@@ -19715,6 +19785,177 @@ function bmdSetupDrag(){
     padding: 4px 0 calc(4px + var(--m-sab)) !important;
   }
   :root { --m-nav-h: 48px; }
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   BOARDMD MOBILE · v1.2 SCROLL FIX · 17/05/2026
+   – PROBLEMA: html/body/#app têm overflow:hidden + height:100vh.
+     Isso é estratégia desktop (sidebar interna rola).
+     No mobile, mata o scroll completamente.
+   – SOLUÇÃO: libera o scroll da PÁGINA, não de containers internos.
+     Estratégia idêntica a Amboss/UWorld mobile.
+   ═══════════════════════════════════════════════════════════════════════ */
+@media (max-width: 760px) {
+
+  /* ────── 1 · LIBERA O SCROLL DA PÁGINA INTEIRA ────── */
+  html, body {
+    height: auto !important;
+    min-height: 100% !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    overscroll-behavior-y: contain !important;
+    /* Espaço para a bottom-nav fixed: */
+    /* (não usar padding aqui — vai no #app pra herdar o background) */
+  }
+
+  /* ────── 2 · #APP: container alto, sem trava ────── */
+  #app, #app.active {
+    height: auto !important;
+    min-height: 100vh !important;
+    min-height: 100dvh !important;
+    overflow: visible !important;
+    display: flex !important;
+    flex-direction: column !important;
+    /* Padding bottom GLOBAL para o conteúdo nunca ficar sob a bottom-nav */
+    padding-bottom: calc(var(--m-nav-h) + var(--m-sab) + 8px) !important;
+  }
+
+  /* ────── 3 · CONTAINERS DE TELA: removem scroll INTERNO ────── */
+  /* Eles eram scrolláveis para a estratégia desktop;
+     no mobile, o scroll é da página, eles só fluem. */
+  .deck-home,
+  .deck-home.active,
+  .lb-panel,
+  .lb-panel.active,
+  .profile-panel,
+  .profile-panel.active {
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    overflow: visible !important;
+    flex: 0 0 auto !important;
+    /* Padding bottom interno é desnecessário agora (#app já cobre) */
+    padding-bottom: 16px !important;
+  }
+
+  /* ────── 4 · APP-LAYOUT (modo estudo) ────── */
+  .app-layout {
+    height: auto !important;
+    min-height: calc(100vh - var(--m-hdr-h)) !important;
+    min-height: calc(100dvh - var(--m-hdr-h)) !important;
+    overflow: visible !important;
+    flex: 1 !important;
+  }
+  .study-main {
+    overflow: visible !important;
+    height: auto !important;
+    min-height: 0 !important;
+  }
+  .study-inner {
+    overflow: visible !important;
+    height: auto !important;
+    min-height: 0 !important;
+  }
+
+  /* ────── 5 · #card-el: flui naturalmente ────── */
+  #card-el {
+    overflow: visible !important;
+    height: auto !important;
+    min-height: 0 !important;
+  }
+  /* O cols-row antes tinha scroll-y interno (estratégia desktop split-view).
+     No mobile: scroll é da página, ele só empilha. */
+  #bmd-cols-row {
+    overflow: visible !important;
+    height: auto !important;
+    min-height: 0 !important;
+    flex: 0 0 auto !important;
+  }
+  #bmd-q-col, #bmd-ans-col, #bmd-q-inner {
+    overflow: visible !important;
+    height: auto !important;
+  }
+
+  /* ────── 6 · FSRS: não mais sticky (estava prendendo scroll) ────── */
+  /* Sticky no card-el quebrava em alguns iOS porque o pai não rolava.
+     Volta para fluxo normal — fica logo após o conteúdo. */
+  .fsrs-nav {
+    position: static !important;
+    bottom: auto !important;
+    z-index: auto !important;
+    /* Mantém visual de barra forte: */
+    padding: 14px 12px !important;
+    background: var(--surface) !important;
+    border-top: 1px solid var(--border) !important;
+    box-shadow: 0 -1px 0 var(--border) !important;
+    /* Quando estiver no fluxo, o padding-bottom do #app garante folga */
+  }
+
+  /* ────── 7 · APP-HEADER: sticky correto agora que body rola ────── */
+  .app-header {
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 50 !important;
+  }
+
+  /* ────── 8 · BOTTOM-NAV: já é fixed, mas reforça ────── */
+  .bmd-bottom-nav {
+    position: fixed !important;
+    bottom: 0 !important;
+    z-index: 100 !important;
+  }
+
+  /* ────── 9 · TODOS os modais/overlays mantêm comportamento ────── */
+  /* Quando overlay aberto, o body fica com overflow:hidden via JS;
+     no fechamento, restaurar o overflow:auto. */
+  body.bmd-modal-open {
+    overflow: hidden !important;
+  }
+
+  /* ────── 10 · BS-OVERLAY (BrainStorm): scroll próprio interno ────── */
+  /* Esse é um overlay full-screen, ele PRECISA de scroll interno. */
+  .bs-overlay.on {
+    position: fixed !important;
+    inset: 0 !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    z-index: 9000 !important;
+  }
+
+  /* ────── 11 · POSTSTEP PANEL: scroll próprio ────── */
+  #poststep-panel.active {
+    position: fixed !important;
+    inset: 0 !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    z-index: 200 !important;
+    background: var(--bg) !important;
+  }
+
+  /* ────── 12 · Garante que a tab-nav interna não trava scroll ────── */
+  .profile-panel .tab-nav {
+    position: relative !important;  /* era sticky; problemático combinado com page scroll */
+    top: auto !important;
+  }
+
+  /* ────── 13 · UPDATE BUILD MARKER ────── */
+  body::after {
+    content: 'mobile-v1.2-scroll-fix' !important;
+  }
+}
+
+/* Em landscape compacto, mantém */
+@media (max-width: 900px) and (orientation: landscape) and (max-height: 500px) {
+  html, body {
+    overflow-y: auto !important;
+    height: auto !important;
+  }
+  #app, #app.active {
+    height: auto !important;
+    overflow: visible !important;
+  }
 }
 
 </style>
