@@ -18,8 +18,8 @@ if('caches' in window){
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>BoardMD — Medical Board Review</title><!-- build:20260518-1100-pmid-pubmed -->
-<script>window.__BMD_BUILD__ = '20260518-1100-pmid-pubmed';</script>
+<title>BoardMD — Medical Board Review</title><!-- build:20260518-1130-kp-cloze -->
+<script>window.__BMD_BUILD__ = '20260518-1130-kp-cloze';</script>
 <!-- PWA -->
 <link rel="manifest" href="/manifest.json">
 <meta name="theme-color" content="#080c12">
@@ -21450,6 +21450,22 @@ function renderClinicalReasoning(card, el) {
     html += '<div class="bs-crk bs-crk-' + cls + '" data-i="2">' +
       '<div class="bs-crk-l">' + lbl + '</div>' +
       '<div class="bs-crk-t">' + hlBold(acontent) + '</div>' +
+    '</div>';
+  }
+
+  // Chunk 4: KP Cloze (se disponível)
+  const kpCloze = card.kp_cloze || '';
+  if (kpCloze && kpCloze.includes('{{')) {
+    // Converte {{termo}} em HTML clicável
+    const clozeHtml = kpCloze.replace(/\{\{(.+?)\}\}/g, function(_, word) {
+      return '<span class="bs-kp-cloze" onclick="bsKpReveal(this)" style="cursor:pointer;display:inline-flex;align-items:center;gap:4px;border-radius:6px;padding:1px 6px;border:1.5px dashed var(--accent);background:rgba(59,127,255,.07);" title="Tap to reveal">' +
+        '<span class="bs-kp-cloze-mask" style="color:var(--accent);font-weight:700;font-size:.9em;letter-spacing:.5px;">[ ? ]</span>' +
+        '<span class="bs-kp-cloze-word" style="display:none;color:var(--accent);font-weight:700;">' + word + '</span>' +
+      '</span>';
+    });
+    html += '<div class="bs-crk bs-crk-kp" data-i="3">' +
+      '<div class="bs-crk-l">Key Point</div>' +
+      '<div class="bs-crk-t" style="line-height:1.7;">' + clozeHtml + '</div>' +
     '</div>';
   }
 
