@@ -18,8 +18,8 @@ if('caches' in window){
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>BoardMD — Medical Board Review</title><!-- build:20260518-0900-distractor-render-fix -->
-<script>window.__BMD_BUILD__ = '20260518-0900-distractor-render-fix';</script>
+<title>BoardMD — Medical Board Review</title><!-- build:20260518-1100-pmid-pubmed -->
+<script>window.__BMD_BUILD__ = '20260518-1100-pmid-pubmed';</script>
 <!-- PWA -->
 <link rel="manifest" href="/manifest.json">
 <meta name="theme-color" content="#080c12">
@@ -8113,13 +8113,24 @@ function revealAnswer(sel,card){
 }
 
 async function prefetchPubmedAbstracts(card){
-  const query = card.pubmed_query || (card.topic ? card.topic + ' ' + (card.subject||'') : null);
-  if(!query || _pubmedCache[card.id]) return;
+  if(_pubmedCache[card.id]) return;
   _pubmedCache[card.id] = { status: 'loading', articles: [], abstracts: [] };
   try {
-    const sr = await fetch('https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed&term='+encodeURIComponent(query.trim())+'&retmax=3&sort=relevance&retmode=json');
-    const sd = await sr.json();
-    const ids = sd.esearchresult?.idlist || [];
+    // Prioridade 1: PMIDs reais do OE (cochrane_pmid) — busca cirúrgica
+    // Prioridade 2: pubmed_query — busca por relevância
+    let ids = [];
+    const storedPmids = card.cochrane_pmid;
+    if(storedPmids && Array.isArray(storedPmids) && storedPmids.length > 0){
+      // Usa PMIDs diretos do OE — artigos que embasaram a questão
+      ids = storedPmids.slice(0,3);
+    } else {
+      // Fallback: busca por texto
+      const query = card.pubmed_query || (card.topic ? card.topic + ' ' + (card.subject||'') : null);
+      if(!query){ _pubmedCache[card.id].status = 'empty'; return; }
+      const sr = await fetch('https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed&term='+encodeURIComponent(query.trim())+'&retmax=3&sort=relevance&retmode=json');
+      const sd = await sr.json();
+      ids = sd.esearchresult?.idlist || [];
+    }
     if(!ids.length){ _pubmedCache[card.id].status = 'empty'; return; }
 
     const smr = await fetch('https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=pubmed&id='+ids.join(',')+'&retmode=json');
