@@ -18,8 +18,8 @@ if('caches' in window){
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>BoardMD — Medical Board Review</title><!-- build:20260517-2200-splitter-fix -->
-<script>window.__BMD_BUILD__ = '20260517-2200-splitter-fix';</script>
+<title>BoardMD — Medical Board Review</title><!-- build:20260517-2230-opendeck -->
+<script>window.__BMD_BUILD__ = '20260517-2230-opendeck';</script>
 <!-- PWA -->
 <link rel="manifest" href="/manifest.json">
 <meta name="theme-color" content="#080c12">
@@ -5265,6 +5265,22 @@ mark, mark.hl-yellow, mark.hl-green, mark.hl-blue, mark.hy, mark.hg, mark.hb {
           <button class="study-btn" onclick="event.stopPropagation();switchDeckAndStudy('new_s2ck')">Study</button>
         </div>
 
+        <div class="deck-row" onclick="switchDeckAndStudy('open-s2')" style="cursor:pointer">
+          <div class="deck-icon" style="background:rgba(139,92,246,.1);">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>
+              <path d="M11 8v6M8 11h6"/>
+            </svg>
+          </div>
+          <div class="deck-info">
+            <div class="deck-title">Open S2</div>
+            <div class="deck-sub">OpenEvidence · Evidence-Based MCQs</div>
+            <div class="deck-stats-line" id="stats-open-s2"><span class="ds-total">— cards</span></div>
+          </div>
+          <div class="deck-badges" id="badges-open-s2"></div>
+          <button class="study-btn" onclick="event.stopPropagation();switchDeckAndStudy('open-s2')">Study</button>
+        </div>
+
                 <div class="deck-row" onclick="switchDeckAndStudy('daily_review')" style="cursor:pointer">
           <div class="deck-icon" style="background:rgba(14,165,233,.12);">
             <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#0ea5e9" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
@@ -6649,7 +6665,7 @@ function goHome(){
 // Track which step the user is studying
 let currentStep = localStorage.getItem('bmd_step') || 's1'; // 's1' or 's2'
 const STEP1_DECKS = ['boardmd_s1','s1_core','s1','hy1','fa_step1','fa_s1','arrows','ethics'];
-const STEP2_DECKS = ['boardmd_s2','core','daily_review','s2','shelf','shelf_surgery','shelf_em','shelf_fm','shelf_im','shelf_neuro','shelf_obgyn','shelf_peds','shelf_psych'];
+const STEP2_DECKS = ['boardmd_s2','core','daily_review','open-s2','s2','shelf','shelf_surgery','shelf_em','shelf_fm','shelf_im','shelf_neuro','shelf_obgyn','shelf_peds','shelf_psych'];
 const SHELF_DECKS = ['shelf','shelf_surgery','shelf_em','shelf_obgyn','shelf_fm','shelf_im','shelf_neuro','shelf_peds','shelf_psych'];
 
 function openApp(dk){
