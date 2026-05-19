@@ -6990,7 +6990,7 @@ function ensureStudyUI(){
 
 // ── SHUFFLE OPTIONS ───────────────────────────────────────────────────
 function shuffleOpts(card){
-  const opts=[{text:card.c,correct:true},...(card.w||[]).map(w=>({text:w,correct:false}))];
+  const opts=[{text:card.c,correct:true},...(card.w||[]).map(w=>({text:(typeof w==='object'&&w!==null)?(w.t||w.text||JSON.stringify(w)):w,correct:(typeof w==='object'&&w!==null)?!!w.correct:false}))];
   for(let i=opts.length-1;i>0;i--){
     const j=Math.floor(Math.random()*(i+1));
     [opts[i],opts[j]]=[opts[j],opts[i]];
@@ -11974,6 +11974,12 @@ function buildDecks(allCards){
   window.DECKS = {};
   for(const card of allCards){
     if(typeof card.w === 'string'){ try { card.w = JSON.parse(card.w); } catch(e){ card.w = []; } }
+    if(Array.isArray(card.w) && card.w.length && typeof card.w[0] === 'object' && card.w[0] !== null){
+      const correctItem = card.w.find(x => x.correct === true);
+      if(correctItem && correctItem.t && !card.c) card.c = correctItem.t;
+      card._wObjects = card.w;
+      card.w = card.w.filter(x => !x.correct).map(x => x.t || x.text || '');
+    }
     if(typeof card.brainstorm === 'string'){ try { card.brainstorm = JSON.parse(card.brainstorm); } catch(e){ card.brainstorm = {}; } }
     if(typeof card.venn === 'string'){ try { card.venn = JSON.parse(card.venn); } catch(e){ card.venn = {}; } }
     const dk = DECK_NAME_MAP[card.deck] || card.deck;
