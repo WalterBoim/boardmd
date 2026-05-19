@@ -18,8 +18,8 @@ if('caches' in window){
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>BoardMD — Medical Board Review</title><!-- build:20260518-1600-brainstorm-modes-fix -->
-<script>window.__BMD_BUILD__ = '20260518-1600-brainstorm-modes-fix';</script>
+<title>BoardMD — Medical Board Review</title><!-- build:20260518-2000-brainstorm-quality-fix -->
+<script>window.__BMD_BUILD__ = '20260518-2000-brainstorm-quality-fix';</script>
 <!-- PWA -->
 <link rel="manifest" href="/manifest.json">
 <meta name="theme-color" content="#080c12">
@@ -18034,24 +18034,61 @@ function bmdSetupDrag(){
 .bs-deck.on .bs-deck-sub .bdc-d{color:#86efac !important}
 .bs-deck.on .bs-deck-sub .bdc-sep{color:rgba(255,255,255,.5) !important}
 
+/* ═══════════════════════════════════════════════════════════════
+   2026-05-18: FIX CRÍTICO — oclusão SÓLIDA do diagnóstico/action.
+   Antes: blur(6px) sem background opaco deixava o texto LEGÍVEL,
+   o aluno via "Dermatomyositis" antes de responder (bug nos prints 1/3).
+   Agora: máscara sólida cor surface + texto "Tap to reveal" centralizado,
+   com micro-shimmer para sinalizar interatividade.
+   ═══════════════════════════════════════════════════════════════ */
 .bs-cr-occlude{
   position:relative;cursor:pointer;
   border-radius:0 10px 10px 0;
   overflow:hidden;
   transition:all .2s;
+  /* Esconde o texto real até o reveal: torna invisível mas mantém o layout */
+  color:transparent !important;
+  text-shadow:none !important;
+  user-select:none;
+  -webkit-user-select:none;
 }
+.bs-cr-occlude *{color:transparent !important;text-shadow:none !important;}
 .bs-cr-occlude::after{
   content:'Tap to reveal';
   position:absolute;inset:0;
-  display:flex;align-items:center;justify-content:center;
-  font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
-  color:rgba(255,255,255,.7);
-  backdrop-filter:blur(6px);
-  -webkit-backdrop-filter:blur(6px);
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--text-dim,#94a3b8);
+  background:var(--surface,#1a1f2e);
+  /* Padrão sutil para indicar área clicável (sem revelar conteúdo) */
+  background-image:repeating-linear-gradient(135deg,transparent 0 10px,rgba(255,255,255,.025) 10px 11px);
+  border-radius:inherit;
   transition:all .2s;
+  z-index:2;
 }
-.bs-cr-occlude.revealed::after{display:none;}
-.bs-cr-occlude:hover::after{color:#fff;}
+.bs-cr-occlude::before{
+  /* Ícone de cadeado/olho via pseudo */
+  content:'👁';
+  position:absolute;top:50%;left:50%;
+  transform:translate(-78px,-50%);
+  font-size:13px;opacity:.55;
+  z-index:3;pointer-events:none;
+}
+.bs-cr-occlude:hover::after,.bs-cr-occlude:focus::after{
+  color:var(--accent,#3b7fff);
+  background-image:repeating-linear-gradient(135deg,transparent 0 10px,rgba(59,127,255,.08) 10px 11px);
+}
+.bs-cr-occlude:hover::before{opacity:.9}
+.bs-cr-occlude.revealed{
+  color:inherit !important;
+  user-select:auto;
+  -webkit-user-select:auto;
+}
+.bs-cr-occlude.revealed *{color:inherit !important;}
+.bs-cr-occlude.revealed::after,
+.bs-cr-occlude.revealed::before{display:none;}
+/* Modo "tela grande" (large/A+) — aumenta área-alvo */
+.fz-lg .bs-cr-occlude::after,.fz-xl .bs-cr-occlude::after{font-size:13px}
 
 /* ═══════════════════════════════════════════════════════════════
    2026-05-16: CLINICAL CHAIN — chip + commit-before-reveal + 260+ INSIGHT
@@ -18390,6 +18427,55 @@ function bmdSetupDrag(){
 .bs-ar-fsrs-btn.easy{background:rgba(59,127,255,.12);border-color:#3b7fff;color:#3b7fff}
 .bs-ar-fsrs-label{font-size:9px;color:var(--text-dim);margin-top:3px;display:block}
 
+
+/* ═══════════════════════════════════════════════════════════════
+   2026-05-18: KEY POINT CLOZE — estilo AnKing autêntico.
+   Uma palavra-chave do KP fica ocluída como [...], tap revela.
+   Frase aparece legível, só a "joia" da carta está escondida.
+   ═══════════════════════════════════════════════════════════════ */
+.bs-kp-cloze{
+  cursor:pointer;
+  display:inline-block;
+  border-radius:5px;
+  padding:2px 10px;
+  margin:0 2px;
+  border:1.5px dashed var(--accent,#3b7fff);
+  background:rgba(59,127,255,.1);
+  color:var(--accent,#3b7fff);
+  font-weight:700;
+  transition:all .18s ease;
+  vertical-align:baseline;
+  line-height:1.4;
+  user-select:none;
+  -webkit-user-select:none;
+  letter-spacing:.04em;
+}
+.bs-kp-cloze:hover{
+  background:rgba(59,127,255,.22);
+  border-style:solid;
+  transform:translateY(-1px);
+  box-shadow:0 2px 8px rgba(59,127,255,.2);
+}
+.bs-kp-cloze:active{transform:translateY(0);box-shadow:none}
+.bs-kp-cloze.revealed{
+  background:rgba(34,197,94,.14);
+  border:1.5px solid #22c55e;
+  color:#22c55e;
+  cursor:default;
+  box-shadow:none;
+  transform:none;
+  animation:bsKpClozeReveal .3s ease;
+  letter-spacing:0;
+}
+.bs-kp-cloze.revealed:hover{background:rgba(34,197,94,.14);transform:none}
+@keyframes bsKpClozeReveal{
+  0%{transform:scale(.92);opacity:.6}
+  60%{transform:scale(1.04);opacity:1}
+  100%{transform:scale(1);opacity:1}
+}
+.bs-kp-cloze-mask,.bs-kp-cloze-word{display:inline}
+.bs-kp-cloze:not(.revealed) .bs-kp-cloze-word{display:none}
+.bs-kp-cloze.revealed .bs-kp-cloze-mask{display:none}
 
 /* Clinical Reasoning chunks */
 .bs-cr{padding:22px 28px 18px;display:flex;flex-direction:column;gap:14px;position:relative}
@@ -20657,17 +20743,17 @@ function render(){
           + '<div class="bs-kpr-resp" id="bs-kpr-resp">'
             + '<div class="bs-kpr-l">RESPONSE</div>'
             + (function(){
-                const rawCloze = card.kp_cloze || '';
-                if(rawCloze && rawCloze.includes('{{')){
-                  const clozeHtml = rawCloze.replace(/\{\{(.+?)\}\}/g, function(_,w){
-                    return '<span class="bs-kp-cloze" onclick="bsKpReveal(this)" style="cursor:pointer;display:inline-flex;align-items:center;gap:4px;border-radius:6px;padding:2px 8px;border:1.5px dashed var(--accent);background:rgba(59,127,255,.07);">'
-                      +'<span class="bs-kp-cloze-mask" style="color:var(--accent);font-weight:700;">[ ? ]</span>'
-                      +'<span class="bs-kp-cloze-word" style="display:none;color:var(--accent);font-weight:700;">'+w+'</span>'
-                    +'</span>';
-                  });
-                  return '<div style="line-height:1.8;">'+clozeHtml+'</div>'
-                       + '<div style="font-size:11px;color:var(--text-faint);margin-top:8px;text-align:center;">Tap [ ? ] to reveal · +1 coin each</div>';
-                }
+                // 2026-05-18: usa helper bsKpAutoCloze (AnKing-style, 1 palavra)
+                try {
+                  if(typeof window.bsKpAutoCloze === 'function'){
+                    const r = window.bsKpAutoCloze(card);
+                    if(r && r.hasCloze){
+                      return r.html
+                        + '<div style="font-size:11px;color:var(--text-faint);margin-top:10px;text-align:center;letter-spacing:.04em;">Tap [ ... ] to reveal</div>';
+                    }
+                  }
+                } catch(e){}
+                // Fallback duro: máscara sobre response inteiro
                 return '<div class="bs-kpr-mask" onclick="kprReveal(event)">tap to reveal</div>'
                      + '<div class="bs-kpr-t bs-kpr-hidden">'+hlBold(_response)+'</div>';
               })()
@@ -21469,21 +21555,18 @@ function renderClinicalReasoning(card, el) {
     '</div>';
   }
 
-  // Chunk 4: KP Cloze (se disponível)
-  const kpCloze = card.kp_cloze || '';
-  if (kpCloze && kpCloze.includes('{{')) {
-    // Converte {{termo}} em HTML clicável
-    const clozeHtml = kpCloze.replace(/\{\{(.+?)\}\}/g, function(_, word) {
-      return '<span class="bs-kp-cloze" onclick="bsKpReveal(this)" style="cursor:pointer;display:inline-flex;align-items:center;gap:4px;border-radius:6px;padding:1px 6px;border:1.5px dashed var(--accent);background:rgba(59,127,255,.07);" title="Tap to reveal">' +
-        '<span class="bs-kp-cloze-mask" style="color:var(--accent);font-weight:700;font-size:.9em;letter-spacing:.5px;">[ ? ]</span>' +
-        '<span class="bs-kp-cloze-word" style="display:none;color:var(--accent);font-weight:700;">' + word + '</span>' +
-      '</span>';
-    });
-    html += '<div class="bs-crk bs-crk-kp" data-i="3">' +
-      '<div class="bs-crk-l">Key Point</div>' +
-      '<div class="bs-crk-t" style="line-height:1.7;">' + clozeHtml + '</div>' +
-    '</div>';
-  }
+  // Chunk 4: KP Cloze (se disponível) — 2026-05-18: helper unificado
+  try {
+    if(typeof window.bsKpAutoCloze === 'function'){
+      const _r = window.bsKpAutoCloze(card);
+      if(_r && _r.hasCloze){
+        html += '<div class="bs-crk bs-crk-kp" data-i="3">' +
+          '<div class="bs-crk-l">Key Point</div>' +
+          '<div class="bs-crk-t">' + _r.html + '</div>' +
+        '</div>';
+      }
+    }
+  } catch(e){}
 
   // FSRS buttons — shown after last chunk reveals
   (function(){
@@ -21521,6 +21604,72 @@ function hlBold(t) {
 function stripBold(t) {
   return t ? String(t).replace(/\*\*(.+?)\*\*/g, '$1') : '';
 }
+
+// ═══════════════════════════════════════════════════════════════════════
+// 2026-05-18: bsKpAutoCloze — cloze AnKing (1 palavra-chave ocluída).
+// Prioridade:
+//   1) card.kp_cloze com {{palavra}} explícita do Sonnet → usa
+//   2) **negrito** no kp → ocluí o primeiro negrito
+//   3) diagnosis literal dentro do kp → ocluí
+//   4) fallback: renderiza kp normal (sem cloze)
+// ═══════════════════════════════════════════════════════════════════════
+window.bsKpAutoCloze = function(card){
+  if(!card) return {html:'', hasCloze:false};
+  const kp = card.kp ? String(card.kp) : '';
+  if(!kp) return {html:'', hasCloze:false};
+
+  const _clozeSpan = function(word){
+    return '<span class="bs-kp-cloze" onclick="bsKpReveal(this)" title="Tap to reveal">'
+      + '<span class="bs-kp-cloze-mask">[ ... ]</span>'
+      + '<span class="bs-kp-cloze-word">' + word + '</span>'
+      + '</span>';
+  };
+
+  // 1) kp_cloze explícito do Sonnet
+  const explicit = card.kp_cloze || '';
+  if(explicit && explicit.indexOf('{{') !== -1){
+    const html = explicit.replace(/\{\{(.+?)\}\}/g, function(_, w){ return _clozeSpan(w); });
+    return {html:'<div style="line-height:1.75;">'+html+'</div>', hasCloze:true};
+  }
+
+  // 2) Negrito no kp (markdown **palavra**) — pega o primeiro
+  const boldMatch = kp.match(/\*\*(.+?)\*\*/);
+  if(boldMatch){
+    const word = boldMatch[1];
+    let used = false;
+    const html = kp.replace(/\*\*(.+?)\*\*/g, function(_, w){
+      if(!used){ used = true; return _clozeSpan(w); }
+      return '<span class="bs-hlb">'+w+'</span>'; // outros negritos viram highlight normal
+    });
+    return {html:'<div style="line-height:1.75;">'+html+'</div>', hasCloze:true};
+  }
+
+  // 3) diagnosis literal dentro do kp
+  let dx = '';
+  try {
+    if(card.brainstorm){
+      const _bs = typeof card.brainstorm === 'string' ? JSON.parse(card.brainstorm) : card.brainstorm;
+      const _bsObj = typeof _bs === 'string' ? JSON.parse(_bs) : _bs;
+      dx = (_bsObj && _bsObj.diagnosis) ? _bsObj.diagnosis : '';
+    }
+  } catch(e){}
+  if(dx){
+    // Escape regex chars
+    const dxEsc = dx.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const re = new RegExp('\\b' + dxEsc + '\\b', 'i');
+    if(re.test(kp)){
+      let used = false;
+      const html = kp.replace(re, function(match){
+        if(!used){ used = true; return _clozeSpan(match); }
+        return match;
+      });
+      return {html:'<div style="line-height:1.75;">'+hlBold(html)+'</div>', hasCloze:true};
+    }
+  }
+
+  // 4) Fallback: kp normal, sem cloze
+  return {html:'<div style="line-height:1.75;">'+hlBold(kp)+'</div>', hasCloze:false};
+};
 
 
 /* Active Recall State */
@@ -21638,6 +21787,54 @@ function renderActiveRecall(card, el) {
   const action   = bs.action_content || '';
   const actDist  = bs.action_distractor || '';
 
+  // ═══════════════════════════════════════════════════════════════
+  // 2026-05-18: VALIDAÇÃO DE CATEGORIA dos distratores.
+  // Bug do Print 2: card de torção testicular tinha dx_distractor =
+  // "Urinalysis and urine culture" (uma CONDUTA, não um diagnóstico
+  // competidor). Aqui rejeitamos distratores fora de categoria:
+  //  • Dx distractor não pode parecer uma conduta (verbos de ação,
+  //    nomes de testes/exames/medicações).
+  //  • Action distractor não pode ser igual ao diagnóstico nem ao action.
+  // Quando o distrator é inválido → cai no fallback (reveal sem MCQ),
+  // preservando a regra "sempre 2 opções, ambas próximas e fortes".
+  // ═══════════════════════════════════════════════════════════════
+  const _looksLikeProcedure = function(s){
+    if(!s) return false;
+    const x = String(s).toLowerCase().trim();
+    // Padrões de conduta (não-Dx)
+    const proceduralStarts = /^(start |begin |give |administer |order |obtain |perform |refer |consult |reassure |observe |monitor |stop |discontinue |add |switch |increase |decrease |check |measure |send |culture |biopsy |image |scan |xray |x-ray |ct |mri |ecg |ekg |echo |us |ultrasound |urinalysis|urine |blood |serum |csf )/;
+    const containsTestSuffix = /\b(test|culture|panel|level|titer|screen|swab|biopsy|aspirate|workup|imaging|study|scan|count|gas|x-?ray)\b/;
+    const containsTherapyVerb = /\b(therapy|treatment|prophylaxis|surgery|exploration|repair|resection|ablation|drainage|incision)\b/;
+    return proceduralStarts.test(x) || containsTestSuffix.test(x) || containsTherapyVerb.test(x);
+  };
+  const _norm = function(s){return (s||'').toLowerCase().replace(/[^\w\s]/g,'').replace(/\s+/g,' ').trim();};
+
+  // Validação Dx distractor: não pode ser conduta, não pode ser igual ao Dx correto
+  const dxDistValid = dxDist &&
+                      _norm(dxDist) !== _norm(dx) &&
+                      !_looksLikeProcedure(dxDist);
+
+  // Validação Action distractor: não pode ser igual ao Dx nem ao Action correto
+  const actDistValid = actDist &&
+                       _norm(actDist) !== _norm(action) &&
+                       _norm(actDist) !== _norm(dx);
+
+  // Aplica filtros
+  const _dxDistFinal = dxDistValid ? dxDist : '';
+  const _actDistFinal = actDistValid ? actDist : '';
+
+  // Telemetria suave: log quando rejeitamos (ajuda a calibrar o prompt do Sonnet)
+  try {
+    if(dxDist && !dxDistValid){
+      console.warn('[AR] Dx distractor rejected (looks like procedure or duplicate):',
+        {card:card.id, dx:dx, rejected:dxDist});
+    }
+    if(actDist && !actDistValid){
+      console.warn('[AR] Action distractor rejected (duplicate of dx/action):',
+        {card:card.id, action:action, rejected:actDist});
+    }
+  } catch(e){}
+
   const ACTION_LABELS = {
     NEXT_STEP: 'Next Step', BEST_TEST: 'Best Test',
     TREATMENT: 'Treatment', MECHANISM: 'Mechanism', PROGNOSIS: 'Prognosis'
@@ -21654,9 +21851,11 @@ function renderActiveRecall(card, el) {
       : [{text: wrong, isCorrect: false}, {text: correct, isCorrect: true}];
   }
 
-  const dxOpts = dxDist ? shuffleTwo(dx, dxDist) : null;
-  const actOpts = (atype !== 'NONE' && action && actDist) ? shuffleTwo(action, actDist) : null;
-  const hasAction = atype !== 'NONE' && action;
+  // 2026-05-18: GUARD action_content == diagnosis (mesmo guard do Reveal mode)
+  const _isJunkAction2 = action && dx && _norm(action) === _norm(dx);
+  const dxOpts = _dxDistFinal ? shuffleTwo(dx, _dxDistFinal) : null;
+  const actOpts = (atype !== 'NONE' && action && !_isJunkAction2 && _actDistFinal) ? shuffleTwo(action, _actDistFinal) : null;
+  const hasAction = atype !== 'NONE' && action && !_isJunkAction2;
 
   let html = '<div class="bs-ar" id="bs-ar-wrap">';
 
@@ -21934,7 +22133,28 @@ function renderClinicalReasoningReveal(card, el) {
 
   const atype = (bs.action_type||'NONE').toUpperCase();
   const action = bs.action_content || '';
-  const hasAction = atype !== 'NONE' && action;
+  // ═══════════════════════════════════════════════════════════════
+  // 2026-05-18: GUARD — se Sonnet gerou action_content == diagnosis
+  // (bug visto nos prints: Next Step "Dermatomyositis" / "Frontotemporal
+  // dementia"), suprime o bloco Action para não duplicar e não confundir.
+  // O guard já existia no renderClinicalReasoning legacy (linha ~21462)
+  // mas faltava aqui no Reveal — agora aplicado nos DOIS lugares.
+  // Também filtra subsets triviais ("Dermatomyositis" vs "Dermatomyositis with...").
+  // ═══════════════════════════════════════════════════════════════
+  const _normalize = function(s){
+    return (s||'').toLowerCase()
+      .replace(/[.,;:!?()\[\]"']/g,'')
+      .replace(/\s+/g,' ')
+      .trim();
+  };
+  const _dxN = _normalize(bs.diagnosis||'');
+  const _acN = _normalize(action);
+  const _isJunkAction = action && _dxN && (
+    _acN === _dxN ||                          // exato
+    (_acN.length >= 6 && _dxN.indexOf(_acN) !== -1) ||  // action contido no dx
+    (_dxN.length >= 6 && _acN.indexOf(_dxN) !== -1 && _acN.length < _dxN.length + 4)  // dx contido no action sem agregar info
+  );
+  const hasAction = atype !== 'NONE' && action && !_isJunkAction;
   const amap = ACTION_MAP[atype] || null;
   // 260+ INSIGHT: usa decision_pivot se existir, senão fallback pra phrase
   const insight = (bs.decision_pivot && bs.decision_pivot.trim())
@@ -22358,15 +22578,14 @@ window.crFsrs = function(rating, cardId) {
 };
 
 window.bsKpReveal=function(el){
-  if(el.dataset.revealed==='1')return;
+  if(el.dataset.revealed==='1' || el.classList.contains('revealed'))return;
   el.dataset.revealed='1';
-  el.style.cursor='default';
-  const mask=el.querySelector('.bs-kp-cloze-mask');
-  const word=el.querySelector('.bs-kp-cloze-word');
-  if(mask)mask.style.display='none';
-  if(word){word.style.display='inline';word.style.animation='bsKpPop .3s ease';}
-  el.style.background='rgba(59,127,255,.15)';
-  el.style.borderColor='var(--accent)';
+  el.classList.add('revealed'); // 2026-05-18: dispara CSS AnKing-style
+  // CSS .bs-kp-cloze.revealed cuida do visual (verde + animação bsKpClozeReveal)
+  // Limpa inline styles antigos que poderiam conflitar
+  el.style.cursor='';
+  el.style.background='';
+  el.style.borderColor='';
   // Micro coin reward for actively revealing a cloze
   try{const g=window.getGami?window.getGami():{};g.coins=(g.coins||0)+1;if(window.saveGami)window.saveGami(g);if(window.updateGamiUI)window.updateGamiUI(g);}catch(e){}
 };
