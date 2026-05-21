@@ -4651,6 +4651,17 @@ html:not(.light) .editorial-block{
 }
 
 /* ════════════════════════════════════════════════════════════════════════
+   CRITICAL FIX: Landing is FORCIBLY hidden when app is active.
+   This prevents the empty editorial-block gradient strip from showing
+   when JS didn't fully run or got re-rendered. Uses :has() which
+   works regardless of DOM order. Supported on iOS 15.4+, Chrome 105+.
+   ════════════════════════════════════════════════════════════════════════ */
+body:has(#app.active) #landing,
+html:has(#app.active) #landing {
+  display: none !important;
+}
+
+/* ════════════════════════════════════════════════════════════════════════
    LANDING — MOBILE PREMIUM (≤ 740px) · App-grade polish
    Focus: feel like a native iOS/Android app preview, not a shrunken site
    ════════════════════════════════════════════════════════════════════════ */
@@ -24225,6 +24236,37 @@ document.addEventListener('DOMContentLoaded', function(){
 });
 
 console.log('[BoardMD Venn + Storm] ready');
+
+/* ════════════════════════════════════════════════════════════════════════
+   SAFETY NET: Guarantee #landing is hidden whenever #app is .active
+   Triple-layer protection: CSS :has(), inline display, MutationObserver.
+   Prevents the gradient strip / editorial-block from peeking below the
+   study area on mobile when re-renders or hot-reloads happen.
+   ════════════════════════════════════════════════════════════════════════ */
+(function(){
+  function syncLandingVisibility(){
+    var app = document.getElementById('app');
+    var landing = document.getElementById('landing');
+    if(!app || !landing) return;
+    if(app.classList.contains('active')){
+      if(landing.style.display !== 'none') landing.style.display = 'none';
+    }
+  }
+  // Initial sync
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', syncLandingVisibility);
+  } else {
+    syncLandingVisibility();
+  }
+  // Watch for class changes on #app
+  var app = document.getElementById('app');
+  if(app && typeof MutationObserver !== 'undefined'){
+    new MutationObserver(syncLandingVisibility)
+      .observe(app, { attributes: true, attributeFilter: ['class'] });
+  }
+  // Re-check on page visibility (handles iOS app-switching)
+  document.addEventListener('visibilitychange', syncLandingVisibility);
+})();
 </script>
 </body>
 </html>
