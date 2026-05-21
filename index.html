@@ -3949,6 +3949,121 @@ html.light #venn-inline{ background:linear-gradient(180deg, rgba(37,99,235,0.04)
 #venn-inline-modal .vim-close{ float:right; background:var(--surface2); border:1px solid var(--border); border-radius:8px; padding:6px 12px; font-size:13px; cursor:pointer; color:var(--text-dim); font-family:'Lato', sans-serif; }
 #venn-inline-modal .vim-close:hover{ color:var(--text); background:var(--surface); }
 
+/* ─── Venn mobile: inline tighter + modal fullscreen ─── */
+@media (max-width: 740px){
+  #venn-inline{
+    padding: 8px 10px 10px;
+    margin: 8px 14px 4px !important;
+    border-radius: 10px;
+  }
+  #venn-inline .vi-head{
+    font-size: 9.5px;
+    margin-bottom: 8px;
+    gap: 8px;
+  }
+  #venn-inline .vi-head .vi-tag{
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    min-width: 0;
+    flex: 1;
+  }
+  #venn-inline .vi-expand{
+    flex-shrink: 0;
+    min-height: 28px;
+    padding: 4px 10px;
+    font-size: 9.5px;
+    letter-spacing: .06em;
+    background: var(--accent-dim, rgba(37,99,235,.10));
+    color: var(--accent);
+    border-color: rgba(37,99,235,.30);
+    -webkit-tap-highlight-color: transparent;
+  }
+  #venn-inline .vi-expand:active{
+    transform: scale(.96);
+    background: var(--accent);
+    color: #fff;
+  }
+
+  /* Modal fullscreen on mobile */
+  #venn-inline-modal{
+    padding: 0;
+    background: rgba(0,0,0,.92);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+  #venn-inline-modal .vim-inner{
+    background: var(--bg);
+    border: none;
+    border-radius: 0;
+    padding: calc(16px + env(safe-area-inset-top, 0px)) 16px calc(16px + env(safe-area-inset-bottom, 0px));
+    width: 100vw !important;
+    min-width: 100vw !important;
+    max-width: 100vw !important;
+    height: 100vh;
+    height: 100dvh;
+    max-height: 100vh;
+    max-height: 100dvh;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    box-shadow: none;
+    display: flex;
+    flex-direction: column;
+  }
+  #venn-inline-modal .vim-close{
+    min-height: 36px;
+    padding: 8px 14px;
+    font-size: 13px;
+    font-weight: 700;
+    border-radius: 10px;
+    -webkit-tap-highlight-color: transparent;
+  }
+  #venn-inline-modal .vim-close:active{
+    transform: scale(.96);
+  }
+  #venn-inline-modal #venn-inline-modal-body{
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  #venn-inline-modal #venn-inline-modal-body svg{
+    width: 100%;
+    height: auto;
+    max-width: 100%;
+  }
+}
+
+/* ─── Venn desktop refinements ─── */
+@media (min-width: 741px){
+  #venn-inline{
+    padding: 12px 14px 14px;
+    border-radius: 14px;
+  }
+  #venn-inline .vi-head{
+    font-size: 10px;
+    margin-bottom: 8px;
+  }
+  #venn-inline .vi-head .vi-tag{
+    font-weight: 800;
+    letter-spacing: .14em;
+  }
+  #venn-inline .vi-expand{
+    padding: 4px 12px;
+    font-size: 10px;
+    letter-spacing: .08em;
+    border-radius: 7px;
+    background: var(--accent-dim, rgba(37,99,235,.08));
+    color: var(--accent);
+    border-color: rgba(37,99,235,.22);
+  }
+  #venn-inline .vi-expand:hover{
+    background: var(--accent);
+    color: #fff;
+    border-color: var(--accent);
+  }
+}
+
 
 /* ═══════════════════════════════════════════════════════════════════
    BoardMD — Storm Split Button (premium, didactic, marketing-grade)
@@ -23911,7 +24026,6 @@ window._bmdRenderVennInline = function(card){
     function pushAndReset(){ if(cur){ lines.push(cur); cur=''; } }
     for(var i = 0; i < words.length; i++){
       var w = words[i];
-      // Palavra única excedendo maxChars: divide com -
       while(w.length > maxChars){
         pushAndReset();
         if(lines.length >= maxLines) break;
@@ -23919,7 +24033,6 @@ window._bmdRenderVennInline = function(card){
         w = w.substring(maxChars - 1);
       }
       if(lines.length >= maxLines){
-        // estouramos limite de linhas — tudo o que sobra vira "…" na última
         if(lines.length === maxLines){
           var last = lines[maxLines - 1];
           if(last.length + 1 < maxChars) lines[maxLines - 1] = last + '…';
@@ -23933,12 +24046,10 @@ window._bmdRenderVennInline = function(card){
         lines.push(cur);
         cur = w;
         if(lines.length >= maxLines){
-          // resto vai pra última linha (truncada se preciso)
           var rest = w + (i < words.length - 1 ? ' ' + words.slice(i+1).join(' ') : '');
           if(rest.length > maxChars) rest = rest.substring(0, maxChars - 1) + '…';
           lines.push(rest);
-          // pop "cur" duplicado
-          if(lines[lines.length - 2] !== rest) {} // já adicionou
+          if(lines[lines.length - 2] !== rest) {}
           return lines.slice(0, maxLines);
         }
       }
@@ -23947,25 +24058,29 @@ window._bmdRenderVennInline = function(card){
     return lines.slice(0, maxLines);
   }
 
+  /* Detect dark mode for theme-aware colors */
+  function isLightMode(){
+    return document.documentElement.classList.contains('light');
+  }
+
   function buildSvg(W, opts){
     opts = opts || {};
     var fontSize  = opts.fontSize  || 13;
     var labelSize = opts.labelSize || 11;
     var lineH     = Math.round(fontSize * 1.35);
     var itemGap   = Math.round(fontSize * 0.65);
-    var topPad    = 70;     // espaço pros labels acima dos círculos (maior)
-    var bottomPad = 30;
-    // GERAR LABELS: NÃO TRUNCAR — quebrar em 2 linhas se necessário
-    var leftLblLines  = wrapText(String(v.left_label).toUpperCase(),  22, 2);
-    var rightLblLines = wrapText(String(v.right_label).toUpperCase(), 22, 2);
-    var labelH = Math.max(leftLblLines.length, rightLblLines.length) * 16;
-    if(labelH > 16) topPad = 60 + labelH;
+    var topPad    = opts.topPad || 70;
+    var bottomPad = opts.bottomPad || 30;
 
-    // chars máximos por zona — ajustado pra textos dentro dos círculos
+    var leftLblLines  = wrapText(String(v.left_label).toUpperCase(),  opts.lblChars || 22, 2);
+    var rightLblLines = wrapText(String(v.right_label).toUpperCase(), opts.lblChars || 22, 2);
+    var labelH = Math.max(leftLblLines.length, rightLblLines.length) * (labelSize + 4);
+    if(leftLblLines.length > 1 || rightLblLines.length > 1) topPad = topPad + labelH * 0.5;
+
     var maxL = opts.maxL || 16;
     var maxS = opts.maxS || 13;
     var maxR = opts.maxR || 16;
-    var maxLines = 3;
+    var maxLines = opts.maxLines || 3;
 
     var Lw = L.map(function(t){ return wrapText(t, maxL, maxLines); });
     var Sw = S.map(function(t){ return wrapText(t, maxS, maxLines); });
@@ -23979,18 +24094,16 @@ window._bmdRenderVennInline = function(card){
     var hL = blockHeight(Lw);
     var hS = blockHeight(Sw);
     var hR = blockHeight(Rw);
-    var contentH = Math.max(hL, hS, hR, 130);
+    var contentH = Math.max(hL, hS, hR, opts.minContent || 130);
 
-    // Geometria: raio do círculo com folga generosa
-    var verticalPad = 36;
-    var rCircle = Math.max(contentH/2 + verticalPad, 170);
+    var verticalPad = opts.verticalPad || 36;
+    var rCircle = Math.max(contentH/2 + verticalPad, opts.minR || 170);
     var overlap = rCircle * 0.55;
     var H = topPad + 2 * rCircle + bottomPad;
     var cy = topPad + rCircle;
     var cx1 = W/2 - rCircle + overlap;
     var cx2 = W/2 + rCircle - overlap;
 
-    // Centros X dos textos (centroides simétricos das 3 zonas)
     var leftEdge       = cx1 - rCircle;
     var intersectStart = cx2 - rCircle;
     var intersectEnd   = cx1 + rCircle;
@@ -24000,6 +24113,15 @@ window._bmdRenderVennInline = function(card){
     var zL = leftEdge + leftZoneW / 2;
     var zS = W / 2;
     var zR = intersectEnd + rightZoneW / 2;
+
+    /* Theme-aware text colors — high contrast in BOTH modes */
+    var light = isLightMode();
+    var colorL = light ? '#1e3a8a' : '#bfdbfe';   // dark navy on light, sky blue on dark
+    var colorS = light ? '#5b21b6' : '#ddd6fe';   // dark purple on light, lavender on dark
+    var colorR = light ? '#78350f' : '#fed7aa';   // dark amber on light, peach on dark
+    var labelColorL = light ? '#2563eb' : '#60a5fa';
+    var labelColorS = light ? '#7c3aed' : '#a78bfa';
+    var labelColorR = light ? '#d97706' : '#fbbf24';
 
     function renderZone(wrapped, x, color, weight, blockH){
       var out = '';
@@ -24017,75 +24139,143 @@ window._bmdRenderVennInline = function(card){
       return out;
     }
 
-    // Função pra renderizar label do topo em até 2 linhas
     function renderTopLabel(lines, x, color){
-      var baseY = topPad - 30 - ((lines.length - 1) * 14);
+      var lineSpacing = labelSize + 3;
+      var baseY = topPad - 30 - ((lines.length - 1) * lineSpacing);
       var out = '';
       lines.forEach(function(line, i){
-        out += '<text x="'+x+'" y="'+(baseY + i*14)+'" text-anchor="middle" ' +
-               'font-family="-apple-system, BlinkMacSystemFont, Inter, sans-serif" font-size="'+labelSize+'" font-weight="700" ' +
-               'letter-spacing="2.2" fill="'+color+'">' + esc(line) + '</text>';
+        out += '<text x="'+x+'" y="'+(baseY + i*lineSpacing)+'" text-anchor="middle" ' +
+               'font-family="-apple-system, BlinkMacSystemFont, Inter, sans-serif" font-size="'+labelSize+'" font-weight="800" ' +
+               'letter-spacing="' + (opts.letterSpacing || 2.2) + '" fill="'+color+'">' + esc(line) + '</text>';
       });
       return out;
     }
 
-    // IDs únicos para gradientes (evita conflito entre small/large coexistindo no DOM)
     var uid = 'venn' + Math.random().toString(36).substr(2, 8);
+
+    /* Circle fill gradients — theme-aware */
+    var stop1L = light ? '#dbeafe' : 'rgba(59,127,255,0.20)';
+    var stop2L = light ? '#bfdbfe' : 'rgba(59,127,255,0.30)';
+    var stop1R = light ? '#fef3c7' : 'rgba(245,158,11,0.20)';
+    var stop2R = light ? '#fde68a' : 'rgba(245,158,11,0.30)';
+    var stop1Op = light ? '0.95' : '0.9';
+    var stop2Op = light ? '0.85' : '0.85';
+    var strokeL = light ? '#3b82f6' : '#60a5fa';
+    var strokeR = light ? '#f59e0b' : '#fbbf24';
+    var strokeWidth = opts.strokeWidth || 2;
 
     var out = '<svg viewBox="0 0 '+W+' '+H+'" xmlns="http://www.w3.org/2000/svg" ' +
               'preserveAspectRatio="xMidYMid meet" role="img" ' +
               'aria-label="Venn: '+esc(v.left_label)+' vs '+esc(v.right_label)+'">';
 
-    // Defs: gradientes e shadow
     out += '<defs>';
     out += '<linearGradient id="'+uid+'Lf" x1="0" y1="0" x2="0" y2="1">';
-    out += '<stop offset="0%" stop-color="#dbeafe" stop-opacity="0.95"/>';
-    out += '<stop offset="100%" stop-color="#bfdbfe" stop-opacity="0.85"/>';
+    out += '<stop offset="0%" stop-color="'+stop1L+'" stop-opacity="'+stop1Op+'"/>';
+    out += '<stop offset="100%" stop-color="'+stop2L+'" stop-opacity="'+stop2Op+'"/>';
     out += '</linearGradient>';
     out += '<linearGradient id="'+uid+'Rf" x1="0" y1="0" x2="0" y2="1">';
-    out += '<stop offset="0%" stop-color="#fef3c7" stop-opacity="0.95"/>';
-    out += '<stop offset="100%" stop-color="#fde68a" stop-opacity="0.85"/>';
+    out += '<stop offset="0%" stop-color="'+stop1R+'" stop-opacity="'+stop1Op+'"/>';
+    out += '<stop offset="100%" stop-color="'+stop2R+'" stop-opacity="'+stop2Op+'"/>';
     out += '</linearGradient>';
-    out += '<filter id="'+uid+'Sh" x="-10%" y="-10%" width="120%" height="120%">';
-    out += '<feGaussianBlur in="SourceGraphic" stdDeviation="6"/>';
-    out += '<feOffset dx="0" dy="2" result="offsetblur"/>';
-    out += '<feFlood flood-color="#000" flood-opacity="0.06"/>';
-    out += '<feComposite in2="offsetblur" operator="in"/>';
-    out += '<feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>';
-    out += '</filter>';
+    if(light){
+      out += '<filter id="'+uid+'Sh" x="-10%" y="-10%" width="120%" height="120%">';
+      out += '<feGaussianBlur in="SourceGraphic" stdDeviation="6"/>';
+      out += '<feOffset dx="0" dy="2" result="offsetblur"/>';
+      out += '<feFlood flood-color="#000" flood-opacity="0.06"/>';
+      out += '<feComposite in2="offsetblur" operator="in"/>';
+      out += '<feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>';
+      out += '</filter>';
+    }
     out += '</defs>';
 
-    // Labels topo (até 2 linhas, SEM cortar)
-    out += renderTopLabel(leftLblLines,  zL, '#2563eb');
+    out += renderTopLabel(leftLblLines,  zL, labelColorL);
     out += '<text x="'+zS+'" y="'+(topPad - 30)+'" text-anchor="middle" ' +
-           'font-family="-apple-system, BlinkMacSystemFont, Inter, sans-serif" font-size="'+labelSize+'" font-weight="700" ' +
-           'letter-spacing="2.4" fill="#7c3aed">SHARED</text>';
-    out += renderTopLabel(rightLblLines, zR, '#d97706');
+           'font-family="-apple-system, BlinkMacSystemFont, Inter, sans-serif" font-size="'+labelSize+'" font-weight="800" ' +
+           'letter-spacing="' + (opts.letterSpacing || 2.4) + '" fill="'+labelColorS+'">SHARED</text>';
+    out += renderTopLabel(rightLblLines, zR, labelColorR);
 
-    // Círculos com gradient + sombra suave
+    var filterAttr = light ? ' filter="url(#'+uid+'Sh)"' : '';
     out += '<circle cx="'+cx1+'" cy="'+cy+'" r="'+rCircle+'" ' +
-           'fill="url(#'+uid+'Lf)" stroke="#3b82f6" stroke-width="2" filter="url(#'+uid+'Sh)"/>';
+           'fill="url(#'+uid+'Lf)" stroke="'+strokeL+'" stroke-width="'+strokeWidth+'"'+filterAttr+'/>';
     out += '<circle cx="'+cx2+'" cy="'+cy+'" r="'+rCircle+'" ' +
-           'fill="url(#'+uid+'Rf)" stroke="#f59e0b" stroke-width="2" filter="url(#'+uid+'Sh)" opacity="0.92"/>';
+           'fill="url(#'+uid+'Rf)" stroke="'+strokeR+'" stroke-width="'+strokeWidth+'"'+filterAttr+' opacity="0.92"/>';
 
-    // Itens nas 3 zonas — cores no estilo 800/900 do design system
-    out += renderZone(Lw, zL, '#1e3a8a', '600', hL);   // azul escuro
-    out += renderZone(Sw, zS, '#5b21b6', '700', hS);   // roxo escuro (SHARED em destaque)
-    out += renderZone(Rw, zR, '#78350f', '600', hR);   // âmbar escuro
+    out += renderZone(Lw, zL, colorL, '600', hL);
+    out += renderZone(Sw, zS, colorS, '700', hS);
+    out += renderZone(Rw, zR, colorR, '600', hR);
 
     out += '</svg>';
     return out;
   }
 
-  var svgSmall = buildSvg(680, { fontSize:12, labelSize:11, maxL:16, maxS:12, maxR:16 });
-  var svgLarge = buildSvg(880, { fontSize:14, labelSize:12, maxL:18, maxS:14, maxR:18 });
+  /* Detect viewport & build appropriate SVG.
+     KEY INSIGHT: viewBox should roughly match the rendered width, so the
+     SVG doesn't get scaled DOWN by the browser (which would shrink fonts).
+     Mobile gets a smaller viewBox + proportionally larger fonts. */
+  var isMobile = window.matchMedia('(max-width: 740px)').matches;
+  var isUltraNarrow = window.matchMedia('(max-width: 380px)').matches;
+
+  var svgInline, svgExpanded;
+
+  if(isMobile){
+    /* Mobile inline: viewBox ~380, fontSize 15 → renders ~15px real on phone */
+    svgInline = buildSvg(380, {
+      fontSize: 15,
+      labelSize: 11,
+      maxL: 11, maxS: 9, maxR: 11,
+      maxLines: 3,
+      minR: 110,
+      minContent: 110,
+      verticalPad: 28,
+      topPad: 60,
+      bottomPad: 20,
+      lblChars: 14,
+      letterSpacing: 1.6,
+      strokeWidth: 1.8
+    });
+    /* Mobile expanded (modal): viewBox 600, fontSize 22 → very readable */
+    svgExpanded = buildSvg(600, {
+      fontSize: 22,
+      labelSize: 15,
+      maxL: 14, maxS: 11, maxR: 14,
+      maxLines: 3,
+      minR: 180,
+      minContent: 180,
+      verticalPad: 42,
+      topPad: 80,
+      bottomPad: 30,
+      lblChars: 18,
+      letterSpacing: 2,
+      strokeWidth: 2.2
+    });
+    if(isUltraNarrow){
+      svgInline = buildSvg(340, {
+        fontSize: 14,
+        labelSize: 10,
+        maxL: 10, maxS: 8, maxR: 10,
+        maxLines: 3,
+        minR: 100,
+        minContent: 100,
+        verticalPad: 24,
+        topPad: 56,
+        bottomPad: 18,
+        lblChars: 12,
+        letterSpacing: 1.4,
+        strokeWidth: 1.6
+      });
+    }
+  } else {
+    /* Desktop inline & expanded — current geometry refined */
+    svgInline   = buildSvg(680, { fontSize: 13, labelSize: 11, maxL: 16, maxS: 13, maxR: 16, letterSpacing: 2.2 });
+    svgExpanded = buildSvg(880, { fontSize: 15, labelSize: 13, maxL: 18, maxS: 14, maxR: 18, letterSpacing: 2.4, minR: 200, minContent: 180 });
+  }
 
   host.innerHTML =
     '<div class="vi-head">' +
       '<span class="vi-tag">◐ ' + esc(String(v.left_label).toUpperCase()) + ' vs ' + esc(String(v.right_label).toUpperCase()) + '</span>' +
       '<button class="vi-expand" type="button" onclick="document.getElementById(\'venn-inline-modal\').classList.add(\'on\')">⤢ Expand</button>' +
     '</div>' +
-    svgSmall;
+    svgInline;
 
   var modal = document.getElementById('venn-inline-modal');
   if(!modal){
@@ -24104,11 +24294,50 @@ window._bmdRenderVennInline = function(card){
   }
   var mBody  = document.getElementById('venn-inline-modal-body');
   var mTitle = document.getElementById('venn-inline-modal-title');
-  if(mBody)  mBody.innerHTML  = svgLarge;
+  if(mBody)  mBody.innerHTML  = svgExpanded;
   if(mTitle) mTitle.textContent = '◐ ' + String(v.left_label).toUpperCase() + ' vs ' + String(v.right_label).toUpperCase();
+
+  /* Track last card to re-render on theme change or resize crossover */
+  window._bmdLastVennCard = card;
 
   host.style.cssText = 'display:block !important; margin:10px 18px 4px;';
 };
+
+/* Re-render Venn on theme toggle (light/dark colors change) */
+(function(){
+  if(typeof MutationObserver === 'undefined') return;
+  var lastIsLight = document.documentElement.classList.contains('light');
+  new MutationObserver(function(){
+    var nowIsLight = document.documentElement.classList.contains('light');
+    if(nowIsLight !== lastIsLight){
+      lastIsLight = nowIsLight;
+      if(window._bmdLastVennCard && typeof window._bmdRenderVennInline === 'function'){
+        try { window._bmdRenderVennInline(window._bmdLastVennCard); } catch(e){}
+      }
+    }
+  }).observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+})();
+
+/* Re-render Venn on viewport size crossover (rotate, resize) */
+(function(){
+  var lastIsMobile = window.matchMedia('(max-width: 740px)').matches;
+  var lastIsUltra  = window.matchMedia('(max-width: 380px)').matches;
+  var debounce;
+  window.addEventListener('resize', function(){
+    clearTimeout(debounce);
+    debounce = setTimeout(function(){
+      var nowIsMobile = window.matchMedia('(max-width: 740px)').matches;
+      var nowIsUltra  = window.matchMedia('(max-width: 380px)').matches;
+      if(nowIsMobile !== lastIsMobile || nowIsUltra !== lastIsUltra){
+        lastIsMobile = nowIsMobile;
+        lastIsUltra  = nowIsUltra;
+        if(window._bmdLastVennCard && typeof window._bmdRenderVennInline === 'function'){
+          try { window._bmdRenderVennInline(window._bmdLastVennCard); } catch(e){}
+        }
+      }
+    }, 220);
+  });
+})();
 
 /* ═══════════════════════════════════════════════════════════════════
    BoardMD — Storm This Card (v3 — vai direto pra sessão filtrada)
