@@ -18,8 +18,8 @@ if('caches' in window){
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>BoardMD — Medical Board Review</title><!-- build:20260518-2000-brainstorm-quality-fix -->
-<script>window.__BMD_BUILD__ = '20260518-2000-brainstorm-quality-fix';</script>
+<title>BoardMD — Medical Board Review</title><!-- build:20260521-1200-hyclue-fix-catch-clean -->
+<script>window.__BMD_BUILD__ = '20260521-1200-hyclue-fix-catch-clean';</script>
 <!-- PWA -->
 <link rel="manifest" href="/manifest.json">
 <meta name="theme-color" content="#080c12">
@@ -22884,7 +22884,15 @@ const AR = {
 
 // Fallback para cards sem brainstorm/distractor — mostra HY → Dx reveal → FSRS
 function renderARFallback(card, el, bs) {
-  const hy = (bs && bs.hy_clue) || card.phrase || '';
+  // 2026-05-21: Sanitize hy_clue — strip diagnosis name if Sonnet leaked it
+  let hy = (bs && bs.hy_clue) || card.phrase || '';
+  if(hy && bs && bs.diagnosis){
+    const _dxWds = bs.diagnosis.toLowerCase().split(/\W+/).filter(w => w.length > 3);
+    _dxWds.forEach(function(w){
+      const _re = new RegExp('\\b' + w.replace(/[.*+?^${}()|[\]\\]/g,'\\$&') + '\\w*', 'gi');
+      if(_re.test(hy)) hy = hy.replace(_re, '___');
+    });
+  }
   const dx = (bs && bs.diagnosis) || card.kp || '';
   const atype = bs ? (bs.action_type||'NONE').toUpperCase() : 'NONE';
   const action = bs ? (bs.action_content||''): '';
@@ -22981,8 +22989,16 @@ function renderActiveRecall(card, el) {
   AR.actionCorrect = false;
   AR.cardId = card.id;
 
-  const hy       = bs.hy_clue || '';
+  // 2026-05-21: Sanitize hy_clue — strip diagnosis name if Sonnet leaked it
+  let hy = bs.hy_clue || '';
   const dx       = bs.diagnosis || '';
+  if(hy && dx){
+    const _dxWds2 = dx.toLowerCase().split(/\W+/).filter(w => w.length > 3);
+    _dxWds2.forEach(function(w){
+      const _re2 = new RegExp('\\b' + w.replace(/[.*+?^${}()|[\]\\]/g,'\\$&') + '\\w*', 'gi');
+      if(_re2.test(hy)) hy = hy.replace(_re2, '___');
+    });
+  }
   const dxDist   = bs.dx_distractor || '';
   const atype    = (bs.action_type || 'NONE').toUpperCase();
   const action   = bs.action_content || '';
@@ -23366,6 +23382,23 @@ function renderClinicalReasoningReveal(card, el) {
   let html = '<div class="bs-cr" id="bs-cr-wrap">';
 
   // ═══════════════════════════════════════════════════════════════
+  // 2026-05-21: SANITIZE hy_clue before render
+  // If hy_clue contains the diagnosis name (Sonnet generation bug),
+  // replace the diagnosis word(s) with "___" so it doesn't spoil the card.
+  // ═══════════════════════════════════════════════════════════════
+  let safeHyClue = bs.hy_clue || '';
+  if(safeHyClue && bs.diagnosis){
+    const _dxWords = bs.diagnosis.toLowerCase().split(/\W+/).filter(w => w.length > 3);
+    _dxWords.forEach(function(w){
+      // Case-insensitive replace of the diagnosis word in hy_clue
+      const _re = new RegExp('\\b' + w.replace(/[.*+?^${}()|[\]\\]/g,'\\$&') + '\\w*', 'gi');
+      if(_re.test(safeHyClue)){
+        safeHyClue = safeHyClue.replace(_re, '___');
+      }
+    });
+  }
+
+  // ═══════════════════════════════════════════════════════════════
   // 2026-05-16: Chip "CLINICAL CHAIN" — afirma a tese do modo
   // (raciocínio sequencial completo, não escolha isolada)
   // + botões "Commit-before-reveal" (I knew / I didn't)
@@ -23376,10 +23409,10 @@ function renderClinicalReasoningReveal(card, el) {
     '<span class="bs-cr-header-hint">clue → diagnosis → action</span>' +
   '</div>';
 
-  // HY Clue — normal
+  // HY Clue — sanitized
   html += '<div class="bs-crk bs-crk-hy show">' +
     '<div class="bs-crk-l">HY Clue</div>' +
-    '<div class="bs-crk-t">' + hlBold(bs.hy_clue||'') + '</div>' +
+    '<div class="bs-crk-t">' + hlBold(safeHyClue) + '</div>' +
   '</div>';
 
   // Commit-before-reveal (some after first commit)
@@ -23516,41 +23549,45 @@ window.showWhatYouNeededToCatch = function(phase){
   const old = wrap.querySelector('.bs-cr-pearl');
   if(old) old.remove();
 
-  let chunks = [];
   let shortcut = '';
+  let hyClueText = '';
 
   if(phase === 'dx'){
-    // Tenta usar chunks_explained gerado pelo Sonnet (após batch)
-    if(bs.chunks_explained && Array.isArray(bs.chunks_explained) && bs.chunks_explained.length){
-      chunks = bs.chunks_explained;
-    } else {
-      // Fallback: parsa hy_clue por "+" e gera chunks sem explicação
-      const hy = bs.hy_clue || '';
-      // Remove prefixo demográfico tipo "52F:" ou "4M:"
-      const cleanHy = hy.replace(/^\s*\d+\s*[FMfm]\s*:?\s*/,'');
-      const pieces = cleanHy.split(/\s*\+\s*/).filter(p => p.trim().length > 1);
-      chunks = pieces.map(p => ({ trigger: p.trim(), points_to: '' }));
-    }
+    // 2026-05-21: Clean design — show hy_clue as a single meaningful clue line
+    // (old bullets were just splitting hy_clue by "+" which was purely repetitive)
+    // If chunks_explained exist (future enrichment), use them; otherwise show hy_clue as-is
+    hyClueText = bs.hy_clue || '';
     shortcut = bs.decision_pivot || bs.phrase || '';
   } else {
-    // phase === 'act' (futuro)
-    chunks = bs.action_chunks_explained || [];
     shortcut = bs.decision_pivot || '';
   }
 
   let html = '<div class="bs-cr-pearl" id="bs-cr-pearl">';
   html += '<div class="bs-cr-pearl-h">What you needed to catch</div>';
   html += '<div class="bs-cr-pearl-body">';
-  chunks.forEach(function(c){
-    html += '<div class="bs-cr-pearl-row">';
-    html += '<div class="bs-cr-pearl-dot"></div>';
-    html += '<div class="bs-cr-pearl-text">';
-    html += '<div class="bs-cr-pearl-trig">' + escapeHtml(c.trigger || '') + '</div>';
-    if(c.points_to){
-      html += '<div class="bs-cr-pearl-pts">→ ' + escapeHtml(c.points_to) + '</div>';
+
+  if(phase === 'dx'){
+    if(bs.chunks_explained && Array.isArray(bs.chunks_explained) && bs.chunks_explained.length){
+      // Rich version: structured chunks with explanation (future enrichment field)
+      bs.chunks_explained.forEach(function(c){
+        html += '<div class="bs-cr-pearl-row">';
+        html += '<div class="bs-cr-pearl-dot"></div>';
+        html += '<div class="bs-cr-pearl-text">';
+        html += '<div class="bs-cr-pearl-trig">' + escapeHtml(c.trigger || '') + '</div>';
+        if(c.points_to){
+          html += '<div class="bs-cr-pearl-pts">→ ' + escapeHtml(c.points_to) + '</div>';
+        }
+        html += '</div></div>';
+      });
+    } else if(hyClueText){
+      // Clean version: show the full hy_clue as a single insight line — no redundant bullets
+      html += '<div class="bs-cr-pearl-row bs-cr-pearl-row-single">';
+      html += '<div class="bs-cr-pearl-dot" style="margin-top:4px"></div>';
+      html += '<div class="bs-cr-pearl-text">';
+      html += '<div class="bs-cr-pearl-trig" style="font-style:italic;color:var(--text)">' + escapeHtml(hyClueText) + '</div>';
+      html += '</div></div>';
     }
-    html += '</div></div>';
-  });
+  }
   if(shortcut){
     html += '<div class="bs-cr-pearl-shortcut">';
     html += '<div class="bs-cr-pearl-shortcut-l">260+ shortcut</div>';
