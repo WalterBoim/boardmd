@@ -4650,10 +4650,504 @@ html:not(.light) .editorial-block{
   .fade-up{opacity:1;transform:none;transition:none;}
 }
 
-@media (max-width:740px){
-  .pillars-header{padding:60px 24px 32px;}
-  .editorial-block{padding:48px 24px;}
-  .cta-final{padding:60px 24px;}
+/* ════════════════════════════════════════════════════════════════════════
+   LANDING — MOBILE PREMIUM (≤ 740px) · App-grade polish
+   Focus: feel like a native iOS/Android app preview, not a shrunken site
+   ════════════════════════════════════════════════════════════════════════ */
+@media (max-width: 740px) {
+
+  /* ────────────────────────────────
+     1 · ROOT TOKENS · Tighter rhythm
+     ──────────────────────────────── */
+  #landing {
+    --m-pad: 20px;
+    --m-pad-tight: 16px;
+    --m-section-y: 64px;
+    --m-radius: 16px;
+    --m-tap: 44px;
+  }
+
+  body { overflow-x: hidden; -webkit-text-size-adjust: 100%; }
+  #landing { width: 100%; max-width: 100vw; overflow-x: hidden; }
+  #landing *:not(svg):not(path):not(circle):not(line):not(polyline) { max-width: 100%; }
+
+  /* ────────────────────────────────
+     2 · NAV · compact, sticky, premium
+     ──────────────────────────────── */
+  #landing > .nav {
+    padding: 12px var(--m-pad-tight) !important;
+    padding-top: calc(12px + env(safe-area-inset-top, 0px)) !important;
+    min-height: 56px;
+    background: rgba(245, 247, 250, 0.92) !important;
+    backdrop-filter: blur(24px) saturate(180%);
+    -webkit-backdrop-filter: blur(24px) saturate(180%);
+  }
+  html:not(.light) #landing > .nav {
+    background: rgba(8, 12, 18, 0.92) !important;
+  }
+  #landing > .nav .nav-logo {
+    font-size: 22px !important;
+    letter-spacing: -.3px;
+  }
+  #landing > .nav .nav-links { gap: 6px !important; }
+  #landing > .nav .theme-toggle {
+    width: 36px; height: 36px;
+    display: inline-flex; align-items: center; justify-content: center;
+    background: transparent; border: 1px solid var(--border);
+    border-radius: 10px; color: var(--text-dim);
+    transition: transform .15s ease, background .15s ease;
+  }
+  #landing > .nav .theme-toggle:active { transform: scale(.92); background: var(--surface2); }
+  #landing > .nav #nav-login-btn {
+    padding: 8px 12px !important;
+    font-size: 12px !important;
+    border-radius: 9px !important;
+    min-height: 36px;
+    overflow: hidden;
+    white-space: nowrap;
+    max-width: 110px;
+    text-overflow: ellipsis;
+  }
+  #landing > .nav .nav-btn.primary {
+    padding: 8px 14px !important;
+    font-size: 12px !important;
+    border-radius: 9px !important;
+    min-height: 36px;
+    font-weight: 700;
+  }
+  @media (max-width: 380px) {
+    #landing > .nav #nav-login-btn {
+      max-width: 36px;
+      font-size: 0;
+      padding: 8px !important;
+      width: 36px;
+      position: relative;
+    }
+    #landing > .nav #nav-login-btn::before {
+      content: '⇣';
+      font-size: 14px;
+      color: var(--text-dim);
+    }
+  }
+
+  /* ────────────────────────────────
+     3 · HERO · recalibrated for thumb scroll
+     ──────────────────────────────── */
+  #landing .hero {
+    padding: 56px var(--m-pad) 40px !important;
+    min-height: calc(100vh - 56px);
+    min-height: calc(100dvh - 56px);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+  }
+  #landing .hero::before {
+    background: radial-gradient(ellipse 500px 350px at 50% 25%,
+      rgba(37,99,235,.08) 0%, transparent 70%) !important;
+  }
+  html:not(.light) #landing .hero::before {
+    background: radial-gradient(ellipse 500px 350px at 50% 25%,
+      rgba(59,127,255,.12) 0%, transparent 70%) !important;
+  }
+  #landing .hero .hero-badge {
+    font-size: 10.5px !important;
+    padding: 5px 11px !important;
+    margin-bottom: 22px !important;
+    letter-spacing: .4px;
+  }
+  #landing .hero h1 {
+    font-size: clamp(38px, 11vw, 56px) !important;
+    line-height: 1.02 !important;
+    letter-spacing: -1px !important;
+    margin-bottom: 20px !important;
+  }
+  #landing .hero .hero-sub {
+    font-size: 15px !important;
+    line-height: 1.65 !important;
+    margin-bottom: 32px !important;
+    padding: 0 4px;
+  }
+  #landing .hero .hero-cta {
+    flex-direction: column !important;
+    width: 100%;
+    max-width: 320px;
+    gap: 10px !important;
+    margin-bottom: 36px !important;
+  }
+  #landing .hero .hero-cta .btn-hp,
+  #landing .hero .hero-cta .btn-hs {
+    width: 100%;
+    min-height: var(--m-tap);
+    padding: 13px 24px !important;
+    font-size: 15px !important;
+    border-radius: 12px !important;
+    justify-content: center !important;
+    display: inline-flex !important;
+    align-items: center !important;
+  }
+  #landing .hero .hero-cta .btn-hp {
+    box-shadow: 0 4px 16px rgba(37,99,235,.25);
+  }
+  #landing .hero .hero-cta .btn-hp:active { transform: scale(.98); }
+  #landing .hero .trust {
+    padding: 22px 0 0 !important;
+    gap: 14px 18px !important;
+    display: grid !important;
+    grid-template-columns: 1fr 1fr;
+    width: 100%;
+    max-width: 320px;
+    justify-items: center;
+  }
+  #landing .hero .trust .trust-item {
+    font-size: 10.5px !important;
+    letter-spacing: .1em !important;
+    gap: 6px !important;
+    justify-content: flex-start;
+  }
+  #landing .hero .trust .trust-item svg { width: 12px; height: 12px; }
+
+  /* ────────────────────────────────
+     4 · SECTION FRAMING
+     ──────────────────────────────── */
+  #landing .section {
+    padding: var(--m-section-y) var(--m-pad) !important;
+  }
+  #landing .section-label {
+    font-size: 10px !important;
+    letter-spacing: .14em !important;
+    margin-bottom: 10px !important;
+  }
+  #landing .section-title {
+    font-size: clamp(28px, 7.5vw, 36px) !important;
+    line-height: 1.1 !important;
+    letter-spacing: -.6px !important;
+    margin-bottom: 14px !important;
+  }
+  #landing .section-sub {
+    font-size: 15px !important;
+    line-height: 1.65 !important;
+    margin-bottom: 32px !important;
+  }
+  #landing .divider { margin: 0 var(--m-pad) !important; }
+
+  /* ────────────────────────────────
+     5 · METHOD · 2x2 grid
+     ──────────────────────────────── */
+  #landing .method-grid {
+    grid-template-columns: 1fr 1fr !important;
+    border-radius: 14px !important;
+    box-shadow: 0 2px 10px rgba(15,23,42,.04);
+  }
+  #landing .method-grid .method-step { padding: 24px 18px !important; }
+  #landing .method-grid .method-num {
+    font-size: 10px !important;
+    margin-bottom: 14px !important;
+    letter-spacing: .16em;
+  }
+  #landing .method-grid .method-icon {
+    width: 38px !important; height: 38px !important;
+    border-radius: 10px !important;
+    margin-bottom: 14px !important;
+  }
+  #landing .method-grid .method-icon svg { width: 17px !important; height: 17px !important; }
+  #landing .method-grid .method-name {
+    font-size: 18px !important;
+    margin-bottom: 8px !important;
+    line-height: 1.2 !important;
+  }
+  #landing .method-grid .method-desc {
+    font-size: 13px !important;
+    line-height: 1.55 !important;
+  }
+  @media (max-width: 380px) {
+    #landing .method-grid { grid-template-columns: 1fr !important; }
+  }
+
+  /* ────────────────────────────────
+     6 · PILLARS · vertical stack
+     ──────────────────────────────── */
+  #landing .pillars-header {
+    padding: var(--m-section-y) var(--m-pad) 24px !important;
+  }
+  #landing .pillars-bar { grid-template-columns: 1fr !important; }
+  #landing .pillars-bar .pillar { padding: 32px var(--m-pad) !important; }
+  #landing .pillars-bar .pillar:not(:last-child) {
+    border-bottom: 1px solid var(--border) !important;
+  }
+  #landing .pillars-bar .pillar-num {
+    font-size: 46px !important;
+    margin-bottom: 14px !important;
+  }
+  #landing .pillars-bar .pillar-title {
+    font-size: 22px !important;
+    line-height: 1.2 !important;
+    margin-bottom: 12px !important;
+    letter-spacing: -.4px !important;
+  }
+  #landing .pillars-bar .pillar-body {
+    font-size: 14.5px !important;
+    line-height: 1.7 !important;
+  }
+
+  /* ────────────────────────────────
+     7 · DECKS · full-width cards
+     ──────────────────────────────── */
+  #landing .decks-grid-new {
+    grid-template-columns: 1fr !important;
+    gap: 14px !important;
+  }
+  #landing .deck-card-new {
+    padding: 26px 22px !important;
+    min-height: auto !important;
+    border-radius: var(--m-radius) !important;
+  }
+  #landing .deck-card-new::before {
+    height: 3px !important;
+    opacity: 1 !important;
+  }
+  #landing .deck-card-new:active {
+    transform: scale(.99);
+    transition: transform .1s ease;
+  }
+  #landing .deck-card-new .deck-step-tag {
+    font-size: 10.5px !important;
+    margin-bottom: 12px !important;
+    letter-spacing: .14em !important;
+  }
+  #landing .deck-card-new .deck-title-new {
+    font-size: 26px !important;
+    line-height: 1.1 !important;
+    margin-bottom: 10px !important;
+    letter-spacing: -.5px !important;
+  }
+  #landing .deck-card-new .deck-desc-new {
+    font-size: 13.5px !important;
+    line-height: 1.6 !important;
+    margin-bottom: 18px !important;
+  }
+  #landing .deck-card-new .deck-footer-new { padding-top: 14px !important; }
+  #landing .deck-card-new .deck-meta-new { font-size: 11px !important; }
+  #landing .deck-card-new .deck-arrow-new {
+    width: 30px !important; height: 30px !important;
+    border-radius: 9px !important;
+  }
+  #landing .deck-card-new .deck-arrow-new svg { width: 13px !important; height: 13px !important; }
+  #landing .coming-tag {
+    font-size: 9.5px !important;
+    padding: 2px 7px !important;
+    letter-spacing: .12em !important;
+  }
+  #landing .decks-note {
+    font-size: 10px !important;
+    letter-spacing: .14em !important;
+    margin-top: 24px !important;
+    padding: 0 12px;
+    line-height: 1.6;
+  }
+
+  /* ────────────────────────────────
+     8 · EDITORIAL QUOTE
+     ──────────────────────────────── */
+  #landing .editorial-block {
+    padding: 56px var(--m-pad) !important;
+  }
+  #landing .editorial-block .editorial-quote {
+    font-size: clamp(22px, 6vw, 28px) !important;
+    line-height: 1.3 !important;
+    letter-spacing: -.3px !important;
+  }
+  #landing .editorial-block .editorial-attr {
+    font-size: 10px !important;
+    margin-top: 22px !important;
+    letter-spacing: .14em !important;
+  }
+
+  /* ────────────────────────────────
+     9 · FEATURES · stack, app-card style
+     ──────────────────────────────── */
+  #landing .features-grid-new {
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+  }
+  #landing .feat-new {
+    padding: 24px 20px !important;
+    border-radius: var(--m-radius) !important;
+  }
+  #landing .feat-new:active {
+    transform: scale(.99);
+    transition: transform .1s ease;
+  }
+  #landing .feat-new .feat-icon-new {
+    width: 38px !important; height: 38px !important;
+    border-radius: 10px !important;
+    margin-bottom: 14px !important;
+  }
+  #landing .feat-new .feat-icon-new svg { width: 18px !important; height: 18px !important; }
+  #landing .feat-new .feat-title-new {
+    font-size: 20px !important;
+    line-height: 1.2 !important;
+    margin-bottom: 10px !important;
+    letter-spacing: -.4px !important;
+  }
+  #landing .feat-new .feat-desc-new {
+    font-size: 14px !important;
+    line-height: 1.65 !important;
+  }
+
+  /* ────────────────────────────────
+     10 · FINAL CTA · punchy, thumb-zone
+     ──────────────────────────────── */
+  #landing .cta-final {
+    padding: var(--m-section-y) var(--m-pad) !important;
+  }
+  #landing .cta-final .cta-title {
+    font-size: clamp(32px, 9vw, 44px) !important;
+    line-height: 1.05 !important;
+    letter-spacing: -.7px !important;
+    margin-bottom: 18px !important;
+  }
+  #landing .cta-final .cta-sub {
+    font-size: 15px !important;
+    line-height: 1.6 !important;
+    margin-bottom: 28px !important;
+  }
+  #landing .cta-final .hero-cta {
+    flex-direction: column !important;
+    width: 100%;
+    max-width: 320px;
+    margin: 0 auto !important;
+    gap: 10px !important;
+  }
+  #landing .cta-final .hero-cta .btn-hp,
+  #landing .cta-final .hero-cta .btn-hs {
+    width: 100%;
+    min-height: var(--m-tap);
+    padding: 13px 24px !important;
+    font-size: 15px !important;
+    border-radius: 12px !important;
+    justify-content: center !important;
+    display: inline-flex !important;
+    align-items: center !important;
+  }
+  #landing .cta-final .cta-note {
+    font-size: 10px !important;
+    margin-top: 24px !important;
+    letter-spacing: .14em !important;
+    padding: 0 12px;
+    line-height: 1.6;
+  }
+
+  /* ────────────────────────────────
+     11 · FOOTER · mobile-elegant
+     ──────────────────────────────── */
+  #landing footer.footer {
+    padding: 40px var(--m-pad) calc(28px + env(safe-area-inset-bottom, 0px)) !important;
+  }
+  #landing footer.footer .footer-inner {
+    flex-direction: column !important;
+    gap: 28px !important;
+  }
+  #landing footer.footer .footer-logo { font-size: 22px; }
+  #landing footer.footer .footer-tag {
+    font-size: 13px !important;
+    margin-top: 4px;
+    max-width: 100%;
+  }
+  #landing footer.footer .footer-meta {
+    width: 100%;
+    gap: 28px !important;
+    flex-wrap: wrap;
+  }
+  #landing footer.footer .footer-meta > div {
+    flex: 1 1 calc(50% - 14px);
+    min-width: 130px;
+  }
+  #landing footer.footer .footer-col-title {
+    font-size: 10px !important;
+    margin-bottom: 10px !important;
+  }
+  #landing footer.footer .footer-link {
+    font-size: 13px !important;
+    padding: 6px 0 !important;
+    min-height: 28px;
+  }
+  #landing footer.footer .disclaimer {
+    font-size: 11px !important;
+    line-height: 1.6 !important;
+    margin-top: 16px;
+  }
+  #landing footer.footer .footer-bottom-new {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 8px !important;
+    font-size: 10px !important;
+    margin-top: 24px !important;
+    padding-top: 18px !important;
+  }
+
+  /* ────────────────────────────────
+     12 · MICRO-INTERACTIONS · iOS feel
+     ──────────────────────────────── */
+  #landing { -webkit-overflow-scrolling: touch; }
+  @media (hover: none) {
+    #landing .deck-card-new:hover,
+    #landing .feat-new:hover,
+    #landing .method-step:hover {
+      transform: none !important;
+      box-shadow: none !important;
+      background: var(--surface) !important;
+      border-color: var(--border) !important;
+    }
+  }
+  #landing .btn-hp,
+  #landing .btn-hs,
+  #landing .nav-btn,
+  #landing .deck-card-new,
+  #landing .feat-new {
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+  #landing h1,
+  #landing .section-title,
+  #landing .deck-title-new,
+  #landing .feat-title-new,
+  #landing .cta-title,
+  #landing .editorial-quote {
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  #landing ::selection { background: var(--accent); color: #fff; }
+}
+
+/* ────────────────────────────────
+   13 · ULTRA-NARROW (≤ 360px)
+   ──────────────────────────────── */
+@media (max-width: 360px) {
+  #landing { --m-pad: 16px; --m-pad-tight: 14px; }
+  #landing .hero h1 { font-size: 34px !important; }
+  #landing .hero .hero-sub { font-size: 14px !important; }
+  #landing .section-title { font-size: 26px !important; }
+  #landing .pillars-bar .pillar-title { font-size: 20px !important; }
+  #landing .deck-card-new .deck-title-new { font-size: 24px !important; }
+  #landing .feat-new .feat-title-new { font-size: 18px !important; }
+  #landing .cta-title { font-size: 30px !important; }
+  #landing .editorial-block .editorial-quote { font-size: 20px !important; }
+}
+
+/* ────────────────────────────────
+   14 · LANDSCAPE PHONE
+   ──────────────────────────────── */
+@media (max-width: 900px) and (orientation: landscape) and (max-height: 500px) {
+  #landing .hero {
+    min-height: auto !important;
+    padding: 36px 20px 32px !important;
+  }
+  #landing .hero h1 { font-size: 38px !important; }
+  #landing .hero .hero-sub { margin-bottom: 20px !important; }
+  #landing .hero .trust {
+    grid-template-columns: repeat(4, 1fr) !important;
+    max-width: 600px !important;
+    padding: 16px 0 0 !important;
+  }
 }
 </style>
 
@@ -4669,7 +5163,7 @@ html:not(.light) .editorial-block{
   <div class="nav-logo">Board<span>MD</span></div>
   <div class="nav-links" style="display:flex;align-items:center;gap:10px;">
     <button class="theme-toggle" onclick="toggleTheme()" title="Toggle theme" aria-label="Toggle theme">
-      <svg id="theme-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+      <svg id="theme-icon-landing" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
     </button>
     <div id="nav-user-area" style="display:none;align-items:center;gap:8px;font-size:13px;color:var(--text-dim);">
       <span id="nav-user-name">User</span>
