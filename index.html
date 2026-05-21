@@ -4662,6 +4662,105 @@ html:has(#app.active) #landing {
 }
 
 /* ════════════════════════════════════════════════════════════════════════
+   TOTAL VIEW ISOLATION SYSTEM v2
+   When any major view/overlay is active, NOTHING else may show behind.
+   Applies to BOTH mobile and desktop. Prevents the "page floating behind"
+   feeling when overlays open or views transition.
+   ════════════════════════════════════════════════════════════════════════ */
+
+/* ─── A. When app is active: solid background, full height, no leaks ─── */
+#app.active {
+  background: var(--bg) !important;
+  /* Block any landing showing through */
+  position: relative;
+  z-index: 1;
+  /* Make sure no transparent gap below content */
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+/* When app is active on mobile: html and body also solid bg */
+body:has(#app.active),
+html:has(#app.active) {
+  background: var(--bg) !important;
+}
+
+/* ─── B. When BrainStorm overlay is ON ─── */
+/* Lock body scroll */
+body:has(.bs-overlay.on) {
+  overflow: hidden !important;
+}
+
+/* Force brainstorm to be completely opaque & full-coverage */
+.bs-overlay.on {
+  background: var(--bg) !important;
+  isolation: isolate;
+}
+
+/* Force brainstorm to be FULL viewport, edge-to-edge, no gaps */
+.bs-overlay.on {
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  z-index: 9999 !important;
+  /* internal scroll only */
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch !important;
+}
+
+/* On mobile, brainstorm should leave room for bottom nav still
+   but with safe-area handling */
+@media (max-width: 740px) {
+  .bs-overlay.on {
+    bottom: 0 !important;
+    padding-bottom: calc(58px + env(safe-area-inset-bottom, 0px)) !important;
+  }
+}
+
+/* Hide views completely behind brainstorm */
+body:has(.bs-overlay.on) #deck-home,
+body:has(.bs-overlay.on) .study-area,
+body:has(.bs-overlay.on) .study-inner,
+body:has(.bs-overlay.on) #lb-panel,
+body:has(.bs-overlay.on) #profile-panel,
+body:has(.bs-overlay.on) #poststep-panel,
+body:has(.bs-overlay.on) #search-panel,
+body:has(.bs-overlay.on) .app-header,
+body:has(.bs-overlay.on) .filter-bar,
+body:has(.bs-overlay.on) .app-layout {
+  visibility: hidden !important;
+}
+
+/* But keep bottom-nav VISIBLE if it should stay (so user can close storm) */
+body:has(.bs-overlay.on) .bmd-bottom-nav {
+  visibility: visible !important;
+  z-index: 10000 !important;
+}
+
+/* ─── C. Solid backgrounds on every view-panel ─── */
+#deck-home,
+.study-area,
+.study-inner,
+#lb-panel,
+#profile-panel,
+#poststep-panel,
+#search-panel,
+.bs-overlay {
+  background: var(--bg);
+}
+
+/* ─── D. When in study mode, hide deck-home explicitly ─── */
+.deck-home.active ~ .app-layout,
+.deck-home.active ~ .filter-bar {
+  /* If deck-home is active, hide study stuff */
+}
+.app-layout[style*="display: flex"] ~ .deck-home,
+.app-layout[style*="display:flex"] ~ .deck-home {
+  /* If study area is visible, deck-home shouldn't appear */
+}
+
+/* ════════════════════════════════════════════════════════════════════════
    LANDING — MOBILE PREMIUM (≤ 740px) · App-grade polish
    Focus: feel like a native iOS/Android app preview, not a shrunken site
    ════════════════════════════════════════════════════════════════════════ */
@@ -24238,10 +24337,12 @@ document.addEventListener('DOMContentLoaded', function(){
 console.log('[BoardMD Venn + Storm] ready');
 
 /* ════════════════════════════════════════════════════════════════════════
-   SAFETY NET: Guarantee #landing is hidden whenever #app is .active
+   SAFETY NET: Total view isolation
    Triple-layer protection: CSS :has(), inline display, MutationObserver.
-   Prevents the gradient strip / editorial-block from peeking below the
-   study area on mobile when re-renders or hot-reloads happen.
+   - Hides #landing when #app is .active
+   - Hides background views when .bs-overlay is .on
+   - Locks body scroll during overlays
+   - Re-checks on iOS app-switching (visibilitychange)
    ════════════════════════════════════════════════════════════════════════ */
 (function(){
   function syncLandingVisibility(){
@@ -24252,20 +24353,75 @@ console.log('[BoardMD Venn + Storm] ready');
       if(landing.style.display !== 'none') landing.style.display = 'none';
     }
   }
+
+  function syncBrainstormIsolation(){
+    var overlay = document.querySelector('.bs-overlay');
+    var body = document.body;
+    if(!overlay || !body) return;
+    var isOpen = overlay.classList.contains('on');
+    if(isOpen){
+      // Lock body scroll, store current scroll
+      if(!body.dataset.scrollLock){
+        body.dataset.scrollY = window.scrollY;
+        body.dataset.scrollLock = '1';
+        body.style.overflow = 'hidden';
+        body.style.position = 'fixed';
+        body.style.top = '-' + window.scrollY + 'px';
+        body.style.width = '100%';
+      }
+    } else {
+      // Restore scroll
+      if(body.dataset.scrollLock){
+        var y = parseInt(body.dataset.scrollY || '0', 10);
+        body.style.overflow = '';
+        body.style.position = '';
+        body.style.top = '';
+        body.style.width = '';
+        delete body.dataset.scrollLock;
+        delete body.dataset.scrollY;
+        window.scrollTo(0, y);
+      }
+    }
+  }
+
+  function syncAll(){
+    syncLandingVisibility();
+    syncBrainstormIsolation();
+  }
+
   // Initial sync
   if(document.readyState === 'loading'){
-    document.addEventListener('DOMContentLoaded', syncLandingVisibility);
+    document.addEventListener('DOMContentLoaded', syncAll);
   } else {
-    syncLandingVisibility();
+    syncAll();
   }
+
   // Watch for class changes on #app
   var app = document.getElementById('app');
   if(app && typeof MutationObserver !== 'undefined'){
-    new MutationObserver(syncLandingVisibility)
+    new MutationObserver(syncAll)
       .observe(app, { attributes: true, attributeFilter: ['class'] });
   }
+
+  // Watch for class changes on .bs-overlay
+  var bsObserver = new MutationObserver(syncBrainstormIsolation);
+  function attachBsObserver(){
+    var overlay = document.querySelector('.bs-overlay');
+    if(overlay){
+      bsObserver.observe(overlay, { attributes: true, attributeFilter: ['class'] });
+    } else {
+      // Retry later — overlay might not exist yet
+      setTimeout(attachBsObserver, 500);
+    }
+  }
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', attachBsObserver);
+  } else {
+    attachBsObserver();
+  }
+
   // Re-check on page visibility (handles iOS app-switching)
-  document.addEventListener('visibilitychange', syncLandingVisibility);
+  document.addEventListener('visibilitychange', syncAll);
 })();
 </script>
 </body>
